@@ -74,9 +74,37 @@ Phase 9: 输出产物 → 输入:10项产物 → 输出:交付清单
   │ [SLIM] 输出产物清单确认
 ```
 
-### Phase 0: 样本量验证 🆕
+### Phase 0: SAP 验证与样本量验证 🆕
 
-开始分析前，验证实际可用样本量是否满足 SAP 计划的统计检验需求。
+> 参考：shared/sap_standardization/sap_standard.md — SAP标准格式定义
+> 参考：shared/sap_standardization/validate_sap.py — SAP验证脚本
+
+开始分析前，首先验证SAP文件的完整性和格式规范性。
+
+**SAP 验证内容**：
+- [ ] SAP文件存在且可读
+- [ ] Frontmatter完整（study_id, version, status, study_type）
+- [ ] 章节完整性（Section 1-8）
+- [ ] 变量构造定义（Section 7）
+- [ ] 分析规范表（Section 8）
+- [ ] SAP状态为"approved"
+
+**SAP 验证失败处理**：
+
+| 触发条件 | 一线处理 | 仍失败兜底 |
+|---------|---------|-----------|
+| SAP文件不存在 | 提示用户提供SAP文件 | 停止执行，要求先完成Stage 2 |
+| SAP格式不完整 | 调用validate_sap.py生成问题清单，提示用户修复 | 标记为"SAP不完整"，建议回到Stage 2 |
+| SAP状态非"approved" | 提示用户确认SAP是否已批准 | 停止执行，要求先完成Stage 2.5门闸 |
+
+> 🔴 [MANDATORY-S0] SAP验证完成后，必须展示验证结果给用户确认：
+> 1. SAP文件信息（study_id, version, status）
+> 2. 验证结果（通过/不通过 + 问题清单）
+> 3. 分析规范表摘要（分析数量、方法列表）
+>
+> 用户确认后才能进入样本量验证。
+
+**样本量验证**：验证实际可用样本量是否满足 SAP 计划的统计检验需求。
 
 **验证内容**：
 - [ ] 实际可用样本量：各分析人群的实际例数（ITT / PP / Safety）

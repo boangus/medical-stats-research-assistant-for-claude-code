@@ -243,6 +243,8 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 ### Stage 2.5: SAP QUALITY GATE 🔴（阻断式检查）
 
 > **IRON RULE**: 这是阻断式检查点。Stage 2.5 未通过 → **必须退回 Stage 2 修订**，不得继续进入 Stage 3。
+> 参考：shared/sap_standardization/sap_standard.md — SAP标准格式定义
+> 参考：shared/sap_standardization/validate_sap.py — SAP验证脚本
 
 - **Skill**: `analysis-plan` (复用)
 - **Mode**: `quality-gate`（只检查，不修改）
