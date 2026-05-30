@@ -1,5 +1,56 @@
 # CHANGELOG
 
+## [0.6.0] — 2026-05-30
+
+### Added
+- **SAP 标准化与验证机制**：`shared/sap/sap_standard.md` 定义标准格式，`validate_sap.py` 自动验证
+- **变量选择与方法推荐指南**：`shared/sap/variable_selection_guide.md`（基线筛选原则、方法选择决策树、变量构建公式）
+- **观察性研究高级方法集成**（Phase 6.1）：IPTW、双重稳健估计(AIPW)、限制性立方样条(RCS)、E-value、亚组分析
+- **错误诊断知识库**：`shared/error-diagnostics/`（错误模式分类、自动修复建议）
+- **假设检验自动化**（Phase 7）：预检验检查、自动化流程、报告模板
+- **SAP 一致性检查器**：比较 SAP 预设方法与数据特征，检测不匹配
+- **报告模板扩展**：新增 AIM、CMJ_v2、CJE 期刊模板（共 7 个）
+- **报告规范扩展**：新增 TRIPOD+AI、CARE、REMARK、ARRIVE、**CONSORT**、**STROBE** 检查清单（共 6 个）
+- **图表样式库**：期刊配色方案、图表类型规范、字体尺寸规范
+- **方法学描述模板**：自动生成描述性统计、推断性统计、敏感性分析方法段落
+- **SAP 到方法学描述转换**：`shared/sap/sap_to_methods.py` 自动从 SAP 生成方法学描述
+- **可重复性验证**：pipeline auditor、3 次重跑验证、复现报告生成
+- **存档包生成器**：产物收集、清单生成、完整性验证
+- **数据共享**：去标识化、代码包、结果包生成
+- **度量校准框架**：金标准对比、准确率报告（实验性功能）
+- **观察性研究方法参考文档**：`shared/statistics-methods/observational-study-methods.md`
+
+### Changed
+- **流程精简优化**：
+  - MANDATORY 检查点 6→4，SLIM 检查点 4→1，ADAPTIVE 检查点 5→3
+  - 高效模式暂停次数 8→4（减半）
+  - 交互模式 3→2（移除极速模式，与高效模式合并）
+- **analysis-plan**：合并 Phase 2+3（Estimands + 方法选择 + 参数确认合并为单一确认点），参数使用默认值
+- **analysis-exec**：合并 Phase 1+2、Phase 3-5、Phase 7-9，唯一 MANDATORY 确认点为 Phase 6 完成后
+- **analysis-exec**：新增 Phase 6.1（观察性研究高级方法，SAP 参数直接使用）
+- **analysis-exec**：新增反模式 #21-25（观察性研究因果推断禁忌）
+- **analysis-plan**：Phase 3 新增观察性研究高级方法选择章节
+- **version**: 0.5.0 → 0.6.0
+- **目录结构优化**：
+  - 合并 `statistical-methods/` → `statistics-methods/`（消除命名混淆）
+  - 合并 SAP 三目录 → `shared/sap/`（consistency + standardization + to_methods）
+  - 移动 `checklists/` → `reporting-guidelines/`
+  - 移动 `collaboration/` → `statistics-methods/`
+
+### Fixed
+- 路径引用修正：`shared/methods/` → `shared/statistics-methods/`（10+ 处）
+- `code_executor_agent.md` 标记 DEPRECATED（已被 exec_runner + exec_inference 替代）
+- Stage 3.5 检查项数统一为 8 项
+
+### Removed
+- `agents/code_executor_agent.md`（DEPRECATED，功能已拆分）
+- `docs/optimization-roadmap.md`（已完成的路线图）
+- `shared/templates/survival_analysis_template.R`（保留 ggsurvfit 版，删除 survminer 版）
+- `tests/healthcare_dataset.csv` 从 git 跟踪中移除（8.4MB，已在 .gitignore）
+- `.msra/results.tsv` 从 git 跟踪中移除
+
+---
+
 ## [0.5.0] — 2026-05-29
 
 ### Added
