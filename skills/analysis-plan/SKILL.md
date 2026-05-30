@@ -206,8 +206,12 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
 > 参考：shared/methods/chapters/ch18-multiple-comparisons-methods.md — 多重比较校正 (统计指南第18章)
 > 参考：shared/methods/chapters/ch19-gatekeeping-strategies.md — 关口策略 (统计指南第19章)
 > 参考：shared/sap_standardization/sap_standard.md — SAP标准格式定义
+> 参考：shared/sap_standardization/variable_selection_guide.md — 变量选择与方法推荐指南
 
-确认方法后，**严格按照SAP标准格式**生成正式的统计分析计划文档：
+确认方法后，**严格按照SAP标准格式**生成正式的统计分析计划文档。SAP必须包含：
+1. 变量选择推荐（强制纳入/建议纳入/不纳入）
+2. 统计方法选择推荐（主要/次要/敏感性分析）
+3. 变量构建推荐与公式（构造逻辑、切点、依据）
 
 **SAP 结构**：
 
