@@ -133,7 +133,15 @@ medical-stats-research-assistant/
 │   ├── calibration/              # 校准框架
 │   ├── passport/                 # Material Passport 产物追踪
 │   ├── statistics-methods/       # 统计与方法指南 (41章)
-│   └── value-normalization/      # 值规范化（TCM术语+数值变体）
+│   ├── value-normalization/      # 值规范化（TCM术语+数值变体）
+│   ├── chart-styles/             # 图表样式库（期刊配色、图表类型、字体规范）
+│   ├── error-diagnostics/        # 错误诊断知识库（错误模式、自动修复建议）
+│   ├── reporting-guidelines/     # 报告规范检查清单（TRIPOD+AI/CARE/REMARK/ARRIVE）
+│   ├── journal-templates/        # 期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ/AIM/CJE）
+│   ├── sap_consistency/          # SAP一致性检查（SAP与数据特征比对）
+│   ├── sap_to_methods/           # SAP到方法学描述转换（自动生成方法学段落）
+│   ├── data_sharing/             # 数据共享（去标识化、代码包、结果包生成）
+│   └── archive/                  # 存档包（产物收集、清单生成、完整性验证）
 │
 ├── docs/                         # 文档
 │   └── PIPELINE.md               # 架构与流水线详细文档

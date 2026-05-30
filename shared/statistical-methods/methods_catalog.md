@@ -9,9 +9,9 @@
 > - **敏感性一致性**: `shared/sensitivity-agreement/` (主要-敏感性分析一致性评估)
 >
 > **统计方法指南** :
-> - **完整索引**: `shared/methods/INDEX.md` — 55 章完整索引
-> - **速查**: `shared/methods/cheatsheet.md`
-> - **术语表**: `shared/methods/glossary.md`
+> - **完整索引**: `shared/statistics-methods/INDEX.md` — 55 章完整索引
+> - **速查**: `shared/statistics-methods/cheatsheet.md`
+> - **术语表**: `shared/statistics-methods/glossary.md`
 
 ## 1. 描述性统计 (Descriptive Statistics)
 
@@ -244,13 +244,13 @@
 
 ## 10. 统计方法指南引用
 
-> ⭐ 本目录的方法学依据可参考 `shared/methods/` 中的 55 章《统计与方法指南》。
+> ⭐ 本目录的方法学依据可参考 `shared/statistics-methods/` 中的 55 章《统计与方法指南》。
 > 以下列出每个方法分类对应的章节，便于深入查阅原始方法学出处。
 
 | 方法分类 | 对应章节 | 关键参考文献 |
 |---------|---------------|------------|
-| 描述性统计 | ch32（边际效应） | 参见 `shared/methods/chapters/ch32-marginal-effects.md` |
-| 组间比较（t 检验/ANOVA） | ch33（协变量调整） | `shared/methods/chapters/ch33-covariate-adjustment.md` |
+| 描述性统计 | ch32（边际效应） | 参见 `shared/statistics-methods/chapters/ch32-marginal-effects.md` |
+| 组间比较（t 检验/ANOVA） | ch33（协变量调整） | `shared/statistics-methods/chapters/ch33-covariate-adjustment.md` |
 | Logistic 回归 | **ch15**（Logistic 回归）**ch16**（诊断） | `ch15-logistic-regression.md` + `ch16-logistic-regression-diagnostics.md` |
 | Cox 回归/生存分析 | **ch10**（时间至事件分析） | `ch10-time-to-event-analysis.md` |
 | 诊断试验/ROC | **ch23**（决策曲线分析）**ch36**（FROC）**ch39**（C统计量） | `ch23-decision-curve-analysis.md` |
@@ -263,7 +263,7 @@
 | 效应量（OR/HR/NNT） | **ch31**（OR）**ch17**（NNT） | `ch31-odds-ratio.md` + `ch17-number-needed-to-treat.md` |
 | 因果推断（DID/MR） | **ch24**（双重差分）**ch27**（孟德尔随机化）**ch30**（中介分析） | `ch24-difference-in-differences.md` |
 | 混杂控制（E值） | **ch28**（E值）**ch29**（指示性混杂） | `ch28-e-value.md` + `ch29-indication-bias.md` |
-| 研究设计（RCT/非劣效性） | **ch01**（非劣效性）**ch04**（整群随机）**ch05**（阶梯楔形） | `shared/methods/INDEX.md` 第一节 |
+| 研究设计（RCT/非劣效性） | **ch01**（非劣效性）**ch04**（整群随机）**ch05**（阶梯楔形） | `shared/statistics-methods/INDEX.md` 第一节 |
 | 贝叶斯分析 | **ch22**（贝叶斯分析） | `ch22-bayesian-analysis.md`
 
 
