@@ -1,15 +1,17 @@
 [
   {
     "id": 1,
-    "prompt": "/msra-report CONSORT --template JAMA 帮我生成CONSORT报告",
-    "expected": "结果解读 → 选择规范 → 选择模板 → 生成表格 → 生成图表 → 方法学描述 → 规范合规检查 → 报告组装输出"
+    "prompt": "请帮我生成一份符合CONSORT规范的RCT报告，包括方法学描述、结果表格和图表。",
+    "expected": "应该选择CONSORT规范，生成符合要求的表格（Table 1基线特征表）、图表（KM曲线或森林图）、方法学描述段落"
   },
   {
     "id": 2,
-    "prompt": "/msra-report --type table1 帮我生成Table 1",
-    "expected": "quick 模式，仅生成 Table 1 基线特征表，跳过其他 Phase"
+    "prompt": "请帮我生成Table 1，比较两组的基线特征。",
+    "expected": "应该生成三线表格式的基线特征表，连续变量用均数±SD或中位数(IQR)，分类变量用频数(百分比)"
+  },
+  {
+    "id": 3,
+    "prompt": "这个结果的临床意义不大，但统计学显著。请帮我写结果解读。",
+    "expected": "应该讨论统计显著性vs临床意义，报告效应量和置信区间，解释结果的实际意义，不夸大发现"
   }
 ]
-
-
-

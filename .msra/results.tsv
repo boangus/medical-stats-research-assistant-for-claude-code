@@ -1,0 +1,6 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-05-30T13:13	baseline	pipeline	-	83.9	baseline	-	初始评估	dry_run
+2026-05-30T13:13	baseline	data-prep	-	81.2	baseline	-	初始评估	dry_run
+2026-05-30T13:13	baseline	analysis-plan	-	79.5	baseline	-	初始评估	dry_run
+2026-05-30T13:13	baseline	analysis-exec	-	82.3	baseline	-	初始评估	dry_run
+2026-05-30T13:13	baseline	report	-	80.8	baseline	-	初始评估	dry_run

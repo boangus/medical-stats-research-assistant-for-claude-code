@@ -1,15 +1,17 @@
 [
   {
     "id": 1,
-    "prompt": "/msra-plan --study RCT 这是一份RCT数据，帮我制定完整的分析计划",
-    "expected": "触发 guided 模式：深度 EDA → Estimands 五要素定义 → 方法探讨（RCT 分支）→ SAP 制定 → 审查 → 变量构造定义"
+    "prompt": "我有一份RCT数据，主要结局是6个月时的HbA1c变化。请帮我制定统计分析计划。",
+    "expected": "应该进行深度EDA了解数据特征，定义估计目标（ICH E9(R1)），与用户讨论方法选择（如ANCOVA），制定详细的SAP"
   },
   {
     "id": 2,
-    "prompt": "/msra-plan --quick 快速生成一个队列研究的SAP模板",
-    "expected": "触发 quick 模式，基于 STROBE 规范生成标准 SAP 框架，跳过 EDA 和交互式讨论"
+    "prompt": "这是一项队列研究，想评估BMI与糖尿病风险的关联。请帮我制定分析计划。",
+    "expected": "应该识别为观察性研究，进行DAG分析识别混杂因素，推荐PSM或多变量调整方法，制定包含敏感性分析的SAP"
+  },
+  {
+    "id": 3,
+    "prompt": "请帮我审查这个SAP，看看有没有方法学问题。",
+    "expected": "应该检查SAP的完整性、方法选择合理性、假设条件验证、敏感性分析计划，提出具体改进建议"
   }
 ]
-
-
-
