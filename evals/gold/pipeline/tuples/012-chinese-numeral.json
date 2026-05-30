@@ -1,0 +1,24 @@
+{
+  "tuple_id": "012-chinese-numeral",
+  "kind": "format_variant",
+  "test_name": "中文数字",
+  "source_pit": 12,
+  "description": "Temperature(五) and Notes(五级) contain Chinese numerals, must detect but not auto-convert",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "data-prep",
+    "trigger_columns": [
+      "Temperature",
+      "Notes"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "info",
+    "phase": "Phase 2.5 (Chinese numeral detection)",
+    "action": "Detect and flag only, user decides whether to convert"
+  },
+  "failure_pattern": "LLM may auto-convert 五 to 5, or completely ignore"
+}
+
+

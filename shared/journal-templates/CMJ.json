@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "journal": "中华医学杂志 / Chinese Medical Journal",
+    "abbr": "CMJ",
+    "publisher": "中华医学会",
+    "recommended_study_type": ["RCT", "observational", "diagnostic", "cross-sectional"],
+    "guideline": "CONSORT / STROBE",
+    "description": "CMJ-style statistical analysis report. 三线表为核心格式，统计方法描述遵循中文期刊规范，表格采用三线表格式。"
+  },
+  "sections": [
+    {
+      "id": "methods",
+      "title": "统计学分析",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "数据来源和研究对象",
+        "样本量计算（含参数）",
+        "主要分析方法（具体模型与协变量）",
+        "次要分析与探索性分析",
+        "缺失数据处理方法",
+        "敏感性分析",
+        "亚组分析（预设 vs post-hoc）",
+        "统计软件及版本，显著性水平"
+      ]
+    },
+    {
+      "id": "results_baseline",
+      "title": "基线资料",
+      "order": 2,
+      "tables": [
+        {"label": "表1", "title": "两组患者基线特征比较",
+         "type": "baseline_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "results_primary",
+      "title": "主要结局",
+      "order": 3,
+      "tables": [
+        {"label": "表2", "title": "主要结局指标分析",
+         "type": "main_results_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "图1", "title": "主要结局分析",
+         "type": "clinical_figure", "alt_types": ["km_curve", "forest_plot"]}
+      ]
+    },
+    {
+      "id": "results_secondary",
+      "title": "次要结局",
+      "order": 4,
+      "tables": [
+        {"label": "表3", "title": "次要结局指标",
+         "type": "secondary_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "subgroup",
+      "title": "亚组分析",
+      "order": 5,
+      "figures": [
+        {"label": "图2", "title": "亚组分析森林图",
+         "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "sensitivity",
+      "title": "敏感性分析",
+      "order": 6,
+      "content": {"type": "narrative"},
+      "tables": [
+        {"label": "补充表1", "title": "敏感性分析结果",
+         "type": "supplement_table"}
+      ]
+    }
+  ],
+  "supplement": {
+    "description": "补充材料（在线）",
+    "sections": [
+      {"id": "supp_tables", "title": "补充表格", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "补充图", "type": "supplement_figures"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "docx_three_line",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "CMJ_grey",
+    "supplement_as_separate_file": true
+  }
+}
+
+
+

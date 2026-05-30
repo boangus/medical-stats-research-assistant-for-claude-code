@@ -1,0 +1,24 @@
+{
+  "tuple_id": "014-zero-variance-block",
+  "kind": "statistical_concern",
+  "test_name": "零方差变量块",
+  "source_pit": 15,
+  "description": "HeartRate/Temperature rows 500-509 have zero variance, QC must detect",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-exec",
+    "trigger_columns": [
+      "HeartRate",
+      "Temperature"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 8 (QC: zero-variance variable)",
+    "action": "Zero-variance variable cannot enter regression, must flag"
+  },
+  "failure_pattern": "LLM may include variable in model without checking variance"
+}
+
+

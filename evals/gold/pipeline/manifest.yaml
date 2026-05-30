@@ -1,0 +1,69 @@
+# MSRA Pipeline Gold Evaluation Set — Manifest
+eval_set_id: msra-pipeline-gold-001
+version: "1.0"
+created: "2026-05-29"
+source_data: "tests/msra_test_data.csv"
+total_tuples: 21
+kinds:
+  data_value:
+    description: "值异常 — 异常的数值、缺失、重复"
+    count: 4
+  logic_conflict:
+    description: "逻辑矛盾 — 字段间不一致、日期/性别矛盾"
+    count: 4
+  format_variant:
+    description: "格式变体 — 中医术语、数值截断、中文数字等非标准值"
+    count: 4
+  statistical_concern:
+    description: "统计隐患 — 组不平衡、零方差、稀少类别等"
+    count: 4
+  pipeline_edge:
+    description: "流程边界 — 阻断条件、Checkpoint 触发"
+    count: 5
+thresholds:
+  aggregate_detection_rate: 0.90
+  per_kind_detection_rate: 0.75
+  max_false_positive: 1
+tuples:
+  - id: "001"
+    file: "tuples/001-negative-billing-amount.json"
+  - id: "002"
+    file: "tuples/002-abnormal-age.json"
+  - id: "003"
+    file: "tuples/003-missing-age-block.json"
+  - id: "004"
+    file: "tuples/004-duplicate-patient-id.json"
+  - id: "005"
+    file: "tuples/005-gender-diagnosis-conflict.json"
+  - id: "006"
+    file: "tuples/006-date-logic-error.json"
+  - id: "007"
+    file: "tuples/007-impossible-vital-sign.json"
+  - id: "008"
+    file: "tuples/008-invalid-category-value.json"
+  - id: "009"
+    file: "tuples/009-tcm-term-variant.json"
+  - id: "010"
+    file: "tuples/010-numeric-truncation-markers.json"
+  - id: "011"
+    file: "tuples/011-comma-multi-value.json"
+  - id: "012"
+    file: "tuples/012-chinese-numeral.json"
+  - id: "013"
+    file: "tuples/013-extreme-group-imbalance.json"
+  - id: "014"
+    file: "tuples/014-zero-variance-block.json"
+  - id: "015"
+    file: "tuples/015-sparse-category.json"
+  - id: "016"
+    file: "tuples/016-mar-missing-pattern.json"
+  - id: "017"
+    file: "tuples/017-blocking-gate-trigger.json"
+  - id: "018"
+    file: "tuples/018-adaptive-sample-size-stop.json"
+  - id: "019"
+    file: "tuples/019-skip-mark-on-insufficient-data.json"
+  - id: "020"
+    file: "tuples/020-eda-flag-extreme-outlier.json"
+  - id: "021"
+    file: "tuples/021-severe-adverse-event-flag.json"

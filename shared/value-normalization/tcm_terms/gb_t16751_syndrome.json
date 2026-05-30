@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "name": "GB/T 16751.2-2023 证候术语映射表（节选）",
+    "description": "中医临床诊疗术语 第2部分：证候 — 标准术语与常见变体映射",
+    "source": "GB/T 16751.2-2023 国家标准全文",
+    "version": "2023",
+    "note": "此为示例节选，覆盖临床常用证候。完整版需从标准全文提取。",
+    "last_updated": "2026-05-29"
+  },
+  "TCM_TERM_MAP": {
+    "心脾两虚": {"standard": "心脾两虚证", "code": "BZW.300", "category": "脏腑证候"},
+    "心脾两虚证": {"standard": "心脾两虚证", "code": "BZW.300", "category": "脏腑证候"},
+    "心脾两虚证型": {"standard": "心脾两虚证", "code": "BZW.300", "category": "脏腑证候"},
+    "心脾不足": {"standard": "心脾两虚证", "code": "BZW.300", "category": "脏腑证候"},
+    "心脾俱虚": {"standard": "心脾两虚证", "code": "BZW.300", "category": "脏腑证候"},
+
+    "肝气郁结": {"standard": "肝气郁结证", "code": "BZG.050", "category": "脏腑证候"},
+    "肝气郁结证": {"standard": "肝气郁结证", "code": "BZG.050", "category": "脏腑证候"},
+    "肝郁气滞": {"standard": "肝气郁结证", "code": "BZG.050", "category": "脏腑证候"},
+    "肝郁": {"standard": "肝气郁结证", "code": "BZG.050", "category": "脏腑证候"},
+
+    "湿热下注": {"standard": "湿热下注证", "code": "BZY.210", "category": "病因证候"},
+    "湿热下注证": {"standard": "湿热下注证", "code": "BZY.210", "category": "病因证候"},
+    "湿热下注证型": {"standard": "湿热下注证", "code": "BZY.210", "category": "病因证候"},
+    "下焦湿热": {"standard": "湿热下注证", "code": "BZY.210", "category": "病因证候"},
+
+    "气滞血瘀": {"standard": "气滞血瘀证", "code": "BZX.150", "category": "气血津液证候"},
+    "气滞血瘀证": {"standard": "气滞血瘀证", "code": "BZX.150", "category": "气血津液证候"},
+    "血瘀气滞": {"standard": "气滞血瘀证", "code": "BZX.150", "category": "气血津液证候"},
+
+    "气血两虚": {"standard": "气血两虚证", "code": "BZX.050", "category": "气血津液证候"},
+    "气血两虚证": {"standard": "气血两虚证", "code": "BZX.050", "category": "气血津液证候"},
+    "气血两虚证型": {"standard": "气血两虚证", "code": "BZX.050", "category": "气血津液证候"},
+    "气血不足": {"standard": "气血两虚证", "code": "BZX.050", "category": "气血津液证候"},
+
+    "脾肾阳虚": {"standard": "脾肾阳虚证", "code": "BZW.240", "category": "脏腑证候"},
+    "脾肾阳虚证": {"standard": "脾肾阳虚证", "code": "BZW.240", "category": "脏腑证候"},
+    "脾肾阳虚证型": {"standard": "脾肾阳虚证", "code": "BZW.240", "category": "脏腑证候"},
+
+    "肝肾阴虚": {"standard": "肝肾阴虚证", "code": "BZW.010", "category": "脏腑证候"},
+    "肝肾阴虚证": {"standard": "肝肾阴虚证", "code": "BZW.010", "category": "脏腑证候"},
+    "肝肾阴亏": {"standard": "肝肾阴虚证", "code": "BZW.010", "category": "脏腑证候"},
+
+    "痰湿内阻": {"standard": "痰湿内阻证", "code": "BZY.330", "category": "病因证候"},
+    "痰湿内阻证": {"standard": "痰湿内阻证", "code": "BZY.330", "category": "病因证候"},
+    "痰湿阻遏": {"standard": "痰湿内阻证", "code": "BZY.330", "category": "病因证候"},
+
+    "脾气虚": {"standard": "脾气虚证", "code": "BZW.140", "category": "脏腑证候"},
+    "脾气虚证": {"standard": "脾气虚证", "code": "BZW.140", "category": "脏腑证候"},
+    "脾虚": {"standard": "脾气虚证", "code": "BZW.140", "category": "脏腑证候"},
+
+    "肾阳虚": {"standard": "肾阳虚证", "code": "BZW.110", "category": "脏腑证候"},
+    "肾阳虚证": {"standard": "肾阳虚证", "code": "BZW.110", "category": "脏腑证候"},
+    "肾阳不足": {"standard": "肾阳虚证", "code": "BZW.110", "category": "脏腑证候"},
+
+    "肺热壅盛": {"standard": "肺热壅盛证", "code": "BZW.070", "category": "脏腑证候"},
+    "肺热": {"standard": "肺热壅盛证", "code": "BZW.070", "category": "脏腑证候"},
+    "肺经热盛": {"standard": "肺热壅盛证", "code": "BZW.070", "category": "脏腑证候"},
+
+    "肝郁脾虚": {"standard": "肝郁脾虚证", "code": "BZW.240", "category": "脏腑证候"},
+    "肝郁脾虚证": {"standard": "肝郁脾虚证", "code": "BZW.240", "category": "脏腑证候"},
+    "肝郁脾虚证型": {"standard": "肝郁脾虚证", "code": "BZW.240", "category": "脏腑证候"},
+
+    "气虚血瘀": {"standard": "气虚血瘀证", "code": "BZX.200", "category": "气血津液证候"},
+    "气虚血瘀证": {"standard": "气虚血瘀证", "code": "BZX.200", "category": "气血津液证候"},
+
+    "阴虚火旺": {"standard": "阴虚火旺证", "code": "BZX.120", "category": "气血津液证候"},
+    "阴虚火旺证": {"standard": "阴虚火旺证", "code": "BZX.120", "category": "气血津液证候"},
+    "阴虚内热": {"standard": "阴虚火旺证", "code": "BZX.120", "category": "气血津液证候"}
+  },
+  "SUFFIX_PATTERNS": ["证型$", "证候$", "候$", "证$", "型$"],
+  "COMPOUND_DELIMITERS": ["，", ",", "、", "兼", "合并", "合"],
+  "NUMERIC_PREFIX_PATTERNS": ["^<\\s*", "^≤\\s*", "^>\\s*", "^≥\\s*"],
+  "CN_PREFIX_PATTERNS": ["^小[于於]\\s*", "^大[于於]\\s*", "^不[超[过]?]\\s*", "^不[低[于]?]\\s*", "^不[高[于]?]\\s*", "^至[多[于]?]\\s*", "^至[少[于]?]\\s*"]
+}
+
+
+

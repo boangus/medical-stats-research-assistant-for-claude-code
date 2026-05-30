@@ -1,0 +1,23 @@
+{
+  "tuple_id": "020-eda-flag-extreme-outlier",
+  "kind": "pipeline_edge",
+  "test_name": "EDA异常值标记",
+  "source_pit": 9,
+  "description": "BillingAmount=999999 extreme outlier, EDA quality check must flag",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "data-prep",
+    "trigger_columns": [
+      "BillingAmount"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 4 (EDA: outlier detection)",
+    "action": "Flag outlier, return to Phase 2 for discussion"
+  },
+  "failure_pattern": "LLM may Winsorize or delete without investigation"
+}
+
+

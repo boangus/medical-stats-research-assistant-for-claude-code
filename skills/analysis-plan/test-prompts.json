@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "prompt": "/msra-plan --study RCT 这是一份RCT数据，帮我制定完整的分析计划",
+    "expected": "触发 guided 模式：深度 EDA → Estimands 五要素定义 → 方法探讨（RCT 分支）→ SAP 制定 → 审查 → 变量构造定义"
+  },
+  {
+    "id": 2,
+    "prompt": "/msra-plan --quick 快速生成一个队列研究的SAP模板",
+    "expected": "触发 quick 模式，基于 STROBE 规范生成标准 SAP 框架，跳过 EDA 和交互式讨论"
+  }
+]
+
+
+

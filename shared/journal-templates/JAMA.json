@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "journal": "JAMA",
+    "abbr": "JAMA",
+    "publisher": "American Medical Association",
+    "recommended_study_type": ["RCT", "observational", "diagnostic"],
+    "guideline": "CONSORT / STROBE / STARD",
+    "description": "JAMA-style statistical analysis report template. Emphasizes standardized reporting, comprehensive eTable supplement, and detailed statistical methods per JAMA Instructions for Authors."
+  },
+  "sections": [
+    {
+      "id": "methods",
+      "title": "Statistical Analysis",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Data sources and study population",
+        "Exposure and outcome definitions",
+        "Statistical methods for primary analysis",
+        "Covariate selection and adjustment strategy",
+        "Missing data handling approach",
+        "Sensitivity and subgroup analyses",
+        "Software (SAS/R/Stata version) and 2-sided α level"
+      ]
+    },
+    {
+      "id": "results_baseline",
+      "title": "Baseline Characteristics",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics",
+         "type": "baseline_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "results_primary",
+      "title": "Primary Analysis",
+      "order": 3,
+      "tables": [
+        {"label": "Table 2", "title": "Primary Analysis Results",
+         "type": "main_results_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "Primary Analysis",
+         "type": "clinical_figure", "alt_types": ["km_curve", "forest_plot"]}
+      ]
+    },
+    {
+      "id": "results_secondary",
+      "title": "Secondary and Exploratory Analyses",
+      "order": 4,
+      "tables": [
+        {"label": "eTable 1", "title": "Secondary Outcomes",
+         "type": "supplement_table"},
+        {"label": "eTable 2", "title": "Exploratory Analyses",
+         "type": "supplement_table"}
+      ]
+    },
+    {
+      "id": "subgroup",
+      "title": "Subgroup Analyses",
+      "order": 5,
+      "figures": [
+        {"label": "Figure 2", "title": "Subgroup Forest Plot",
+         "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "sensitivity",
+      "title": "Sensitivity Analyses",
+      "order": 6,
+      "tables": [
+        {"label": "eTable 3", "title": "Sensitivity Analyses",
+         "type": "supplement_table"}
+      ]
+    }
+  ],
+  "supplement": {
+    "description": "eMethods, eTables, eFigures (online-only)",
+    "sections": [
+      {"id": "supp_methods", "title": "eMethods", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "eTables", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "eFigures", "type": "supplement_figures"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "docx_three_line",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "JAMA_default",
+    "supplement_as_separate_file": true
+  }
+}
+
+
+

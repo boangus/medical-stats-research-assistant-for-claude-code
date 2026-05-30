@@ -1,0 +1,21 @@
+analysis_id,gold_method,gold_estimate,gold_lower,gold_upper,gold_p,gold_significant,dataset,sample_size,covariates,notes
+CAL_001,Logistic Regression,1.80,1.30,2.49,0.001,TRUE,RCT_Toy,200,"age,sex,bmi",主要结局 OR
+CAL_002,Logistic Regression,1.20,0.85,1.69,0.300,FALSE,RCT_Toy,200,"age,sex,bmi",次要结局
+CAL_003,Logistic Regression,0.65,0.45,0.94,0.023,TRUE,Obs_Toy,500,"age,bmi,smoking",保护因素
+CAL_004,Logistic Regression,2.10,1.40,3.15,0.001,TRUE,RCT_Toy,200,"age,sex",强关联
+CAL_005,Logistic Regression,1.05,0.72,1.53,0.800,FALSE,RCT_Toy,200,"age,sex,bmi,diabetes",无效应
+CAL_006,Cox Regression,0.70,0.55,0.89,0.004,TRUE,Surv_Toy,300,"age,sex,treatment",治疗组HR
+CAL_007,Cox Regression,0.85,0.65,1.11,0.230,FALSE,Surv_Toy,300,"age,sex",非显著
+CAL_008,Cox Regression,1.50,1.10,2.04,0.011,TRUE,Surv_Toy,300,"age,bmi,smoking",风险因素
+CAL_009,Cox Regression,0.60,0.42,0.86,0.006,TRUE,Surv_Toy,300,"treatment",强保护
+CAL_010,Cox Regression,1.10,0.78,1.55,0.570,FALSE,Surv_Toy,300,"age,sex,bmi",无效应
+CAL_011,t-test,2.50,0.80,4.20,0.005,TRUE,Cont_Toy,100,,连续变量组间比较
+CAL_012,t-test,-1.20,-3.10,0.70,0.210,FALSE,Cont_Toy,100,,非显著
+CAL_013,t-test,3.80,1.50,6.10,0.001,TRUE,Cont_Toy,100,,强效应
+CAL_014,t-test,0.50,-1.80,2.80,0.670,FALSE,Cont_Toy,100,,无差异
+CAL_015,t-test,-2.10,-4.00,-0.20,0.030,TRUE,Cont_Toy,100,,反向效应
+CAL_016,Chi-square,1.30,0.60,2.82,0.510,FALSE,Cat_Toy,200,,分类变量
+CAL_017,Chi-square,2.80,1.20,6.53,0.018,TRUE,Cat_Toy,200,,强关联
+CAL_018,Chi-square,1.00,0.45,2.22,1.000,FALSE,Cat_Toy,200,,完全无关联
+CAL_019,Chi-square,3.50,1.60,7.66,0.002,TRUE,Cat_Toy,200,,显著关联
+CAL_020,Chi-square,0.80,0.35,1.83,0.600,FALSE,Cat_Toy,200,,保护趋势不显著

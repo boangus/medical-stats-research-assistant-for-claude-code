@@ -1,0 +1,61 @@
+# 忽略文件
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+
+# 输出文件 (示例)
+examples/output/
+*.docx
+*.pdf
+*.html
+
+# 测试输出
+tests/output/
+.pytest_cache/
+
+# 测试数据（原始Kaggle数据太大，不上传）
+tests/healthcare_dataset.csv
+tests/healthcare_dataset_dictionary.md
+# 测试输出（运行生成，不进版本控制）
+tests/output/
+tests/*.md
+!tests/msra_test_data_dictionary.md
+
+# 本地配置
+config.local.yaml
+.env
+
+# 复现验证
+shared/reproducibility/runs/
+shared/reproducibility/_test_output/
+
+# Skill优化评估
+.darwin-results/

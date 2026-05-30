@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "prompt": "/msra-report CONSORT --template JAMA 帮我生成CONSORT报告",
+    "expected": "结果解读 → 选择规范 → 选择模板 → 生成表格 → 生成图表 → 方法学描述 → 规范合规检查 → 报告组装输出"
+  },
+  {
+    "id": 2,
+    "prompt": "/msra-report --type table1 帮我生成Table 1",
+    "expected": "quick 模式，仅生成 Table 1 基线特征表，跳过其他 Phase"
+  }
+]
+
+
+

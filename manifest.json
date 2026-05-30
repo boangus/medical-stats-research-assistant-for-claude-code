@@ -1,0 +1,73 @@
+{
+  "name": "medical-stats-research-assistant",
+  "version": "0.5.0",
+  "description": "Medical Statistics Research Assistant for Claude Code - A pipeline-driven toolkit for medical statistical analysis from data cleaning to final report",
+  "author": "boangus",
+  "license": "MIT",
+  "min_claude_code_version": "3.7.0",
+  "commands": {
+    "/msra": {
+      "id": "msra-pipeline",
+      "name": "MSRA Pipeline",
+      "entry_point": "skills/pipeline/SKILL.md",
+      "description": "Launch pipeline with auto-detect entry point",
+      "usage": "/msra [context]",
+      "examples": [
+        "/msra 我有原始数据要分析",
+        "/msra --from plan",
+        "/msra --status"
+      ]
+    },
+    "/msra-data": {
+      "id": "msra-data-prep",
+      "name": "Data Preparation",
+      "entry_point": "skills/data-prep/SKILL.md",
+      "description": "Data validation, cleaning, and quality gate",
+      "usage": "/msra-data [file]",
+      "examples": [
+        "/msra-data raw_data.csv",
+        "/msra-data --dict dictionary.xlsx --quick",
+        "/msra-data --quality-gate"
+      ]
+    },
+    "/msra-plan": {
+      "id": "msra-analysis-plan",
+      "name": "Analysis Planning",
+      "entry_point": "skills/analysis-plan/SKILL.md",
+      "description": "Create and review statistical analysis plan",
+      "usage": "/msra-plan [data]",
+      "examples": [
+        "/msra-plan cleaned_data.csv --study RCT",
+        "/msra-plan --quick"
+      ]
+    },
+    "/msra-exec": {
+      "id": "msra-analysis-exec",
+      "name": "Analysis Execution",
+      "entry_point": "skills/analysis-exec/SKILL.md",
+      "description": "Execute analysis per approved SAP",
+      "usage": "/msra-exec --sap [plan] --data [data]",
+      "examples": [
+        "/msra-exec --sap sap.md --data cleaned.csv",
+        "/msra-exec --check-only"
+      ]
+    },
+    "/msra-report": {
+      "id": "msra-report",
+      "name": "Report Generation",
+      "entry_point": "skills/report/SKILL.md",
+      "description": "Generate publication-ready report",
+      "usage": "/msra-report [guideline]",
+      "examples": [
+        "/msra-report CONSORT",
+        "/msra-report --type table1"
+      ]
+    }
+  },
+  "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research"],
+  "languages": ["zh-CN", "en"],
+  "repository": "https://github.com/boangus/medical-stats-research-assistant"
+}
+
+
+

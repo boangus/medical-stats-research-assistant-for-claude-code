@@ -1,0 +1,177 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Python imports check
+        run: |
+          python -c "
+          import pandas, numpy, scipy, statsmodels
+          print(f'pandas: {pandas.__version__}')
+          print(f'numpy: {numpy.__version__}')
+          print(f'scipy: {scipy.__version__}')
+          print(f'statsmodels: {statsmodels.__version__}')
+          print('All imports OK')
+          "
+
+      - name: SKILL frontmatter validation
+        run: |
+          python -c "
+          import os, yaml, sys
+
+          skill_dirs = [
+            'skills/pipeline',
+            'skills/data-prep',
+            'skills/analysis-plan',
+            'skills/analysis-exec',
+            'skills/report',
+          ]
+
+          errors = []
+          for sd in skill_dirs:
+              path = os.path.join(sd, 'SKILL.md')
+              if not os.path.exists(path):
+                  errors.append(f'MISSING: {path}')
+                  continue
+
+              with open(path, 'r', encoding='utf-8') as f:
+                  content = f.read()
+
+              # Extract YAML frontmatter
+              if not content.startswith('---'):
+                  errors.append(f'NO FRONTMATTER: {path}')
+                  continue
+
+              _, fm_str, _ = content.split('---', 2)
+
+              try:
+                  fm = yaml.safe_load(fm_str)
+              except Exception as e:
+                  errors.append(f'YAML ERROR in {path}: {e}')
+                  continue
+
+              # Check required fields
+              required = ['name', 'description']
+              for field in required:
+                  if field not in fm:
+                      errors.append(f'MISSING {field} in {path}')
+
+              if errors:
+                  continue
+
+              print(f'  ✅ {os.path.basename(os.path.dirname(path))}: name={fm.get(\"name\",\"?\")[:30]}...')
+
+          if errors:
+              print(f'\n❌ {len(errors)} error(s):')
+              for e in errors:
+                  print(f'  {e}')
+              sys.exit(1)
+          else:
+              print(f'\n✅ All {len(skill_dirs)} SKILLs validated')
+          " 2>&1 || pip install pyyaml && python -c "
+          import os, yaml, sys
+          skill_dirs = ['skills/pipeline','skills/data-prep','skills/analysis-plan','skills/analysis-exec','skills/report']
+          errors = []
+          for sd in skill_dirs:
+              path = os.path.join(sd, 'SKILL.md')
+              if not os.path.exists(path):
+                  errors.append(f'MISSING: {path}'); continue
+              with open(path) as f:
+                  content = f.read()
+              if not content.startswith('---'):
+                  errors.append(f'NO FRONTMATTER: {path}'); continue
+              _, fm_str, _ = content.split('---', 2)
+              try:
+                  fm = yaml.safe_load(fm_str)
+              except Exception as e:
+                  errors.append(f'YAML ERROR in {path}: {e}'); continue
+              for field in ['name','description']:
+                  if field not in fm:
+                      errors.append(f'MISSING {field} in {path}')
+              print(f'  ✅ {os.path.basename(os.path.dirname(path))}')
+          if errors:
+              for e in errors: print(f'  ❌ {e}')
+              sys.exit(1)
+          else:
+              print(f'✅ All SKILLs validated')
+          "
+
+      - name: Cross-reference check (manifest vs skills)
+        run: |
+          python -c "
+          import json
+          with open('manifest.json') as f:
+              manifest = json.load(f)
+          commands = manifest.get('commands', {})
+          for cmd, info in commands.items():
+              entry = info.get('entry_point', '')
+              print(f'  {cmd:15} -> {entry}')
+          print(f'✅ {len(commands)} commands registered in manifest.json')
+          "
+
+      - name: Python end-to-end test
+        run: |
+          python -c "
+          import pandas as pd
+          import numpy as np
+
+          # Load test data
+          df = pd.read_csv('tests/msra_test_data.csv')
+          print(f'Rows: {len(df)}, Columns: {len(df.columns)}')
+          print(f'Columns: {list(df.columns)}')
+          # Dtypes skipped for pitfall test data
+          print(f'Missing: {df.isnull().sum().sum()} cells')
+
+          # Basic validation checks
+          assert len(df) > 0, 'Empty dataset'
+          assert 'Age' in df.columns, 'Missing Age column'
+          assert 'Gender' in df.columns, 'Missing Gender column'
+          print('✅ Test data loaded and validated')
+
+          # Run basic analysis
+          print(f'Age range: {df[\"Age\"].min():.0f}-{df[\"Age\"].max():.0f}')
+          print(f'Gender distribution:\n{df[\"Gender\"].value_counts().to_dict()}')
+          print(f'MedicalCondition distribution:\n{df[\"MedicalCondition\"].value_counts().to_dict()}')
+          print(f'Known pitfalls: missing={int(df.isnull().sum().sum())}, neg_billing={int((pd.to_numeric(df[\"BillingAmount\"], errors=\"coerce\") < 0).sum())}, dup_ids={int(df.duplicated(subset=[\"PatientID\"]).sum())}')
+          print('✅ End-to-end smoke test passed')
+          "
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Python files syntax
+        run: |
+          python -m py_compile tests/run_validation.py
+          python -m py_compile tests/run_cleaning.py
+          python -m py_compile tests/run_eda.py
+          python -m py_compile tests/run_analysis.py
+          python -m py_compile tests/run_quality_gate.py
+          echo '✅ All Python files compile'

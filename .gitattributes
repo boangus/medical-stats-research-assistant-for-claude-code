@@ -1,0 +1,22 @@
+# Force LF line endings for all text files (prevents CRLF on Windows → Linux CI)
+* text=auto eol=lf
+
+# Explicitly mark these as text
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.toml text eol=lf
+
+# Binary files - do not modify
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary

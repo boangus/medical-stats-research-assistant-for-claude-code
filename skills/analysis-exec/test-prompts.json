@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "prompt": "/msra-exec --sap sap.md --data cleaned.csv 按SAP执行分析",
+    "expected": "样本量验证 → 变量构造（按SAP）→ 执行前检查 → 描述性统计 → 依从性 → 安全性 → 代码生成与执行 → 假设检验 → 质量检查"
+  },
+  {
+    "id": 2,
+    "prompt": "/msra-exec --check-only --sap sap.md 帮我检查结果质量",
+    "expected": "仅执行 Phase 8 质量检查（22 项清单），不运行任何分析"
+  }
+]
+
+
+

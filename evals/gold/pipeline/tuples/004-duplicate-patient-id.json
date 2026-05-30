@@ -1,0 +1,3 @@
+{"tuple_id": "004-duplicate-patient-id", "kind": "data_value", "test_name": "重复受试者编号", "description": "PatientID 含 2 个重复(SUBJ-0300, SUBJ-0450)，结构检查必须检出", "source_pit": 19, "input": {"data_file": "tests/msra_test_data.csv", "pipeline_stage": "data-prep", "mode": "guided", "trigger_columns": ["PatientID"]}, "expected": {"detection": true, "severity": "critical", "phase": "Phase 1 (验证: 结构检查)", "action": "展示重复记录原文，与用户讨论保留哪条"}, "failure_pattern": "LLM 容易忽略重复ID，或自动去重不告知用户。"}
+
+
