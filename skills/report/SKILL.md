@@ -1,5 +1,5 @@
 ---
-version: "0.2.0"
+version: "0.6.0"
 name: MSRA Report Generation
 description: |
   生成符合医学报告规范（CONSORT/STROBE/PRISMA等）的出版级表格、
@@ -68,8 +68,8 @@ Phase 7: 报告组装 → 输入:JSON骨架+图表 → 输出:HTML+MD
 **解读框架**：
 
 > 参考：shared/statistical-methods/methods_catalog.md — 效应量解读和统计方法描述
-> 参考：shared/methods/chapters/ch07-minimal-clinically-important-difference.md — MCID临床意义解读 (统计指南第7章)
-> 参考：shared/methods/chapters/ch17-number-needed-to-treat.md — NNT解读 (统计指南第17章)
+> 参考：shared/statistics-methods/chapters/ch07-minimal-clinically-important-difference.md — MCID临床意义解读 (统计指南第7章)
+> 参考：shared/statistics-methods/chapters/ch17-number-needed-to-treat.md — NNT解读 (统计指南第17章)
 
 **1. 统计显著性 vs 临床意义**
 - p值是否达到统计显著性？
@@ -352,7 +352,7 @@ Rscript shared/templates/export_tables_flextable.R
 ### Phase 5: 方法学描述
 
 > 参考：shared/statistical-methods/methods_catalog.md — 统计方法描述模板
-> 参考：shared/methods/SKILL.md — 统计方法描述的JAMA规范格式参考
+> 参考：shared/statistics-methods/REFERENCE.md — 统计方法描述的JAMA规范格式参考
 
 **统计方法学段落模板**：
 

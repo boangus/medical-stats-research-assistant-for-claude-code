@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Medical Statistics Research Assistant for Claude Code - A pipeline-driven toolkit for medical statistical analysis from data cleaning to final report",
   "author": "boangus",
   "license": "MIT",

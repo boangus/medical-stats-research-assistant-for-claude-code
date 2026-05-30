@@ -190,7 +190,7 @@ shared/
 
 ## 已知限制与改进方向
 
-详见 [GAP_ANALYSIS.md](GAP_ANALYSIS.md)
+详见 CHANGELOG.md 版本历史
 
 - 缺少多 Agent 协作架构（Phase 3 规划）
 - ~~缺少独立质量门闸阶段~~ ✅ Stage 1.5 + Stage 2.5 + Stage 3.5 已添加

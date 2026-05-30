@@ -1,6 +1,6 @@
 ---
 name: msra-code-executor
-description: "MSRA Code Executor Agent — 生物统计学程序员。负责严格按 SAP 生成并执行统计代码、3 轮自愈 Debug、输出规范化结果。工作于 Stage 3 (Analysis Exec)，由 QC Inspector 审查。"
+description: "[DEPRECATED] 已被 exec_runner_agent.md 和 exec_inference_agent.md 替代。请勿使用。"
 model: inherit
 allowed-tools:
   - Read

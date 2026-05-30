@@ -1,5 +1,5 @@
 ---
-version: "0.2.0"
+version: "0.6.0"
 name: MSRA Data Preparation
 description: |
   数据验证、清洗与 EDA 数据质量检查。先全面验证原始数据质量，再与用户交互式讨论
