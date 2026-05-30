@@ -127,6 +127,12 @@ medical-stats-research-assistant/
 │
 ├── shared/                       # 共享资源
 │   ├── templates/                # 代码模板 (R + Python)
+│   │   ├── 00_config_template.R  # 配置脚本模板
+│   │   ├── 02_var_define_template.R  # 变量定义模板
+│   │   ├── 03_baseline_template.R    # 基线分析模板
+│   │   └── 04_iptw_template.R        # IPTW分析模板
+│   ├── project-templates/        # 项目结构模板
+│   │   └── structured-analysis-workflow.md  # input/script/outcome 结构
 │   ├── sample-size/              # 样本量计算
 │   ├── causal-inference/         # 因果推断工作流
 │   ├── reproducibility/          # 可重复性验证
@@ -173,6 +179,71 @@ medical-stats-research-assistant/
 - 所有步骤生成可重复代码
 - 清洗过程完全记录
 - 分析严格按 SAP 执行
+
+---
+
+## 结构化分析工作流 (input/script/outcome)
+
+MSRA 支持基于目录分离的标准化分析项目结构，灵感来自成熟的医学统计项目实践：
+
+### 目录结构
+
+```
+project/
+├── input/                    # 输入数据（原始数据，只读）
+│   ├── raw_data.csv         # 原始数据文件
+│   ├── data_dictionary.xlsx # 数据字典
+│   └── inclusion_criteria.md # 纳入排除标准
+│
+├── script/                   # 分析脚本（按执行顺序编号）
+│   ├── 00_config.R          # 全局配置
+│   ├── 01_data_extract.R    # 数据提取
+│   ├── 02_var_define.R      # 变量定义
+│   ├── 03_baseline.R        # 基线分析
+│   ├── 04_iptw_matching.R   # 倾向性评分
+│   └── 05_survival_analysis.R # 生存分析
+│
+├── load/                     # 中间数据（各步骤缓存）
+│   ├── 01_extracted.rda     # 提取后的数据
+│   ├── 02_var_defined.rda   # 变量定义后的数据
+│   └── 04_iptw.rda          # IPTW数据
+│
+└── outcome/                  # 最终结果
+    ├── tables/              # 表格输出
+    ├── figures/             # 图表输出
+    └── reports/             # 报告文档
+```
+
+### 核心原则
+
+1. **输入只读**: `input/` 中的文件永不修改，保留原始数据可追溯性
+2. **脚本编号化**: `00-`, `01-`, `02-` 前缀表示执行顺序
+3. **中间数据缓存**: 每步保存 `.rda` 到 `load/`，支持断点续跑
+4. **变量集中定义**: 在 `02_var_define.R` 统一定义标签、协变量、亚组
+5. **输入输出声明**: 每个脚本顶部声明 `input_file` 和 `output_dir`
+
+### 快速开始
+
+```bash
+# 1. 创建项目结构
+mkdir -p my_project/{input,script,load,outcome/{tables,figures,reports}}
+
+# 2. 复制模板脚本
+cp shared/templates/00_config_template.R my_project/script/00_config.R
+cp shared/templates/02_var_define_template.R my_project/script/02_var_define.R
+
+# 3. 放入原始数据
+cp my_data.csv my_project/input/raw_data.csv
+
+# 4. 按顺序运行脚本
+cd my_project
+Rscript script/00_config.R
+Rscript script/01_data_extract.R
+Rscript script/02_var_define.R
+# ... 继续后续分析
+```
+
+详细指南请查看: [shared/project-templates/structured-analysis-workflow.md](shared/project-templates/structured-analysis-workflow.md)
 
 ---
 

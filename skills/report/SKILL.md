@@ -281,13 +281,127 @@ python shared/report-assembler/export_tables_docx.py \
 Rscript shared/templates/export_tables_flextable.R
 ```
 
-**Step 3.5.3: 异常处理**
+**Step 3.5.3: 完整代码示例**
 
-| 触发条件 | 处理方式 |
-|---------|---------|
-| python-docx 未安装 | `pip install python-docx` 后重试 |
-| 表格内容为空 | 跳过导出，记录日志 |
-| 列数过多 (>10列) | 提示用户拆分表格或调整页面方向为横向 |
+**Python 完整示例** (推荐):
+```python
+import pandas as pd
+from docx import Document
+from docx.shared import Pt, Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+def export_three_line_table(df, title, output_path, note=None):
+    """
+    导出三线表到 Word
+    
+    参数:
+        df: pandas DataFrame
+        title: 表题
+        output_path: 输出路径 (.docx)
+        note: 表注 (可选)
+    """
+    doc = Document()
+    
+    # 添加表题
+    title_para = doc.add_paragraph()
+    title_run = title_para.add_run(title)
+    title_run.bold = True
+    title_run.font.size = Pt(11)
+    title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    # 创建表格
+    table = doc.add_table(rows=1, cols=len(df.columns))
+    table.style = 'Table Grid'
+    
+    # 设置表头
+    hdr_cells = table.rows[0].cells
+    for i, col in enumerate(df.columns):
+        hdr_cells[i].text = str(col)
+        # 表头加粗
+        for paragraph in hdr_cells[i].paragraphs:
+            for run in paragraph.runs:
+                run.font.bold = True
+    
+    # 填充数据
+    for _, row in df.iterrows():
+        row_cells = table.add_row().cells
+        for i, value in enumerate(row):
+            row_cells[i].text = str(value)
+    
+    # 添加表注
+    if note:
+        note_para = doc.add_paragraph()
+        note_run = note_para.add_run(f"注: {note}")
+        note_run.font.size = Pt(9)
+        note_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    
+    # 保存
+    doc.save(output_path)
+    print(f"表格已保存至: {output_path}")
+
+# 使用示例
+df = pd.DataFrame({
+    '变量': ['年龄', '男性', '吸烟者'],
+    'OR': ['1.02', '1.35', '2.10'],
+    '95% CI': ['1.01-1.03', '1.12-1.63', '1.75-2.52'],
+    'p值': ['<0.001', '0.002', '<0.001']
+})
+
+export_three_line_table(
+    df, 
+    title="表2 Logistic回归分析结果",
+    output_path="reports/tables/table2_results.docx",
+    note="OR: 比值比; CI: 置信区间"
+)
+```
+
+**R 完整示例** (备选):
+```r
+library(flextable)
+library(officer)
+
+# 创建示例数据
+df <- data.frame(
+  变量 = c("年龄", "男性", "吸烟者"),
+  OR = c("1.02", "1.35", "2.10"),
+  CI_95 = c("1.01-1.03", "1.12-1.63", "1.75-2.52"),
+  p值 = c("<0.001", "0.002", "<0.001")
+)
+
+# 创建 flextable
+ft <- flextable(df) %>%
+  # 设置表头样式
+  bold(part = "header") %>%
+  # 设置字体
+  font(fontname = "Times New Roman", part = "all") %>%
+  # 设置字号
+  fontsize(size = 11, part = "header") %>%
+  fontsize(size = 10, part = "body") %>%
+  # 居中对齐
+  align(align = "center", part = "all") %>%
+  # 设置边框（三线表）
+  border_remove() %>%
+  hline_top(border = fp_border(width = 2)) %>%
+  hline_bottom(border = fp_border(width = 1), part = "header") %>%
+  hline_bottom(border = fp_border(width = 2))
+
+# 保存为 Word
+doc <- read_docx() %>%
+  body_add_par("表2 Logistic回归分析结果", style = "heading 2") %>%
+  body_add_flextable(ft) %>%
+  body_add_par("注: OR=比值比; CI=置信区间", style = "Normal")
+
+print(doc, target = "reports/tables/table2_results.docx")
+```
+
+**Step 3.5.4: 异常处理**
+
+| 触发条件 | 一线处理 | 仍失败兜底 |
+|---------|---------|-----------|
+| python-docx 未安装 | `pip install python-docx` 后重试 | 输出 CSV + 提示用户手动格式化 |
+| 表格内容为空 | 跳过导出，记录日志 | 生成占位表格，标注"数据待补充" |
+| 列数过多 (>10列) | 提示用户拆分表格或调整页面方向为横向 | 自动拆分为子表 (Table 2a, 2b) |
+| 中文显示乱码 | 指定字体为 "SimSun" 或 "Microsoft YaHei" | 输出英文表头版本 |
 
 > [SLIM] Checkpoint: 展示已导出的 docx 文件清单给用户确认。
 
@@ -330,13 +444,174 @@ Rscript shared/templates/export_tables_flextable.R
 - 图片保存到 `reports/figures/{分析名}_{图类型}.png`，300 DPI
 - 记录执行方式和路径：`{图类型}: Python/R, saved to reports/figures/...`
 
-**Step 4.4: 异常处理**
+**Step 4.4: 完整代码示例**
+
+**Python - 森林图 (Forest Plot)**:
+```python
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+def plot_forest(df, title="Forest Plot", output_path="forest_plot.png"):
+    """
+    绘制森林图
+    
+    参数:
+        df: DataFrame with columns ['变量', '效应量', '下限', '上限', 'p值']
+        title: 图标题
+        output_path: 输出路径
+    """
+    # 设置中文字体
+    plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS']
+    plt.rcParams['axes.unicode_minus'] = False
+    
+    fig, ax = plt.subplots(figsize=(10, len(df) * 0.5 + 2))
+    
+    # Y轴位置
+    y_pos = np.arange(len(df))
+    
+    # 绘制置信区间
+    for i, row in df.iterrows():
+        ax.plot([row['下限'], row['上限']], [i, i], 'k-', linewidth=1.5)
+        ax.plot(row['效应量'], i, 'ko', markersize=8)
+    
+    # 参考线 (效应量为1)
+    ax.axvline(x=1, color='red', linestyle='--', alpha=0.5, label='Null effect')
+    
+    # 设置标签
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(df['变量'])
+    ax.set_xlabel('Odds Ratio (95% CI)', fontsize=11)
+    ax.set_title(title, fontsize=12, fontweight='bold')
+    
+    # 添加效应量标签
+    for i, row in df.iterrows():
+        label = f"{row['效应量']:.2f} ({row['下限']:.2f}-{row['上限']:.2f})"
+        ax.text(row['上限'] + 0.1, i, label, va='center', fontsize=9)
+    
+    ax.set_xlim(0, max(df['上限']) * 1.5)
+    ax.invert_yaxis()
+    ax.grid(axis='x', alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"森林图已保存: {output_path}")
+    plt.close()
+
+# 使用示例
+df = pd.DataFrame({
+    '变量': ['年龄', '男性', '吸烟', '高血压', '糖尿病'],
+    '效应量': [1.02, 1.35, 2.10, 1.45, 1.78],
+    '下限': [1.01, 1.12, 1.75, 1.20, 1.45],
+    '上限': [1.03, 1.63, 2.52, 1.75, 2.18],
+    'p值': [0.001, 0.002, 0.001, 0.001, 0.001]
+})
+
+plot_forest(df, title="图1 多因素Logistic回归森林图", 
+            output_path="reports/figures/figure1_forest.png")
+```
+
+**R - KM 生存曲线**:
+```r
+library(survival)
+library(survminer)
+library(ggplot2)
+
+# 假设数据已加载: data_select 包含 Time, Event, Group 列
+
+# 拟合生存曲线
+fit <- survfit(Surv(Time, Event) ~ Group, data = data_select)
+
+# 绘制 KM 曲线
+km_plot <- ggsurvplot(
+  fit,
+  data = data_select,
+  pval = TRUE,                    # 显示 log-rank p 值
+  pval.method = TRUE,             # 显示检验方法
+  conf.int = TRUE,                # 显示置信区间
+  risk.table = TRUE,              # 显示风险表
+  risk.table.col = "strata",      # 风险表按分组着色
+  linetype = 1,                   # 线型
+  surv.median.line = "hv",        # 中位生存期线
+  ggtheme = theme_bw(),           # 主题
+  palette = c("#E64B35", "#4DBBD5"),  # 配色
+  
+  # 标题和标签
+  title = "图2 Kaplan-Meier生存曲线",
+  xlab = "Time (months)",
+  ylab = "Overall survival probability",
+  
+  # 图例
+  legend.title = "Treatment",
+  legend.labs = c("Control", "Treatment"),
+  
+  # 风险表
+  risk.table.y.text.col = TRUE,
+  risk.table.y.text = FALSE,
+  ncensor.plot = TRUE             # 显示删失图
+)
+
+# 保存
+pdf("reports/figures/figure2_km_curve.pdf", width = 10, height = 8)
+print(km_plot)
+dev.off()
+
+# 同时保存 PNG
+ggsave("reports/figures/figure2_km_curve.png", 
+       plot = km_plot$plot, width = 10, height = 6, dpi = 300)
+```
+
+**Python - ROC 曲线**:
+```python
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+
+def plot_roc(y_true, y_score, title="ROC Curve", output_path="roc_curve.png"):
+    """
+    绘制 ROC 曲线
+    
+    参数:
+        y_true: 真实标签
+        y_score: 预测概率
+        title: 图标题
+        output_path: 输出路径
+    """
+    fpr, tpr, _ = roc_curve(y_true, y_score)
+    roc_auc = auc(fpr, tpr)
+    
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='darkorange', lw=2, 
+             label=f'ROC curve (AUC = {roc_auc:.3f})')
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', 
+             label='Random classifier')
+    
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate', fontsize=11)
+    plt.ylabel('True Positive Rate', fontsize=11)
+    plt.title(title, fontsize=12, fontweight='bold')
+    plt.legend(loc="lower right")
+    plt.grid(alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"ROC曲线已保存: {output_path}")
+    plt.close()
+
+# 使用示例
+# plot_roc(y_test, y_pred_proba, title="图3 预测模型ROC曲线",
+#          output_path="reports/figures/figure3_roc.png")
+```
+
+**Step 4.5: 异常处理**
 
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---------|---------|-----------|
 | R/Python 包未安装 | 自动 pip install / install.packages 重试 (最多1次) | 描述性文本替代，标注"图表暂不可用" |
 | 数据不足绘制完整图表 | 简化图表（减少分组/调整分类数） | 输出数据 + 代码供用户后续自行渲染 |
 | 坐标轴/图例混乱 | 手动调整参数（limits/breaks/labels） | 用简单替代方案（如条形图代替箱线图） |
+| 中文显示乱码 | 指定字体 'SimHei' 或 'Microsoft YaHei' | 使用英文标签 |
+| 图像分辨率不足 | 设置 dpi=300 或更高 | 输出矢量图 (PDF/SVG) |
 
 > [SLIM] Checkpoint: 图表生成后展示图片路径给用户确认，不满意可重新生成参数。
 

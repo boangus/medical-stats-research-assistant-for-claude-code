@@ -1,17 +1,23 @@
 [
   {
     "id": 1,
-    "prompt": "请按这个SAP执行分析：主要分析采用ANCOVA比较两组HbA1c变化，调整基线HbA1c和年龄。",
-    "expected": "应该先验证样本量，按SAP构造变量，执行描述性统计，然后进行主要分析（ANCOVA），最后进行假设检验和质量检查"
+    "name": "完整分析执行",
+    "prompt": "请执行我的队列研究分析：1) 基线特征表；2) 倾向性评分匹配；3) Cox回归计算HR；4) 亚组分析；5) 敏感性分析。数据已经准备好了。",
+    "expected": "按序执行11个子步骤：加载SAP→加载数据→基线分析→PSM→主分析→模型诊断→亚组分析→敏感性分析→多重比较校正→结果整合→产物打包，每步生成代码并执行",
+    "test_focus": ["dim2", "dim5", "dim8"]
   },
   {
     "id": 2,
-    "prompt": "分析代码执行失败了，报错说'变量age不存在'。请帮我修复。",
-    "expected": "应该使用自愈Debug流程，分析错误类型（运行时错误），检查数据集中的变量名，修复代码并重新执行"
+    "name": "代码执行错误处理",
+    "prompt": "运行Cox回归时出现了错误：'Error in coxph: X matrix deemed to be singular'。请帮我诊断并修复这个问题。",
+    "expected": "触发错误处理流程：解析错误信息→诊断原因（完全分离/共线性）→提出修复方案（合并类别/移除共线性变量/Firth惩罚）→重新执行",
+    "test_focus": ["dim3", "dim5", "dim8"]
   },
   {
     "id": 3,
-    "prompt": "主要分析结果p值=0.048，效应量很小。请帮我解读这个结果。",
-    "expected": "应该报告精确p值和效应量+95%CI，讨论统计显著性vs临床意义，不依赖p<0.05的二元判断"
+    "name": "模型诊断与验证",
+    "prompt": "我的Cox回归模型拟合完成了，请帮我做模型诊断：检查PH假设、 influential points、和预测性能。",
+    "expected": "执行模型诊断步骤：Schoenfeld残差检验PH假设→DFBETA识别influential points→C-index评估区分度→校准曲线评估校准度→生成诊断报告",
+    "test_focus": ["dim5", "dim8"]
   }
 ]
