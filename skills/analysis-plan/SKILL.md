@@ -41,7 +41,7 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
 
 ### Phase 1: 深度 EDA（方法选择用）
 
-> 参考：shared/statistical-methods/methods_catalog.md — EDA 方法速查
+> 参考：shared/statistics-methods/methods_catalog.md — EDA 方法速查
 > 参考：shared/statistics-methods/chapters/ch12-missing-data.md — 缺失数据模式分析 (统计指南第12章)
 > **与 Stage 1 EDA（数据质量）的区别**：Stage 1 EDA 用于在锁定前发现数据质量问题；此处 EDA 在锁定后执行，使用最终清洗数据为方法选择服务。
 
@@ -78,7 +78,7 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
 ### Phase 2: 估计目标定义（Estimands）
 
 > 依据：ICH E9(R1) Estimands and Sensitivity Analysis in Clinical Trials
-> 参考：shared/statistical-methods/methods_catalog.md — 伴发事件处理策略
+> 参考：shared/statistics-methods/methods_catalog.md — 伴发事件处理策略
 
 在讨论统计方法之前，先精确定义估计目标。这是统计分析的核心框架。
 
@@ -180,8 +180,8 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 **4. 观察性研究高级方法选择**
 
 > **当研究类型为观察性研究时**，在基础方法选择后，必须额外讨论以下高级因果推断方法：
-> 参考：shared/statistical-methods/chapters/ch35-propensity-scores.md — 倾向性评分方法
-> 参考：shared/statistical-methods/chapters/ch28-e-value.md — E-value 敏感性分析
+> 参考：shared/statistics-methods/chapters/ch35-propensity-scores.md — 倾向性评分方法
+> 参考：shared/statistics-methods/chapters/ch28-e-value.md — E-value 敏感性分析
 
 | 方法 | 适用场景 | 默认参数（无需确认） |
 |------|---------|---------------------|
@@ -225,11 +225,11 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 
 ### Phase 4: 制定 SAP
 
-> 参考：shared/statistical-methods/methods_catalog.md — 统计方法选择依据
+> 参考：shared/statistics-methods/methods_catalog.md — 统计方法选择依据
 > 参考：shared/statistics-methods/chapters/ch18-multiple-comparisons-methods.md — 多重比较校正 (统计指南第18章)
 > 参考：shared/statistics-methods/chapters/ch19-gatekeeping-strategies.md — 关口策略 (统计指南第19章)
-> 参考：shared/sap_standardization/sap_standard.md — SAP标准格式定义
-> 参考：shared/sap_standardization/variable_selection_guide.md — 变量选择与方法推荐指南
+> 参考：shared/sap/sap_standard.md — SAP标准格式定义
+> 参考：shared/sap/variable_selection_guide.md — 变量选择与方法推荐指南
 
 确认方法后，**严格按照SAP标准格式**生成正式的统计分析计划文档。SAP必须包含：
 1. 变量选择推荐（强制纳入/建议纳入/不纳入）
@@ -289,7 +289,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 
 ### Phase 5: 计划审查
 
-> 参考：shared/checklists/quality_checklist.md — SAP 审查清单
+> 参考：shared/reporting-guidelines/quality_checklist.md — SAP 审查清单
 > 参考：shared/statistics-methods/chapters/ch25-case-control-studies.md — 数据库研究检查清单 (统计指南第43章)
 
 SAP 制定完成后，自动进行独立审查：
@@ -349,7 +349,7 @@ SAP 制定完成后，自动进行独立审查：
 | 2 | 多重比较控制方法未指定 | P2 | 主要+关键次要共3个终点 | 在 SAP §5 补充 Hochberg 序贯门控 | 待修改 |
 
 严重等级: P0(阻断) / P1(必须修改) / P2(建议修改) / P3(信息性)
-审查标准: 参考 shared/checklists/quality_checklist.md
+审查标准: 参考 shared/reporting-guidelines/quality_checklist.md
 ```
 
 ### Phase 6: 变量构造定义 🆕

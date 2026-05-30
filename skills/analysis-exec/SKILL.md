@@ -70,8 +70,8 @@ Phase 7-9: 假设检验 + 质检 + 输出 → 输出:10项产物
 
 ### Phase 0: SAP 验证与样本量验证 🆕
 
-> 参考：shared/sap_standardization/sap_standard.md — SAP标准格式定义
-> 参考：shared/sap_standardization/validate_sap.py — SAP验证脚本
+> 参考：shared/sap/sap_standard.md — SAP标准格式定义
+> 参考：shared/sap/validate_sap.py — SAP验证脚本
 
 开始分析前，首先验证SAP文件的完整性和格式规范性。
 
@@ -147,7 +147,7 @@ Phase 7-9: 假设检验 + 质检 + 输出 → 输出:10项产物
 
 ### Phase 2: 执行前检查
 
-> 参考：shared/reproducibility/reproducibility_guide.md — 复现验证准备；shared/checklists/quality_checklist.md — 执行前检查清单
+> 参考：shared/reproducibility/reproducibility_guide.md — 复现验证准备；shared/reporting-guidelines/quality_checklist.md — 执行前检查清单
 
 开始前验证：
 - [ ] SAP 文档已批准
@@ -161,7 +161,7 @@ Phase 7-9: 假设检验 + 质检 + 输出 → 输出:10项产物
 
 ### Phase 3: 描述性统计
 
-> 参考：shared/statistical-methods/methods_catalog.md — 描述性统计方法速查
+> 参考：shared/statistics-methods/methods_catalog.md — 描述性统计方法速查
 > 参考：shared/statistics-methods/chapters/ch06-sample-size-calculations.md — 样本量计算原则 (统计指南第6章)
 > **与深度 EDA（Stage 2）的区别**：深度 EDA 为方法选择服务，此处 Table 1 和描述性统计为报告输出服务。
 
@@ -325,7 +325,7 @@ cleaned_data %>%
 
 > 当 SAP 中包含 IPTW、双重稳健估计、RCS、E-value 等方法时，在 Phase 6 之后执行此阶段。
 > **参数已在 Stage 2 SAP 中确认**，此处直接使用 SAP 预定义的参数，无需再次确认。
-> 参考：shared/statistical-methods/observational-study-methods.md — 方法详解与代码模板
+> 参考：shared/statistics-methods/observational-study-methods.md — 方法详解与代码模板
 
 #### Phase 6.1.1: 参数来源
 
@@ -399,7 +399,7 @@ cleaned_data %>%
 
 ### Phase 7: 假设检验
 
-> 参考：shared/statistical-methods/methods_catalog.md — 假设检验方法速查
+> 参考：shared/statistics-methods/methods_catalog.md — 假设检验方法速查
 > 参考：shared/statistics-methods/INDEX.md — 各统计方法对应的统计指南章节（LOGIT/COX/PSM等）
 > 参考：shared/error-diagnostics/ — 错误诊断知识库（用于假设违反时的修复建议）
 
@@ -471,7 +471,7 @@ cleaned_data %>%
 
 ### Phase 8: 质量检查
 
-> 参考：shared/checklists/quality_checklist.md — 8 维度质量检查清单；shared/reproducibility/reproducibility_check.py — 复现验证脚本
+> 参考：shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单；shared/reproducibility/reproducibility_check.py — 复现验证脚本
 
 分析完成后，自动执行质量检查：
 

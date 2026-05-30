@@ -33,7 +33,7 @@
 - Material Passport 跨阶段产物追踪（`shared/passport/passport.py`）
 - 值规范化模块（TCM 术语 + 数值格式变体，`shared/value-normalization/`）
 - 统计方法指南 41 章（`shared/methods/`）
-- 12 种方法降级决策树（`shared/statistical-methods/methods_catalog.md`）
+- 12 种方法降级决策树（`shared/statistics-methods/methods_catalog.md`）
 - 16 个代码模板（R + Python）
 - 5 个期刊输出模板（NEJM / JAMA / Lancet / BMJ / CMJ）
 - 6 个研究类型分支（RCT / 观察性 / 诊断试验）

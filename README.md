@@ -121,25 +121,27 @@ medical-stats-research-assistant/
 │   ├── protocol.md               # 协作协议
 │   ├── data_validator_agent.md   # 数据质量专家
 │   ├── method_consultant_agent.md# 方法顾问
-│   ├── code_executor_agent.md    # 代码执行者
+│   ├── exec_runner_agent.md      # 代码执行者
+│   ├── exec_inference_agent.md   # 推断执行者
 │   └── qc_inspector_agent.md     # 质量审查员
 │
 ├── shared/                       # 共享资源
-│   ├── checklists/               # 质量检查清单
 │   ├── templates/                # 代码模板 (R + Python)
 │   ├── sample-size/              # 样本量计算
 │   ├── causal-inference/         # 因果推断工作流
 │   ├── reproducibility/          # 可重复性验证
 │   ├── calibration/              # 校准框架
 │   ├── passport/                 # Material Passport 产物追踪
-│   ├── statistics-methods/       # 统计与方法指南 (41章)
+│   ├── statistics-methods/       # 统计与方法指南 (41章) + 方法目录
 │   ├── value-normalization/      # 值规范化（TCM术语+数值变体）
 │   ├── chart-styles/             # 图表样式库（期刊配色、图表类型、字体规范）
 │   ├── error-diagnostics/        # 错误诊断知识库（错误模式、自动修复建议）
-│   ├── reporting-guidelines/     # 报告规范检查清单（TRIPOD+AI/CARE/REMARK/ARRIVE）
+│   ├── anti-patterns/            # 反模式黑名单
+│   ├── reporting-guidelines/     # 报告规范检查清单（质量检查清单 + TRIPOD+AI/CARE/REMARK/ARRIVE）
 │   ├── journal-templates/        # 期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ/AIM/CJE）
-│   ├── sap_consistency/          # SAP一致性检查（SAP与数据特征比对）
-│   ├── sap_to_methods/           # SAP到方法学描述转换（自动生成方法学段落）
+│   ├── report-assembler/         # 报告组装器（DOCX/HTML输出）
+│   ├── sensitivity-agreement/    # 敏感性分析一致性评估
+│   ├── sap/                      # SAP标准化、一致性检查与方法转换
 │   ├── data_sharing/             # 数据共享（去标识化、代码包、结果包生成）
 │   └── archive/                  # 存档包（产物收集、清单生成、完整性验证）
 │

@@ -34,7 +34,7 @@ allowed_skills: [analysis-exec, statistics-methods]
 ### Phase 7: 假设检验（独立执行）
 
 > 你**不依赖** exec-runner 是否已做过假设检验——你独立重新验证。
-> 参考：shared/statistical-methods/methods_catalog.md — 假设检验方法速查
+> 参考：shared/statistics-methods/methods_catalog.md — 假设检验方法速查
 > 参考：shared/methods/INDEX.md — 各统计方法对应的统计指南章节
 
 根据 SAP 中计划的内容，对 exec-runner 输出的结果表独立验证所有诊断检验：
@@ -57,7 +57,7 @@ allowed_skills: [analysis-exec, statistics-methods]
 
 ### Phase 8: 质量检查（22 项）
 
-> 参考：shared/checklists/quality_checklist.md — 8 维度质量检查清单
+> 参考：shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单
 
 **检查清单**：
 

@@ -329,7 +329,7 @@ deviations:
 
 ### 6.1 SAP 验证脚本
 
-位置: `shared/sap_standardization/validate_sap.py`
+位置: `shared/sap/validate_sap.py`
 
 功能:
 - 验证SAP格式完整性
@@ -339,7 +339,7 @@ deviations:
 
 ### 6.2 SAP 到代码转换
 
-位置: `shared/sap_standardization/sap_to_code.py`
+位置: `shared/sap/sap_to_code.py`
 
 功能:
 - 解析SAP分析规范表
@@ -348,7 +348,7 @@ deviations:
 
 ### 6.3 SAP 执行追踪
 
-位置: `shared/sap_standardization/track_execution.py`
+位置: `shared/sap/track_execution.py`
 
 功能:
 - 追踪SAP执行状态

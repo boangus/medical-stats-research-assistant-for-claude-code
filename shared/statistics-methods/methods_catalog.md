@@ -2,7 +2,7 @@
 >
 > **模板索引** ⭐ 新增:
 > - **基线特征表**: `table1_template.R` (gtsummary) | `table1_pharmaverse.R` (Pharmaverse rtables)
-> - **生存分析**: `survival_analysis_template.R` (survminer) | `survival_ggsurvfit.R` (ggsurvfit) | `survival_lifelines.py` (lifelines)
+> - **生存分析**: `survival_ggsurvfit.R` (ggsurvfit, 推荐) | `survival_lifelines.py` (lifelines)
 > - **因果推断**: `psm_template.py` (PSM) | `overlapping_weighting_template.py` (OW) | `causal_inference_dowhy.py` (DoWhy+EconML)
 > - **机器学习**: `ml_analysis_template.py` (完整 ML 流程) | `shap_plot_template.py` (SHAP 可解释性)
 > - **临床预测模型**: `prediction_model_template.py` (TRIPOD 合规：EPV→开发→Bootstrap→DCA→列线图→报告)
@@ -72,8 +72,7 @@
 - Log-rank 检验比较组间差异
 
 **可用模板**:
-- `survival_analysis_template.R` — survminer 版本 (经典)
-- `survival_ggsurvfit.R` — Pharmaverse ggsurvfit 版本 ⭐ **新增** (出版级 ggplot2 风格)
+- `survival_ggsurvfit.R` — ggsurvfit 版本 (推荐, 出版级 ggplot2 风格)
 - `survival_lifelines.py` — Python lifelines 版本 ⭐ **新增**
 - `cox_template.py` — Python Cox 回归模板
 

@@ -59,3 +59,6 @@ shared/reproducibility/_test_output/
 
 # Skill优化评估
 .darwin-results/
+
+# 运行时缓存
+.msra/

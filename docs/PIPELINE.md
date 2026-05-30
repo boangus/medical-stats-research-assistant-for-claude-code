@@ -93,13 +93,13 @@ Skill 包含：
 
 ```
 shared/
-├── statistical-methods/        # 统计方法目录
+├── statistics-methods/        # 统计方法目录
 │   └── methods_catalog.md      # 方法索引（8 类方法）
 ├── checklists/                 # 质量检查清单
 │   └── quality_checklist.md    # 8 维度结构化检查清单
 ├── templates/                  # 代码模板
 │   ├── table1_template.R              # Table 1 生成 (R)
-│   ├── survival_analysis_template.R   # 生存分析模板 (R)
+│   ├── survival_ggsurvfit.R           # 生存分析模板 (ggsurvfit)
 │   ├── logistic_template.py           # Logistic 回归 (Python)
 │   ├── cox_template.py                # Cox 回归 (Python)
 │   ├── roc_template.py                # ROC 诊断分析 (Python)
@@ -184,7 +184,7 @@ shared/
 
 ### 添加新统计方法
 
-1. 在 `shared/statistical-methods/methods_catalog.md` 中添加
+1. 在 `shared/statistics-methods/methods_catalog.md` 中添加
 2. 创建对应的代码模板（shared/templates/）
 3. 在相关 SKILL.md 中引用
 
