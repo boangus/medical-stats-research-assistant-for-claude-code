@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "journal": "中华流行病学杂志",
+    "abbr": "CJE",
+    "publisher": "中华医学会",
+    "recommended_study_type": ["cohort", "case-control", "cross-sectional", "ecological"],
+    "guideline": "STROBE",
+    "description": "中华流行病学杂志统计分析报告模板。强调流行病学方法、混杂控制、因果推断。"
+  },
+  "sections": [
+    {
+      "id": "methods",
+      "title": "统计学方法",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "研究设计与研究对象",
+        "样本量计算与检验效能",
+        "暴露/结局定义与测量",
+        "混杂因素识别与控制",
+        "主要分析：方法、协变量、假设检验",
+        "次要分析与探索性分析",
+        "分层分析与交互作用",
+        "敏感性分析（缺失数据、不同假设）",
+        "软件与检验水准"
+      ]
+    },
+    {
+      "id": "results_baseline",
+      "title": "研究对象基线特征",
+      "order": 2,
+      "tables": [
+        {"label": "表1", "title": "研究对象基线特征",
+         "type": "baseline_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "results_exposure",
+      "title": "暴露与结局关联",
+      "order": 3,
+      "tables": [
+        {"label": "表2", "title": "暴露与结局的关联",
+         "type": "main_results_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "图1", "title": "暴露与结局的剂量-反应关系",
+         "type": "dose_response_plot"}
+      ]
+    },
+    {
+      "id": "results_adjusted",
+      "title": "调整后关联",
+      "order": 4,
+      "content": {"type": "narrative", "style": "adjusted_results"},
+      "tables": [
+        {"label": "表3", "title": "调整混杂因素后的关联",
+         "type": "adjusted_results_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "subgroup",
+      "title": "分层分析",
+      "order": 5,
+      "figures": [
+        {"label": "图2", "title": "分层分析",
+         "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "sensitivity",
+      "title": "敏感性分析",
+      "order": 6,
+      "tables": [
+        {"label": "表4", "title": "敏感性分析结果",
+         "type": "sensitivity_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "causal_inference",
+      "title": "因果推断（如适用）",
+      "order": 7,
+      "content": {"type": "narrative", "style": "causal_inference"}
+    }
+  ],
+  "supplement": {
+    "description": "补充材料（网络版）",
+    "sections": [
+      {"id": "supp_methods", "title": "补充方法", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "补充表", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "补充图", "type": "supplement_figures"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "docx_three_line",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "CJE_blue",
+    "supplement_as_separate_file": true,
+    "language": "Chinese"
+  }
+}

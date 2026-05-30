@@ -1,0 +1,120 @@
+{
+  "font_families": {
+    "sans_serif": ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"],
+    "serif": ["Times New Roman", "Times", "DejaVu Serif", "Liberation Serif", "serif"],
+    "monospace": ["Courier New", "Courier", "DejaVu Sans Mono", "Liberation Mono", "monospace"]
+  },
+  "journal_requirements": {
+    "NEJM": {
+      "font_family": "Times New Roman",
+      "font_sizes": {
+        "title": 14,
+        "axis_labels": 12,
+        "tick_labels": 10,
+        "legend": 9,
+        "caption": 9
+      },
+      "figure_dimensions": {
+        "single_column": 85,
+        "double_column": 175,
+        "max_height": 230
+      },
+      "dpi": 300
+    },
+    "JAMA": {
+      "font_family": "Arial",
+      "font_sizes": {
+        "title": 12,
+        "axis_labels": 10,
+        "tick_labels": 9,
+        "legend": 8,
+        "caption": 8
+      },
+      "figure_dimensions": {
+        "single_column": 85,
+        "double_column": 175,
+        "max_height": 230
+      },
+      "dpi": 300
+    },
+    "Lancet": {
+      "font_family": "Arial",
+      "font_sizes": {
+        "title": 12,
+        "axis_labels": 10,
+        "tick_labels": 9,
+        "legend": 8,
+        "caption": 8
+      },
+      "figure_dimensions": {
+        "single_column": 85,
+        "double_column": 175,
+        "max_height": 230
+      },
+      "dpi": 300
+    },
+    "BMJ": {
+      "font_family": "Arial",
+      "font_sizes": {
+        "title": 12,
+        "axis_labels": 10,
+        "tick_labels": 9,
+        "legend": 8,
+        "caption": 8
+      },
+      "figure_dimensions": {
+        "single_column": 85,
+        "double_column": 175,
+        "max_height": 230
+      },
+      "dpi": 300
+    },
+    "CMJ": {
+      "font_family": "SimSun",
+      "font_sizes": {
+        "title": 14,
+        "axis_labels": 12,
+        "tick_labels": 10,
+        "legend": 9,
+        "caption": 9
+      },
+      "figure_dimensions": {
+        "single_column": 80,
+        "double_column": 160,
+        "max_height": 200
+      },
+      "dpi": 300
+    }
+  },
+  "general_specs": {
+    "line_width": {
+      "thin": 0.5,
+      "normal": 1.0,
+      "thick": 2.0
+    },
+    "marker_size": {
+      "small": 3,
+      "medium": 6,
+      "large": 9
+    },
+    "axis_ticks": {
+      "major_width": 1.0,
+      "minor_width": 0.5,
+      "major_length": 5,
+      "minor_length": 2.5
+    },
+    "grid_lines": {
+      "style": "dotted",
+      "width": 0.5,
+      "color": "#e0e0e0"
+    }
+  },
+  "color_accessibility": {
+    "contrast_ratio": {
+      "minimum": 4.5,
+      "recommended": 7.0
+    },
+    "color_blind_safe": ["#0072B2", "#E69F00", "#009E73", "#F0E442", "#56B4E9", "#D55E00", "#CC79A7"],
+    "avoid_colors": ["#FF0000", "#00FF00", "#0000FF"]
+  }
+}
