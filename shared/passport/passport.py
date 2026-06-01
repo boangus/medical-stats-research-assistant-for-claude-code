@@ -140,8 +140,19 @@ class PassportManager:
 
     # ── 前置条件验证 ──
 
+    # 阶段 → 对应门闸 stage 映射
+    STAGE_GATE_MAP = {
+        "stage_2": "stage_1.5",
+        "stage_3": "stage_2.5",
+        "stage_4": "stage_3.5",
+    }
+
     def verify_prerequisites(self, stage: str) -> tuple:
         """检查进入某阶段所需的前置产物是否齐全
+        
+        同时验证：
+        1. 所有前置 artifact 状态不为 planned/error/rollback
+        2. 对应 gate 的 result 不为 blocked（passed 或 conditional 均可）
         
         Returns:
             (ok: bool, missing: list[str])
@@ -149,9 +160,22 @@ class PassportManager:
         required = STAGE_PREREQUISITES.get(stage, [])
         missing = []
         for art_id in required:
-            a = self.get_artifact(art_id)
+            a = self.get_artifact(artifact_id=art_id)
             if not a or a["status"] in ("planned", "error", "rollback"):
                 missing.append(art_id)
+
+        # 检查 gate result（如果该阶段有前置 gate）
+        gate_stage = self.STAGE_GATE_MAP.get(stage)
+        if gate_stage:
+            gate_info = self.data.get("gates", {}).get(gate_stage)
+            if gate_info:
+                gate_status = gate_info.get("status", "")
+                if gate_status == "blocked":
+                    missing.append(f"gate_{gate_stage}(blocked)")
+            else:
+                # gate 不存在视为未通过
+                missing.append(f"gate_{gate_stage}(not_found)")
+
         return len(missing) == 0, missing
 
     def verify_mid_entry(self, stage: str) -> tuple:

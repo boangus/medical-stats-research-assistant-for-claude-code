@@ -178,8 +178,8 @@ for i in range(N):
     else: row["TreatmentGroup"] = random.choices(["Treatment","Control"],[90,10])[0]
 
     # Outcome - 主结局含缺失 (MAR 模式)
-    if i in range(300,310): row["Outcome"] = ""
-    else: row["Outcome"] = random.choice(["改善","稳定","进展",""])
+    # 先随机生成 Outcome（非空为主）
+    row["Outcome"] = random.choice(["改善","稳定","进展"])
 
     # AdverseEvent - 严重不良事件
     if i in (580,581): row["AdverseEvent"] = "Severe"
@@ -196,8 +196,18 @@ for i in range(N):
     rows.append(row)
 
 # MAR: Outcome 缺失集中在 Education=文盲 子集
-for i in range(300,305):
+# 策略：将大量文盲行的 Outcome 设为空，非文盲行几乎不缺失
+# 1. 先把 rows 300-349 设为 Education=文盲
+for i in range(300, 350):
     rows[i]["EducationLevel"] = "文盲"
+    rows[i]["Outcome"] = ""  # 文盲行全部缺失
+
+# 2. 非文盲行只保留极少量缺失（<3%）
+for i in range(0, 300):
+    if random.random() < 0.02:  # 2% 概率随机缺失
+        rows[i]["Outcome"] = ""
+    else:
+        rows[i]["Outcome"] = random.choice(["改善","稳定","进展"])
 
 # 重复行
 for i in range(450,455):
@@ -314,7 +324,8 @@ print("[20] Duplicate PatientIDs: {} IDs".format(len(dups)))
 ok_list.append(len(dups) > 0)
 
 mar_outcome = sum(1 for r in rows if r["Outcome"] == "" and r["EducationLevel"] == "文盲")
-print("[21] MAR: Outcome missing & Edu=文盲: {} rows".format(mar_outcome))
-ok_list.append(mar_outcome > 0)
+non_mar = sum(1 for r in rows if r["Outcome"] == "" and r["EducationLevel"] != "文盲")
+print("[21] MAR: Outcome missing & Edu=文盲: {} rows (non-文盲 missing: {})".format(mar_outcome, non_mar))
+ok_list.append(mar_outcome > non_mar * 2)  # 文盲缺失应显著多于非文盲
 
 print("\n>>> {} of 21 pitfalls covered <<<".format(sum(ok_list)))

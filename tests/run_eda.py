@@ -1,20 +1,34 @@
-"""MSRA Stage 2 Phase 1: Exploratory Data Analysis"""
+"""MSRA Stage 2 Phase 1: Exploratory Data Analysis
+Schema: msra_test_data.csv (generate_test_data.py output)
+"""
 import pandas as pd
 import numpy as np
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent
-df = pd.read_csv(BASE / "tests/msra_clean.csv")
+
+# 优先读清洗后数据，不存在则读原始数据
+clean_path = BASE / "tests/msra_clean.csv"
+raw_path = BASE / "tests/msra_test_data.csv"
+if clean_path.exists():
+    df = pd.read_csv(clean_path)
+    data_source = "msra_clean.csv"
+else:
+    df = pd.read_csv(raw_path)
+    data_source = "msra_test_data.csv"
 
 print("=" * 64)
 print("MSRA Pipeline — Stage 2 Phase 1: 探索性数据分析 (EDA)")
 print("=" * 64)
+print(f"  数据源: {data_source}")
 
 # === 1. 连续变量分布 ===
 print("\n[1] 连续变量分布")
-num_cols = ["Age", "Billing Amount", "Room Number"]
+num_cols = ["Age", "BillingAmount", "HeartRate"]
 for col in num_cols:
-    v = df[col]
+    if col not in df.columns:
+        continue
+    v = pd.to_numeric(df[col], errors="coerce").dropna()
     print(f"\n  {col}:")
     print(f"    n={len(v)}, mean={v.mean():.1f}, sd={v.std():.1f}")
     print(f"    median={v.median():.1f}, IQR={v.quantile(0.25):.1f}~{v.quantile(0.75):.1f}")
@@ -32,9 +46,11 @@ for col in num_cols:
 
 # === 2. 分类变量频数 ===
 print("\n[2] 分类变量分布")
-cat_cols = ["Gender", "Blood Type", "Medical Condition", "Admission Type", 
-            "Test Results", "Insurance Provider", "Medication"]
+cat_cols = ["Gender", "BloodType", "MedicalCondition", "AdmissionType",
+            "TreatmentGroup", "InsuranceProvider", "Medication"]
 for col in cat_cols:
+    if col not in df.columns:
+        continue
     vc = df[col].value_counts()
     rare = (vc / len(df) * 100) < 5
     n_rare = rare.sum()
@@ -47,52 +63,55 @@ for col in cat_cols:
         print(f"    -> {n_rare} 个水平占比<5%，需考虑合并")
 
 # === 3. 关键分组比较 (Table 1-style) ===
-print("\n[3] 按 Admission Type 分组基线特征")
-for grp in ["Emergency", "Elective", "Urgent"]:
-    sub = df[df["Admission Type"] == grp]
+print("\n[3] 按 AdmissionType 分组基线特征")
+for grp in df["AdmissionType"].unique():
+    sub = df[df["AdmissionType"] == grp]
+    age_sub = pd.to_numeric(sub["Age"], errors="coerce").dropna()
+    bill_sub = pd.to_numeric(sub["BillingAmount"], errors="coerce").dropna()
     print(f"\n  {grp} (n={len(sub)}):")
-    print(f"    Age: {sub['Age'].mean():.1f} +/- {sub['Age'].std():.1f}")
-    for cond in df["Medical Condition"].unique():
-        pct = (sub["Medical Condition"] == cond).mean() * 100
+    print(f"    Age: {age_sub.mean():.1f} +/- {age_sub.std():.1f}")
+    for cond in df["MedicalCondition"].unique():
+        pct = (sub["MedicalCondition"] == cond).mean() * 100
         print(f"    {cond}: {pct:.1f}%")
     gender_pct = (sub["Gender"] == "Male").mean() * 100
     print(f"    Male: {gender_pct:.1f}%")
-    print(f"    Billing: ${sub['Billing Amount'].mean():.0f} +/- ${sub['Billing Amount'].std():.0f}")
+    print(f"    Billing: ${bill_sub.mean():.0f} +/- ${bill_sub.std():.0f}")
 
 print("\n[4] 按 Gender 分组")
 for grp in ["Male", "Female"]:
     sub = df[df["Gender"] == grp]
+    age_sub = pd.to_numeric(sub["Age"], errors="coerce").dropna()
+    bill_sub = pd.to_numeric(sub["BillingAmount"], errors="coerce").dropna()
     print(f"\n  {grp} (n={len(sub)}):")
-    print(f"    Age: {sub['Age'].mean():.1f} +/- {sub['Age'].std():.1f}")
-    print(f"    Billing: ${sub['Billing Amount'].mean():.0f} +/- ${sub['Billing Amount'].std():.0f}")
+    print(f"    Age: {age_sub.mean():.1f} +/- {age_sub.std():.1f}")
+    print(f"    Billing: ${bill_sub.mean():.0f} +/- ${bill_sub.std():.0f}")
 
 # === 4. 相关性 ===
 print("\n[5] 关键变量相关性 (Pearson)")
-corr_age_bill = df["Age"].corr(df["Billing Amount"])
-corr_room_bill = df["Room Number"].corr(df["Billing Amount"])
-print(f"  Age vs Billing Amount: r={corr_age_bill:.3f}")
-print(f"  Room Number vs Billing Amount: r={corr_room_bill:.3f}")
+age_num = pd.to_numeric(df["Age"], errors="coerce")
+bill_num = pd.to_numeric(df["BillingAmount"], errors="coerce")
+valid = age_num.notna() & bill_num.notna()
+corr_age_bill = age_num[valid].corr(bill_num[valid])
+print(f"  Age vs BillingAmount: r={corr_age_bill:.3f}")
 
 # === 5. 关键发现总结 ===
 print("\n" + "=" * 64)
 print("EDA 关键发现")
 print("=" * 64)
-print("1. 数据概况: 55,392 条, 15 变量, 无缺失值")
-print("2. 年龄: 13-89 岁, 接近均匀分布 (mean=51.5, sd=19.6)")
-print("3. 计费金额: $9-$52,764, 正偏态分布 (skewness>0)")
-print("4. Medical Condition: 6 类近乎均匀 (各 ~16.7%)")
-print("5. Test Results: 3 类近乎均匀 (各 ~33%)")
-print("6. Billing Amount 与 Age 几乎无相关 (r={:.3f})".format(corr_age_bill))
-print("7. 性别均衡 (Male 50.1%, Female 49.9%)")
-print("8. 入院类型均衡 (Elective 33.6%, Urgent 33.5%, Emergency 32.9%)")
+print(f"1. 数据概况: {len(df)} 条, {len(df.columns)} 变量")
+print(f"2. 年龄: {age_num.min():.0f}-{age_num.max():.0f} 岁 (mean={age_num.mean():.1f}, sd={age_num.std():.1f})")
+print(f"3. 计费金额: ${bill_num.min():.2f}~${bill_num.max():.2f}")
+print(f"4. MedicalCondition: {df['MedicalCondition'].nunique()} 类")
+print(f"5. 性别: Male {(df['Gender']=='Male').mean()*100:.1f}%, Female {(df['Gender']=='Female').mean()*100:.1f}%")
+print(f"6. 入院类型: {', '.join(f'{k} {v/len(df)*100:.1f}%' for k,v in df['AdmissionType'].value_counts().items())}")
 
 # Save report
 report = f"""# EDA 报告 — Stage 2 Phase 1
 
 ## 数据概况
-- 记录: 55,392
-- 变量: 15
-- 缺失: 无
+- 记录: {len(df)}
+- 变量: {len(df.columns)}
+- 数据源: {data_source}
 
 ## 连续变量
 
@@ -100,17 +119,18 @@ report = f"""# EDA 报告 — Stage 2 Phase 1
 |------|------|----|--------|-----|------|"""
 
 for col in num_cols:
-    v = df[col]
+    if col not in df.columns:
+        continue
+    v = pd.to_numeric(df[col], errors="coerce").dropna()
     report += f"""
 | {col} | {v.mean():.1f} | {v.std():.1f} | {v.median():.1f} | {v.quantile(0.25):.1f}-{v.quantile(0.75):.1f} | {v.skew():.2f} |"""
 
 report += """
 
 ## 关键发现
-1. Billing Amount 正偏态分布
-2. 所有分类变量各组近乎均匀分布
-3. 无缺失值，无严重异常值（负值已在清洗中删除）
-4. 变量间相关性低
+1. BillingAmount 正偏态分布
+2. 所有分类变量各组分布情况见上方
+3. 变量间相关性低
 """
 
 eda_path = BASE / "tests/eda_report.md"
