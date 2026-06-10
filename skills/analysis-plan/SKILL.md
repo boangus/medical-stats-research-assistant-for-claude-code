@@ -121,6 +121,7 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
 ### Phase 3: 方法探讨 + 参数确认（交互式，单一确认点）
 
 > **设计原则**：将 Estimands 定义、方法选择、参数确认合并为一个交互式确认点，避免多次暂停。
+> 参考：shared/statistics-methods/stat_test_decision_tree.md — 统计检验决策树（检验方法快速选择）
 
 基于清洗后的数据特征和研究问题，一次性完成 Estimands 定义 + 方法选择 + 参数确认。
 

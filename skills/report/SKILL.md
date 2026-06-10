@@ -420,7 +420,8 @@ print(doc, target = "reports/tables/table2_results.docx")
 | 诊断试验 (ROC) | ROC 曲线 | roc_template.py, roc_visualization_template.R |
 | 一致性检验 | Bland-Altman 图 | bland_altman_template.py |
 | 预测模型 | 校准曲线 | calibration_plot_template.R (仅R) |
-| 基线特征 | Table 1 结构化图 | table1_template.R |
+| 基线特征 | Table 1 结构化图 | table1_template.R, gtsummary_template.R (出版级), janitor_tabyl_template.R (快速交叉表) |
+| 相关性分析 | 相关性热图/网络图 | correlation_template.R (corrr 一站式分析) |
 
 **Step 4.2: 加载模板**
 
