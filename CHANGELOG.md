@@ -57,6 +57,17 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
   - Robustness tests: missing injection, noise, case mixing, date format chaos
 - **Version bump**: manifest.json updated to 0.7.1
 
+## [0.7.2] - 2026-06-14
+
+### Changed
+- Pipeline SKILL.md: 精简从 789→690 行 (-12.5%)，压缩示例/角色切换/进度追踪
+- analysis-plan SKILL.md: 消除"建议"软化措辞，改为强制性指令
+
+### Added
+- `shared/reporting-guidelines/PRISMA_NMA_checklist.md` — 网络Meta分析报告规范 (25项检查)
+- Anti-patterns catalog: 新增 G(网络Meta)/H(孟德尔随机化)/T(目标试验)/J(GEE) 四类共 9 条反模式
+- CI: 新增 Python 模板语法检查步骤
+
 ## [0.7.0] - 2026-06-13
 
 ### Fixed

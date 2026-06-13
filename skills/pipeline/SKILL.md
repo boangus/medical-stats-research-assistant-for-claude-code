@@ -467,70 +467,36 @@ SLIM 触发点：
 
 ## 5. Progress Tracking
 
-> 使用 Material Passport (`shared/passport/passport.py`) 持久化追踪全部产物的生命周期。
-> 护照文件路径: `.msra/passport.json`（自动创建）
+> 使用 Material Passport (`shared/passport/passport.py`) 追踪产物生命周期。
+> 护照路径: `.msra/passport.json`（自动创建）。
+> 能力: 产物追踪(planned→consumed) / 前置检查 / 恢复(`/msra --resume`) / 回滚 / 门闸记录
 
-### 5.0 Passport 初始化
+### 5.0 状态表示
 
-Pipeline 启动时自动加载或创建护照：
-
-```python
-from shared.passport.passport import PassportManager
-pm = PassportManager(".msra/passport.json")
-```
-
-护照提供以下能力：
-
-- **产物追踪**: 每个产物经历 planned → in_progress → completed → verified → consumed
-- **前置检查**: `verify_prerequisites(stage)` 自动检查所有所需产物是否就绪
-- **恢复**: `get_resume_point()` 返回上次中断位置，`/msra --resume` 使用
-- **回滚**: `rollback_to(stage)` 标记后续全部产物失效
-- **门闸记录**: `set_gate_result(gate, status, passed, total)` 记录每次门闸结果
-
-### 5.1 状态表示
-
-在每个 checkpoint 更新进度：
+在每个 checkpoint 更新进度（示例）：
 
 ```
-Pipeline Progress:
-  Stage 1  [数据准备]       ██████████ 100% ✅
-  Stage 1.5 [数据质量门闸]   ██████████ 100% ✅
-  Stage 2  [分析计划]       ██████████ 100% ✅
-  Stage 2.5 [SAP质量门闸]   ████████░░  80% 🔄 (2/7 检查完成)
-  Stage 3  [分析执行]       ░░░░░░░░░░   0% ⏳
-  Stage 3.5 [结果质量门闸]   ░░░░░░░░░░   0% ⏳
-  Stage 4  [报告生成]       ░░░░░░░░░░   0% ⏳
-  Stage 4  [图文报告]       ░░░░░░░░░░   0% ⏳
+Stage 1  [数据准备]       ██████████ 100% ✅
+Stage 1.5 [数据质量门闸]   ██████████ 100% ✅
+Stage 2  [分析计划]       ████████░░  80% 🔄
+Stage 3  [分析执行]       ░░░░░░░░░░   0% ⏳
+Stage 3.5 [结果质量门闸]   ░░░░░░░░░░   0% ⏳
+Stage 4  [报告生成]       ░░░░░░░░░░   0% ⏳
 ```
 
 ### 5.2 产物追踪
 
-记录每个阶段的产物和版本。使用 Passport 自动管理：
+使用 Passport 自动管理（`pm.update_status()` / `pm.get_resume_point()`）：
 
-```python
-# 阶段完成时
-pm.update_status("cleaned_data", "completed",
-                 hash=pm.compute_hash("data/cleaned/cleaned_data_v1.csv"))
-pm.update_checkpoint("stage_1")
-
-# 恢复时
-resume_point = pm.get_resume_point()
-```
-
-产物追踪表（Passport 自动维护）：
-
-| 阶段 | 产物 | 版本 | 状态 | 护照ID |
-|------|------|------|------|--------|
-| Stage 1 | 清洗后数据 | v1 | ✅ completed | cleaned_data |
-| Stage 1 | 清洗日志 | v1 | ✅ completed | cleaning_log |
-| Stage 1.5 | 数据质量门闸报告 | - | 🔄 in_progress | gate_stage_1.5 |
-| Stage 2 | SAP | v1 | 🔄 in_progress | sap |
-| Stage 2.5 | SAP质量门闸报告 | - | ⏳ planned | gate_stage_2.5 |
-| Stage 3 | 分析结果 | - | ⏳ planned | analysis_results |
-| Stage 3.5 | 结果质量门闸报告 | - | ⏳ planned | gate_stage_3.5 |
-| Stage 4 | 最终报告 (HTML+MD) | - | ⏳ planned | final_report |
-| Stage 4 | 图表图片 (figures/*.png) | - | ⏳ planned | figures |
-| Stage 4 | 三线表 (tables/*.docx) | - | ⏳ planned | tables |
+| 阶段 | 产物 | 护照ID |
+|------|------|--------|
+| Stage 1 | 清洗后数据 + 清洗日志 + 盲态审核 + 锁定记录 | cleaned_data / cleaning_log / ... |
+| Stage 1.5 | 数据质量门闸报告 | gate_stage_1.5 |
+| Stage 2 | SAP | sap |
+| Stage 2.5 | SAP质量门闸报告 | gate_stage_2.5 |
+| Stage 3 | 分析结果 + 质检报告 | analysis_results / qc_report |
+| Stage 3.5 | 结果质量门闸报告 | gate_stage_3.5 |
+| Stage 4 | 最终报告 + 图表 + 三线表 | final_report / figures / tables |
 
 ---
 
@@ -547,40 +513,9 @@ resume_point = pm.get_resume_point()
 
 ### 6.1 角色切换规则
 
-```
-Pipeline Orchestrator
-  │
-  ├── Stage 1: 切换为 Data Validator
-  │              → 完成数据验证/清洗
-  │              → 切回 Orchestrator → Checkpoint
-  │
-  ├── Stage 1.5: 切换为 QC Inspector
-  │                → 执行数据质量门闸
-  │                → 切回 Orchestrator → 结果决策
-  │
-  ├── Stage 2: 切换为 Method Consultant
-  │              → 完成 SAP 制定
-  │              → 切回 Orchestrator → Checkpoint
-  │
-  ├── Stage 2.5: 切换为 QC Inspector
-  │                → 执行 SAP 质量门闸
-  │                → 切回 Orchestrator → 结果决策
-  │
-  ├── Stage 3: Generator-Evaluator 模式
-  │                ├── Phase 0-6: 切换为 Exec Runner → 代码生成与执行
-  │                │                → 自动切回 Orchestrator（无 Checkpoint）
-  │                ├── Phase 7-9: 切换为 Exec Inference → 假设检验与质检
-  │                │                → 切回 Orchestrator → Checkpoint
-  │                └── Generator-Evaluator 差异比对 → 纳入 Stage 3.5 门闸输入
-  │
-  ├── Stage 3.5: 切换为 QC Inspector
-  │                → 执行结果质量门闸
-  │                → 切回 Orchestrator → 结果决策
-  │
-  └── Stage 4: 切换为 Report Expert
-                  → 生成报告
-                  → 最终交付
-```
+每个 Stage 开始时切换为对应角色，完成后切回 Orchestrator。
+Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase 7-9 为 Exec Inference。
+差异比对结果纳入 Stage 3.5 门闸输入。
 
 ### 6.2 Agent 角色卡速查
 
@@ -694,59 +629,25 @@ Pipeline Orchestrator
 ### Example 1: 全流程（高效模式）
 ```
 用户: /msra 我有一份RCT的原始数据，想完成整个分析流程
+→ 检测到原始数据 → 从 Stage 1 开始 → 用户选 [2] 高效模式
 
-→ 检测到原始数据 → 从 Stage 1 开始
-→ 询问交互密度 → 用户选 [2] 高效模式
-
-  Stage 1: 数据验证和清洗
-  → [MANDATORY] 清洗完成，继续？
-  → Stage 1.5: 数据质量门闸（7项阻断检查）
-  → [MANDATORY] 门闸结果，继续？
-  → Stage 2: 制定分析计划
-  → [SLIM] EDA 展示后一行确认
-  → [MANDATORY] SAP 审查通过，继续？
-  → Stage 2.5: SAP 质量门闸（7项阻断检查）
-  → [MANDATORY] 门闸通过，继续？
-  → Stage 3: 执行分析
-  → [SLIM] 质检结果一行确认
-  → Stage 3.5: 结果质量门闸（8项阻断检查）
-  → [MANDATORY] 门闸通过，继续？
-  → Stage 4: 生成报告
-  → [MANDATORY] 合规检查，最终确认
-
-完成 ✅（共 6 次 MANDATORY + 2 次 SLIM，比旧版 19 次暂停减少约 58%）
+Stage 1 → [MANDATORY] → Stage 1.5(8项) → [MANDATORY]
+→ Stage 2 → [SLIM] → [MANDATORY] → Stage 2.5(8项) → [MANDATORY]
+→ Stage 3 → [SLIM] → Stage 3.5(9项) → [MANDATORY]
+→ Stage 4 → [MANDATORY] 合规检查 → 完成 ✅
+共 6 次 MANDATORY + 2 次 SLIM
 ```
 
-### Example 2: 中途切入
+### Example 2: 中途切入 + 新手引导
 ```
-用户: /msra 我的数据已经清洗好了，帮我制定分析计划
+# 中途切入
+用户: /msra 数据已清洗好，帮我做分析计划
+→ 从 Stage 2 开始 → 前置检查: 清洗日志存在 → 高效模式 → Stage 2 → ...
 
-→ 检测到已清洗数据 → 从 Stage 2 开始
-→ 前置检查: 确认清洗日志存在
-→ 询问交互密度 → 用户选 [2] 高效模式
-→ Stage 2: 制定分析计划 → ...
-```
-
-### Example 3: 跳到报告（高效模式）
-```
-用户: /msra 分析做完了，帮我生成CONSORT报告
-
-→ 检测到分析结果 → 从 Stage 4 开始
-→ 前置检查: 确认 Stage 3.5 质量门闸通过 + 质检报告存在
-→ 用户选 [2] 高效模式
-→ Stage 4: 生成报告 → 自动完成 ✅
-→ [MANDATORY-M4] 合规检查 → 最终确认
-```
-
-### Example 4: 新手详细引导
-```
-用户: /msra 我有一份数据，但不太确定该怎么做统计
-
-→ 检测到原始数据 → 从 Stage 1 开始
-→ 用户选 [1] 详细引导 → 每个步骤都有完整 Dashboard
-→ Stage 1: 每一步都暂停讨论策略 → 确认 → 执行
-→ Stage 1.5: 逐项解释门闸检查结果 → 用户理解后继续
-→ ...每个 Stage 后 FULL checkpoint
+# 新手详细引导
+用户: /msra 我有数据但不确定怎么做统计
+→ 从 Stage 1 开始 → 用户选 [1] 详细引导
+→ 每步暂停讨论策略 → 逐项解释门闸结果 → 全程 FULL checkpoint
 ```
 
 ---
