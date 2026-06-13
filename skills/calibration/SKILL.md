@@ -92,6 +92,46 @@ Phase 4: 更新校准数据库
 | calibration_db.json 写入失败 | 检查文件权限和磁盘空间 | 输出校准结果为独立 JSON 文件，提示用户手动合并 |
 | 校准数据不足（<5条有效对比） | 提示用户补充金标准数据 | 输出"校准数据不足"警告，不计算累计指标 |
 
+### 校准引擎调用示例
+
+**Python 调用**：
+```python
+from shared.calibration.calibration_runner import CalibrationRunner
+
+runner = CalibrationRunner(
+    gold_csv="shared/calibration/gold_standard_example.csv",
+    msra_results="MSRA/analysis_results.json",  # MSRA 输出路径
+    output_dir="MSRA/calibration/"
+)
+
+# 执行四维对比
+report = runner.run()
+
+# 输出关键指标
+print(f"TPR: {report.metrics['TPR']:.1%}")
+print(f"FPR: {report.metrics['FPR']:.1%}")
+print(f"方法匹配率: {report.method_match_rate:.1%}")
+print(f"MAPE: {report.numeric_deviation['MAPE']:.1%}")
+
+# 更新校准数据库
+runner.update_database("shared/calibration/calibration_db.json")
+```
+
+**R 调用**：
+```r
+source("shared/calibration/calibration_runner.R")
+
+result <- run_calibration(
+  gold_csv = "shared/calibration/gold_standard_example.csv",
+  msra_json = "MSRA/analysis_results.json",
+  output_dir = "MSRA/calibration/"
+)
+
+cat(sprintf("TPR: %.1f%%\n", result$metrics$TPR * 100))
+cat(sprintf("FPR: %.1f%%\n", result$metrics$FPR * 100))
+cat(sprintf("方法匹配率: %.1f%%\n", result$method_match_rate * 100))
+```
+
 ---
 
 ## 模式 2: 状态查看
