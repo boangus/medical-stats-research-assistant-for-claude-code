@@ -71,3 +71,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-13T23:30	summary-v071	-	-	-	reval-v071	6个skill重评：avg 88.7(上次88.0)；calibration首次评估81.1为最弱环节	dry_run
 2026-06-14T00:05	optimize-calibration	msra-calibration	81.1	86.1	keep	dim3+dim5+dim8	test-prompts 6→15; failure modes 6→10; Mode2/3具体化; 真实校准积累机制	dry_run
 2026-06-14T00:05	optimize-report	msra-report	88.2	89.5	keep	dim8	test-prompts 10→15; +CONSORT2025/Quarto/STARD/NMA/AI disclosure	dry_run
+2026-06-14T00:30	optimize-pipeline	msra-pipeline	90.0	91.5	keep	dim7	dim7:8→9; 789→690行(-12.5%)	dry_run
+2026-06-14T00:30	optimize-analysis-plan	msra-analysis-plan	91.2	91.9	keep	dim5	dim5:9→10; 消除"建议"软词	dry_run
