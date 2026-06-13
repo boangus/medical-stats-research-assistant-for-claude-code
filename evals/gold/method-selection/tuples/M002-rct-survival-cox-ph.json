@@ -1,0 +1,45 @@
+{
+  "tuple_id": "M002-rct-survival-cox-ph",
+  "kind": "method_selection",
+  "test_name": "RCT生存结局需调整分析应选Cox PH",
+  "description": "一项RCT比较免疫疗法vs化疗在晚期NSCLC中的OS，需调整分层因素（PD-L1表达水平、ECOG评分）。正确方法为分层Cox比例风险模型，而非单独的log-rank检验。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "RCT",
+    "outcome_type": "survival",
+    "outcome_variable": "总生存期（OS）",
+    "stratification_factors": ["PD-L1表达水平（<50% vs >=50%）", "ECOG评分（0 vs 1）"],
+    "median_follow_up": "18个月",
+    "sample_size": 380,
+    "events": 260,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "分层Cox比例风险模型",
+    "expected_parameters": "Stratified Cox PH model with treatment as covariate, stratified by PD-L1 and ECOG",
+    "model_specification": "h(t) = h_s(t) * exp(beta * treatment), strata(PD-L1, ECOG)",
+    "effect_measure": "HR with 95% CI",
+    "key_diagnostics": ["PH假设检验（Schoenfeld残差）", "log-log生存曲线平行性"],
+    "supplementary_analysis": ["Kaplan-Meier生存曲线", "log-rank检验（非主要）"]
+  },
+  "common_wrong_methods": [
+    {
+      "method": "单独log-rank检验",
+      "why_wrong": "log-rank无法纳入分层因素的调整；对于预设的分层因素，应使用分层log-rank或分层Cox作为主要分析"
+    },
+    {
+      "method": "非分层Cox模型（将分层因素作为协变量）",
+      "why_wrong": "当分层因素与治疗存在交互可能时，分层Cox比将分层因素作为协变量更稳健，且不依赖PH假设对分层因素的要求"
+    },
+    {
+      "method": "加速失效时间模型（AFT）",
+      "why_wrong": "AFT假设加速因子恒定，而Cox PH更为通用；在肿瘤学RCT中Cox PH是标准做法"
+    }
+  ],
+  "reasoning": "RCT中预设分层因素（如PD-L1）的调整分析必须在主要分析中体现。分层Cox PH模型允许每层有各自的基线风险函数，同时估计统一的治疗效应HR。这是ICH E6和FDA指南对肿瘤生存分析的标准推荐。log-rank检验仅作为描述性补充，不能替代调整后的HR估计。",
+  "references": [
+    "ICH E9(R1): Estimands and Sensitivity Analysis in Clinical Trials (2019)",
+    "FDA Guidance: Clinical Trial Endpoints for the Approval of Non-Small Cell Lung Cancer Drugs and Biologics (2015)"
+  ]
+}

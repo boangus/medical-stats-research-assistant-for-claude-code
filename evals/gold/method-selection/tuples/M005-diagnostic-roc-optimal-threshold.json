@@ -1,0 +1,43 @@
+{
+  "tuple_id": "M005-diagnostic-roc-optimal-threshold",
+  "kind": "method_selection",
+  "test_name": "诊断试验+连续标志物应选ROC/AUC+最优阈值",
+  "description": "评估一种新型血清标志物（连续值，ng/mL）诊断早期胰腺癌的准确性，以病理确诊为金标准。需要报告AUC、最优截断值（cutoff）、以及对应的敏感度/特异度，而非简单按中位数分组后做卡方检验。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "diagnostic accuracy",
+    "outcome_type": "binary（金标准：病理确诊 vs 排除）",
+    "index_test": "血清CA-X水平（连续，ng/mL）",
+    "gold_standard": "病理组织学确诊",
+    "prevalence": "18%（早期胰腺癌）",
+    "sample_size": 450,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "ROC分析 + AUC",
+    "expected_parameters": "Non-parametric ROC curve (DeLong method for CI), Youden index or cost-based optimal threshold",
+    "model_specification": "ROC: Sensitivity(c) vs 1-Specificity(c) for all possible cutoffs c\nAUC with 95% CI via DeLong method\nOptimal cutoff: max(Youden J) = max(Sensitivity + Specificity - 1)",
+    "reported_metrics": ["AUC (95% CI)", "最优cutoff", "Sensitivity at cutoff", "Specificity at cutoff", "PPV", "NPV", "Likelihood ratios (LR+, LR-)"],
+    "supplementary": ["多标志物比较用DeLong test", "校准曲线（如果用logistic模型）"]
+  },
+  "common_wrong_methods": [
+    {
+      "method": "按中位数/四分位分组后做卡方检验",
+      "why_wrong": "连续标志物按任意阈值二分会损失大量信息，降低统计效能；ROC分析评估的是标志物在所有可能阈值下的整体判别能力"
+    },
+    {
+      "method": "仅报告单一阈值的敏感度/特异度",
+      "why_wrong": "不报告AUC无法评估标志物的整体判别能力；不同临床场景对敏感度/特异度的要求不同，应提供完整ROC供决策"
+    },
+    {
+      "method": "logistic回归仅报告OR",
+      "why_wrong": "OR不能直接反映诊断准确性；需要从logistic模型导出预测概率后再做ROC分析"
+    }
+  ],
+  "reasoning": "诊断准确性研究的核心是评估连续标志物区分疾病有无的能力。ROC曲线和AUC是国际公认的诊断准确性评估标准（STARD指南）。AUC反映标志物在所有阈值下的整体判别能力，而最优阈值的选择需结合临床场景（筛查偏重敏感度、确诊偏重特异度）。DeLong方法提供AUC比较的统计推断。报告LR+/-有助于贝叶斯临床决策。",
+  "references": [
+    "Bossuyt PM, et al. STARD 2015: An Updated List of Essential Items for Reporting Diagnostic Accuracy Studies. BMJ. 2015;351:h5527.",
+    "DeLong ER, DeLong DM, Clarke-Pearson DL. Comparing the areas under two or more correlated receiver operating characteristic curves. Biometrics. 1988;44(3):837-845."
+  ]
+}

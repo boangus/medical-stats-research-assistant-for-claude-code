@@ -1,0 +1,159 @@
+---
+title: "分析报告"
+subtitle: "由 MSRA 自动生成"
+author: ""
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    theme: cosmo
+    code-fold: true
+    code-tools: true
+    self-contained: true
+  docx:
+    toc: true
+    number-sections: true
+    reference-doc: custom-reference.docx
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(tidyverse)
+library(gtsummary)
+library(flextable)
+
+# 全局设置
+options(digits = 4)
+knitr::opts_chunk$set(
+  fig.width = 8, fig.height = 6,
+  dpi = 300, fig.align = "center"
+)
+```
+
+# 研究概述
+
+**研究标题**: `r params$study_title`
+
+**研究设计**: `r params$study_design`
+
+**主要结局**: `r params$primary_outcome`
+
+```{r}
+#| label: params
+params <- list(
+  study_title = "待填写研究标题",
+  study_design = "待填写研究设计",
+  primary_outcome = "待填写主要结局"
+)
+```
+
+# 方法
+
+## 研究设计
+
+<!-- 由 MSRA report Phase 5 方法描述模板自动生成 -->
+
+## 统计分析
+
+- **主要分析**: `r params$primary_method`
+- **显著性水平**: α = 0.05 (双侧)
+- **软件**: R `r R.version.string`
+
+## 报告规范
+
+本报告遵循 `r params$reporting_guideline` 规范。
+
+# 结果
+
+## 参与者流程
+
+```{r}
+#| label: consort-flow
+#| fig.cap: "CONSORT 流程图"
+# TODO: 由 MSRA 生成 CONSORT 流程图
+```
+
+## 基线特征
+
+```{r}
+#| label: table1
+#| tbl-cap: "表 1. 基线特征"
+
+# 示例: 从分析数据生成 Table 1
+# data <- read_csv("analysis_data.csv")
+# data %>%
+#   select(age, sex, group) %>%
+#   tbl_summary(by = group) %>%
+#   add_p() %>%
+#   add_overall()
+```
+
+## 主要结局
+
+```{r}
+#| label: primary-result
+#| tbl-cap: "表 2. 主要结局分析结果"
+
+# TODO: 由 MSRA analysis-exec 输出填充
+```
+
+## 次要结局
+
+```{r}
+#| label: secondary-results
+#| tbl-cap: "表 3. 次要结局分析结果"
+
+# TODO: 由 MSRA analysis-exec 输出填充
+```
+
+## 安全性分析
+
+```{r}
+#| label: safety
+#| tbl-cap: "表 4. 不良事件汇总"
+
+# TODO: 由 MSRA analysis-exec Phase 5 输出填充
+```
+
+# 讨论
+
+## 主要发现
+
+<!-- 由 MSRA report Phase 1 结果解读自动生成 -->
+
+## 局限性
+
+<!-- 由 MSRA report Phase 6 合规检查提示 -->
+
+## 临床意义
+
+<!-- 由 MSRA report Phase 1 四维度解读自动生成 -->
+
+# 补充材料
+
+## 假设检验诊断
+
+```{r}
+#| label: diagnostics
+#| fig.cap: "假设检验诊断图"
+# TODO: 由 MSRA analysis-exec Phase 7 输出填充
+```
+
+## 敏感性分析
+
+```{r}
+#| label: sensitivity
+#| tbl-cap: "敏感性分析结果"
+# TODO: 由 MSRA analysis-exec 敏感性分析输出填充
+```
+
+# 参考文献
+
+<!-- 由 MSRA 根据引用的方法学章节自动生成 -->

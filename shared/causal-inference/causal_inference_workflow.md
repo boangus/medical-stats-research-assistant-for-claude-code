@@ -257,13 +257,76 @@ def e_value(RR_obs):
 
 ---
 
-## 六、MSRA 可用模板
+## 六、完整因果推断链路: DAG → 识别 → 估计 → 敏感性
+
+### 6.1 标准化工作流
+
+```
+Step 1: 构建 DAG
+    ├── 基于文献/专家知识确定因果结构
+    ├── 识别暴露(E)→结局(O)的所有路径
+    └── 工具: DAGitty / ggdag / dagR
+
+Step 2: 识别策略 (Identification)
+    ├── 后门准则 → 选择最小充分调整集
+    ├── 前门准则 → 当存在中介变量时
+    ├── 工具变量法 → 当存在有效IV时
+    └── 输出: 调整集 S = {变量列表}
+
+Step 3: 估计 (Estimation)
+    ├── 调整集小(≤5) → 多变量回归
+    ├── 调整集大 → PSM / IPTW / OW
+    ├── 时变暴露 → 边际结构模型(MSM)
+    ├── 存在工具变量 → 2SLS / IV-GMM
+    └── 输出: 效应估计 + 95% CI
+
+Step 4: 敏感性分析 (Sensitivity)
+    ├── E-value → 未测量混杂的最小强度
+    ├── Rosenbaum 界 → 匹配分析的敏感性
+    ├── 阴性对照 → 排除残余混杂
+    └── 输出: 结论稳健性评估
+```
+
+### 6.2 识别策略选择
+
+| 条件 | 策略 | 适用方法 |
+|------|------|---------|
+| 存在后门路径 | 后门准则 | 回归调整 / PSM / IPTW |
+| 存在未测量混杂但有IV | 工具变量法 | 2SLS / IV-GMM |
+| 存在中介且无混杂 | 前门准则 | 中介分析 |
+| 存在未测量混杂且无IV | 敏感性分析 | E-value / 负对照 |
+
+### 6.3 多重稳健估计 (Doubly Robust)
+
+当担心模型误设时，使用 **AIPW (Augmented Inverse Probability Weighting)**:
+- 只需倾向性评分模型或结果模型**之一**正确即可得到一致估计
+- 结合了 IPTW 和回归调整的优势
+
+```r
+# R: 使用 WeightIt 进行 AIPW
+library(WeightIt)
+w <- weightit(treatment ~ age + sex + bmi, data = df, method = "ps")
+library(survey)
+svyglm(outcome ~ treatment, design = svydesign(~1, weights = w$weights, data = df))
+```
+
+```python
+# Python: 使用 DoWhy
+from dowhy import CausalModel
+model = CausalModel(data=df, treatment='treatment', outcome='outcome', graph=dot_graph)
+estimate = model.estimate_effect(identified_estimand, method_name="backdoor.econml.dml.DML")
+```
+
+---
+
+## 七、MSRA 可用模板
 
 | 模板 | 用途 | 文件 |
 |------|------|------|
 | PSM 模板 (Python) | 倾向性评分匹配全流程 | `psm_template.py` |
-| **Overlapping Weighting 模板 (Python)** ⭐ **新增** | **OW 加权因果效应估计，含 IPTW 对比和权重分布可视化** | `overlapping_weighting_template.py` |
-| **DoWhy 因果推断模板 (Python)** ⭐ **新增** | **基于 DoWhy/EconML 的完整因果推断工作流，含反驳检验和 E-value** | `causal_inference_dowhy.py` |
+| Overlapping Weighting 模板 (Python) | OW 加权因果效应估计，含 IPTW 对比和权重分布可视化 | `overlapping_weighting_template.py` |
+| DoWhy 因果推断模板 (Python) | 基于 DoWhy/EconML 的完整因果推断工作流，含反驳检验和 E-value | `causal_inference_dowhy.py` |
+| **PS 诊断图模板 (R)** ⭐ **新增** | **Love plot、权重分布图、PS 重叠图、平衡表** | `shared/templates/ps_diagnostics_template.R` |
 
 ### 新增模板使用推荐
 

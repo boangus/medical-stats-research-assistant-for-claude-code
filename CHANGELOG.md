@@ -2,7 +2,7 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
-## [0.6.0] - 2025-06-13
+## [0.6.0] - 2026-06-13
 
 ### Added
 - **Calibration Skill** (`skills/calibration/`): Metric calibration framework with gold standard comparison
@@ -37,3 +37,32 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
 ### Changed
 - Pipeline SKILL.md: `depends_on` now includes `calibration`; `works_with` includes `shared/passport/passport_schema.md`
 - Stage 3.5 quality gate expanded from 7 to 9 check items (added calibration linkage + [SKIP] marking)
+
+## [0.6.1] - 2026-06-13
+
+### Fixed
+- `shared/templates/prediction_model_template.py` line 58: syntax error (`outcome prevalence` → `outcome_prevalence`)
+- `shared/templates/bland_altman_template.R` line 79: replaced `...` placeholder with proper comment
+- `CHANGELOG.md`: corrected date from 2025-06-13 to 2026-06-13
+- `README.md`: corrected skill count (5→6), command count (5→6), quality gate item counts (7→8/9), added `/msra-calibrate` command, added calibration skill to project structure, expanded supported methods and reporting guidelines lists
+
+### Added
+- **New templates**:
+  - `shared/templates/gee_template.R` — GEE (Generalized Estimating Equations) for longitudinal data (geepack)
+  - `shared/templates/gee_template.py` — GEE for longitudinal data (statsmodels)
+  - `shared/templates/nonparametric_template.R` — Mann-Whitney U, Kruskal-Wallis, Wilcoxon signed-rank, Friedman, non-parametric Table 1
+  - `shared/templates/competing_risks_template.R` — Cumulative incidence, cause-specific hazards, Fine-Gray subdistribution model (tidycmprsk)
+  - `shared/templates/ps_diagnostics_template.R` — Love plot, weight distribution, PS overlap, balance table (MatchIt/cobalt)
+  - `shared/templates/repeated_measures_anova_template.R` — Sphericity check, post-hoc, effect sizes (rstatix/emmeans)
+- **Knowledge base chapters**:
+  - `ch42-nonparametric-tests.md` — Mann-Whitney, Kruskal-Wallis, Wilcoxon, Friedman, decision tree, effect sizes, anti-patterns
+  - `ch43-gee-longitudinal-analysis.md` — GEE theory, working correlation selection (QIC), sandwich estimator, marginal vs conditional effects
+- **Evaluation framework**:
+  - `evals/gold/method-selection/` — 10 method-selection gold standard tuples (M001-M010) covering RCT ANCOVA, survival Cox, observational IPTW, diagnostic ROC, non-inferiority, negative binomial, multiplicity, Firth logistic, competing risks
+- **Enhanced causal inference workflow**:
+  - Added Section 6: complete DAG → identification → estimation → sensitivity pipeline
+  - Added identification strategy selection table
+  - Added doubly robust estimation (AIPW) examples
+  - Added PS diagnostics template reference
+- **Data Prep test-prompts**: expanded from 10 to 15 test cases (added: mixed missing patterns, multi-format import, outlier strategy, time series validation, encoding conversion)
+- **CI enhancement**: added Python template syntax check step for all 8 Python templates

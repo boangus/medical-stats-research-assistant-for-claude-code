@@ -135,6 +135,41 @@ jobs:
           print(f'✅ {len(commands)} commands registered in manifest.json')
           "
 
+      - name: Python template import check
+        run: |
+          python -c "
+          import importlib, sys, os
+          templates = [
+              'shared/templates/logistic_template',
+              'shared/templates/cox_template',
+              'shared/templates/roc_template',
+              'shared/templates/forest_plot_template',
+              'shared/templates/prediction_model_template',
+              'shared/templates/ml_analysis_template',
+              'shared/templates/shap_plot_template',
+              'shared/templates/gee_template',
+          ]
+          errors = []
+          for t in templates:
+              if not os.path.exists(t + '.py'):
+                  errors.append(f'MISSING: {t}.py')
+                  continue
+              # Check syntax via compile
+              try:
+                  with open(t + '.py', 'r', encoding='utf-8') as f:
+                      compile(f.read(), t + '.py', 'exec')
+                  print(f'  ✅ {os.path.basename(t)}.py')
+              except SyntaxError as e:
+                  errors.append(f'SYNTAX ERROR in {t}.py: {e}')
+                  print(f'  ❌ {os.path.basename(t)}.py: {e}')
+          if errors:
+              print(f'\n❌ {len(errors)} error(s)')
+              for e in errors: print(f'  {e}')
+              sys.exit(1)
+          else:
+              print(f'\n✅ All {len(templates)} Python templates syntax-checked')
+          "
+
       - name: Python end-to-end test
         run: |
           python -c "

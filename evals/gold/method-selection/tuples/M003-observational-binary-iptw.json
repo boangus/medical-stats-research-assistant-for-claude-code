@@ -1,0 +1,43 @@
+{
+  "tuple_id": "M003-observational-binary-iptw",
+  "kind": "method_selection",
+  "test_name": "观察性研究二分类结局+混杂因素应选IPTW/PSM",
+  "description": "一项观察性队列研究比较二甲双胍vs磺脲类药物对2型糖尿病患者心血管事件（有/无）的影响，存在多个已知混杂因素（年龄、BMI、HbA1c、病程等）。正确方法为倾向性评分加权（IPTW）或匹配（PSM），而非朴素logistic回归。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "retrospective cohort",
+    "outcome_type": "binary",
+    "outcome_variable": "2年内MACE事件（有/无）",
+    "exposure": "二甲双胍 vs 磺脲类",
+    "confounders": ["年龄", "BMI", "HbA1c基线", "糖尿病病程", "基线eGFR", "合并用药数量"],
+    "sample_size": 5200,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "IPTW（逆概率处理加权）",
+    "expected_parameters": "Propensity score estimated via logistic regression, stabilized IPTW weights, weighted logistic regression or weighted Cox model",
+    "model_specification": "Step 1: PS = logit(treatment) ~ age + BMI + HbA1c + disease_duration + eGFR + polypharmacy\nStep 2: SATE = E[Y(1) - Y(0)] via IPTW",
+    "balance_diagnostics": ["标准化均值差（SMD < 0.1）", "PS分布重叠", "加权后协变量平衡表"],
+    "sensitivity_analysis": ["PSM作为补充分析", "E-value评估未测量混杂的影响"]
+  },
+  "common_wrong_methods": [
+    {
+      "method": "朴素logistic回归（直接纳入所有协变量）",
+      "why_wrong": "当暴露组和对照组协变量分布差异大时，logistic回归的外推依赖强参数假设；PS方法通过重新加权使组间可比，因果解释更清晰"
+    },
+    {
+      "method": "仅按混杂因素分层分析",
+      "why_wrong": "多个混杂因素导致分层后每层样本量过小（维度灾难），且难以获得统一的效应估计"
+    },
+    {
+      "method": "单变量logistic回归（仅暴露→结局）",
+      "why_wrong": "完全忽略混杂，估计量严重偏倚"
+    }
+  ],
+  "reasoning": "观察性研究中因果推断需要控制混杂。倾向性评分方法通过估计每个个体接受处理的概率，构建伪随机化人群，使暴露组在观测协变量上平衡。IPTW保留全样本（vs PSM丢弃不匹配样本），且Stabilized weights避免极端权重。这是STROBE和GRADE指南中观察性因果分析的推荐方法。Robins等人(2000)的MSM框架为此提供了理论基础。",
+  "references": [
+    "Robins JM, Hernan MA, Brumback B. Marginal structural models and causal inference in epidemiology. Epidemiology. 2000;11(5):550-560.",
+    "Austin PC. An Introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies. Multivariate Behav Res. 2011;46(3):399-424."
+  ]
+}

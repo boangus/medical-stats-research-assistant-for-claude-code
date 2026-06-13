@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/boangus/medical-stats-research-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/boangus/medical-stats-research-assistant/actions/workflows/ci.yml)
 
-一个以 **Pipeline 驱动** 的医学统计分析工具集。从原始数据到最终报告，4 个阶段、5 个命令，覆盖完整的医学统计分析流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
+一个以 **Pipeline 驱动** 的医学统计分析工具集。从原始数据到最终报告，4 个阶段、6 个命令，覆盖完整的医学统计分析流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
 
 兼容 Claude Code、Codex、Cursor 等支持 Agent Skills Standard 的 runtime。
 
@@ -36,7 +36,7 @@
                    ▼
 ┌─────────────────────────────────────────────────────┐
 │  🔴 Stage 1.5: 数据质量门闸 (阻断式检查)             │
-│  7 项数据质量检查 → ✅ 通过 / ❌ 退回修订             │
+│  8 项数据质量检查 → ✅ 通过 / ❌ 退回修订             │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@
                    ▼
 ┌─────────────────────────────────────────────────────┐
 │  🔴 Stage 2.5: SAP 质量门闸 (阻断式检查)            │
-│  7 项 SAP 完整性检查 → ✅ 通过 / ❌ 退回修订          │
+│  8 项 SAP 完整性检查 → ✅ 通过 / ❌ 退回修订          │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
@@ -57,7 +57,7 @@
                    ▼
 ┌─────────────────────────────────────────────────────┐
 │  🔴 Stage 3.5: 结果质量门闸 (阻断式检查)            │
-│  7 项结果完整性检查 → ✅ 通过 / ❌ 退回修正          │
+│  9 项结果完整性检查 → ✅ 通过 / ❌ 退回修正          │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
@@ -89,6 +89,7 @@
 | `/msra-plan` | 方法探讨、SAP制定与审查 | Stage 2 |
 | `/msra-exec` | 按SAP执行分析 + 质量检查 | Stage 3 |
 | `/msra-report` | 生成出版级报告 | Stage 4 |
+| `/msra-calibrate` | 指标校准（金标准对比） | 校准 |
 
 ---
 
@@ -104,7 +105,7 @@ medical-stats-research-assistant/
 ├── .github/workflows/            # CI/CD
 │   └── ci.yml                    # GitHub Actions（smoke + lint）
 │
-├── skills/                       # 5 个 Skill
+├── skills/                       # 6 个 Skill
 │   ├── pipeline/                 # 🔀 流水线编排器（核心）
 │   │   └── SKILL.md
 │   ├── data-prep/                # 📊 数据准备
@@ -113,7 +114,9 @@ medical-stats-research-assistant/
 │   │   └── SKILL.md
 │   ├── analysis-exec/            # ⚙️ 分析执行
 │   │   └── SKILL.md
-│   └── report/                   # 📝 报告生成
+│   ├── report/                   # 📝 报告生成
+│   │   └── SKILL.md
+│   └── calibration/              # 🎯 指标校准
 │       └── SKILL.md
 │
 ├── agents/                       # 多 Agent 定义
@@ -249,15 +252,16 @@ Rscript script/02_var_define.R
 
 ## 支持的统计方法
 
-- **组间比较**: t检验、ANOVA、卡方、Mann-Whitney U、Kruskal-Wallis
-- **回归分析**: 线性、Logistic、Poisson、Cox
-- **生存分析**: Kaplan-Meier、Log-rank、竞争风险
-- **高级方法**: 混合效应模型、GEE、倾向性评分、多重插补、Meta分析
-- **诊断试验**: ROC、敏感性/特异性、AUC
+- **组间比较**: t检验、ANOVA、卡方、Mann-Whitney U、Kruskal-Wallis、Fisher精确检验、McNemar检验
+- **回归分析**: 线性、Logistic、Poisson、负二项、条件Logistic、Cox
+- **生存分析**: Kaplan-Meier、Log-rank、竞争风险（Fine-Gray）
+- **高级方法**: 混合效应模型、GEE、倾向性评分（PSM/IPTW/重叠加权）、双重稳健估计（AIPW）、目标试验模拟（TTE）、多重插补、Meta分析、网络Meta分析、中介分析、孟德尔随机化、DID、RCS
+- **诊断试验**: ROC、DeLong检验、Bland-Altman、DCA（决策曲线）
+- **机器学习**: 随机森林、SVM、XGBoost、LightGBM、SHAP解释
 
 ## 支持的报告规范
 
-CONSORT (RCT) · STROBE (观察性) · PRISMA (系统综述) · STARD (诊断) · TRIPOD (预测模型) · CARE (病例报告)
+CONSORT 2025 (RCT) · STROBE (观察性) · PRISMA (系统综述) · PRISMA-NMA (网络Meta) · STARD (诊断) · TRIPOD+AI (预测模型) · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物)
 
 ---
 

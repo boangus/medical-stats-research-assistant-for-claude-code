@@ -1,0 +1,46 @@
+{
+  "tuple_id": "M004-observational-time-varying-msm",
+  "kind": "method_selection",
+  "test_name": "观察性研究+时变暴露应选边际结构模型",
+  "description": "一项队列研究评估长期他汀使用（随时间变化：开始、停药、剂量调整）对心血管死亡风险的影响，暴露状态随访期间反复变化，且暴露-混杂反馈存在（高胆固醇既是用药指征又是结局风险因素）。正确方法为边际结构模型（MSM），而非标准Cox回归。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "longitudinal cohort",
+    "outcome_type": "survival",
+    "outcome_variable": "心血管死亡",
+    "exposure": "他汀使用状态（时变：未使用/低剂量/高剂量）",
+    "time_varying_covariates": ["LDL-C水平", "血压", "新发糖尿病", "肝酶"],
+    "time_fixed_covariates": ["年龄", "性别", "吸烟史"],
+    "exposure_confounding_feedback": true,
+    "follow_up_intervals": "每3个月",
+    "sample_size": 12000,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "边际结构模型（MSM）",
+    "expected_parameters": "Inverse Probability of Treatment Weighting (IPTW) with time-varying weights, pooled logistic or weighted Cox model",
+    "model_specification": "Step 1: Treatment model: P(A_t | A_bar_{t-1}, L_t, L_0) via pooled logistic\nStep 2: Censoring model: P(C_t=0 | ...) for censoring weights\nStep 3: Marginal structural Cox model: h(t) = h_0(t) * exp(beta * A_bar_t)\nCombined weight: W = 1 / prod(P(A_k | ...)) * censoring weight",
+    "key_diagnostics": ["权重分布（均值接近1，无极端值）", "权重截断敏感性分析", "暴露-混杂反馈的DAG验证"],
+    "stabilized_weights": true
+  },
+  "common_wrong_methods": [
+    {
+      "method": "标准Cox回归（将时变协变量作为时间依赖协变量纳入）",
+      "why_wrong": "当存在暴露-混杂反馈（confounding by indication over time）时，标准Cox将时变混杂纳入会引入碰撞偏倚（collider bias），因为过去的暴露影响了当前的混杂值"
+    },
+    {
+      "method": "按基线暴露分组的Cox回归",
+      "why_wrong": "忽略暴露的时间变化特征，导致严重的分类错误和选择偏倚"
+    },
+    {
+      "method": "时依Cox + lag处理",
+      "why_wrong": "lag仅缓解时序问题，不能解决暴露-混杂反馈的结构性偏倚；MSM通过逆概率加权从结构上解决此问题"
+    }
+  ],
+  "reasoning": "当暴露状态随时间变化，且暴露与混杂之间存在反馈（当前暴露影响未来混杂值，混杂值又影响未来暴露决定）时，传统回归方法无法一致估计因果效应。MSM通过逆概率处理加权，在每个时间点构建伪人群，使时变暴露在每个时间点条件独立于时变混杂。这是Robins等人因果推断框架的核心方法，被FDA和EMA在药物安全性研究中广泛采用。",
+  "references": [
+    "Robins JM, Hernan MA, Brumback B. Marginal structural models and causal inference in epidemiology. Epidemiology. 2000;11(5):550-560.",
+    "Hernan MA, Robins JM. Causal Inference: What If. Boca Raton: Chapman & Hall/CRC; 2020. Chapter 12."
+  ]
+}

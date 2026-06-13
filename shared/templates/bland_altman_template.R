@@ -75,8 +75,7 @@ plot_bland_altman <- function(method1, method2,
                linewidth = 0.8) +
     geom_hline(yintercept = loa_lower, linetype = "dashed", color = "#E74C3C",
                linewidth = 0.8) +
-    # 置信区间带
-    ...  # (conf_int 区域，后续实现)
+    # 置信区间带在下方 conf_int 块中按需添加
 
   # 散点
   p <- p + geom_point(alpha = 0.6, size = 2.5, color = "steelblue") +

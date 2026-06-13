@@ -1,0 +1,46 @@
+{
+  "tuple_id": "M006-rct-non-inferiority-margin",
+  "kind": "method_selection",
+  "test_name": "RCT非劣效设计应选非劣效检验+界值",
+  "description": "一项非劣效RCT比较仿制药vs原研降压药，主要终点为8周SBP下降值（连续），预设非劣效界值为3 mmHg（单侧）。正确方法为单侧置信区间与非劣效界值比较，而非传统的双侧等效性检验或优效性t检验。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "non-inferiority RCT",
+    "outcome_type": "continuous",
+    "outcome_variable": "8周SBP下降值（mmHg）",
+    "non_inferiority_margin": "3 mmHg（单侧）",
+    "direction": "越大越好（下降值）",
+    "alpha": 0.025,
+    "power": 0.90,
+    "sample_size": 520,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "非劣效性检验（单侧置信区间法）",
+    "expected_parameters": "Two-sample t-test or ANCOVA for mean difference, one-sided 97.5% CI (or 95% CI for non-inferiority at alpha=0.025), compare lower bound to -delta",
+    "model_specification": "H0: mu_new - mu_reference <= -delta (新药劣于界值)\nH1: mu_new - mu_reference > -delta (新药非劣效)\nDecision: If lower bound of 95% CI > -3 mmHg, declare non-inferiority",
+    "decision_rule": "95% CI下限 > -3 mmHg → 非劣效成立",
+    "analysis_populations": ["ITT分析（主要）", "PP分析（支持性）"],
+    "sensitivity": "两种分析集结论需一致"
+  },
+  "common_wrong_methods": [
+    {
+      "method": "双侧优效性t检验（p<0.05）",
+      "why_wrong": "优效性检验的H0是两组无差异，与非劣效假设完全不同；p>0.05不能得出非劣效结论（'absence of evidence is not evidence of absence'）"
+    },
+    {
+      "method": "等效性检验（TOST，双侧界值）",
+      "why_wrong": "等效性检验需要两侧都低于界值，适用于生物等效性；非劣效仅关心下限，单侧即可"
+    },
+    {
+      "method": "仅报告p值而不报告置信区间",
+      "why_wrong": "非劣效判断依赖CI与界值的比较，p值无法直观反映效应量与界值的关系"
+    }
+  ],
+  "reasoning": "非劣效设计用于证明新干预（如仿制药、简化方案）不比标准治疗差过临床可接受的幅度。关键在于预设的非劣效界值（margin）和单侧置信区间比较法。FDA和EMA均要求非劣效试验报告CI而非仅p值。ICH E10明确指出非劣效与优效的检验逻辑相反，不能用p>0.05解释为非劣效。ITT和PP分析集在非劣效中的特殊角色（ITT偏保守）也需要关注。",
+  "references": [
+    "ICH E10: Choice of Control Group and Related Issues in Clinical Trials (2000)",
+    "FDA Guidance: Non-Inferiority Clinical Trials (2016)"
+  ]
+}

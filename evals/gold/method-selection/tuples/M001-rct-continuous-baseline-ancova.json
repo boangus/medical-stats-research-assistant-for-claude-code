@@ -1,0 +1,43 @@
+{
+  "tuple_id": "M001-rct-continuous-baseline-ancova",
+  "kind": "method_selection",
+  "test_name": "RCT连续结局+基线协变量应选ANCOVA",
+  "description": "一项RCT比较降压药A vs B，主要终点为12周收缩压变化值（连续），基线血压存在明显差异。正确方法为ANCOVA（以基线值为协变量），而非独立样本t检验。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "RCT",
+    "outcome_type": "continuous",
+    "outcome_variable": "12周SBP变化值（终点-基线）",
+    "key_covariate": "基线SBP",
+    "sample_size": 240,
+    "groups": 2,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "ANCOVA（协方差分析）",
+    "expected_parameters": "ANCOVA with baseline SBP as covariate, treatment group as fixed factor",
+    "model_specification": "Y_change ~ treatment + baseline_SBP",
+    "assumptions_to_check": ["正态性（残差）", "方差齐性", "回归斜率同质性（交互项不显著）"],
+    "confidence_interval": "adjusted mean difference with 95% CI"
+  },
+  "common_wrong_methods": [
+    {
+      "method": "独立样本t检验",
+      "why_wrong": "忽略基线血压差异，损失统计效能；ANCOVA通过控制基线协变量可提高精度约10-20%"
+    },
+    {
+      "method": "重复测量ANOVA",
+      "why_wrong": "当仅关注终点变化值且基线仅作为协变量时，ANCOVA更直接且效能更高"
+    },
+    {
+      "method": "Wilcoxon秩和检验",
+      "why_wrong": "连续结局在样本量充足时无需非参数方法；且无法纳入协变量"
+    }
+  ],
+  "reasoning": "RCT中基线值即使随机化后也可能存在机会性不平衡。ANCOVA通过将基线值作为协变量纳入，既控制了基线差异，又减少了残差方差，提高检验效能。这是ICH E9指南和CONSORT声明推荐的标准做法。Vickers & Altman (2001) BMJ论文明确指出RCT连续结局应优先使用ANCOVA而非变化值t检验。",
+  "references": [
+    "Vickers AJ, Altman DG. Analysing controlled trials with baseline and follow up measurements. BMJ. 2001;323(7321):1123-1124.",
+    "ICH E9(R1): Estimands and Sensitivity Analysis in Clinical Trials (2019)"
+  ]
+}

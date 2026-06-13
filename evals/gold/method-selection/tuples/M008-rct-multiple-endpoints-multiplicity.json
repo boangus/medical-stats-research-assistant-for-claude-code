@@ -1,0 +1,51 @@
+{
+  "tuple_id": "M008-rct-multiple-endpoints-multiplicity",
+  "kind": "method_selection",
+  "test_name": "RCT多重主要终点需多重性调整",
+  "description": "一项RCT评估心衰新药，设有3个共同主要终点：全因死亡（二分类）、6分钟步行距离变化（连续）、KCCQ总分变化（连续）。3个终点均为主要终点，必须进行多重性控制以保证整体I类错误率。正确方法为预设的多重性调整策略（如门控法/Holm法），而非独立报告每个p值。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "RCT",
+    "outcome_type": "multiple endpoints",
+    "primary_endpoints": [
+      {"name": "全因死亡", "type": "binary"},
+      {"name": "6分钟步行距离变化", "type": "continuous"},
+      {"name": "KCCQ总分变化", "type": "continuous"}
+    ],
+    "number_of_primary_endpoints": 3,
+    "overall_alpha": 0.05,
+    "sample_size": 1800,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "多重性调整策略",
+    "expected_parameters": "Pre-specified multiplicity adjustment: gatekeeping procedure or hierarchical (fixed-sequence) testing or Holm step-down",
+    "model_specification": "Option A (Gatekeeping): Test death first at alpha=0.05; if significant, allocate alpha to other endpoints\nOption B (Hierarchical): Test in pre-specified order, each at alpha=0.05, stop at first non-significant\nOption C (Holm): Order p-values p(1)<=p(2)<=p(3), test at alpha/3, 2*alpha/3, alpha",
+    "per_endpoint_analysis": [
+      "全因死亡: CMH test or logistic regression",
+      "6MWD: ANCOVA with baseline adjustment",
+      "KCCQ: ANCOVA with baseline adjustment"
+    ],
+    "reporting": "每个终点的p值、效应量、以及多重性调整后的结论"
+  },
+  "common_wrong_methods": [
+    {
+      "method": "独立报告每个p值（不调整）",
+      "why_wrong": "3个主要终点不做调整时整体I类错误率膨胀至约1-(1-0.05)^3=14.3%，远超5%；增加假阳性风险"
+    },
+    {
+      "method": "Bonferroni校正（最简单但最保守）",
+      "why_wrong": "Bonferroni虽然控制FWER但过于保守，尤其当终点间存在相关性时损失效能；应优先考虑有顺序的检验策略"
+    },
+    {
+      "method": "仅选最显著的终点报告",
+      "why_wrong": "事后选择主要终点（cherry-picking）严重偏倚，I类错误不受控；主要终点必须预设"
+    }
+  ],
+  "reasoning": "当一个试验有多个主要终点时，每个终点的独立检验都会增加整体假阳性率。ICH E9要求多重主要终点必须在方案中预设多重性控制策略。门控法（gatekeeping）利用终点间的临床逻辑关系（如先验证死亡再检验功能指标），在控制FWER的同时最大化效能。Holm法是通用的step-down方法，不依赖终点间关系。FDA在心血管和心衰试验中普遍要求预设的多重性策略。",
+  "references": [
+    "ICH E9: Statistical Principles for Clinical Trials (1998), Section 5.6",
+    "Bretz F, et al. A graphical approach to sequentially rejective multiple test procedures. Stat Med. 2009;28(4):586-604."
+  ]
+}

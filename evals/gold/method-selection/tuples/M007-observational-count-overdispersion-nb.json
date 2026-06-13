@@ -1,0 +1,46 @@
+{
+  "tuple_id": "M007-observational-count-overdispersion-nb",
+  "kind": "method_selection",
+  "test_name": "观察性研究计数结局+过离散应选负二项回归",
+  "description": "一项队列研究评估新型抗菌药管理方案对ICU患者抗菌药使用天数（计数数据，均值4.8，方差22.3）的影响，数据存在明显过离散（方差远大于均值）。正确方法为负二项回归，而非泊松回归。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "interrupted time series / cohort",
+    "outcome_type": "count",
+    "outcome_variable": "抗菌药使用天数",
+    "exposure": "管理方案实施前后",
+    "covariates": ["年龄", "APACHE II评分", "住院天数", "是否手术"],
+    "mean_count": 4.8,
+    "variance_count": 22.3,
+    "dispersion_ratio": 4.65,
+    "sample_size": 850,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "负二项回归（Negative Binomial Regression）",
+    "expected_parameters": "Negative binomial GLM with log link, exposure offset (hospital days), dispersion parameter estimated from data",
+    "model_specification": "log(E[Y]) = beta_0 + beta_1 * intervention + beta_2 * covariates + log(hospital_days)\nVar(Y) = mu + alpha * mu^2 (NB2 parameterization)",
+    "model_diagnostics": ["过离散检验（Cameron-Trivedi）", "残差分析", "与泊松模型的似然比检验"],
+    "effect_measure": "Incidence Rate Ratio (IRR) with 95% CI"
+  },
+  "common_wrong_methods": [
+    {
+      "method": "泊松回归",
+      "why_wrong": "泊松假设均值=方差（equidispersion），本例方差是均值的4.65倍，严重过离散会导致标准误低估、p值偏小、假阳性率膨胀"
+    },
+    {
+      "method": "对计数取对数后做线性回归",
+      "why_wrong": "log(Y+1)变换不保证正态性，且对零值处理不自然；结果难以解释（几何均值比而非率比）"
+    },
+    {
+      "method": "将计数二分类化后做logistic回归",
+      "why_wrong": "将连续/计数结局二分类损失大量信息，降低效能；且截断点选择具有任意性"
+    }
+  ],
+  "reasoning": "计数数据的标准方法是泊松回归，但临床数据几乎总是存在过离散（overdispersion），因为个体间的异质性、聚集效应等使方差超过均值。负二项回归通过引入额外的离散参数alpha来建模过离散，是泊松的自然扩展。Cameron & Trivedi的过离散检验可以正式验证是否需要NB。在抗菌药管理研究中，计数结局（用药天数、感染次数等）的过离散是常态，NB回归应作为默认选择。",
+  "references": [
+    "Cameron AC, Trivedi PK. Regression Analysis of Count Data. 2nd ed. Cambridge University Press; 2013.",
+    "Hilbe JM. Negative Binomial Regression. 2nd ed. Cambridge University Press; 2011."
+  ]
+}

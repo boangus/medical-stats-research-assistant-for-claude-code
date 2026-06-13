@@ -55,7 +55,7 @@ def assess_sample_size(
     n_events: int,
     n_predictors: int,
     target_epv: float = 10.0,
-    outcome prevalence: Optional[float] = None,
+    outcome_prevalence: Optional[float] = None,
     n_total: Optional[int] = None,
 ) -> Dict:
     """评估预测模型开发的样本量充分性
