@@ -233,7 +233,7 @@ correction.json 格式:
 - ❌ 不达标: 低于阈值 80%
 
 **门闸联动**: 当门闸校验结果为 ❌ 时，Pipeline Stage 3.5 应标记为"低置信度"，
-建议用户对相关方法类型的结果进行人工复核。
+必须要求用户对相关方法类型的结果进行人工复核。
 
 ---
 
@@ -261,7 +261,7 @@ Stage 3.5 结果质量门闸:
   静态检查 (现有8项) + 动态校准检查 (新增):
     - 该方法类型的历史 TPR ≥ 90%? → ✅ 信任 / ⚠️ 需审查
     - 该方法类型的历史 FPR ≤ 10%? → ✅ 信任 / ⚠️ 需审查
-    - 校准数据不足 (<10条)? → ⚠️ 无法评估，建议人工复核
+    - 校准数据不足 (<10条)? → ⚠️ 无法评估，必须人工复核
 ```
 
 ### Anti-Pattern 验证
@@ -363,7 +363,7 @@ anti-pattern A1 "正态性假定默认化":
 
 | # | 禁止行为 | 为什么 | 正确做法 |
 |---|---------|--------|---------|
-| 8 | 校准数据不足时默认门闸通过 | 无依据的通过比不通过更危险 | 校准数据 <10 条 → ⚠️ 无法评估，建议人工复核 |
+| 8 | 校准数据不足时默认门闸通过 | 无依据的通过比不通过更危险 | 校准数据 <10 条 → ⚠️ 无法评估，必须人工复核 |
 | 9 | 门闸校验 ❌ 时仍自动放行到 Stage 4 | 低置信度结果进入报告可能导致错误临床结论 | ❌ 必须"强制人工复核"，不得自动放行 |
 
 ---
@@ -397,7 +397,7 @@ anti-pattern A1 "正态性假定默认化":
 
 **如果 TPR 显著偏离 50%** → 可能存在标签泄漏或计算偏差。
 
-> **自检频率**: 每次更新 calibration_runner.py 后必须运行自检 1+2。自检 3 建议每季度运行一次。
+> **自检频率**: 每次更新 calibration_runner.py 后必须运行自检 1+2。自检 3 每季度运行一次。
 
 ---
 
@@ -454,7 +454,7 @@ anti-pattern A1 "正态性假定默认化":
 # 伪代码: 门闸校验逻辑
 def gate_check(calibration_db, method_type=None):
     if calibration_db.count < 10:
-        return {"status": "⚠️", "message": "校准数据不足(<10条)，建议人工复核"}
+        return {"status": "⚠️", "message": "校准数据不足(<10条)，必须人工复核"}
 
     metrics = calibration_db.get_metrics(method_type=method_type)
     checks = {
@@ -470,7 +470,7 @@ def gate_check(calibration_db, method_type=None):
     if len(failed) == 0:
         return {"status": "✅", "message": "全部达标"}
     elif len(failed) <= 2:
-        return {"status": "⚠️", "message": f"以下指标未达标: {failed}，建议审查"}
+        return {"status": "⚠️", "message": f"以下指标未达标: {failed}，必须审查"}
     else:
         return {"status": "❌", "message": f"多项不达标: {failed}，强制人工复核"}
 ```
