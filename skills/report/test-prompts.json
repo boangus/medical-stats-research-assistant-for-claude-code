@@ -68,5 +68,40 @@
     "prompt": "我的研究是一个临床预测模型，用了XGBoost做风险预测。请帮我生成符合TRIPOD-AI规范的报告。",
     "expected": "加载TRIPOD_AI_checklist.md→逐项检查→标记完成/未完成→对AI模型特有条目（算法描述/超参数/可解释性）重点审查→生成合规报告",
     "test_focus": ["dim4", "dim5", "dim8"]
+  },
+  {
+    "id": 11,
+    "name": "CONSORT 2025合规检查",
+    "prompt": "请帮我检查我的RCT报告是否符合CONSORT 2025新标准，特别是新增的AI披露、数据共享声明和多样性报告条目。",
+    "expected": "加载CONSORT_checklist.md(2025版)→逐项检查22条→标记新增条目(2025)完成状态→生成合规报告→对未完成的新增条目(AI披露/数据共享/多样性/PPI)给出具体修复建议",
+    "test_focus": ["dim4", "dim5", "dim8"]
+  },
+  {
+    "id": 12,
+    "name": "Quarto格式报告输出",
+    "prompt": "请将我的分析报告输出为Quarto (.qmd)格式，支持HTML和Word双格式渲染，包含可执行的R代码块。",
+    "expected": "调用report_template.qmd→填充分析结果到对应代码块→设置execute: echo=false→生成.qmd文件→提供渲染命令(quarto render report.qmd --to html,docx)",
+    "test_focus": ["dim5", "dim6", "dim8"]
+  },
+  {
+    "id": 13,
+    "name": "诊断试验STARD报告",
+    "prompt": "我的研究评估了一个新型生物标志物的诊断准确性，AUC=0.85 (95%CI: 0.80-0.90)，灵敏度78%，特异度82%。请帮我生成符合STARD规范的诊断试验报告。",
+    "expected": "加载STARD规范→生成2×2诊断表→ROC曲线图→报告灵敏度/特异度/PPV/NPV/LR+/LR-→生成流程图(受试者纳入→指标检测→金标准对比)→STARD合规检查",
+    "test_focus": ["dim5", "dim6", "dim8"]
+  },
+  {
+    "id": 14,
+    "name": "网络Meta分析报告",
+    "prompt": "我做了一个网络Meta分析，比较了5种降压药的疗效。SUCRA排名显示A>B>C>D>E。请帮我生成包含网络几何图、联赛表和SUCRA排名图的报告。",
+    "expected": "调用nma_network_plot()生成网络图→nma_league_table()生成联赛表→nma_ranking()生成SUCRA排名图→一致性检验结果→按PRISMA-NMA扩展撰写方法学",
+    "test_focus": ["dim5", "dim6", "dim8"]
+  },
+  {
+    "id": 15,
+    "name": "AI/LLM使用声明生成",
+    "prompt": "我的论文使用了MSRA进行统计分析和报告生成，请帮我生成符合CONSORT 2025要求的AI使用声明。",
+    "expected": "生成AI使用声明模板：声明使用的AI工具(MSRA)+具体用途(统计分析/报告生成)+人工审核确认+局限性说明→嵌入报告的'利益冲突与AI声明'章节",
+    "test_focus": ["dim5", "dim8"]
   }
 ]
