@@ -69,3 +69,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-13T23:30	reval-v071	msra-report	89.6	88.2	reeval	d1=9,d2=9,d3=9,d4=9,d5=9,d6=10,d7=9,d8=8,d9=9	v0.7.1重评：Quarto模板新增；CONSORT 2025更新；6条test-prompts偏少	dry_run
 2026-06-13T23:30	reval-v071	msra-calibration	-	81.1	reeval	d1=9,d2=8,d3=7,d4=8,d5=8,d6=9,d7=8,d8=6,d9=9	首次评估v0.7.1：4模式清晰；自验证3项；金标准为合成数据(dim8=6)；反例9条	dry_run
 2026-06-13T23:30	summary-v071	-	-	-	reval-v071	6个skill重评：avg 88.7(上次88.0)；calibration首次评估81.1为最弱环节	dry_run
+2026-06-14T00:05	optimize-calibration	msra-calibration	81.1	86.1	keep	dim3+dim5+dim8	test-prompts 6→15; failure modes 6→10; Mode2/3具体化; 真实校准积累机制	dry_run
+2026-06-14T00:05	optimize-report	msra-report	88.2	89.5	keep	dim8	test-prompts 10→15; +CONSORT2025/Quarto/STARD/NMA/AI disclosure	dry_run
