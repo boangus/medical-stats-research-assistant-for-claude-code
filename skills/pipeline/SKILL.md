@@ -9,8 +9,8 @@ description: |
   触发: /msra / 流水线 / pipeline / 数据分析流程 / 统计流程 / 完整流程 / 从头开始 / 数据清洗 / 统计分析 / 分析报告 / 结果解读 / 统计咨询 / orchestrator / 编排 / 调度 / 质量门闸
 data_access_level: redacted
 task_type: open-ended
-depends_on: [data-prep, analysis-plan, analysis-exec, report]
-works_with: [agents/AGENTS.md, agents/protocol.md]
+depends_on: [data-prep, analysis-plan, analysis-exec, report, calibration]
+works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_schema.md]
 ---
 
 # MSRA Pipeline Orchestrator
@@ -97,7 +97,8 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 ### Mid-Entry 前置检查
 
-进入任何阶段前，必须确认前置产物是否存在且有效：
+进入任何阶段前，必须确认前置产物是否存在且有效。
+使用 **Material Passport** (shared/passport/passport_schema.md) 追踪产物生命周期：
 
 ```
 进入 Stage 1.5 之前  → 确认: 清洗后数据 + 清洗日志 + 盲态审核记录 + 数据库锁定记录
@@ -107,6 +108,12 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 进入 Stage 3.5 之前   → 确认: 分析结果 + 质检报告
 进入 Stage 4 之前     → 确认: Stage 3.5 通过 + 分析结果
 ```
+
+**Passport 检查流程**：
+1. 读取 `MSRA/passport.json`，检查各产物状态
+2. 产物状态: `planned` → `in_progress` → `completed` → `verified` → `consumed`
+3. 前置产物必须为 `verified` 或 `consumed` 才允许进入下一阶段
+4. 若 passport.json 不存在，提示用户初始化或从现有产物重建
 
 **IRON RULE**: 如果前置产物缺失或过期，必须先回退补齐，不能跳过。
 
@@ -309,7 +316,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 - **Mode**: `quality-gate`（只检查，不修改）
 - **输入**: 分析结果 + 质检报告 + SAP
 - **输出**: 结果质量门闸报告（通过/不通过 + 具体问题清单）
-- **阻断检查清单 (7 项)**:
+- **阻断检查清单 (9 项)**:
 
   ```
   □ 1. 结果完整性: 所有 SAP 中计划的分析是否都已执行？
@@ -320,6 +327,12 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
   □ 6. 异常结果标记: 是否有异常/意外结果被标记说明？
   □ 7. 结果复现: 3 次重跑关键结论是否一致？（详见 shared/reproducibility/）
   □ 8. [SKIP] 标记: 跳过的分析是否有合理记录？
+  □ 9. [校准联动] 校准置信度: 该方法类型的历史校准指标是否达标？
+      - 读取 calibration_db.json 中该方法类型的累计 TPR/FPR
+      - TPR ≥ 90% 且 FPR ≤ 10% → ✅ 高置信度
+      - TPR 80-90% 或 FPR 10-15% → ⚠️ 低置信度，建议人工复核
+      - TPR < 80% 或 FPR > 15% → ❌ 不可信，强制人工复核
+      - 校准数据不足 (<10条) → ⚠️ 无法评估，建议人工复核
   ```
 
   - **全部通过** → ✅ 进入 Stage 4

@@ -269,13 +269,18 @@ cleaned_data %>%
 
 **自愈代码执行循环**（借鉴 clinical-tlf-automation-system）：
 
+> **错误诊断参考**: shared/error-diagnostics/error_patterns.md — 常见错误模式与诊断流程
+> **自动修复参考**: shared/error-diagnostics/auto_fix_suggestions.py (Python) / .R (R) — 自动修复建议
+
 ```
 生成代码 → 执行 → 成功？→ 输出结果
                 ↓ 失败
            DebugAgent 介入（最多5轮）
            ├── 第1轮: 分析错误类型（语法/运行时/逻辑）+ 根因 + 修复
+           │   └── 参考 error_patterns.md 匹配错误模式
            │   └── 成功 → 输出结果 / 失败 → 第2轮
            ├── 第2轮: 上下文传递 + 增强修复（补全缺失变量/转换数据类型/添加包加载）
+           │   └── 参考 auto_fix_suggestions 获取修复建议
            │   └── 成功 → 输出结果 / 失败 → 第3轮
            ├── 第3轮: 统计诊断（共线性/分离/样本量）+ 方法降级
            │   └── 成功 → 输出结果 / 失败 → 第4轮

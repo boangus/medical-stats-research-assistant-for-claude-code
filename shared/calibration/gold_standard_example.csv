@@ -19,3 +19,83 @@ CAL_017,Chi-square,2.80,1.20,6.53,0.018,TRUE,Cat_Toy,200,,强关联
 CAL_018,Chi-square,1.00,0.45,2.22,1.000,FALSE,Cat_Toy,200,,完全无关联
 CAL_019,Chi-square,3.50,1.60,7.66,0.002,TRUE,Cat_Toy,200,,显著关联
 CAL_020,Chi-square,0.80,0.35,1.83,0.600,FALSE,Cat_Toy,200,,保护趋势不显著
+CAL_021,Mann-Whitney U,0.65,0.42,0.88,0.008,TRUE,Cont_Toy,80,,非正态组间比较
+CAL_022,Mann-Whitney U,0.52,0.28,0.76,0.015,TRUE,Cont_Toy,80,,秩和检验显著
+CAL_023,Mann-Whitney U,0.45,0.18,0.72,0.052,FALSE,Cont_Toy,80,,边缘不显著
+CAL_024,Mann-Whitney U,0.12,-0.15,0.39,0.380,FALSE,Cont_Toy,80,,无差异
+CAL_025,Mann-Whitney U,0.78,0.55,1.01,0.001,TRUE,Cont_Toy,120,,大样本非参数
+CAL_026,Linear Regression,3.20,1.80,4.60,0.001,TRUE,Cont_Toy,300,"age,sex,bmi",连续结局
+CAL_027,Linear Regression,0.80,-0.20,1.80,0.110,FALSE,Cont_Toy,300,"age,sex",非显著
+CAL_028,Linear Regression,-1.50,-2.80,-0.20,0.025,TRUE,Cont_Toy,300,"treatment,bmi",负向关联
+CAL_029,Linear Regression,0.30,-0.50,1.10,0.450,FALSE,Cont_Toy,300,"age,sex,diabetes",无效应
+CAL_030,Linear Regression,5.10,3.50,6.70,0.001,TRUE,Cont_Toy,300,"treatment,age,bmi",强效应
+CAL_031,ANCOVA,2.80,1.20,4.40,0.002,TRUE,RCT_Toy,200,"baseline_value",调整基线
+CAL_032,ANCOVA,0.90,-0.60,2.40,0.240,FALSE,RCT_Toy,200,"baseline_value,age",非显著
+CAL_033,ANCOVA,1.50,0.20,2.80,0.028,TRUE,RCT_Toy,200,"baseline_value",边缘显著
+CAL_034,Repeated Measures ANOVA,4.20,2.10,6.30,0.001,TRUE,RCT_Toy,150,"time,group,time*group",时间交互
+CAL_035,Repeated Measures ANOVA,1.10,-0.50,2.70,0.180,FALSE,RCT_Toy,150,"time,group",无交互
+CAL_036,Mixed Effects Model,2.30,1.10,3.50,0.003,TRUE,Long_Toy,400,"time,group,bmi",随机截距
+CAL_037,Mixed Effects Model,0.70,-0.30,1.70,0.160,FALSE,Long_Toy,400,"time,age",非显著
+CAL_038,Mixed Effects Model,3.50,2.00,5.00,0.001,TRUE,Long_Toy,400,"treatment,time,site",多中心
+CAL_039,Mixed Effects Model,-0.50,-1.80,0.80,0.420,FALSE,Long_Toy,400,"age,sex",无效应
+CAL_040,Mixed Effects Model,1.80,0.60,3.00,0.008,TRUE,Long_Toy,400,"treatment,time",治疗时间交互
+CAL_041,Kaplan-Meier,0.65,0.50,0.85,0.002,TRUE,Surv_Toy,250,,生存曲线比较
+CAL_042,Kaplan-Meier,0.90,0.70,1.16,0.420,FALSE,Surv_Toy,250,,无差异
+CAL_043,Kaplan-Meier,0.55,0.38,0.80,0.003,TRUE,Surv_Toy,250,,显著生存优势
+CAL_044,Kaplan-Meier,1.05,0.82,1.34,0.700,FALSE,Surv_Toy,250,,曲线交叉
+CAL_045,Log-rank Test,0.60,0.45,0.80,0.001,TRUE,Surv_Toy,250,,显著差异
+CAL_046,Log-rank Test,0.95,0.75,1.20,0.680,FALSE,Surv_Toy,250,,无差异
+CAL_047,Competing Risks,0.75,0.55,1.02,0.065,FALSE,Surv_Toy,300,"age,treatment",竞争风险
+CAL_048,Competing Risks,0.50,0.32,0.78,0.003,TRUE,Surv_Toy,300,"treatment",显著
+CAL_049,Propensity Score Matching,1.60,1.10,2.33,0.015,TRUE,Obs_Toy,500,"age,sex,bmi,smoking",PSM后OR
+CAL_050,Propensity Score Matching,1.10,0.78,1.55,0.580,FALSE,Obs_Toy,500,"age,sex,bmi",PSM后无效应
+CAL_051,Propensity Score Matching,0.70,0.50,0.98,0.038,TRUE,Obs_Toy,500,"age,bmi,diabetes,smoking",PSM保护效应
+CAL_052,IPTW,1.45,1.05,2.00,0.025,TRUE,Obs_Toy,600,"age,sex,bmi,smoking,hypertension",IPTW加权OR
+CAL_053,IPTW,0.95,0.70,1.29,0.750,FALSE,Obs_Toy,600,"age,sex,bmi",IPTW无效应
+CAL_054,IPTW,1.80,1.20,2.70,0.005,TRUE,Obs_Toy,600,"age,bmi,smoking,diabetes,hypertension",IPTW强关联
+CAL_055,ROC Analysis,0.82,0.76,0.88,0.001,TRUE,Diag_Toy,300,,AUC诊断性能
+CAL_056,ROC Analysis,0.68,0.60,0.76,0.001,TRUE,Diag_Toy,300,,中等AUC
+CAL_057,ROC Analysis,0.55,0.47,0.63,0.180,FALSE,Diag_Toy,300,,AUC不优于随机
+CAL_058,ROC Analysis,0.91,0.86,0.96,0.001,TRUE,Diag_Toy,300,,高AUC
+CAL_059,ROC Analysis,0.72,0.64,0.80,0.001,TRUE,Diag_Toy,300,,可接受AUC
+CAL_060,DeLong Test,0.05,0.01,0.09,0.020,TRUE,Diag_Toy,300,,AUC比较显著
+CAL_061,DeLong Test,0.02,-0.03,0.07,0.420,FALSE,Diag_Toy,300,,AUC比较无差异
+CAL_062,Meta Analysis,1.35,1.10,1.66,0.004,TRUE,Meta_Toy,5,,合并OR显著
+CAL_063,Meta Analysis,1.08,0.92,1.27,0.350,FALSE,Meta_Toy,5,,合并OR不显著
+CAL_064,Meta Analysis,0.75,0.60,0.94,0.013,TRUE,Meta_Toy,8,,保护效应合并
+CAL_065,Meta Analysis,1.15,0.95,1.39,0.150,FALSE,Meta_Toy,8,,异质性高但不显著
+CAL_066,E-value,2.10,,,0.005,TRUE,Obs_Toy,500,,E-value评估
+CAL_067,E-value,1.25,,,0.200,FALSE,Obs_Toy,500,,E-value弱
+CAL_068,Mediation Analysis,0.35,0.10,0.60,0.008,TRUE,Obs_Toy,400,"treatment,mediator,outcome",间接效应
+CAL_069,Mediation Analysis,0.08,-0.12,0.28,0.440,FALSE,Obs_Toy,400,"treatment,mediator",无中介效应
+CAL_070,Mediation Analysis,0.50,0.20,0.80,0.002,TRUE,Obs_Toy,400,"treatment,mediator1,mediator2",多中介
+CAL_071,Difference-in-Differences,3.50,1.20,5.80,0.005,TRUE,Obs_Toy,800,"time,group,time*group",DID显著
+CAL_072,Difference-in-Differences,0.80,-1.50,3.10,0.480,FALSE,Obs_Toy,800,"time,group",DID不显著
+CAL_073,Difference-in-Differences,2.20,0.30,4.10,0.028,TRUE,Obs_Toy,800,"time,group,covariates",DID调整后
+CAL_074,Fisher Exact Test,3.20,1.10,9.30,0.025,TRUE,Cat_Toy,40,,小样本分类
+CAL_075,Fisher Exact Test,1.50,0.40,5.60,0.520,FALSE,Cat_Toy,40,,小样本不显著
+CAL_076,Fisher Exact Test,5.80,1.80,18.70,0.003,TRUE,Cat_Toy,40,,强关联小样本
+CAL_077,McNemar Test,2.50,1.30,4.81,0.006,TRUE,Diag_Toy,150,,配对分类显著
+CAL_078,McNemar Test,1.20,0.60,2.40,0.600,FALSE,Diag_Toy,150,,配对分类无差异
+CAL_079,Conditional Logistic,1.70,1.10,2.63,0.018,TRUE,Obs_Toy,300,"treatment,bmi",配对Logistic
+CAL_080,Conditional Logistic,1.15,0.75,1.76,0.520,FALSE,Obs_Toy,300,"treatment",配对无效应
+CAL_081,Conditional Logistic,2.30,1.30,4.07,0.005,TRUE,Obs_Toy,300,"treatment,age,bmi",配对强关联
+CAL_082,Poisson Regression,1.40,1.10,1.78,0.006,TRUE,Obs_Toy,500,"age,sex,exposure",计数结局
+CAL_083,Poisson Regression,0.95,0.75,1.21,0.680,FALSE,Obs_Toy,500,"age,sex",计数无效应
+CAL_084,Poisson Regression,1.80,1.30,2.49,0.001,TRUE,Obs_Toy,500,"exposure,age",计数强效应
+CAL_085,Negative Binomial,1.55,1.05,2.29,0.028,TRUE,Obs_Toy,500,"age,sex,exposure",过离散计数
+CAL_086,Negative Binomial,1.10,0.78,1.55,0.590,FALSE,Obs_Toy,500,"age,sex",过离散无效应
+CAL_087,Restricted Cubic Splines,1.80,1.20,2.70,0.004,TRUE,Obs_Toy,600,"bmi_rcs,age,bmi",非线性关联
+CAL_088,Restricted Cubic Splines,1.15,0.80,1.65,0.440,FALSE,Obs_Toy,600,"age_rcs,sex",无非线性
+CAL_089,Restricted Cubic Splines,2.50,1.50,4.17,0.001,TRUE,Obs_Toy,600,"bp_rcs,age,diabetes",J型关联
+CAL_090,Decision Curve Analysis,0.015,0.005,0.025,0.003,TRUE,Diag_Toy,300,,DCA净获益
+CAL_091,Decision Curve Analysis,0.003,-0.005,0.011,0.420,FALSE,Diag_Toy,300,,DCA无获益
+CAL_092,Decision Curve Analysis,0.025,0.010,0.040,0.001,TRUE,Diag_Toy,300,,DCA显著获益
+CAL_093,Sample Size Calculation,0.80,0.65,0.95,0.010,TRUE,RCT_Toy,,,"效能分析,非直接假设检验"
+CAL_094,Sample Size Calculation,0.50,0.30,0.70,0.050,FALSE,RCT_Toy,,,"效能不足,需更大样本"
+CAL_095,Bland-Altman,0.20,-0.30,0.70,0.350,FALSE,Diag_Toy,100,,一致性良好
+CAL_096,Bland-Altman,1.50,0.50,2.50,0.005,TRUE,Diag_Toy,100,,一致性差
+CAL_097,Bland-Altman,-0.10,-0.60,0.40,0.680,FALSE,Diag_Toy,100,,无系统偏差
+CAL_098,Kruskal-Wallis,8.50,,,0.015,TRUE,Cont_Toy,150,,多组非参数
+CAL_099,Kruskal-Wallis,2.30,,,0.320,FALSE,Cont_Toy,150,,多组无差异
+CAL_100,Kruskal-Wallis,12.80,,,0.002,TRUE,Cont_Toy,200,,多组强差异

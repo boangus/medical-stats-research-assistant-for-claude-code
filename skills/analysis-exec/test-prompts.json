@@ -16,8 +16,57 @@
   {
     "id": 3,
     "name": "模型诊断与验证",
-    "prompt": "我的Cox回归模型拟合完成了，请帮我做模型诊断：检查PH假设、 influential points、和预测性能。",
+    "prompt": "我的Cox回归模型拟合完成了，请帮我做模型诊断：检查PH假设、influential points、和预测性能。",
     "expected": "执行模型诊断步骤：Schoenfeld残差检验PH假设→DFBETA识别influential points→C-index评估区分度→校准曲线评估校准度→生成诊断报告",
+    "test_focus": ["dim5", "dim8"]
+  },
+  {
+    "id": 4,
+    "name": "假设检验前置执行",
+    "prompt": "我要做独立样本t检验比较两组HbA1c，请先帮我检查假设条件：正态性和方差齐性。",
+    "expected": "执行假设检验前置：Shapiro-Wilk正态性检验→Levene方差齐性检验→根据结果决定用t-test/Welch/Mann-Whitney→记录假设检验结果",
+    "test_focus": ["dim5", "dim8"]
+  },
+  {
+    "id": 5,
+    "name": "偏差记录",
+    "prompt": "SAP中定义了用ANCOVA做主要分析，但数据中发现基线值有大量缺失，无法做协变量调整。我需要改用t-test，请记录这个偏差。",
+    "expected": "记录偏差到偏差日志：原计划方法→实际方法→偏差原因→对结果的影响评估→用户确认→标记为SAP deviation",
+    "test_focus": ["dim4", "dim8"]
+  },
+  {
+    "id": 6,
+    "name": "敏感性分析一致性",
+    "prompt": "我的主要分析用PSM+Logistic回归得到OR=1.45(1.10-1.91)，敏感性分析用IPTW得到OR=1.38(1.05-1.82)。请评估一致性。",
+    "expected": "调用sensitivity_agreement.py→评估5个维度（方向/显著性/效应量/CI重叠/综合评分）→输出一致性报告→判断是否需要额外敏感性分析",
+    "test_focus": ["dim5", "dim8"]
+  },
+  {
+    "id": 7,
+    "name": "[SKIP]标记处理",
+    "prompt": "分析执行中有2个分析项标记为[SKIP]：1) 竞争风险模型（数据中无竞争事件）；2) 亚组分析-糖尿病亚型（样本量<30）。请处理。",
+    "expected": "检查[SKIP]原因→≥2个[SKIP]触发🛑STOP→展示每个[SKIP]的原因→讨论是否回退或接受→用户决策后继续",
+    "test_focus": ["dim3", "dim4", "dim8"]
+  },
+  {
+    "id": 8,
+    "name": "Generator-Evaluator差异",
+    "prompt": "Exec Runner报告Logistic回归满足假设条件，但Exec Inference独立验证发现Hosmer-Lemeshow检验P=0.03，不满足拟合优度。请处理这个差异。",
+    "expected": "记录Generator-Evaluator差异→展示双方判断→分析差异原因（Runner可能未做HL检验）→建议修正方案→更新结果表",
+    "test_focus": ["dim4", "dim5", "dim8"]
+  },
+  {
+    "id": 9,
+    "name": "样本量不足处理",
+    "prompt": "SAP计划需要200例，但实际可用数据只有120例，效能不足。请帮我评估影响并讨论处理方案。",
+    "expected": "Phase 0样本量验证→检测到<70%→🛑STOP→重新计算实际效能→讨论方案（继续但标注/增加样本/调整终点）→用户决策",
+    "test_focus": ["dim3", "dim4", "dim8"]
+  },
+  {
+    "id": 10,
+    "name": "可重复性验证",
+    "prompt": "分析执行完成了，请帮我验证结果的可重复性：重跑3次确认数值一致。",
+    "expected": "调用reproducibility_check.py→设置随机种子→3次重跑→比对关键数值（效应量/p值/CI）→输出一致性报告→不一致项标记为需审查",
     "test_focus": ["dim5", "dim8"]
   }
 ]

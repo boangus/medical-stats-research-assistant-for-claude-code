@@ -62,6 +62,18 @@
         "/msra-report CONSORT",
         "/msra-report --type table1"
       ]
+    },
+    "/msra-calibrate": {
+      "id": "msra-calibration",
+      "name": "Calibration",
+      "entry_point": "skills/calibration/SKILL.md",
+      "description": "Run metric calibration against gold standard, or view calibration status",
+      "usage": "/msra-calibrate [gold_standard.csv] [--status] [--update results.csv]",
+      "examples": [
+        "/msra-calibrate gold_standard.csv",
+        "/msra-calibrate --status",
+        "/msra-calibrate --update new_results.csv"
+      ]
     }
   },
   "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research"],

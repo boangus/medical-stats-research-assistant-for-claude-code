@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "标准校准运行",
+    "prompt": "请用 gold_standard.csv 对 MSRA 进行度量校准，对比方法选择、数值偏差和结论准确率。",
+    "expected": "加载金标准数据→验证格式→调用CalibrationEngine→生成混淆矩阵+关键指标+方法匹配率+数值偏差+改进建议",
+    "test_focus": ["dim2", "dim5", "dim8"]
+  },
+  {
+    "id": 2,
+    "name": "查看校准状态",
+    "prompt": "/msra-calibrate --status 查看当前校准数据库的状态和累计指标。",
+    "expected": "读取calibration_db.json→展示条目数、最近校准日期、累计TPR/TNR/FPR/FNR、方法匹配率、门闸达标状态",
+    "test_focus": ["dim3", "dim8"]
+  },
+  {
+    "id": 3,
+    "name": "增量更新校准",
+    "prompt": "用户纠正了一条分析结果：MSRA报告OR=1.50(p=0.03)，但实际正确结果应该是OR=1.20(p=0.15，不显著)。请记录这条校准数据。",
+    "expected": "调用CalibrationDatabase.record()→追加记录→更新累计指标→展示更新后摘要，特别关注FP→FPR变化",
+    "test_focus": ["dim3", "dim5", "dim8"]
+  },
+  {
+    "id": 4,
+    "name": "门闸校验",
+    "prompt": "/msra-calibrate --gate-check 检查当前校准指标是否满足质量门闸阈值。",
+    "expected": "读取累计校准指标→对比6项门闸阈值(TPR≥90%/TNR≥90%/FPR≤10%/FNR≤10%/方法匹配≥85%/MAPE≤10%)→输出✅/⚠️/❌状态",
+    "test_focus": ["dim4", "dim8"]
+  },
+  {
+    "id": 5,
+    "name": "金标准格式错误处理",
+    "prompt": "请用这个CSV进行校准：文件缺少gold_p和gold_significant列。",
+    "expected": "Phase 1验证失败→🛑STOP→报告具体缺失字段(gold_p, gold_significant)→提示正确格式",
+    "test_focus": ["dim3", "dim4"]
+  },
+  {
+    "id": 6,
+    "name": "方法匹配率分析",
+    "prompt": "校准结果显示方法匹配率只有72%，最常见错误是用t-test代替了Mann-Whitney U检验。请分析原因并给出改进建议。",
+    "expected": "识别非正态小样本场景的方法选择问题→引用anti-pattern A1→建议加强正态性检验决策树→更新方法选择规则优先级",
+    "test_focus": ["dim5", "dim7", "dim8"]
+  },
+  {
+    "id": 7,
+    "name": "假阳性率过高处理",
+    "prompt": "校准报告显示FPR=18%，远超10%阈值。最常见假阳性出现在Logistic回归的协变量选择上。请给出改进建议。",
+    "expected": "识别过度拟合/变量选择问题→建议增加交叉验证→建议 stricter的变量纳入标准→标记为❌不达标→建议人工复核相关结果",
+    "test_focus": ["dim5", "dim7", "dim8"]
+  },
+  {
+    "id": 8,
+    "name": "校准数据不足场景",
+    "prompt": "我刚安装MSRA，还没有校准数据。/msra-calibrate --gate-check 会怎样？",
+    "expected": "检测校准数据库为空→输出⚠️无法评估→建议先运行标准校准积累至少10条数据→所有门闸项标记为⚠️数据不足",
+    "test_focus": ["dim3", "dim4"]
+  },
+  {
+    "id": 9,
+    "name": "分方法类型校准",
+    "prompt": "我想看不同统计方法类型的分项校准指标，特别是Cox回归和Logistic回归的准确率对比。",
+    "expected": "按gold_method分组→分别计算TPR/TNR/FPR/FNR→对比两种方法→识别短板方法→给出针对性改进建议",
+    "test_focus": ["dim5", "dim8"]
+  },
+  {
+    "id": 10,
+    "name": "校准与Pipeline联动",
+    "prompt": "我刚完成了一次分析执行，QC Inspector检查通过了，但我想确认校准指标是否也支持这个结论。",
+    "expected": "读取当前校准指标→检查相关方法类型的TPR/FPR→若达标则确认→若不达标则标记低置信度并建议人工复核→更新Stage 3.5门闸状态",
+    "test_focus": ["dim4", "dim5", "dim8"]
+  }
+]
