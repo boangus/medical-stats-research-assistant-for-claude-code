@@ -38,7 +38,20 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
 - Pipeline SKILL.md: `depends_on` now includes `calibration`; `works_with` includes `shared/passport/passport_schema.md`
 - Stage 3.5 quality gate expanded from 7 to 9 check items (added calibration linkage + [SKIP] marking)
 
-## [0.6.1] - 2026-06-13
+## [0.7.1] - 2026-06-13
+
+### Added
+- **New templates**:
+  - `shared/templates/mendelian_randomization_template.R` — MR analysis (IVW, MR-Egger, weighted median, mode, MR-PRESSO, leave-one-out, scatter/forest plots)
+  - `shared/templates/network_meta_template.R` — Network meta-analysis (frequentist/Bayesian, SUCRA ranking, league table, network plot, inconsistency test)
+  - `shared/templates/adaptive_design_template.R` — Bayesian adaptive design (group sequential, sample size re-estimation, enrichment, interim analysis, simulation)
+  - `shared/templates/cdisc_integration_template.R` — CDISC data integration (SDTM/ADaM detection, XPT export, ADaM validation)
+- **Knowledge base chapters**:
+  - `ch45-mendelian-randomization.md` — Three assumptions, instrument selection, methods, sensitivity, reporting
+  - `ch46-network-meta-analysis.md` — Indirect comparison, consistency, SUCRA, league table, PRISMA-NMA
+- **analysis-plan SKILL.md**: TTE added to observational study advanced methods table
+
+## [0.7.0] - 2026-06-13
 
 ### Fixed
 - `shared/templates/prediction_model_template.py` line 58: syntax error (`outcome prevalence` → `outcome_prevalence`)

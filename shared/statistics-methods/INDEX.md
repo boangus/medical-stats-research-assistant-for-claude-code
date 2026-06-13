@@ -3,6 +3,7 @@
 > 来源：*方法学 Guide to Statistics and Methods*（Edward H. Livingston, Roger J. Lewis 主编）
 > 整合日期：2026-05-29
 > 本目录提供 46 个与统计分析直接相关的章节索引，按主题分组，便于在 MSRA 流水线各阶段快速查阅。
+> v0.7.1 新增: ch44 目标试验模拟, ch45 孟德尔随机化, ch46 网络Meta分析
 > 已删除 14 章无关内容（数据库实践指南 ch43-55、深度学习 ch42）。
 
 ---
