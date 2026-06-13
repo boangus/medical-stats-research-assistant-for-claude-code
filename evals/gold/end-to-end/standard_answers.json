@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "description": "MSRA 端到端评估标准答案",
+  "datasets": {
+    "E001_mtcars_lm": {
+      "description": "mtcars 线性回归: mpg ~ wt + cyl",
+      "r_code": "model <- lm(mpg ~ wt + cyl, data = mtcars); summary(model)",
+      "expected": {
+        "n": 32,
+        "r_squared_min": 0.80,
+        "r_squared_max": 0.85,
+        "wt_coef_sign": "negative",
+        "cyl_coef_sign": "negative",
+        "wt_p_lt_0.05": true,
+        "cyl_p_lt_0.05": true
+      }
+    },
+    "E002_lung_cox": {
+      "description": "lung 数据集 Cox 回归: ~ age + sex + ph.ecog",
+      "r_code": "library(survival); cox <- coxph(Surv(time, status) ~ age + sex + ph.ecog, data = lung); summary(cox)",
+      "expected": {
+        "n": 228,
+        "events": 165,
+        "sex_hr_sign": "protective",
+        "sex_hr_range": [0.4, 0.7],
+        "sex_p_lt_0.05": true,
+        "ph_ecog_hr_sign": "harmful",
+        "ph_ecog_p_lt_0.05": true
+      }
+    },
+    "E003_breast_cancer_logistic": {
+      "description": "sklearn breast_cancer Logistic 回归",
+      "python_code": "from sklearn.linear_model import LogisticRegression; from sklearn.datasets import load_breast_cancer; data = load_breast_cancer(); model = LogisticRegression(max_iter=10000); model.fit(data.data, data.target)",
+      "expected": {
+        "n": 569,
+        "accuracy_min": 0.92,
+        "auc_min": 0.97,
+        "n_features": 30
+      }
+    },
+    "E004_gee_longitudinal": {
+      "description": "GEE 纵向二分类数据",
+      "expected": {
+        "convergence": true,
+        "trt_effect_sign": "positive",
+        "trt_p_lt_0.05": true,
+        "qic_computed": true
+      }
+    },
+    "E005_competing_risks": {
+      "description": "竞争风险 Fine-Gray 模型",
+      "expected": {
+        "cif_sum_to_one": true,
+        "gray_test_computed": true,
+        "shr_computed": true,
+        "shr_ci_computed": true
+      }
+    }
+  },
+  "compliance_templates": {
+    "CONSORT_2025": {
+      "total_items": 22,
+      "critical_items": ["flow_diagram", "randomization", "primary_outcome_ci", "itt_analysis", "ai_disclosure"],
+      "min_coverage": 0.82
+    },
+    "STROBE": {
+      "total_items": 18,
+      "critical_items": ["study_design", "participants", "outcome_definition", "confounding_control", "sensitivity_analysis"],
+      "min_coverage": 0.83
+    }
+  },
+  "robustness_tests": {
+    "missing_5pct": {
+      "description": "5% 随机缺失注入",
+      "expected": "conclusion_stable"
+    },
+    "noise_1pct": {
+      "description": "1% 高斯噪声添加",
+      "expected": "conclusion_stable"
+    },
+    "case_mixed": {
+      "description": "变量名大小写混乱",
+      "expected": "correctly_parsed"
+    },
+    "date_formats": {
+      "description": "日期格式混合",
+      "expected": "correctly_parsed"
+    }
+  }
+}

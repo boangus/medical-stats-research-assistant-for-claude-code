@@ -50,6 +50,12 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
   - `ch45-mendelian-randomization.md` — Three assumptions, instrument selection, methods, sensitivity, reporting
   - `ch46-network-meta-analysis.md` — Indirect comparison, consistency, SUCRA, league table, PRISMA-NMA
 - **analysis-plan SKILL.md**: TTE added to observational study advanced methods table
+- **End-to-end evaluation framework** (`evals/gold/end-to-end/`):
+  - 4 evaluation dimensions: code executability, numeric accuracy, compliance, robustness
+  - 5 test cases with standard answers (E001-E005)
+  - Compliance templates for CONSORT 2025 and STROBE
+  - Robustness tests: missing injection, noise, case mixing, date format chaos
+- **Version bump**: manifest.json updated to 0.7.1
 
 ## [0.7.0] - 2026-06-13
 
