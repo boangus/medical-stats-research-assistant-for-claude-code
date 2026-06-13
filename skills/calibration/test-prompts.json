@@ -45,7 +45,7 @@
     "id": 7,
     "name": "假阳性率过高处理",
     "prompt": "校准报告显示FPR=18%，远超10%阈值。最常见假阳性出现在Logistic回归的协变量选择上。请给出改进建议。",
-    "expected": "识别过度拟合/变量选择问题→建议增加交叉验证→建议 stricter的变量纳入标准→标记为❌不达标→建议人工复核相关结果",
+    "expected": "识别过度拟合/变量选择问题→建议增加交叉验证→建议更严格的变量纳入标准→标记为❌不达标→建议人工复核相关结果",
     "test_focus": ["dim5", "dim7", "dim8"]
   },
   {
@@ -68,5 +68,40 @@
     "prompt": "我刚完成了一次分析执行，QC Inspector检查通过了，但我想确认校准指标是否也支持这个结论。",
     "expected": "读取当前校准指标→检查相关方法类型的TPR/FPR→若达标则确认→若不达标则标记低置信度并建议人工复核→更新Stage 3.5门闸状态",
     "test_focus": ["dim4", "dim5", "dim8"]
+  },
+  {
+    "id": 11,
+    "name": "自验证-已知答案",
+    "prompt": "请运行校准系统的自验证：用MSRA输出=金标准的数据测试，确认TPR=100%、FPR=0%。",
+    "expected": "构造已知答案数据→运行校准→验证TPR=100%/TNR=100%/FPR=0%/FNR=0%/MAE=0→通过则输出'校准引擎自检通过'→失败则报告偏差",
+    "test_focus": ["dim3", "dim5", "dim8"]
+  },
+  {
+    "id": 12,
+    "name": "用户纠正自动记录",
+    "prompt": "我刚才用/msra-exec做了一个Logistic回归，MSRA说OR=2.1(p<0.001)，但我查了原文献发现正确结果是OR=1.4(p=0.08)。请记录这个纠正。",
+    "expected": "自动提取MSRA原始输出→记录用户纠正→分类为numeric_error+conclusion_error(FP)→追加到calibration_db→更新Logistic回归的分项指标",
+    "test_focus": ["dim3", "dim5", "dim8"]
+  },
+  {
+    "id": 13,
+    "name": "校准趋势分析",
+    "prompt": "我想看过去一个月的校准趋势：MSRA的方法选择准确率是在提升还是下降？",
+    "expected": "读取calibration_db时间序列→按周/月分组→绘制TPR/FPR趋势图→识别改善/退化趋势→给出持续改进建议",
+    "test_focus": ["dim5", "dim8"]
+  },
+  {
+    "id": 14,
+    "name": "校准数据库损坏恢复",
+    "prompt": "calibration_db.json文件损坏了（JSON格式错误），怎么恢复？",
+    "expected": "检测文件损坏→备份损坏文件为.bak→从gold_standard_example.csv重建基础校准数据库→提示用户补充历史纠正数据",
+    "test_focus": ["dim3", "dim4"]
+  },
+  {
+    "id": 15,
+    "name": "跨版本校准对比",
+    "prompt": "我刚升级了MSRA到v0.7.1，想对比升级前后的校准指标是否有变化。",
+    "expected": "读取升级前后两次校准记录→对比TPR/TNR/FPR/FNR变化→识别改善/退化的维度→输出对比表格",
+    "test_focus": ["dim5", "dim8"]
   }
 ]

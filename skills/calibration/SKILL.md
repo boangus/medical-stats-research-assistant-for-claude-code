@@ -1,5 +1,5 @@
 ---
-version: "0.6.0"
+version: "0.7.1"
 name: MSRA Calibration
 description: |
   度量校准：用金标准分析结果对比 MSRA 输出，量化方法选择准确率、
@@ -91,6 +91,10 @@ Phase 4: 更新校准数据库
 | MSRA 输出与金标准字段无法对齐 | 检查字段名映射（gold_method vs msra_method） | 跳过无法对齐的维度，仅对比可匹配维度 |
 | calibration_db.json 写入失败 | 检查文件权限和磁盘空间 | 输出校准结果为独立 JSON 文件，提示用户手动合并 |
 | 校准数据不足（<5条有效对比） | 提示用户补充金标准数据 | 输出"校准数据不足"警告，不计算累计指标 |
+| 用户纠正缺少原始分析ID | 提示用户提供 analysis_id 或分析日期 | 按方法类型+日期范围模糊匹配，标注"匹配不确定" |
+| 校准数据库版本不兼容 | 检测 schema 版本号 | 自动迁移旧格式到新格式，保留历史数据 |
+| 金标准与 MSRA 输出的方法名不一致 | 检查方法名映射表（如 "Cox PH" vs "Cox regression"） | 无法映射的方法标记为"方法名不匹配"，排除出方法匹配率计算 |
+| 累计指标计算溢出（数据量极大） | 使用滑动窗口（最近 1000 条）计算近期指标 | 同时保留全量和窗口指标，在报告中标注计算范围 |
 
 ### 校准引擎调用示例
 
@@ -137,13 +141,37 @@ cat(sprintf("方法匹配率: %.1f%%\n", result$method_match_rate * 100))
 ## 模式 2: 状态查看
 
 ```
-展示内容:
-  1. 校准数据库条目数
-  2. 最近一次校准日期
-  3. 累计关键指标 (TPR/TNR/FPR/FNR)
-  4. 方法匹配率趋势
-  5. 各方法类型的分项准确率
-  6. 门闸阈值达标状态 (✅/⚠️/❌)
+输入: /msra-calibrate --status [--method TYPE] [--last N]
+
+展示内容（按顺序）:
+  1. 校准数据库概览
+     - 总条目数: N
+     - 来源分布: user_correction=X, published=Y, expert=Z
+     - 最近一次校准: YYYY-MM-DD (来源: user_correction)
+     - 时间跨度: YYYY-MM-DD ~ YYYY-MM-DD
+
+  2. 累计关键指标（全部条目）
+     ┌──────────────┬─────────┬──────────┐
+     │ 指标          │ 值       │ 门闸状态  │
+     ├──────────────┼─────────┼──────────┤
+     │ TPR           │ XX.X%   │ ✅/⚠️/❌ │
+     │ TNR           │ XX.X%   │ ✅/⚠️/❌ │
+     │ FPR           │ X.X%    │ ✅/⚠️/❌ │
+     │ FNR           │ X.X%    │ ✅/⚠️/❌ │
+     │ 方法匹配率    │ XX.X%   │ ✅/⚠️/❌ │
+     │ MAPE          │ XX.X%   │ ✅/⚠️/❌ │
+     └──────────────┴─────────┴──────────┘
+
+  3. 分方法类型指标（仅当 --method 未指定时展示全部）
+     - Logistic 回归: TPR=XX%, FPR=X%, N=XX
+     - Cox 回归: TPR=XX%, FPR=X%, N=XX
+     - t 检验: TPR=XX%, FPR=X%, N=XX
+     - ...（按数据量降序排列）
+
+  4. 趋势（最近 --last 条，默认 20）
+     - TPR 趋势: ↑/↓/→ (最近 5 次均值 vs 之前 5 次均值)
+     - FPR 趋势: ↑/↓/→
+     - 方法匹配率趋势: ↑/↓/→
 ```
 
 ---
@@ -151,11 +179,37 @@ cat(sprintf("方法匹配率: %.1f%%\n", result$method_match_rate * 100))
 ## 模式 3: 增量更新
 
 ```
-1. 用户完成一次分析后提供纠正结果
-2. 系统调用 CalibrationDatabase.record()
-3. 自动追加到校准数据库
-4. 重新计算累计指标
-5. 输出更新后的摘要
+输入: /msra-calibrate --update correction.json
+
+correction.json 格式:
+{
+  "analysis_id": "MSRA-2026-0613-001",
+  "original": {
+    "method": "Logistic Regression",
+    "estimate": 1.50,
+    "p_value": 0.03,
+    "significant": true
+  },
+  "corrected": {
+    "method": "Logistic Regression",
+    "estimate": 1.20,
+    "p_value": 0.15,
+    "significant": false
+  },
+  "source": "user_correction",
+  "correction_type": "conclusion_error",
+  "notes": "协变量选择有误，应排除 smoking 变量"
+}
+
+处理流程:
+  1. 验证 correction.json 格式
+  2. 记录到 calibration_db.json (追加，不覆盖)
+  3. 重新计算累计指标
+  4. 检查是否触发门闸状态变更
+  5. 输出:
+     - 更新前: FPR=XX.X%, N=XX
+     - 更新后: FPR=XX.X%, N=XX+1
+     - 门闸状态: ✅→⚠️ / ⚠️→❌ / 不变
 ```
 
 ---
@@ -344,3 +398,92 @@ anti-pattern A1 "正态性假定默认化":
 **如果 TPR 显著偏离 50%** → 可能存在标签泄漏或计算偏差。
 
 > **自检频率**: 每次更新 calibration_runner.py 后必须运行自检 1+2。自检 3 建议每季度运行一次。
+
+---
+
+## 真实校准数据积累机制
+
+> **核心问题**: 合成金标准无法替代真实校准数据。以下机制从用户实际使用中逐步积累校准数据。
+
+### 积累路径
+
+```
+用户完成分析 → 用户纠正结果 → 自动记录为校准数据 → 累积到 calibration_db.json
+     │                │                │
+     │                │                ▼
+     │                │         来源标记: user_correction
+     │                │         字段: analysis_id, method, estimate, correct_estimate, source, timestamp
+     │                │
+     │                ▼
+     │         用户说"这个结果不对，应该是..."
+     │         → 提取: MSRA 原始输出 vs 用户纠正
+     │         → 校准类型: method_error / numeric_error / conclusion_error
+     │
+     ▼
+  Pipeline Stage 3.5 完成后
+  → 自动提示: "本次分析结果已记录，是否需要纠正？"
+  → 用户选"是" → 进入纠正流程
+  → 用户选"否" → 标记为 accepted（不参与校准，仅计数）
+```
+
+### 纠正触发条件
+
+| 场景 | 触发方式 | 校准类型 |
+|------|---------|---------|
+| 用户主动纠正 | "这个OR不对，应该是..." | conclusion_error / numeric_error |
+| QC Inspector 发现偏差 | Stage 3.5 门闸标记异常 | method_error |
+| 同行审稿反馈 | 用户输入审稿意见 | method_error / conclusion_error |
+| 已发表论文对比 | 用户提供论文中的标准结果 | 全维度校准 |
+
+### 校准数据质量控制
+
+| 检查项 | 阈值 | 处理 |
+|--------|------|------|
+| 纠正来源完整性 | 必须标注 source | 缺失 → 提示用户补充 |
+| 时间顺序 | 纠正时间 > 分析时间 | 违反 → 标记为异常记录 |
+| 纠正幅度 | 数值偏差 > 10% 才记录 | <10% → 标记为"微调"(不参与 FPR/FNR 计算) |
+| 重复纠正 | 同一 analysis_id 多次纠正 | 保留最新，旧记录标记为 superseded |
+
+---
+
+## 门闸联动详细规则
+
+### Stage 3.5 动态阈值判定
+
+```python
+# 伪代码: 门闸校验逻辑
+def gate_check(calibration_db, method_type=None):
+    if calibration_db.count < 10:
+        return {"status": "⚠️", "message": "校准数据不足(<10条)，建议人工复核"}
+
+    metrics = calibration_db.get_metrics(method_type=method_type)
+    checks = {
+        "TPR": metrics.TPR >= 0.90,
+        "TNR": metrics.TNR >= 0.90,
+        "FPR": metrics.FPR <= 0.10,
+        "FNR": metrics.FNR <= 0.10,
+        "method_match": metrics.method_match_rate >= 0.85,
+        "MAPE": metrics.MAPE <= 0.10,
+    }
+
+    failed = [k for k, v in checks.items() if not v]
+    if len(failed) == 0:
+        return {"status": "✅", "message": "全部达标"}
+    elif len(failed) <= 2:
+        return {"status": "⚠️", "message": f"以下指标未达标: {failed}，建议审查"}
+    else:
+        return {"status": "❌", "message": f"多项不达标: {failed}，强制人工复核"}
+```
+
+### 分方法类型的门闸联动
+
+当校准数据足够(≥20条)时，按方法类型分别评估：
+
+| 方法类型 | 数据量 | TPR | FPR | 门闸状态 |
+|---------|--------|-----|-----|---------|
+| Logistic 回归 | 15 | 92% | 8% | ✅ |
+| Cox 回归 | 8 | 88% | 12% | ⚠️ 数据量不足 |
+| t 检验 | 20 | 95% | 5% | ✅ |
+| Mann-Whitney | 5 | — | — | ⚠️ 数据不足，无法评估 |
+
+**规则**: 数据量 <10 的方法类型不参与门闸判定，标记为"数据不足"。
