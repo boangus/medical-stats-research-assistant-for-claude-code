@@ -2,8 +2,8 @@
 
 > 来源：*方法学 Guide to Statistics and Methods*（Edward H. Livingston, Roger J. Lewis 主编）
 > 整合日期：2026-05-29
-> 本目录提供 46 个与统计分析直接相关的章节索引，按主题分组，便于在 MSRA 流水线各阶段快速查阅。
-> v0.7.1 新增: ch44 目标试验模拟, ch45 孟德尔随机化, ch46 网络Meta分析
+> 本目录提供 48 个与统计分析直接相关的章节索引，按主题分组，便于在 MSRA 流水线各阶段快速查阅。
+> v0.7.3 新增: ch47 ML公平性, ch48 生存分析ML方法
 > 已删除 14 章无关内容（数据库实践指南 ch43-55、深度学习 ch42）。
 
 ---
@@ -74,7 +74,7 @@
 | ch40 | 成本效益分析 | `chapters/ch40-cost-effectiveness-analysis.md` | `analysis-plan` Phase 3 |
 | ch41 | 时间范围选择 | `chapters/ch41-time-horizon-selection.md` | `analysis-plan` Phase 3 |
 
-## 六、新增方法（第 42–46 章）
+## 六、新增方法（第 42–48 章）
 
 | 编号 | 章节 | 文件名 | MSRA 关联阶段 |
 |------|------|--------|-------------|
@@ -83,6 +83,8 @@
 | ch44 | 目标试验模拟 (TTE) | `chapters/ch44-target-trial-emulation.md` | `analysis-plan` Phase 3 观察性; `analysis-exec` Phase 7 |
 | ch45 | 孟德尔随机化 (MR) | `chapters/ch45-mendelian-randomization.md` | `analysis-plan` Phase 3 观察性 |
 | ch46 | 网络 Meta 分析 (NMA) | `chapters/ch46-network-meta-analysis.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
+| ch47 | ML 公平性与偏倚评估 | `chapters/ch47-ml-fairness-clinical.md` | `analysis-exec` Phase 7; `report` Phase 6 |
+| ch48 | 生存分析 ML 方法 | `chapters/ch48-survival-ml-methods.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
 
 ---
 
