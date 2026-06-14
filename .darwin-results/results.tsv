@@ -79,3 +79,5 @@
 2026-06-14T15:30	research-fusion-r1	msra-report	89.5	91.8	keep	dim3+dim5+dim9	CONSORT重构为官方30项(此前自创22项缺PPI/Item24/Item30); 新增Phase6b statcheck(P值一致性校验含正则/重算公式/容差表/4类误报缓解); dim5显著增强	dry_run
 2026-06-14T15:30	research-fusion-r1	msra-analysis-plan	89.5	90.8	keep	dim6+dim9	SPIRIT 2025(34项)首次引入(此前findstr确认零SPIRIT引用); Phase4新增协议要素完整性自检(Item9/10/11/12/14/22含Estimands框架)	dry_run
 2026-06-14T15:30	research-fusion-r1	summary	-	-	phase1-fusion	-	R1: report 89.5->91.8(+2.3); analysis-plan 89.5->90.8(+1.3); 新增3个reporting-guidelines文件(CONSORT30/SPIRIT34/statcheck); 6skills avg 89.8->90.3(估); 远超≥0.5分增益阈值,进入R2	dry_run
+2026-06-14T16:15	research-fusion-r2	msra-calibration	86.1	89.0	keep	dim8+dim3+dim5	d8核心提升: 新增模式7外部基准评估(StatLLM四任务分层T1-EDA/T2-建模/T3-推断/T4-解读 + MedHELM全维度6维 + RWE-LLM对抗测试集5场景); 合成金标准降级为参考; 直接解决dim8=6"合成数据"根本短板	dry_run
+2026-06-14T16:15	research-fusion-r2	summary	-	-	phase2-fusion	-	R2: calibration 86.1->89.0(+2.9,本轮最大增益); dim8 6->8实质修复最弱维度; 新增模式7(7a-7f)+2个frontmatter触发词; 6skills avg 90.3->90.8(估); 进入R3
