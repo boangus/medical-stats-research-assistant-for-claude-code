@@ -19,8 +19,9 @@ MAPPING_PATH = os.path.join(
 def normalizer():
     if not os.path.exists(MAPPING_PATH):
         pytest.skip("TCM mapping file not found")
-    from shared.value_normalization.tcm_terms.tcm_normalizer import TCMTermNormalizer
-    return TCMTermNormalizer(MAPPING_PATH)
+    import importlib
+    mod = importlib.import_module("shared.value-normalization.tcm_terms.tcm_normalizer")
+    return mod.TCMTermNormalizer(MAPPING_PATH)
 
 
 @pytest.fixture
