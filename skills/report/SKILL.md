@@ -1,5 +1,5 @@
 ---
-version: "0.7.4"
+version: "0.7.5"
 name: MSRA Report Generation
 description: |
   生成符合医学报告规范（CONSORT/STROBE/PRISMA等）的出版级表格、

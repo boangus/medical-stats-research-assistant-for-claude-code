@@ -2,6 +2,92 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.7.5] - 2026-06-14
+
+Research-fusion optimization loop: 5 rounds of targeted literature/GitHub
+research → integration → Darwin re-evaluation → push. Each round sourced
+from peer-reviewed 2024-2026 statements and verified against the existing
+project for true structural gaps (not marginal polish). Branch
+`auto-optimize/research-fusion`.
+
+### Reporting guidelines (3 new + 1 rewrite)
+- **`CONSORT_checklist.md` REWRITE** — restructured from self-authored
+  22-item layout to the official CONSORT 2025 **30-item** structure
+  (Hopewell 2025, PMC11996237). Adds the 7 substantively new items:
+  Item 4 (stopping rules), Item 8 (PPI — patient and public involvement),
+  Item 12b (intervention delivery, TIDieR-integrated), Item 13b
+  (non-pharmacological blinding), Item 21b (harms collection method),
+  Item 22 (delivery fidelity), Item 24 (clinical vs statistical
+  significance), Item 26 (protocol access), Item 27 (IPD sharing),
+  Item 30 (AI use disclosure).
+- **`SPIRIT_checklist.md` NEW** — SPIRIT 2025 **34-item** trial-protocol
+  checklist (Knowles 2025, PMC12035670). Previously the project had zero
+  SPIRIT references (findstr-confirmed). Covers Title/Registration/
+  Funding/Governance/Background/Objectives through Ethics/Dissemination/
+  Consent, with ICH E9(R1) Estimands framework integration and FDA
+  Diversity Action Plan 2024 linkage.
+- **`statcheck_rules.md` NEW** — NHST reporting-consistency auto-check
+  rules (borrows statcheck methodology, Epskamp & Nuijten 2016,
+  PMC7540394). APA-format regex patterns, scipy recompute formulas,
+  4-tier tolerance table, 4-class false-positive mitigation (one-tailed,
+  adjusted-p, rounding, robust SE). No new R/Python dependencies.
+- **`TRIPOD_LLM_checklist.md` NEW** — TRIPOD-LLM **19 main + 50
+  subitems** (Collins 2024, PMC12104976). The LLM-specific extension of
+  TRIPOD+AI. Previously the project had TRIPOD+AI but no LLM-specific
+  checklist. Covers LLM-specific gaps: foundation-model version, prompt
+  engineering, context window, multi-run variance, hallucination control,
+  bias amplification, training-data memorization.
+
+### Causal inference
+- **`causal_inference_workflow.md §3.3.5` NEW** — Negative Control
+  Outcomes (NCO) falsification test. Full section: core logic
+  (confounding bridge function), 3-criteria NCO selection, double-NCO
+  design (NCO+NCE cross-validation), Python implementation
+  (`negative_control_test` + `coca_correction`, statsmodels only),
+  5-step decision tree, 5 NCO anti-patterns. Sources: Shi 2025
+  (Taylor & Francis), DANCE JMLR 2024, COCA AJE 2014.
+- **`ch28-e-value.md` extension** — new "MSRA extension" section at
+  chapter end (clearly marked non-translation addition) clarifying the
+  E-value/NCO complementary relationship: E-value answers "how strong
+  would confounding need to be" (sensitivity), NCO answers "is
+  confounding actually present" (falsification). Both should be reported.
+- **`ch18-multiple-comparisons-methods.md §5` NEW** — Bretz graphical
+  approach (Bretz 2009, Stat Med). Core idea (directed weighted graph
+  for alpha-allocation), ASCII diagram, gMCPLite R implementation,
+  relationship to ch19 gatekeeping (gatekeeping is a special case).
+
+### Skill updates
+- **report SKILL.md Phase 6** — reworked: per-guideline checklist
+  references (CONSORT 30 / STROBE / TRIPOD-AI / TRIPOD-LLM / PRISMA-NMA /
+  CARE / ARRIVE / REMARK) replacing a self-authored 9-item summary;
+  new Step 6b statcheck consistency check as MANDATORY-M4 sub-gate;
+  explicit LLM-vs-ML guideline decision rule.
+- **analysis-plan SKILL.md** — SPIRIT 2025 reference + protocol-
+  completeness self-check (Items 9/10/11/12/14/22); NCO references at
+  sensitivity-analysis row / ch28 / parameter table / anti-pattern #17;
+  Bretz graphical method in §5 + method overview.
+- **calibration SKILL.md mode 7** NEW — External Benchmark Evaluation.
+  Three external gold-standard sources (A. published, B. benchmark
+  datasets StatLLM/MIMIC/Framingham/NHANES, C. expert review) with
+  priority C>A>B>synthetic. StatLLM-style 4-task layered eval (T1 EDA /
+  T2 modeling / T3 inference / T4 interpretation). MedHELM-style 6-
+  dimension holistic eval (safety is a hard gate). RWE-LLM-style
+  adversarial test set (5 dangerous scenarios). Synthetic gold standard
+  demoted to reference use.
+
+### Darwin re-evaluation (.darwin-results/results.tsv)
+- report 89.5 -> 92.3 (+2.8 across R1+R3)
+- analysis-plan 89.5 -> 91.7 (+2.2 across R1+R4+R5)
+- calibration 86.1 -> 89.0 (+2.9 in R2, fixing the weakest dim8=6)
+- Estimated 6-skill average: 89.8 -> ~91.3
+
+### Sources
+CONSORT 2025 (PMC11996237), SPIRIT 2025 (PMC12035670), TRIPOD-LLM
+(PMC12104976), statcheck (PMC7540394), StatLLM (Nature SciData 2026),
+MedHELM (Stanford HAI 2025), RWE-LLM (medRxiv 2025.03.17.25324157),
+NCO (Shi 2025, DANCE JMLR 2024), Bretz graphical (Stat Med 2009), FDA
+Diversity Action Plans (June 2024), E-value (VanderWeele 2017).
+
 ## [0.7.4] - 2026-06-14
 
 ### Fixed

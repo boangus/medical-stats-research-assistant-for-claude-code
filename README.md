@@ -146,7 +146,7 @@ medical-stats-research-assistant/
 │   ├── chart-styles/             # 图表样式库（期刊配色、图表类型、字体规范）
 │   ├── error-diagnostics/        # 错误诊断知识库（错误模式、自动修复建议）
 │   ├── anti-patterns/            # 反模式黑名单
-│   ├── reporting-guidelines/     # 报告规范检查清单（质量检查清单 + TRIPOD+AI/CARE/REMARK/ARRIVE）
+│   ├── reporting-guidelines/     # 报告规范检查清单（CONSORT 2025/SPIRIT 2025/STROBE/PRISMA-NMA/TRIPOD+AI/TRIPOD-LLM/CARE/REMARK/ARRIVE/statcheck）
 │   ├── journal-templates/        # 期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ/AIM/CJE）
 │   ├── report-assembler/         # 报告组装器（DOCX/HTML输出）
 │   ├── sensitivity-agreement/    # 敏感性分析一致性评估
@@ -261,7 +261,7 @@ Rscript script/02_var_define.R
 
 ## 支持的报告规范
 
-CONSORT 2025 (RCT) · STROBE (观察性) · PRISMA (系统综述) · PRISMA-NMA (网络Meta) · STARD (诊断) · TRIPOD+AI (预测模型) · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物)
+CONSORT 2025 (RCT, 30项) · **SPIRIT 2025 (试验协议, 34项) 🆕** · STROBE (观察性) · PRISMA (系统综述) · PRISMA-NMA (网络Meta) · STARD (诊断) · TRIPOD+AI (预测模型, 27项) · **TRIPOD-LLM (LLM研究, 19+50项) 🆕** · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物) · **statcheck 统计一致性校验 🆕**
 
 ---
 

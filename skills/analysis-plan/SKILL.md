@@ -1,5 +1,5 @@
 ---
-version: "0.7.4"
+version: "0.7.5"
 name: MSRA Analysis Planning
 description: |
   按研究类型（RCT/观察性/诊断试验）制定统计分析计划。先深度 EDA 了解数据特征，
