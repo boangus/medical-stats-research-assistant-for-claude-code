@@ -82,4 +82,31 @@ Demetrios N. Kyriacou, Roger J. Lewis
 
 
 
+---
+
+## MSRA 延伸：E 值与阴性对照的互补关系 🆕
+
+> 以下为 MSRA 项目基于 2024-2025 方法学进展的补充说明，不属于上述 JAMA 译文原文。
+> 详细实施见 `shared/causal-inference/causal_inference_workflow.md §3.3.5 阴性对照分析`。
+
+E 值回答的是**假设性**问题："**如果**存在未测量混杂，需要多强才能推翻结果？" 它给出鲁棒性的边界，但不告诉研究者混杂**实际是否存在**。
+
+**阴性对照结局（Negative Control Outcome, NCO）** 补充了 E 值的这一盲区：它通过选择一个理论上不应被暴露影响、但受相同混杂结构影响的结局，**经验性地检测**未测量混杂是否存在。
+
+| 维度 | E 值（敏感性分析） | NCO（证伪检验） |
+|------|------------------|----------------|
+| 问题类型 | 假设性（"如果...会怎样"） | 经验性（"有没有混杂迹象"） |
+| 输出 | 单一数值（鲁棒性下界） | 显著/不显著（混杂检测结果） |
+| 数据需求 | 仅需主分析结果 | 需额外选择并测量 NCO 结局 |
+| 何时使用 | 任何观察性因果推断 | 能找到合适 NCO 时（强烈推荐） |
+| 局限 | 不检测混杂是否真实存在 | NCO 选择依赖生物学判断 |
+
+**MSRA 推荐实践**：观察性因果推断中，**E 值和 NCO 都应报告**。E 值量化鲁棒性边界，NCO 提供混杂存在的经验证据，两者互补构成完整的混杂诊断。详见 `shared/causal-inference/causal_inference_workflow.md §3.3.5` 的决策树和 COCA 校正方法。
+
+**关键参考文献（2024-2025）**：
+- Shi X, et al. Causal inference with unobserved confounding: a review of the negative control outcomes approach. Multivariate Behav Res 2025. Taylor & Francis.
+- Miao W, et al. DANCE: Data-driven automated negative control estimation. JMLR 2024;25:1-42.
+- Lipsitch M, et al. Negative controls: a tool for detecting confounding and selection bias in observational studies. Epidemiology 2010.
+
+
 

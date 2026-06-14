@@ -194,6 +194,111 @@ def e_value(RR_obs):
     return RR_obs + np.sqrt(RR_obs * (RR_obs - 1))
 ```
 
+### 3.3.5 阴性对照分析（Negative Control Outcomes, NCO）🆕
+
+> **与 E-value 的互补关系**（参考: shared/statistics-methods/chapters/ch28-e-value.md）：
+> - **E-value**（敏感性分析）：量化"需要多大未测量混杂才能推翻结果" — 回答"**如果**有混杂会怎样"
+> - **NCO**（证伪检验）：检测"未测量混杂**实际是否存在**" — 回答"**有没有**混杂迹象"
+> - 两者互补：E-value 给出鲁棒性边界，NCO 提供混杂存在的经验证据。**观察性因果推断两者都应报告**。
+> 借鉴 Shi X, et al. Multivariate Behav Res 2025 (Taylor & Francis)、DANCE 自动化方法 (JMLR 2024)、COCA 框架 (AJE 2014)。
+
+**NCO 的核心逻辑**：
+
+```
+阴性对照结局 (NCO) = 一个理论上不应被暴露影响、但受相同混杂结构影响的结局
+                     │
+                     ├── 若 NCO 与暴露无显著关联 → ✅ 无明显未测量混杂（结果可信）
+                     ├── 若 NCO 与暴露显著关联 → ❌ 检测到未测量混杂（主结果存疑）
+                     │
+                     └── 数学基础: 混杂桥函数 (confounding bridge function)
+                         使 NCO 关联反映纯混杂效应，可校正主估计
+```
+
+**NCO 选择标准**（必须同时满足）：
+
+| 标准 | 要求 | 示例（暴露=他汀类用药） |
+|------|------|----------------------|
+| **无因果效应** | 暴露对 NCO 在生物学/时间上不应有因果影响 | 意外伤害死亡率（他汀不影响） |
+| **共享混杂** | NCO 受与主结局相同的混杂因素影响 | 高龄/合并症影响意外伤害和心血管事件 |
+| **可测量** | NCO 在数据中可获得且足够事件数 | 队列中意外伤害死亡 ≥10 例 |
+
+**双阴性对照设计（Double NCO，2024-2025 推荐）**：
+
+```
+主结局（受因果+混杂影响）:    暴露 → 主结局估计 = 因果效应 + 混杂偏倚
+NCO 结局（仅受混杂影响）:     暴露 → NCO 估计   =           混杂偏倚
+                                       ↓
+                         校正后估计 = 主估计 − NCO 估计（去除混杂偏倚）
+
+阴性对照暴露（NCE，可选交叉验证）:
+                         NCE（无因果）→ 主结局估计 =           混杂偏倚
+                         交叉验证 NCO vs NCE 的混杂偏倚估计一致性
+```
+
+**实施步骤**：
+
+```python
+# Python: 阴性对照分析（无需额外依赖，statsmodels 即可）
+import statsmodels.api as sm
+import numpy as np
+
+def negative_control_test(df, exposure, nco_outcome, covariates):
+    """
+    阴性对照结局证伪检验。
+    返回: NCO 估计值、置信区间、p 值、混杂判定。
+    """
+    X = df[[exposure] + covariates]
+    X = sm.add_constant(X)
+    model = sm.Logit(df[nco_outcome], X).fit(disp=0)
+    
+    est = model.params[exposure]
+    ci = model.conf_int().loc[exposure]
+    p = model.pvalues[exposure]
+    
+    # 判定: NCO 不应有显著效应
+    verdict = (
+        "❌ 检测到未测量混杂（NCO 显著）— 主结果存疑"
+        if p < 0.05 else
+        "✅ 无明显未测量混杂（NCO 不显著）— 结果可信"
+    )
+    return {"estimate": est, "ci_low": ci[0], "ci_high": ci[1], "p": p, "verdict": verdict}
+
+def coca_correction(main_est, nco_est):
+    """
+    COCA 校正 (Control Outcome Calibration Approach):
+    用 NCO 估计校正主估计的混杂偏倚。
+    校正后估计 = 主估计 − NCO 估计
+    """
+    return main_est - nco_est
+```
+
+**NCO 分析决策树**：
+
+```
+主因果估计 (暴露→主结局) 显著？
+├── 否 → 排除因果效应，NCO 不必要（阴性结果可能源于效力不足，需评估 power）
+└── 是 → 必须运行 NCO 证伪检验
+         │
+         ├── NCO 不显著 (p≥0.05) → ✅ 结果可信，报告 "通过阴性对照证伪检验"
+         │                        报告 E-value 作为补充鲁棒性证据
+         │
+         ├── NCO 显著 (p<0.05) → ❌ 检测到未测量混杂
+         │   ├── 尝试 COCA 校正 → 校正后仍显著？→ 报告校正后结果 + 局限性
+         │   └── 校正后不显著   → 报告"混杂偏倚可能解释全部效应"，结论降级
+         │
+         └── 无合适 NCO 可选 → 明确声明"无法证伪未测量混杂"，仅报告 E-value
+```
+
+**NCO 选择禁忌**（参考: shared/anti-patterns/medical_stats_anti_patterns.md）：
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 1 | 选择受暴露影响的结局作 NCO | 违反"无因果效应"假设，NCO 失效 | 验证生物学合理性：暴露对 NCO 无作用机制 |
+| 2 | NCO 事件数 <10 就下结论 | 小样本 NCO 检验效力不足，假阴性高 | 标注"NCO 效力不足"，不作为通过证据 |
+| 3 | NCO 显著但忽略不报告 | 选择性报告，掩盖混杂证据 | NCO 结果必须如实报告，无论显著与否 |
+| 4 | 用单一 NCO 就下"无混杂"结论 | 单一 NCO 可能碰巧不显著 | 推荐双 NCO（不同机制）交叉验证 |
+| 5 | 将 COCA 校正当因果估计 | 校正仍有假设（混杂桥函数可交换性） | 报告为"混杂校正后估计"，注明假设 |
+
 ### 3.4 报告模版
 
 ```
