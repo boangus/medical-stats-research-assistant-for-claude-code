@@ -123,6 +123,8 @@ jobs:
               'shared/templates/ml_analysis_template',
               'shared/templates/shap_plot_template',
               'shared/templates/gee_template',
+              'shared/templates/effect_size_template',
+              'shared/reporting-guidelines/statcheck_patterns',
           ]
           errors = []
           for t in templates:

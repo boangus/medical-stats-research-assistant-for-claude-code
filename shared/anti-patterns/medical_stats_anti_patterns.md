@@ -159,7 +159,7 @@ LLM 在医学统计场景下存在三类系统性弱点：
 |------|------|
 | 典型表现 | "P<0.05，差异有统计学意义"但未给出 P=0.047 还是 P=0.003 |
 | 为何危险 | 无法区分边缘显著和高度显著，不支持元分析 |
-| 防御规则 | 报告精确 P 值（P=0.XX）和效应量+95%CI |
+| 防御规则 | 报告精确 P 值（P=0.XX）和效应量+95%CI；用 `shared/reporting-guidelines/statcheck_patterns.py` 自动验证 P 值与统计量一致性 |
 | 涉及 SKILL | report Phase 1, analysis-exec Phase 9 |
 
 ### D2. 统计显著 = 临床显著
