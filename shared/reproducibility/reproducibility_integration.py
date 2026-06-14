@@ -156,32 +156,32 @@ check_reproducibility(
                 timeout=10
             )
             env_info["r_version"] = r_version.stderr.strip()
-        except:
+        except Exception:
             env_info["r_version"] = "未检测到R"
         
         # 尝试获取关键包版本
         try:
             import numpy as np
             env_info["numpy_version"] = np.__version__
-        except:
+        except Exception:
             env_info["numpy_version"] = "未安装"
         
         try:
             import pandas as pd
             env_info["pandas_version"] = pd.__version__
-        except:
+        except Exception:
             env_info["pandas_version"] = "未安装"
         
         try:
             import scipy
             env_info["scipy_version"] = scipy.__version__
-        except:
+        except Exception:
             env_info["scipy_version"] = "未安装"
         
         try:
             import sklearn
             env_info["sklearn_version"] = sklearn.__version__
-        except:
+        except Exception:
             env_info["sklearn_version"] = "未安装"
         
         return env_info

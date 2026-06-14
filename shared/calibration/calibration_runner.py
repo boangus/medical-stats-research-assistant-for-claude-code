@@ -162,15 +162,12 @@ class CalibrationEngine:
             result.method_match_rate = result.method_match / result.n_total
 
             # 记录方法不匹配详情
-            mismatches = merged[~method_match][
-                ["analysis_id", "gold_method", "msra_method"]
+            mismatches = merged.loc[~method_match,
+                ["analysis_id", "gold_method", "msra_method"]]
+            result.method_mismatch_details = [
+                {"analysis_id": r.analysis_id, "gold": r.gold_method, "msra": r.msra_method}
+                for r in mismatches.itertuples(index=False)
             ]
-            for _, row in mismatches.iterrows():
-                result.method_mismatch_details.append({
-                    "analysis_id": row["analysis_id"],
-                    "gold": row["gold_method"],
-                    "msra": row["msra_method"],
-                })
 
         # 4. 数值偏差
         if "gold_estimate" in merged.columns and "msra_estimate" in merged.columns:

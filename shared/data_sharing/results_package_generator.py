@@ -205,7 +205,7 @@ class ResultsPackageGenerator:
                     directory_content += f"### {table}\n\n"
                     directory_content += df.to_markdown(index=False)
                     directory_content += "\n\n"
-                except:
+                except Exception:
                     directory_content += f"### {table}\n\n"
                     directory_content += "*无法预览*\n\n"
         
@@ -227,7 +227,7 @@ class ResultsPackageGenerator:
                     with open(report_path, 'r', encoding='utf-8') as f:
                         content = f.read()
                     directory_content += f"```\n{content[:500]}...\n```\n\n"
-                except:
+                except Exception:
                     directory_content += "*无法预览*\n\n"
         
         directory_path = output_path / "DIRECTORY.md"

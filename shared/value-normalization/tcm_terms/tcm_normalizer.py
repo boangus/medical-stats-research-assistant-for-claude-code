@@ -79,10 +79,15 @@ class TCMTermNormalizer:
             return term_map[stripped]
 
         # 3. 模糊匹配：返回所有Levenshtein距离≤2的候选项
+        #    预过滤：长度差 > max_distance 的候选项直接跳过，避免无效计算
         candidates = []
+        max_dist = 2
+        term_len = len(term)
         for key, value in term_map.items():
+            if abs(len(key) - term_len) > max_dist:
+                continue
             dist = self._levenshtein(term, key)
-            if dist <= 2:
+            if dist <= max_dist:
                 candidates.append((key, value, dist))
 
         if candidates:

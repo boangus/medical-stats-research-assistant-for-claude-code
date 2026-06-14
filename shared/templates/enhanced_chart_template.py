@@ -87,7 +87,7 @@ class EnhancedChartGenerator:
                 plt.rcParams['font.sans-serif'] = [font] + plt.rcParams['font.sans-serif']
                 plt.rcParams['axes.unicode_minus'] = False
                 break
-            except:
+            except Exception:
                 continue
     
     def create_figure(self, figure_type: str, column_width: str = "single") -> Tuple[plt.Figure, plt.Axes]:

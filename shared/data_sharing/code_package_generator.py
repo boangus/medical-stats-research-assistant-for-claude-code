@@ -13,7 +13,14 @@ import subprocess
 from datetime import datetime
 from typing import Dict, List, Tuple, Any, Optional
 from pathlib import Path
-import toml
+
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    try:
+        import tomli as tomllib  # fallback for Python < 3.11
+    except ImportError:
+        tomllib = None
 
 
 class CodePackageGenerator:
@@ -321,24 +328,18 @@ python python/analysis.py
             f.write("PYTHONPATH=.\n")
             f.write("PYTHONDONTWRITEBYTECODE=1\n")
         
-        # 生成pyproject.toml
+        # 生成pyproject.toml（手动写入，避免 toml 依赖）
         pyproject_path = output_path / "python" / "pyproject.toml"
-        pyproject_content = {
-            "project": {
-                "name": "msra-analysis",
-                "version": "0.1.0",
-                "description": "MSRA 分析代码包",
-                "requires-python": ">=3.8",
-                "dependencies": []
-            },
-            "build-system": {
-                "requires": ["setuptools>=42", "wheel"],
-                "build-backend": "setuptools.backends._legacy:_Backend"
-            }
-        }
-        
         with open(pyproject_path, 'w', encoding='utf-8') as f:
-            toml.dump(pyproject_content, f)
+            f.write('[project]\n')
+            f.write('name = "msra-analysis"\n')
+            f.write('version = "0.1.0"\n')
+            f.write('description = "MSRA 分析代码包"\n')
+            f.write('requires-python = ">=3.8"\n')
+            f.write('dependencies = []\n\n')
+            f.write('[build-system]\n')
+            f.write('requires = ["setuptools>=42", "wheel"]\n')
+            f.write('build-backend = "setuptools.backends._legacy:_Backend"\n')
     
     def verify_code_package(self, package_dir: str) -> Dict[str, Any]:
         """

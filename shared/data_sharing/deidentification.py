@@ -8,6 +8,7 @@ MSRA 数据去标识化工具
 
 import re
 import hashlib
+import secrets
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any, Optional
@@ -210,9 +211,17 @@ class DataDeidentifier:
         
         return df, report
     
-    def _hash_column(self, df: pd.DataFrame, col: str, 
-                     salt: str = "msra_salt") -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def _hash_column(self, df: pd.DataFrame, col: str,
+                     salt: str = None) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """哈希替换列"""
+        if salt is None:
+            salt = secrets.token_hex(16)
+            import warnings
+            warnings.warn(
+                "去标识化使用了随机生成的盐值，结果不可复现。"
+                "如需可复现的哈希，请显式传入 salt 参数。",
+                UserWarning, stacklevel=2
+            )
         original_values = df[col].dropna().unique()[:5]  # 记录前5个原始值
         
         # 哈希替换

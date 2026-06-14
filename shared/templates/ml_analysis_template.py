@@ -43,7 +43,11 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-warnings.filterwarnings("ignore")
+# 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
+# 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
+# 以便在医学统计分析中及时发现数值收敛和方法弃用问题。
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 
 
 # ============================================================================
