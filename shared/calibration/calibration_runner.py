@@ -310,13 +310,13 @@ class CalibrationDatabase:
 
     def _load(self):
         if os.path.exists(self.db_path):
-            with open(self.db_path, "r") as f:
+            with open(self.db_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             for item in data:
                 self.entries.append(CalibrationEntry(**item))
 
     def _save(self):
-        with open(self.db_path, "w") as f:
+        with open(self.db_path, "w", encoding="utf-8") as f:
             json.dump([asdict(e) for e in self.entries], f, indent=2, default=str)
 
     def record(

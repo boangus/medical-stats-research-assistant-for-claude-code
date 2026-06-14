@@ -120,6 +120,65 @@ Diversity Action Plans (June 2024), E-value (VanderWeele 2017).
 - README project-structure tree: `statistics-methods/` chapter count corrected
   from 41 to **48** (chapters ch42–ch48 added in 0.7.0–0.7.3).
 
+## [0.7.2] - 2026-06-14
+
+### Changed
+- Pipeline SKILL.md: 精简从 789→690 行 (-12.5%)，压缩示例/角色切换/进度追踪
+- analysis-plan SKILL.md: 消除"建议"软化措辞，改为强制性指令
+
+### Added
+- `shared/reporting-guidelines/PRISMA_NMA_checklist.md` — 网络Meta分析报告规范 (25项检查)
+- Anti-patterns catalog: 新增 G(网络Meta)/H(孟德尔随机化)/T(目标试验)/J(GEE) 四类共 9 条反模式
+- CI: 新增 Python 模板语法检查步骤
+
+## [0.7.1] - 2026-06-13
+
+### Added
+- **New templates**:
+  - `shared/templates/mendelian_randomization_template.R` — MR analysis (IVW, MR-Egger, weighted median, mode, MR-PRESSO, leave-one-out, scatter/forest plots)
+  - `shared/templates/network_meta_template.R` — Network meta-analysis (frequentist/Bayesian, SUCRA ranking, league table, network plot, inconsistency test)
+  - `shared/templates/adaptive_design_template.R` — Bayesian adaptive design (group sequential, sample size re-estimation, enrichment, interim analysis, simulation)
+  - `shared/templates/cdisc_integration_template.R` — CDISC data integration (SDTM/ADaM detection, XPT export, ADaM validation)
+- **Knowledge base chapters**:
+  - `ch45-mendelian-randomization.md` — Three assumptions, instrument selection, methods, sensitivity, reporting
+  - `ch46-network-meta-analysis.md` — Indirect comparison, consistency, SUCRA, league table, PRISMA-NMA
+- **analysis-plan SKILL.md**: TTE added to observational study advanced methods table
+- **End-to-end evaluation framework** (`evals/gold/end-to-end/`):
+  - 4 evaluation dimensions: code executability, numeric accuracy, compliance, robustness
+  - 5 test cases with standard answers (E001-E005)
+  - Compliance templates for CONSORT 2025 and STROBE
+  - Robustness tests: missing injection, noise, case mixing, date format chaos
+- **Version bump**: manifest.json updated to 0.7.1
+
+## [0.7.0] - 2026-06-13
+
+### Fixed
+- `shared/templates/prediction_model_template.py` line 58: syntax error (`outcome prevalence` → `outcome_prevalence`)
+- `shared/templates/bland_altman_template.R` line 79: replaced `...` placeholder with proper comment
+- `CHANGELOG.md`: corrected date from 2025-06-13 to 2026-06-13
+- `README.md`: corrected skill count (5→6), command count (5→6), quality gate item counts (7→8/9), added `/msra-calibrate` command, added calibration skill to project structure, expanded supported methods and reporting guidelines lists
+
+### Added
+- **New templates**:
+  - `shared/templates/gee_template.R` — GEE (Generalized Estimating Equations) for longitudinal data (geepack)
+  - `shared/templates/gee_template.py` — GEE for longitudinal data (statsmodels)
+  - `shared/templates/nonparametric_template.R` — Mann-Whitney U, Kruskal-Wallis, Wilcoxon signed-rank, Friedman, non-parametric Table 1
+  - `shared/templates/competing_risks_template.R` — Cumulative incidence, cause-specific hazards, Fine-Gray subdistribution model (tidycmprsk)
+  - `shared/templates/ps_diagnostics_template.R` — Love plot, weight distribution, PS overlap, balance table (MatchIt/cobalt)
+  - `shared/templates/repeated_measures_anova_template.R` — Sphericity check, post-hoc, effect sizes (rstatix/emmeans)
+- **Knowledge base chapters**:
+  - `ch42-nonparametric-tests.md` — Mann-Whitney, Kruskal-Wallis, Wilcoxon, Friedman, decision tree, effect sizes, anti-patterns
+  - `ch43-gee-longitudinal-analysis.md` — GEE theory, working correlation selection (QIC), sandwich estimator, marginal vs conditional effects
+- **Evaluation framework**:
+  - `evals/gold/method-selection/` — 10 method-selection gold standard tuples (M001-M010) covering RCT ANCOVA, survival Cox, observational IPTW, diagnostic ROC, non-inferiority, negative binomial, multiplicity, Firth logistic, competing risks
+- **Enhanced causal inference workflow**:
+  - Added Section 6: complete DAG → identification → estimation → sensitivity pipeline
+  - Added identification strategy selection table
+  - Added doubly robust estimation (AIPW) examples
+  - Added PS diagnostics template reference
+- **Data Prep test-prompts**: expanded from 10 to 15 test cases (added: mixed missing patterns, multi-format import, outlier strategy, time series validation, encoding conversion)
+- **CI enhancement**: added Python template syntax check step for all 8 Python templates
+
 ## [0.6.0] - 2026-06-13
 
 ### Added
@@ -155,62 +214,3 @@ Diversity Action Plans (June 2024), E-value (VanderWeele 2017).
 ### Changed
 - Pipeline SKILL.md: `depends_on` now includes `calibration`; `works_with` includes `shared/passport/passport_schema.md`
 - Stage 3.5 quality gate expanded from 7 to 9 check items (added calibration linkage + [SKIP] marking)
-
-## [0.7.1] - 2026-06-13
-
-### Added
-- **New templates**:
-  - `shared/templates/mendelian_randomization_template.R` — MR analysis (IVW, MR-Egger, weighted median, mode, MR-PRESSO, leave-one-out, scatter/forest plots)
-  - `shared/templates/network_meta_template.R` — Network meta-analysis (frequentist/Bayesian, SUCRA ranking, league table, network plot, inconsistency test)
-  - `shared/templates/adaptive_design_template.R` — Bayesian adaptive design (group sequential, sample size re-estimation, enrichment, interim analysis, simulation)
-  - `shared/templates/cdisc_integration_template.R` — CDISC data integration (SDTM/ADaM detection, XPT export, ADaM validation)
-- **Knowledge base chapters**:
-  - `ch45-mendelian-randomization.md` — Three assumptions, instrument selection, methods, sensitivity, reporting
-  - `ch46-network-meta-analysis.md` — Indirect comparison, consistency, SUCRA, league table, PRISMA-NMA
-- **analysis-plan SKILL.md**: TTE added to observational study advanced methods table
-- **End-to-end evaluation framework** (`evals/gold/end-to-end/`):
-  - 4 evaluation dimensions: code executability, numeric accuracy, compliance, robustness
-  - 5 test cases with standard answers (E001-E005)
-  - Compliance templates for CONSORT 2025 and STROBE
-  - Robustness tests: missing injection, noise, case mixing, date format chaos
-- **Version bump**: manifest.json updated to 0.7.1
-
-## [0.7.2] - 2026-06-14
-
-### Changed
-- Pipeline SKILL.md: 精简从 789→690 行 (-12.5%)，压缩示例/角色切换/进度追踪
-- analysis-plan SKILL.md: 消除"建议"软化措辞，改为强制性指令
-
-### Added
-- `shared/reporting-guidelines/PRISMA_NMA_checklist.md` — 网络Meta分析报告规范 (25项检查)
-- Anti-patterns catalog: 新增 G(网络Meta)/H(孟德尔随机化)/T(目标试验)/J(GEE) 四类共 9 条反模式
-- CI: 新增 Python 模板语法检查步骤
-
-## [0.7.0] - 2026-06-13
-
-### Fixed
-- `shared/templates/prediction_model_template.py` line 58: syntax error (`outcome prevalence` → `outcome_prevalence`)
-- `shared/templates/bland_altman_template.R` line 79: replaced `...` placeholder with proper comment
-- `CHANGELOG.md`: corrected date from 2025-06-13 to 2026-06-13
-- `README.md`: corrected skill count (5→6), command count (5→6), quality gate item counts (7→8/9), added `/msra-calibrate` command, added calibration skill to project structure, expanded supported methods and reporting guidelines lists
-
-### Added
-- **New templates**:
-  - `shared/templates/gee_template.R` — GEE (Generalized Estimating Equations) for longitudinal data (geepack)
-  - `shared/templates/gee_template.py` — GEE for longitudinal data (statsmodels)
-  - `shared/templates/nonparametric_template.R` — Mann-Whitney U, Kruskal-Wallis, Wilcoxon signed-rank, Friedman, non-parametric Table 1
-  - `shared/templates/competing_risks_template.R` — Cumulative incidence, cause-specific hazards, Fine-Gray subdistribution model (tidycmprsk)
-  - `shared/templates/ps_diagnostics_template.R` — Love plot, weight distribution, PS overlap, balance table (MatchIt/cobalt)
-  - `shared/templates/repeated_measures_anova_template.R` — Sphericity check, post-hoc, effect sizes (rstatix/emmeans)
-- **Knowledge base chapters**:
-  - `ch42-nonparametric-tests.md` — Mann-Whitney, Kruskal-Wallis, Wilcoxon, Friedman, decision tree, effect sizes, anti-patterns
-  - `ch43-gee-longitudinal-analysis.md` — GEE theory, working correlation selection (QIC), sandwich estimator, marginal vs conditional effects
-- **Evaluation framework**:
-  - `evals/gold/method-selection/` — 10 method-selection gold standard tuples (M001-M010) covering RCT ANCOVA, survival Cox, observational IPTW, diagnostic ROC, non-inferiority, negative binomial, multiplicity, Firth logistic, competing risks
-- **Enhanced causal inference workflow**:
-  - Added Section 6: complete DAG → identification → estimation → sensitivity pipeline
-  - Added identification strategy selection table
-  - Added doubly robust estimation (AIPW) examples
-  - Added PS diagnostics template reference
-- **Data Prep test-prompts**: expanded from 10 to 15 test cases (added: mixed missing patterns, multi-format import, outlier strategy, time series validation, encoding conversion)
-- **CI enhancement**: added Python template syntax check step for all 8 Python templates

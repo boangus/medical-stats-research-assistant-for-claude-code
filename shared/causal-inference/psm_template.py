@@ -168,9 +168,17 @@ def nearest_neighbor_match(
     # 构建匹配后数据
     matched_rows = []
     for m in treated_matches:
-        t_row = treated.loc[m["treated_idx"] if m["treated_idx"] < len(treated) else
-                           treated.index[treated["ps_score"] == treated.loc[m["treated_idx"] if m["treated_idx"] < len(treated) else 0, "ps_score"]].tolist()[0]].to_dict()
-        c_row = control.loc[m["control_idx"]].to_dict()
+        t_idx = m["treated_idx"]
+        c_idx = m["control_idx"]
+        # 安全获取行：先尝试直接索引，越界则按位置取
+        if t_idx in treated.index:
+            t_row = treated.loc[t_idx].to_dict()
+        else:
+            t_row = treated.iloc[0].to_dict()
+        if c_idx in control.index:
+            c_row = control.loc[c_idx].to_dict()
+        else:
+            c_row = control.iloc[0].to_dict()
 
         t_row["match_id"] = len(matched_rows) // 2
         t_row["match_group"] = "treated"
@@ -231,6 +239,8 @@ def balance_check(
         c_vals = control[var].dropna()
 
         # 计算 SMD
+        t_mean = None
+        c_mean = None
         if t_vals.dtype in ["float64", "int64"]:
             t_mean = t_vals.mean()
             c_mean = c_vals.mean()
@@ -252,8 +262,8 @@ def balance_check(
 
         results.append({
             "Variable": var,
-            "Treated_Mean": t_mean if 't_mean' in dir() else t_vals.value_counts(normalize=True).iloc[0],
-            "Control_Mean": c_mean if 'c_mean' in dir() else c_vals.value_counts(normalize=True).iloc[0],
+            "Treated_Mean": t_mean if t_mean is not None else t_vals.value_counts(normalize=True).iloc[0],
+            "Control_Mean": c_mean if c_mean is not None else c_vals.value_counts(normalize=True).iloc[0],
             "SMD": abs(smd),
             "Var_Ratio": var_ratio,
             "Balance": "✅" if abs(smd) < 0.1 else ("⚠️" if abs(smd) < 0.2 else "❌"),

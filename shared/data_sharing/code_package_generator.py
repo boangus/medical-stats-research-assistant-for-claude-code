@@ -339,7 +339,7 @@ python python/analysis.py
             f.write('dependencies = []\n\n')
             f.write('[build-system]\n')
             f.write('requires = ["setuptools>=42", "wheel"]\n')
-            f.write('build-backend = "setuptools.backends._legacy:_Backend"\n')
+            f.write('build-backend = "setuptools.build_meta"\n')
     
     def verify_code_package(self, package_dir: str) -> Dict[str, Any]:
         """

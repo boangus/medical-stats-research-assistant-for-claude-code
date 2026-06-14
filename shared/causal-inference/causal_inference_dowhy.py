@@ -323,6 +323,8 @@ def estimate_cate_econml(
     except ImportError:
         raise ImportError("需要安装 EconML: pip install econml")
 
+    from sklearn.linear_model import LogisticRegression
+
     X = df[features].values
     T = df[treatment].values
     Y = df[outcome].values

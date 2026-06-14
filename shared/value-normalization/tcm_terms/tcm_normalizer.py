@@ -137,7 +137,7 @@ class TCMTermNormalizer:
         # 只处理object/string/category类型
         if not pd.api.types.is_object_dtype(column) and \
            not pd.api.types.is_string_dtype(column) and \
-           not pd.api.types.is_categorical_dtype(column):
+           column.dtype.name != 'category':
             return []
 
         value_counts = column.value_counts()
@@ -209,7 +209,7 @@ class TCMTermNormalizer:
                 col for col in data.columns
                 if pd.api.types.is_object_dtype(data[col])
                 or pd.api.types.is_string_dtype(data[col])
-                or pd.api.types.is_categorical_dtype(data[col])
+                or data[col].dtype.name == 'category'
             ]
 
         results = {}

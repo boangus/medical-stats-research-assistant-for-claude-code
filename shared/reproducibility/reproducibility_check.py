@@ -163,7 +163,7 @@ with open(__RUN_OUTPUT_FILE__, "w") as _f:
                     print(f"ERROR (rc={result.returncode})")
                     all_metrics.append({"__error__": result.stderr[-500:] if result.stderr else "Unknown error"})
                 elif os.path.exists(output_json):
-                    with open(output_json, "r") as f:
+                    with open(output_json, "r", encoding="utf-8") as f:
                         metrics = json.load(f)
                     all_metrics.append(metrics)
                     print(f"OK ({elapsed:.1f}s)")
