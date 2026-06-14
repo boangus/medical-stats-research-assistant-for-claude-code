@@ -70,7 +70,7 @@ def assess_sample_size(
         候选预测因子数（含分类变量展开后的总列数）
     target_epv : float
         目标 EPV（通常 10-20）
-    outcome prevalence : Optional[float]
+    outcome_prevalence : Optional[float]
         结局发生率（0-1）
     n_total : Optional[int]
         总样本量
@@ -82,8 +82,8 @@ def assess_sample_size(
     """
     epv = n_events / n_predictors if n_predictors > 0 else float("inf")
 
-    if n_total and outcome prevalence:
-        expected_events = n_total * outcome prevalence
+    if n_total and outcome_prevalence:
+        expected_events = n_total * outcome_prevalence
         expected_epv = expected_events / n_predictors
     else:
         expected_events = None
@@ -106,7 +106,7 @@ def assess_sample_size(
     # 建议
     if epv < 10:
         min_events = int(target_epv * n_predictors)
-        min_total = int(min_events / outcome prevalence) if outcome prevalence else None
+        min_total = int(min_events / outcome_prevalence) if outcome_prevalence else None
         suggestion = (
             f"建议至少 {min_events} 个事件"
             + (f"（约 {min_total} 例样本）" if min_total else "")
@@ -122,7 +122,7 @@ def assess_sample_size(
         "assessment": assessment,
         "risk": risk,
         "suggestion": suggestion,
-        "prevalence": outcome prevalence,
+        "prevalence": outcome_prevalence,
         "min_events_needed": int(target_epv * n_predictors) if epv < target_epv else n_events,
     }
 
@@ -775,7 +775,7 @@ def full_prediction_model_workflow(
     prevalence = y_train.mean()
 
     sample_assess = assess_sample_size(
-        n_events, n_pred, outcome prevalence=prevalence, n_total=len(y_train))
+        n_events, n_pred, outcome_prevalence=prevalence, n_total=len(y_train))
     results["sample_size"] = sample_assess
     print(f"  EPV = {sample_assess['epv']:.1f} ({sample_assess['assessment']})")
     print(f"  {sample_assess['suggestion']}")

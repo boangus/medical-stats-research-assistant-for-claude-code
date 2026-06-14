@@ -207,6 +207,11 @@ jobs:
           python -m py_compile tests/run_quality_gate.py
           echo '✅ All Python files compile'
 
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:
