@@ -173,7 +173,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 
 事后检验(主检验显著时):
   ANOVA → Tukey/Dunnett/Sidak | K-W → Dunn's | 重复测量 → Tukey+配对t
-  多重比较校正须在SAP预定义(Bonferroni/Holm/FDR)
+  多重比较校正须在SAP预定义(Bonferroni/Holm/FDR/图形化方法Bretz)
 
 其他: 混杂→多变量/PS | 重复测量→混合/GEE | 聚类→多水平 | 复杂设计→GLMM/GEE
 ```
@@ -316,6 +316,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 
 ## 5. 多重比较控制
 - 校正方法（Bonferroni, Hochberg, 序贯门控等）
+- **图形化方法（Bretz 2009，多层级终点推荐）** — 用有向加权图表达 α 分配与传递，比固定关口策略更灵活；参考 ch18 §5 + gMCPLite R 包
 - 检验层次（主要 → 关键次要 → 其他次要）
 - 总 I 类错误率控制策略
 

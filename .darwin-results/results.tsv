@@ -83,3 +83,4 @@
 2026-06-14T16:15	research-fusion-r2	summary	-	-	phase2-fusion	-	R2: calibration 86.1->89.0(+2.9,本轮最大增益); dim8 6->8实质修复最弱维度; 新增模式7(7a-7f)+2个frontmatter触发词; 6skills avg 90.3->90.8(估); 进入R3
 2026-06-14T16:50	research-fusion-r3	msra-report	91.8	92.3	keep	dim3+dim9	TRIPOD-LLM(19+50项)首次引入(此前仅有TRIPOD+AI无LLM专用); Phase6新增LLM研究规范行+LLM-vs-ML规范选择决策规则; d3防止误用TRIPOD+AI于LLM研究
 2026-06-14T17:30	research-fusion-r4	msra-analysis-plan	90.8	91.4	keep	dim3+dim6	阴性对照(NCO)首次引入(此前ch28 E-value无NCO、workflow仅提及无实质); 新增causal_workflow §3.3.5完整NCO章节(逻辑+标准+双NCO+COCA校正+决策树+5禁忌); ch28补充E-value/NCO互补; analysis-plan 4处引用更新; dim3反例17强化
+2026-06-14T18:00	research-fusion-r5	msra-analysis-plan	91.4	91.7	keep	dim6	ch18新增§5 Bretz图形化多重检验(此前ch18仅传统Bonferroni/Holm/FDR无图形化); 含有向加权图示例+gMCPLite R实现+决策表+与ch19关系; analysis-plan §5+方法概要2处引用; 增益<0.5触发停止条件
