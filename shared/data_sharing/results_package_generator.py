@@ -96,18 +96,38 @@ class ResultsPackageGenerator:
         
         return str(output_path)
     
-    def _generate_manifest(self, output_path: Path, 
+    def _generate_manifest(self, output_path: Path,
                           tables: List[str], figures: List[str],
                           reports: List[str], raw_results: List[str]):
-        """生成结果清单"""
+        """生成结果清单（含文件哈希）"""
+        import hashlib
+
+        def _file_hash(filepath: Path) -> str:
+            """计算文件 SHA256 哈希"""
+            h = hashlib.sha256()
+            try:
+                with open(filepath, "rb") as f:
+                    for chunk in iter(lambda: f.read(8192), b""):
+                        h.update(chunk)
+                return h.hexdigest()
+            except Exception:
+                return "unreadable"
+
+        # 为每个文件计算哈希
+        def _add_hashes(file_list: List[str], subdir: str) -> List[dict]:
+            return [
+                {"name": name, "sha256": _file_hash(output_path / subdir / name)}
+                for name in file_list
+            ]
+
         manifest = {
             "created_at": datetime.now().isoformat(),
             "project_root": str(self.project_root),
             "files": {
-                "tables": tables,
-                "figures": figures,
-                "reports": reports,
-                "raw_results": raw_results
+                "tables": _add_hashes(tables, "tables"),
+                "figures": _add_hashes(figures, "figures"),
+                "reports": _add_hashes(reports, "report"),
+                "raw_results": _add_hashes(raw_results, "results")
             },
             "statistics": {
                 "total_files": len(tables) + len(figures) + len(reports) + len(raw_results),

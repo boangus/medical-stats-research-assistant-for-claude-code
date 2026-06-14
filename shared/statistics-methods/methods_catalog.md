@@ -260,7 +260,7 @@
 | 样本量计算 | **ch06**（样本量计算）**ch07**（MCID） | `ch06-sample-size-calculations.md` + `ch07-minimal-clinically-important-difference.md` |
 | 多重比较 | **ch18**（多重比较方法）**ch19**（关口策略） | `ch18-multiple-comparisons-methods.md` |
 | 效应量（OR/HR/NNT） | **ch31**（OR）**ch17**（NNT） | `ch31-odds-ratio.md` + `ch17-number-needed-to-treat.md` |
-| 因果推断（DID/MR） | **ch24**（双重差分）**ch27**（孟德尔随机化）**ch30**（中介分析） | `ch24-difference-in-differences.md` |
+| 因果推断（DID/MR） | **ch24**（双重差分）**ch45**（孟德尔随机化）**ch30**（中介分析） | `ch24-difference-in-differences.md` |
 | 混杂控制（E值） | **ch28**（E值）**ch29**（指示性混杂） | `ch28-e-value.md` + `ch29-indication-bias.md` |
 | 研究设计（RCT/非劣效性） | **ch01**（非劣效性）**ch04**（整群随机）**ch05**（阶梯楔形） | `shared/statistics-methods/INDEX.md` 第一节 |
 | 贝叶斯分析 | **ch22**（贝叶斯分析） | `ch22-bayesian-analysis.md`

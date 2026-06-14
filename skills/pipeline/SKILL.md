@@ -638,7 +638,7 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase
 用户: /msra 我有一份RCT的原始数据，想完成整个分析流程
 → 检测到原始数据 → 从 Stage 1 开始 → 用户选 [2] 高效模式
 
-Stage 1 → [MANDATORY] → Stage 1.5(8项) → [MANDATORY]
+Stage 1 → [MANDATORY] → Stage 1.5(9项) → [MANDATORY]
 → Stage 2 → [SLIM] → [MANDATORY] → Stage 2.5(8项) → [MANDATORY]
 → Stage 3 → [SLIM] → Stage 3.5(9项) → [MANDATORY]
 → Stage 4 → [MANDATORY] 合规检查 → 完成 ✅

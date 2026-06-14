@@ -48,7 +48,7 @@
 | ch24 | 双重差分法（DID） | `chapters/ch24-difference-in-differences.md` | `analysis-plan` Phase 3 观察性 |
 | ch25 | 病例对照研究 | `chapters/ch25-case-control-studies.md` | `analysis-plan` Phase 3 |
 | ch26 | Meta 分析 | `chapters/ch26-meta-analysis.md` | `analysis-plan` Phase 3 |
-| ch27 | 孟德尔随机化 | `chapters/ch27-mendelian-randomization.md` | `analysis-plan` Phase 3 观察性 |
+| ~~ch27~~ | ~~孟德尔随机化~~ | → ch45（内容合并至 ch45） | — |
 | ch28 | E 值（敏感性分析） | `chapters/ch28-e-value.md` | `analysis-exec` Phase 7 敏感性 |
 | ch29 | 指示性混杂（Indication Bias） | `chapters/ch29-indication-bias.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
 | ch30 | 中介分析 | `chapters/ch30-mediation-analysis.md` | `analysis-plan` Phase 3 观察性 |
@@ -95,7 +95,6 @@
 | `glossary.md` | 术语表 |
 | `cheatsheet.md` | 研究设计、统计方法、偏倚类型速查 |
 | `patterns.md` | 8 种常见方法学模式 |
-| `SKILL.md` | 完整的方法学框架与思维模型 |
 
 ## 与 MSRA 各阶段的对应关系
 

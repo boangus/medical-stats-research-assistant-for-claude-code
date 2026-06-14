@@ -53,7 +53,7 @@ class DataDeidentifier:
             ]
         }
         
-        # 间接标识符模式
+        # 间接标识符模式（HIPAA Safe Harbor 18 类）
         self.indirect_identifiers = {
             "birth_date": [
                 r"出生日期", r"birth.*date", r"出生年月",
@@ -77,6 +77,36 @@ class DataDeidentifier:
             "geographic": [
                 r"地区", r"region", r"省市", r"城市",
                 r"区县", r"乡镇"
+            ],
+            "account_number": [
+                r"账号", r"account.*num", r"银行.*号",
+                r"保险.*号", r"医保.*卡号", r"社保.*卡号"
+            ],
+            "certificate_number": [
+                r"证书.*号", r"license.*num", r"执照.*号",
+                r"资格证.*号", r"执业.*证号"
+            ],
+            "vehicle_identifier": [
+                r"车牌", r"vehicle.*id", r"车架号", r"VIN"
+            ],
+            "device_identifier": [
+                r"设备.*号", r"device.*id", r"器械.*号",
+                r"UDI", r"序列号"
+            ],
+            "web_url": [
+                r"网址", r"url", r"website", r"链接",
+                r"http[s]?://", r"www\."
+            ],
+            "ip_address": [
+                r"IP.*地址", r"ip.*addr", r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+            ],
+            "biometric_identifier": [
+                r"指纹", r"fingerprint", r"虹膜", r"retina",
+                r"声纹", r"voiceprint", r"面部.*识别"
+            ],
+            "photo": [
+                r"照片", r"photo", r"picture", r"图像",
+                r"面部", r"face.*image"
             ]
         }
         
@@ -239,18 +269,27 @@ class DataDeidentifier:
         
         return df, report
     
-    def _generalize_column(self, df: pd.DataFrame, col: str, 
+    def _generalize_column(self, df: pd.DataFrame, col: str,
                           bins: List[int] = None) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-        """泛化列"""
+        """泛化列（HIPAA Safe Harbor: 年龄 >89 聚合为 '90+'）"""
         if bins is None:
-            # 默认年龄分组
-            bins = [0, 18, 30, 40, 50, 60, 70, 80, 100]
-        
+            # 默认年龄分组（HIPAA: >89 必须聚合）
+            bins = [0, 18, 30, 40, 50, 60, 70, 80, 90]
+
         original_values = df[col].dropna().unique()[:5]
-        
+
         if df[col].dtype in ['int64', 'float64']:
-            # 数值型泛化
-            df[col] = pd.cut(df[col], bins=bins, right=False)
+            # HIPAA Safe Harbor: 年龄 >89 聚合为 "90+"
+            if col.lower() in ['age', '年龄'] and df[col].max() > 89:
+                df[col] = df[col].apply(lambda x: "90+" if pd.notna(x) and x > 89 else x)
+                # 对 <=89 的值进行分组
+                mask = df[col] != "90+"
+                if mask.any():
+                    numeric_vals = pd.to_numeric(df[mask[col]], errors='coerce')
+                    df.loc[mask, col] = pd.cut(numeric_vals, bins=bins, right=False)
+            else:
+                # 数值型泛化
+                df[col] = pd.cut(df[col], bins=bins, right=False)
         
         report = {
             "strategy": "generalize",

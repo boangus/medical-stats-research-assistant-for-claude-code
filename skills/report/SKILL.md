@@ -281,23 +281,9 @@ python shared/report-assembler/export_tables_docx.py \
 Rscript shared/templates/export_tables_flextable.R
 ```
 
-**Step 3.5.3: 调用导出脚本**
-
-```bash
-# Python 版 (首推) — 完整 API 见 shared/report-assembler/export_tables_docx.py
-python shared/report-assembler/export_tables_docx.py \
-  --input-md "| 变量 | OR | 95% CI | p |\n|---|...|" \
-  --output reports/tables/table2_regression.docx \
-  --title "表2 Logistic回归结果" \
-  --note "OR: 比值比; CI: 置信区间"
-
-# R flextable 版 (备选) — 完整 API 见 shared/templates/export_tables_flextable.R
-Rscript shared/templates/export_tables_flextable.R
-```
-
 > 完整代码示例（含自定义样式、中文字体处理）见 `shared/report-assembler/export_tables_docx.py` 和 `shared/templates/export_tables_flextable.R`。
 
-**Step 3.5.4: 异常处理**
+**Step 3.5.3: 异常处理**
 
 | 触发条件 | 一线处理 | 仍失败兜底 |
 |---------|---------|-----------|

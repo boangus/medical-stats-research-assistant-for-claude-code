@@ -85,20 +85,21 @@ Write-Host "`n[4/5] Initializing passport..." -ForegroundColor Yellow
 $passportPath = Join-Path $ProjectRoot "MSRA\passport\passport.json"
 if (-not (Test-Path $passportPath)) {
     $passport = @{
-        version = "0.6.0"
+        passport_id = "msra-$(Get-Date -Format 'yyyyMMdd')-001"
+        passport_schema_version = "1"
+        pipeline_version = "0.7.5"
         created_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
-        artifacts = @{}
-        stages = @{
-            "data-prep" = "not_started"
-            "analysis-plan" = "not_started"
-            "analysis-exec" = "not_started"
-            "report" = "not_started"
+        updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+        status = "in_progress"
+        study_type = $null
+        current_stage = "stage_1"
+        artifacts = @()
+        checkpoints = @{
+            last_completed = $null
+            last_verified = $null
+            resume_point = "stage_1"
         }
-        gates = @{
-            "data-quality" = "pending"
-            "sap-quality" = "pending"
-            "results-quality" = "pending"
-        }
+        gates = @{}
     } | ConvertTo-Json -Depth 5
     Set-Content -Path $passportPath -Value $passport
     Write-Host "  Created: passport.json" -ForegroundColor Green
@@ -110,16 +111,8 @@ if (-not (Test-Path $passportPath)) {
 Write-Host "`n[5/5] Initializing calibration database..." -ForegroundColor Yellow
 $calibPath = Join-Path $ProjectRoot "MSRA\calibration\calibration_db.json"
 if (-not (Test-Path $calibPath)) {
-    $calibDb = @{
-        version = "0.6.0"
-        created_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
-        records = @()
-        summary = @{
-            total_comparisons = 0
-            method_match_rate = 0
-            conclusion_accuracy = 0
-        }
-    } | ConvertTo-Json -Depth 5
+    $calibDb = @()  # CalibrationDatabase expects a JSON array of entries
+    $calibDb = $calibDb | ConvertTo-Json -Depth 5
     Set-Content -Path $calibPath -Value $calibDb
     Write-Host "  Created: calibration_db.json" -ForegroundColor Green
 } else {

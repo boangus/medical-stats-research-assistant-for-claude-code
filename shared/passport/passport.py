@@ -315,7 +315,7 @@ class PassportManager:
         return {
             "passport_id": f"msra-{self._now()[:10].replace('-', '')}-001",
             "passport_schema_version": PassportManager.PASSPORT_SCHEMA_VERSION,
-            "pipeline_version": "0.4.1",
+            "pipeline_version": "0.7.5",
             "created_at": self._now(),
             "updated_at": self._now(),
             "status": "in_progress",

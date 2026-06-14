@@ -157,8 +157,16 @@ medical-stats-research-assistant/
 ├── docs/                         # 文档
 │   └── PIPELINE.md               # 架构与流水线详细文档
 │
-└── examples/                     # 使用示例
-    └── example_workflow.md
+├── examples/                     # 使用示例
+│   └── example_workflow.md
+│
+└── MSRA/                         # 运行时输出目录（由 install.ps1 创建）
+    ├── data/                     # 用户数据
+    ├── reports/                  # 分析报告
+    │   ├── figures/              # 图表
+    │   └── tables/               # 表格
+    ├── passport/                 # 产物护照
+    └── calibration/              # 校准数据库
 ```
 
 ---
