@@ -451,7 +451,7 @@ anti-pattern A1 "正态性假定默认化":
 
 ---
 
-## 模式 7: 外部基准评估 🆕
+## 模式 5: 外部基准评估 🆕
 
 > 解决 dim8 核心短板：合成金标准（gold_standard_example.csv）无法反映真实场景。
 > 借鉴 **StatLLM**（Nature SciData 2026, human-centered gold standard, 90 数据集×5 学科）、
@@ -614,7 +614,7 @@ def gate_check(calibration_db, method_type=None):
 
 ---
 
-## 模式 5: 复现验证 🆕
+## 模式 6: 复现验证 🆕
 
 > 借鉴 LLM-Assisted Replication (arXiv:2602.18453) 的"文本解读→代码生成→执行→差异分析"迭代循环。
 > 核心思路：从已发表论文中自动提取统计结果，MSRA 独立生成分析代码并执行，比对两者差异。
@@ -707,7 +707,7 @@ source 标记为 "replication_verification"。
 
 ---
 
-## 模式 6: 公平性校准 🆕
+## 模式 7: 公平性校准 🆕
 
 > 借鉴 BiasScan (arXiv 2025) 的 LLM 偏见检测方法和医疗 AI 公平性研究。
 > 医学统计分析中的偏见可能导致不公平的临床决策，影响不同人群的健康结局。

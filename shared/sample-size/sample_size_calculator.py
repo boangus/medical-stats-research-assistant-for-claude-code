@@ -289,6 +289,65 @@ def calc_power_t(
 
 
 # ============================================================================
+# 7. 诊断试验样本量
+# ============================================================================
+
+
+def calc_sample_size_diagnostic(
+    sensitivity: float,
+    specificity: float,
+    prevalence: float,
+    ci_width: float = 0.10,
+    alpha: float = 0.05,
+) -> Dict[str, int]:
+    """诊断试验样本量计算
+
+    基于灵敏度/特异度的置信区间宽度反推所需病例数。
+    公式: n = Z²α/2 × p(1-p) / (d/2)²
+    其中 p 为目标指标值，d 为期望的 CI 宽度。
+
+    Parameters
+    ----------
+    sensitivity : float
+        预期灵敏度 (0-1)
+    specificity : float
+        预期特异度 (0-1)
+    prevalence : float
+        目标人群中阳性比例 (0-1)
+    ci_width : float
+        期望的 95% CI 宽度 (默认 0.10)
+    alpha : float
+        显著性水平 (默认 0.05)
+
+    Returns
+    -------
+    Dict
+        所需阳性病例数、阴性病例数和总病例数
+    """
+    z = stats.norm.ppf(1 - alpha / 2)
+
+    # 灵敏度所需的阳性病例数
+    n_pos = int(np.ceil((z**2 * sensitivity * (1 - sensitivity)) / (ci_width / 2) ** 2))
+
+    # 特异度所需的阴性病例数
+    n_neg = int(np.ceil((z**2 * specificity * (1 - specificity)) / (ci_width / 2) ** 2))
+
+    # 考虑患病率后的总样本量
+    n_total_sens = int(np.ceil(n_pos / prevalence))
+    n_total_spec = int(np.ceil(n_neg / (1 - prevalence)))
+    n_total = max(n_total_sens, n_total_spec)
+
+    return {
+        "n_positive": n_pos,
+        "n_negative": n_neg,
+        "n_total": n_total,
+        "alpha": alpha,
+        "ci_width": ci_width,
+        "method": "Diagnostic test sample size (CI width)",
+    }
+
+
+# ============================================================================
 # 示例
 # ============================================================================
 if __name__ == "__main__":

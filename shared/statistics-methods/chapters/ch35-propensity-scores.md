@@ -45,14 +45,52 @@
 - 倾向性评分模型的正确设定（包括交互项和非线性项）至关重要
 - 倾向性评分不代表因果关系，仅是混杂控制的一种工具
 
+## 倾向性评分模型诊断
+
+### 模型设定检验
+
+倾向性评分模型的质量直接影响因果推断的有效性。模型设定不当会导致残余混杂。
+
+**必须检查的指标**：
+1. **C-statistic（AUC）**：PS 模型的区分度。一般 0.7-0.8 为佳；>0.9 可能意味着分离（separation）
+2. **校准曲线**：预测概率与实际治疗比例的一致性
+3. ** Hosmer-Lemeshow 检验**：分层校准度（p>0.05 为佳）
+
+### 平衡性诊断
+
+匹配/加权后必须评估协变量平衡：
+
+| 指标 | 阈值 | 说明 |
+|------|------|------|
+| 标准化均值差 (SMD) | <0.1 | 所有协变量均应满足 |
+| 方差比 (VR) | 0.5-2.0 | 连续变量的方差比 |
+| 重叠度 (Overlap) | 可视化 | PS 分布重叠区域 |
+
+**Love Plot**：可视化匹配前后所有协变量的 SMD 变化，是最直观的平衡性诊断工具。
+
+### 常见陷阱
+
+1. **Positivity 违反**：PS 接近 0 或 1 的区域缺乏重叠 → 无法进行有效推断
+2. **过度拟合**：PS 模型 AUC >0.95 → 可能存在分离，导致匹配失败
+3. **忽略非线性**：PS 模型仅包含线性项 → 残余混杂
+4. **匹配后重新评估**：匹配后必须重新检查协变量平衡，而非假设匹配即平衡
+
+## MSRA 工具链
+
+| 工具 | 用途 |
+|------|------|
+| `shared/causal-inference/psm_template.py` | PSM 匹配 + 平衡诊断 |
+| `shared/causal-inference/overlapping_weighting_template.py` | OW/IPTW 加权 |
+| `shared/templates/ps_diagnostics_template.R` | R 版 PS 诊断（Love plot + 重叠图） |
+| `shared/sensitivity-agreement/` | 主分析 vs 敏感性一致性 |
+
 ## 参考文献
 
-1. Rozé JC, et al. Association between early echocardiography screening and mortality in very preterm infants. 方法学, 2014, 312(18): 1924–1933.
-2. Huybrechts KF, et al. Antidepressant use in pregnancy and the risk of persistent pulmonary hypertension in newborns. 方法学, 2015, 313(21): 2142–2151.
-3. Rosenbaum PR, Rubin DB. The central role of the propensity score in observational studies for causal effects. Biometrika, 1983, 70(1): 41–55.
-4. Austin PC. An introduction to propensity score methods for reducing the effects of confounding in observational studies. Multivariate Behav Res, 2011, 46(3): 399–424.
-5. Haukoos JS, Lewis RJ. The propensity score. 方法学, 2015, 314(15): 1637–1638.
-6. Lunceford JK, Davidian M. Stratification and weighting via the propensity score in estimation of causal treatment effects. Stat Med, 2004, 23(19): 2937–2960.
+1. Rosenbaum PR, Rubin DB. The central role of the propensity score in observational studies for causal effects. Biometrika, 1983, 70(1): 41–55.
+2. Austin PC. An introduction to propensity score methods for reducing the effects of confounding in observational studies. Multivariate Behav Res, 2011, 46(3): 399–424.
+3. Austin PC. Balance diagnostics for comparing the distribution of baseline covariates between treatment groups in propensity-score matched samples. Stat Med, 2009, 28(25): 3083–3107.
+4. Lee BK, Lessler J, Stuart EA. Improving propensity score weighting using machine learning. Stat Med, 2010, 29(3): 337–346.
+5. Lunceford JK, Davidian M. Stratification and weighting via the propensity score in estimation of causal treatment effects. Stat Med, 2004, 23(19): 2937–2960.
 
 ---
 
