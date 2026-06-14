@@ -1,4 +1,4 @@
-timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+﻿timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-05-29T10:42	baseline	msra-pipeline	-	88.1	baseline	-	结构优良，编排器纯调度架构清晰	dry_run
 2026-05-29T11:03	de1bd81	msra-pipeline	88.1	92.1	keep	dim1+dim3+dim5+dim6	触发词+错误优先级+信号冲突+shared refs	dry_run
 2026-05-29T10:42	baseline	msra-data-prep	-	82.4	baseline	-	数据验证清洗完整，反例黑名单出色	dry_run
@@ -73,3 +73,9 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-14T00:05	optimize-report	msra-report	88.2	89.5	keep	dim8	test-prompts 10→15; +CONSORT2025/Quarto/STARD/NMA/AI disclosure	dry_run
 2026-06-14T00:30	optimize-pipeline	msra-pipeline	90.0	91.5	keep	dim7	dim7:8→9; 789→690行(-12.5%)	dry_run
 2026-06-14T00:30	optimize-analysis-plan	msra-analysis-plan	91.2	91.9	keep	dim5	dim5:9→10; 消除"建议"软词	dry_run
+2026-06-14T11:00	a5f4df7	analysis-plan	88.0	89.5	fix	dim6+dim4	P0 variable_spec_template.md 新建134行 + P1 CHECKPOINT-M6 悬空引用改指 Phase5	dry_run
+2026-06-14T11:00	a5f4df7	data-prep	90.8	91.3	fix	dim2+dim5	Phase7 判定表 8/8->9/9 项目5/6/7->5/6/7/9 对齐 Pipeline	dry_run
+2026-06-14T11:00	a5f4df7	summary	-	-	phase1-baseline	-	6 skills avg 89.8/100 baseline; 3 P0/P1 fixed; runtime 绿灯; soft-lang 0 hits	dry_run
+2026-06-14T15:30	research-fusion-r1	msra-report	89.5	91.8	keep	dim3+dim5+dim9	CONSORT重构为官方30项(此前自创22项缺PPI/Item24/Item30); 新增Phase6b statcheck(P值一致性校验含正则/重算公式/容差表/4类误报缓解); dim5显著增强	dry_run
+2026-06-14T15:30	research-fusion-r1	msra-analysis-plan	89.5	90.8	keep	dim6+dim9	SPIRIT 2025(34项)首次引入(此前findstr确认零SPIRIT引用); Phase4新增协议要素完整性自检(Item9/10/11/12/14/22含Estimands框架)	dry_run
+2026-06-14T15:30	research-fusion-r1	summary	-	-	phase1-fusion	-	R1: report 89.5->91.8(+2.3); analysis-plan 89.5->90.8(+1.3); 新增3个reporting-guidelines文件(CONSORT30/SPIRIT34/statcheck); 6skills avg 89.8->90.3(估); 远超≥0.5分增益阈值,进入R2	dry_run

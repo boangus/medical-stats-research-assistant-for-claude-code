@@ -232,11 +232,13 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 > 参考：shared/statistics-methods/chapters/ch19-gatekeeping-strategies.md — 关口策略 (统计指南第19章)
 > 参考：shared/sap/sap_standard.md — SAP标准格式定义
 > 参考：shared/sap/variable_selection_guide.md — 变量选择与方法推荐指南
+> 参考：shared/reporting-guidelines/SPIRIT_checklist.md — **SPIRIT 2025 试验协议 34 项清单**（RCT 协议完整性）
 
 确认方法后，**严格按照SAP标准格式**生成正式的统计分析计划文档。SAP必须包含：
 1. 变量选择推荐（强制纳入/建议纳入/不纳入）
 2. 统计方法选择推荐（主要/次要/敏感性分析）
 3. 变量构建推荐与公式（构造逻辑、切点、依据）
+4. **协议要素完整性自检（RCT 适用）**：对照 `SPIRIT_checklist.md` 34 项，确保 SAP 涵盖 Item 9（设计）、Item 10（合格标准+多样性目标）、Item 11（干预）、Item 12（结局）、Item 14（样本量）、Item 22（统计方法含 Estimands 框架）；缺失项须在 SAP 末尾"协议完整性备注"中标注并提示用户补充
 
 **Targeted-Context 机制**（借鉴 YH-SAP）：
 
