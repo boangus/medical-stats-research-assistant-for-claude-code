@@ -284,6 +284,35 @@ Stage 3.5:
 
 ## 协作协议
 
+### 0. 架构原则：Thin MCP, Thick Skills
+
+> 借鉴 ClinAgent 五层架构（medRxiv 2026）的 "Thin MCP, Thick Skills" 设计哲学：
+> MCP（Model Context Protocol）层仅提供最小化的数据访问操作，所有领域逻辑封装在 Skills 中。
+
+**核心原则**：
+- **MCP 层（薄）**：仅负责数据 I/O — 读取文件、写入文件、查询数据库、调用 API
+- **Skills 层（厚）**：封装所有领域知识 — 统计方法选择、假设检验逻辑、质量控制规则、反模式防御
+
+**分层映射**：
+
+| 层级 | 职责 | MSRA 中的体现 | 禁止行为 |
+|------|------|-------------|---------|
+| **MCP 层** | 数据访问 | 读取 CSV/Excel、写入报告、调用 R/Python | ❌ 不做统计判断、不做方法选择 |
+| **Skills 层** | 领域逻辑 | Hybrid Prompting、Targeted-Context、[SKIP] 规则、反模式防御 | ❌ 不直接操作文件系统 |
+| **Agent 层** | 编排决策 | 阶段路由、质量门闸、人机回环 | ❌ 不执行具体分析代码 |
+
+**对 Agent 协作的影响**：
+- Data Validator 通过 MCP 读取数据，通过 Skills 执行验证逻辑
+- Method Consultant 通过 Skills 获取方法知识，不直接访问数据
+- Exec Runner 通过 MCP 执行代码，通过 Skills 生成代码模板（Hybrid Prompting）
+- QC Inspector 通过 Skills 执行检查规则，通过 MCP 读取产物
+
+**优势**：
+1. **可测试性**：Skills 逻辑可独立测试，不依赖数据源
+2. **可替换性**：MCP 层可替换（如从本地文件切换到数据库），Skills 不受影响
+3. **可扩展性**：新增统计方法只需扩展 Skills，不修改 MCP 层
+4. **一致性**：所有 Agent 使用相同的 Skills 知识库，避免知识碎片化
+
 ### 1. 接棒格式 (Handoff)
 
 每个 Agent 完成任务后必须包含：
@@ -370,6 +399,105 @@ Pipeline Orchestrator
 ```
 
 **核心原则**: Pipeline Orchestrator 始终持有控制权。Agent 角色是"帽子"——你在不同阶段戴不同的帽子，完成该阶段工作后切回 Orchestrator 帽子。
+
+---
+
+## 级联错误防御机制 🆕
+
+> 借鉴 Multi-Agent AI Systems 综述 (MDPI Methods & Protocols, 2026) 的关键发现：
+> 多 Agent 系统存在"不可靠性税"(unreliability tax)——token 消耗比单模型高 15-50 倍，
+> 且初始幻觉可在 Agent 集体中被放大（级联错误）。以下机制专门防御此类风险。
+
+### 1. 幻觉传播阻断规则
+
+**核心原则**：任何 Agent 的输出在传递给下游 Agent 前，必须经过事实核查。
+
+| 传播路径 | 阻断规则 | 检查方式 |
+|---------|---------|---------|
+| Data Validator → Method Consultant | 数据特征描述必须与原始数据一致 | Method Consultant 独立验证关键统计量（N、缺失率、分布类型） |
+| Method Consultant → Exec Runner | SAP 中的方法必须与数据特征兼容 | Exec Runner 执行前检查假设条件是否满足 |
+| Exec Runner → Exec Inference | 代码输出必须可独立复现 | Exec Inference 独立重跑假设检验（Generator-Evaluator） |
+| Exec Inference → QC Inspector | 差异报告必须完整 | QC Inspector 检查差异报告是否覆盖所有计划分析 |
+
+**幻觉传播判定**：
+
+| 级别 | 定义 | 处理 |
+|------|------|------|
+| 🟢 无传播 | 上游输出经下游独立验证一致 | 正常流转 |
+| 🟡 轻微偏差 | 数值偏差 < 5%，结论一致 | 记录偏差，继续流转 |
+| 🔴 幻觉传播 | 上游声称的统计量与实际数据不符 | 阻断流转，退回上游修正 |
+
+### 2. Token 消耗控制策略
+
+> MAS 综述指出：多 Agent 系统的 token 消耗可达单模型的 15-50 倍。
+> MSRA 通过以下策略控制 token 消耗，同时保证分析质量。
+
+**2a. 上下文精简规则**：
+
+| 阶段 | 传递内容 | 禁止传递 | 节省比例 |
+|------|---------|---------|---------|
+| Stage 1 → 2 | 数据摘要 + 验证报告 + 清洗日志 | 原始数据行 | ~80% |
+| Stage 2 → 3 | SAP + 分析规范表 + 变量构造定义 | EDA 原始图表 | ~60% |
+| Stage 3 内部 | 代码 + 结果表 + [SKIP] 标记 | 全部 Debug 日志 | ~40% |
+| Stage 3 → 4 | 结果表 + 效应量 + CI + p 值 | 代码 + 中间输出 | ~70% |
+
+**2b. Targeted-Context 机制**（已在 analysis-plan 中实现）：
+- 每个阶段只加载当前任务所需的最小上下文
+- `context_scope` 字段定义每个 Phase 的上下文边界
+- 超出范围的上下文不加载，减少 token 消耗
+
+**2c. 渐进式细化**：
+- 第一轮：仅执行主要分析（最小 token 消耗）
+- 第二轮（如需）：补充敏感性分析和亚组分析
+- 避免一次性加载所有分析需求
+
+### 3. 确定性编排保障
+
+> MAS 综述强调：临床和研究采用 MAS 需要"确定性编排和严格的成本-效用框架"。
+
+**3a. 编排确定性规则**：
+
+| 规则 | 说明 | 违反后果 |
+|------|------|---------|
+| 单一控制权 | Orchestrator 始终持有控制权，Agent 不可自行调度 | Agent 自行调度 → 输出不可信 |
+| 顺序执行 | 严格按 Stage 1→1.5→2→2.5→3→3.5→4 执行 | 跳过门闸 → 强制退回 |
+| 产物锁定 | 前序阶段的产物在后续阶段只读不可修改 | 修改前序产物 → 标记为偏差 |
+| 幂等检查 | 同一检查重复执行结果必须一致 | 不一致 → 标记为"非确定性"，需人工审核 |
+
+**3b. 成本-效用监控**：
+
+```
+每次 Agent 切换时记录:
+  - 阶段: Stage X
+  - Token 消耗: input=N, output=M
+  - 产物质量: 门闸通过/条件通过/阻断
+  - 累计 Token: total
+
+当累计 Token 超过阈值时:
+  - 警告阈值: 50K tokens → 提示用户当前消耗
+  - 审查阈值: 100K tokens → 建议用户评估是否继续
+  - 强制暂停: 200K tokens → 必须用户确认后才能继续
+```
+
+### 4. Agent 输出交叉验证矩阵
+
+> 借鉴 MAS 综述中"cross-verify outputs"原则，确保每个 Agent 的输出至少被一个独立 Agent 验证。
+
+| 产出 Agent | 验证 Agent | 验证内容 | 验证方式 |
+|-----------|-----------|---------|---------|
+| Data Validator | Method Consultant | 数据特征描述准确性 | 独立计算关键统计量 |
+| Method Consultant | QC Inspector | SAP 完整性和合理性 | 8 项阻断检查 |
+| Exec Runner | Exec Inference | 代码正确性和假设满足 | Generator-Evaluator 比对 |
+| Exec Inference | QC Inspector | 推理逻辑和差异完整性 | 8 项阻断检查 |
+| Report | QC Inspector | 规范合规和数值一致性 | 报告规范检查清单 |
+
+**验证失败升级路径**：
+```
+验证失败 → 标记差异 → Orchestrator 评估严重程度
+  ├── 轻微差异 → 记录并继续（附差异说明）
+  ├── 中等差异 → 条件通过（需用户确认）
+  └── 严重差异 → 阻断并退回产出 Agent 修正
+```
 
 
 

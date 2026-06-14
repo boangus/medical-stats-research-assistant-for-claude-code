@@ -37,9 +37,10 @@ allowed_skills: [statistics-methods]
 □ 6. 逻辑一致性 — 日期/范围/交叉字段自洽？
 □ 7. 值规范化完成 — TCM术语+数值变体已处理？
 □ 8. 可重复性 — 清洗脚本可独立运行？
+□ 9. 隐私合规完成 — PHI已检测并脱敏/处理？ 🆕
 ```
 
-**判定**: 全部通过→进入Stage 2 / 1-2项未过→条件通过 / 3+项未过或5/6/7未过→阻断退回Stage 1
+**判定**: 全部通过→进入Stage 2 / 1-2项未过→条件通过 / 3+项未过或5/6/7/9未过→阻断退回Stage 1
 
 ### Stage 2.5: SAP 质量门闸（8项阻断检查）
 
@@ -70,6 +71,74 @@ allowed_skills: [statistics-methods]
 ```
 
 **判定**: 全部通过→进入Stage 4 / 1-2项未过→条件通过 / 3+项未过或1/3/4未过→阻断退回Stage 3
+
+### Stage 4.5: AI 治理门闸（5维度检查）🆕
+
+> 借鉴 PharmaSUG 2026 "Large Language Models and AI Agents in Patient Outcomes Research" 的五维度治理框架。
+> 对齐 NIST AI RMF 1.0、TRIPOD+AI、CONSORT-AI 和 FDA RWD/E 监管要求。
+
+```
+□ 1. 统计可重复性 (Statistical Reproducibility)
+    □ 随机种子已记录且固定？
+    □ 软件版本和包版本已记录？
+    □ 分析代码可独立运行？
+    □ 结果可被第三方复现？
+
+□ 2. 数据治理与隐私 (Data Governance & Privacy)
+    □ PHI 已脱敏或合规处理？
+    □ 数据访问权限已审计？
+    □ 数据血缘可追溯？
+    □ 符合 HIPAA/GDPR 要求？
+
+□ 3. 透明度与可审计性 (Transparency & Auditability)
+    □ 所有决策点有记录？
+    □ 审计日志完整且不可变？
+    □ 方法选择依据可解释？
+    □ [SKIP] 标记有合理说明？
+
+□ 4. 偏见与漂移管理 (Bias & Drift Management)
+    □ 方法选择公平性已检查？
+    □ 效应量报告完整性已验证？
+    □ 结论一致性已评估？
+    □ 模型/方法漂移已监控？
+
+□ 5. 监管适用性 (Fitness-for-Purpose in Regulated Workflows)
+    □ 符合 FDA RWD/E 指导？
+    □ 符合 CONSORT-AI/STROBE-AI 报告规范？
+    □ 人机回环(HITL)检查点已设置？
+    □ 适用性声明已明确？
+```
+
+**判定**: 全部通过→监管级证据 / 1-2项未过→需补充说明 / 3+项未过或2/5未过→不可用于监管提交
+
+**NIST AI RMF 对齐映射**：
+
+| NIST AI RMF 函数 | MSRA 对应检查 | 满足方式 |
+|-----------------|--------------|---------|
+| **GOVERN** | 治理结构、角色定义 | AGENTS.md 定义角色边界和操作权限 |
+| **MAP** | 上下文理解、风险识别 | data-prep Phase 7 PHI 检测 + 反模式防御 |
+| **MEASURE** | 性能评估、偏见检测 | calibration 公平性校准 + TPR/FPR 监控 |
+| **MANAGE** | 风险缓解、持续监控 | 门闸阻断 + 人机回环 + 审计日志 |
+
+**监管合规映射**：
+
+| 法规/指南 | MSRA 满足方式 | 检查项 |
+|----------|--------------|--------|
+| FDA 21 CFR Part 11 | 审计日志 + 电子签名 | Stage 4.5-3 |
+| FDA RWD/E Guidance | 数据质量 + 方法合理性 | Stage 1.5 + 2.5 |
+| CONSORT-AI | AI 方法透明报告 | Stage 4.5-3 + 4.5-5 |
+| TRIPOD+AI | 预测模型报告规范 | Stage 4 报告模板 |
+| ICH E9(R1) | Estimands 框架 | Stage 2.5-3 |
+
+## 反例与黑名单
+
+> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（B2/E3）
+
+| 禁止行为 | 正确做法 |
+|---------|---------|
+| 门闸检查时修改数据或脚本 | quality-gate 模式只检查不修改 |
+| 阻断未通过时允许跳过 | 阻断必须退回前一阶段修订 |
+| 不记录偏差继续执行 | 偏差必须记录在门闸报告中 |
 
 ## 接棒格式
 

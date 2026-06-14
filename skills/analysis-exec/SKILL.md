@@ -254,6 +254,14 @@ cleaned_data %>%
 
 ### Phase 6: 代码生成与执行
 
+> **Hybrid Prompting 策略**（借鉴 Frontiers AI 2025）：
+> 统计推理准确性通过组合三层提示策略显著提升：
+> 1. **明确指令层**：方法选择规则、假设检验顺序、效应量报告要求
+> 2. **推理脚手架层**：分步推理模板、假设-检验-结论结构化流程
+> 3. **格式约束层**：输出格式模板、数值精度要求、标记规范
+>
+> 三层策略必须同时应用于代码生成和结果解读，缺一不可。
+
 **代码结构**（R/Python）：
 
 ```r
@@ -266,6 +274,87 @@ cleaned_data %>%
 - 所有假设必须检验
 - 所有计划的分析必须执行
 - 任何偏差必须记录
+
+**Hybrid Prompting 代码生成模板**：
+
+> 每段分析代码必须遵循三层结构，确保统计推理的严谨性。
+
+```markdown
+### [分析名称] — Hybrid Prompting 模板
+
+#### Layer 1: 明确指令 (Explicit Instructions)
+- 方法: [从SAP引用具体方法，如"ANCOVA调整基线HbA1c"]
+- 假设: [列出必须检验的假设，如"正态性、方差齐性、线性"]
+- 效应量: [预定义效应量类型，如"Cohen's d + 95%CI"]
+- 偏差处理: [假设违反时的降级路径，如"→ Welch's t → Mann-Whitney"]
+
+#### Layer 2: 推理脚手架 (Reasoning Scaffold)
+代码必须按以下结构组织：
+1. 假设检验代码（先于主分析）
+2. 假设结果解读（通过/违反 + 证据）
+3. 方法选择决策（基于假设结果选择方法）
+4. 主分析代码（使用选定方法）
+5. 效应量计算（预定义类型）
+6. 结果摘要（效应量+CI+p值+临床解读）
+
+#### Layer 3: 格式约束 (Format Constraints)
+- 数值精度: p值4位小数, 效应量2位小数, CI 2位小数
+- 标记规范: [SKIP:原因] / [DEVIATION:描述] / [EXPLORATORY]
+- 输出格式: 表格必须含列名、单位、注释行
+```
+
+**Hybrid Prompting 应用示例（R - 两组连续变量比较）**：
+
+```r
+# === Layer 1: 明确指令 ===
+# 方法: 独立样本t检验（如正态）或 Mann-Whitney U（如非正态）
+# 假设: 1) Shapiro-Wilk正态性 2) Levene方差齐性
+# 效应量: Cohen's d (正态) 或 r = Z/sqrt(N) (非参数)
+# 降级路径: t检验 → Welch's t → Mann-Whitney U
+
+# === Layer 2: 推理脚手架 ===
+# Step 1: 假设检验
+shapiro_ctrl <- shapiro.test(data$outcome[data$group == "control"])
+shapiro_trt <- shapiro.test(data$outcome[data$group == "treatment"])
+cat(sprintf("正态性检验: 对照组 P=%.4f, 治疗组 P=%.4f\n",
+            shapiro_ctrl$p.value, shapiro_trt$p.value))
+
+# Step 2: 假设结果解读 + 方法决策
+normal_ok <- shapiro_ctrl$p.value > 0.05 & shapiro_trt$p.value > 0.05
+if (normal_ok) {
+  # Step 3: 方差齐性检验
+  levene_result <- car::leveneTest(outcome ~ group, data = data)
+  var_equal <- levene_result$`Pr(>F)`[1] > 0.05
+  method_used <- if(var_equal) "Student's t" else "Welch's t"
+
+  # Step 4: 主分析
+  test_result <- t.test(outcome ~ group, data = data, var.equal = var_equal)
+
+  # Step 5: 效应量
+  d <- effsize::cohen.d(outcome ~ group, data = data)
+  cat(sprintf("方法: %s | 均差=%.2f [%.2f, %.2f] | p=%.4f | d=%.2f\n",
+              method_used, diff(test_result$estimate),
+              test_result$conf.int[1], test_result$conf.int[2],
+              test_result$p.value, d$estimate))
+} else {
+  # 降级: 非参数方法
+  method_used <- "Mann-Whitney U"
+  test_result <- wilcox.test(outcome ~ group, data = data, conf.int = TRUE)
+
+  # Step 5: 效应量 (r = Z/sqrt(N))
+  z <- qnorm(test_result$p.value / 2)
+  r_eff <- abs(z) / sqrt(nrow(data))
+  cat(sprintf("方法: %s | 中位数差=%.2f [%.2f, %.2f] | p=%.4f | r=%.2f\n",
+              method_used,
+              diff(tapply(data$outcome, data$group, median)),
+              test_result$conf.int[1], test_result$conf.int[2],
+              test_result$p.value, r_eff))
+}
+
+# === Layer 3: 格式约束 ===
+# 输出必须包含: 方法名 | 效应量[95%CI] | p值 | 假设检验结果
+# 如假设违反且降级: 标记 [DEVIATION: 非正态→非参数]
+```
 
 **自愈代码执行循环**（借鉴 clinical-tlf-automation-system）：
 
@@ -727,8 +816,121 @@ for group in df['treatment'].unique():
 10. **假设检验报告**: 所有诊断结果
 11. **质检报告**: 检查结果摘要
 12. **偏差日志**: 与SAP的任何偏差
+13. **审计日志**: 不可变操作记录（JSON Lines 格式）🆕
 
-> [SLIM] 输出产物确认：展示 12 项产物的生成状态清单（✅/⚠️/❌），用户确认后交付到下一阶段。
+> [SLIM] 输出产物确认：展示 13 项产物的生成状态清单（✅/⚠️/❌），用户确认后交付到下一阶段。
+
+### Phase 10: 不可变审计日志 🆕
+
+> 借鉴 Data Analysis Copilot (arXiv 2025) 的不可变审计日志机制。
+> 临床统计分析必须满足可重复性和合规性要求，审计日志是核心保障。
+> **核心原则**：每次分析操作的输入、代码、输出、时间戳必须被记录且不可修改。
+
+**10a. 审计日志结构**：
+
+```json
+{
+  "audit_id": "MSRA-2026-0614-001-AUDIT",
+  "analysis_id": "MSRA-2026-0614-001",
+  "timestamp": "2026-06-14T10:30:45.123Z",
+  "stage": "Stage 3: Analysis Exec",
+  "phase": "Phase 6: 主分析执行",
+  "operation": {
+    "type": "statistical_analysis",
+    "method": "Cox Proportional Hazards",
+    "software": "R 4.3.2 / survival 3.5-7"
+  },
+  "input": {
+    "data_hash": "sha256:a1b2c3d4...",
+    "sap_version": "v1.2",
+    "variables": ["time", "event", "treatment", "age", "sex"]
+  },
+  "code": {
+    "file": "analysis/cox_model.R",
+    "hash": "sha256:e5f6g7h8...",
+    "lines": "15-42"
+  },
+  "output": {
+    "result_file": "results/cox_results.csv",
+    "hash": "sha256:i9j0k1l2...",
+    "key_findings": {
+      "HR": 0.75,
+      "CI_lower": 0.58,
+      "CI_upper": 0.97,
+      "p_value": 0.028
+    }
+  },
+  "quality_checks": {
+    "assumptions": "PH assumption verified (p=0.45)",
+    "convergence": "Converged in 4 iterations",
+    "warnings": []
+  },
+  "signature": {
+    "agent": "Exec Runner",
+    "verifier": "Exec Inference",
+    "checksum": "sha256:m3n4o5p6..."
+  }
+}
+```
+
+**10b. 审计日志不可变性保障**：
+
+| 保障机制 | 实现方式 | 验证方法 |
+|---------|---------|---------|
+| 写入即锁定 | 日志文件权限设为只读 | 尝试修改 → 权限拒绝 |
+| 哈希链 | 每条日志包含前一条日志的哈希 | 链断裂 → 检测到篡改 |
+| 时间戳签名 | 使用可信时间源签名 | 时间戳验证 → 确认记录时间 |
+| 副本备份 | 日志同步到独立存储 | 主日志损坏 → 从备份恢复 |
+
+**10c. 审计日志记录点**：
+
+| Phase | 记录内容 | 触发时机 |
+|-------|---------|---------|
+| Phase 0 | 样本量验证结果 | 验证完成时 |
+| Phase 1 | 变量构造代码和映射 | 构造完成时 |
+| Phase 2 | 执行前检查结果 | 检查通过时 |
+| Phase 3-6 | 每个分析的输入/代码/输出 | 分析完成时 |
+| Phase 7 | 假设检验结果 | 检验完成时 |
+| Phase 8 | 质检结果 | 质检完成时 |
+| Phase 9 | 产物清单和哈希 | 产物生成时 |
+
+**10d. 审计日志查询接口**：
+
+```python
+# 查询特定分析的所有审计记录
+audit_log.query(analysis_id="MSRA-2026-0614-001")
+
+# 查询特定时间范围的操作
+audit_log.query(start_time="2026-06-01", end_time="2026-06-14")
+
+# 验证审计链完整性
+audit_log.verify_chain()  # → True/False + 断裂点位置
+
+# 导出合规报告
+audit_log.export_compliance_report(format="FDA_21CFR11")
+```
+
+**10e. 合规性映射**：
+
+| 法规要求 | 审计日志字段 | 满足方式 |
+|---------|-------------|---------|
+| FDA 21 CFR Part 11 | 电子签名、时间戳、不可修改 | signature + timestamp + 哈希链 |
+| GCP | 操作可追溯、数据可复现 | input/output hash + code hash |
+| ICH E6 | 分析过程记录 | phase + operation + quality_checks |
+| GDPR | 数据处理透明 | input variables + purpose |
+
+**10f. 审计日志异常处理**：
+
+| 异常情况 | 检测方式 | 处理 |
+|---------|---------|------|
+| 日志写入失败 | 写入操作返回错误 | 暂停分析，提示用户检查存储 |
+| 哈希链断裂 | verify_chain() 返回 False | 标记断裂点，记录到安全日志，通知管理员 |
+| 时间戳异常 | 时间戳早于前一条记录 | 标记为"时间异常"，需人工审核 |
+| 代码哈希不匹配 | 执行代码与记录哈希不同 | 标记为"代码变更"，记录到偏差日志 |
+
+> [IRON RULE] 审计日志记录失败时，分析流程必须暂停。不可在没有审计追踪的情况下继续执行临床统计分析。
+
+**输出**：`{stage_dir}/audit_log.jsonl`（JSON Lines 格式，每行一条记录）
 
 ## 命令
 
