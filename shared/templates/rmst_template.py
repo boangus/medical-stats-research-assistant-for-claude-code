@@ -178,7 +178,9 @@ def _rmst_variance(
 ) -> float:
     """RMST 方差的简化估计"""
     n = len(time)
-    # 使用 Greenwood-like 估计
+    if n == 0:
+        return 0.0
+
     order = np.argsort(time)
     time = time[order]
     event = event[order]
@@ -188,14 +190,16 @@ def _rmst_variance(
     at_risk = n
 
     for i in range(n):
-        if event[i] == 1:
-            q = 1 / at_risk
-            km_surv.append(km_surv[-1] * (1 - q))
-            # Greenwood formula
-            km_var.append(km_surv[-1]**2 * (q / (1 - q)) / at_risk)
+        if event[i] == 1 and at_risk > 0:
+            q = 1.0 / at_risk
+            new_surv = km_surv[-1] * (1 - q)
+            km_surv.append(new_surv)
+            # Greenwood formula (avoid division by zero)
+            denom = 1 - q
+            if denom > 0 and at_risk > 0:
+                km_var.append(new_surv**2 * (q / denom) / at_risk)
         at_risk -= 1
 
-    # 简化: 返回生存曲线的平均方差
     return np.mean(km_var) if km_var else 0.0
 
 

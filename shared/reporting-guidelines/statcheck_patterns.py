@@ -27,6 +27,8 @@ import re
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 
+import numpy as np
+
 try:
     from scipy import stats as sp_stats
     HAS_SCIPY = True

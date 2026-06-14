@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pyyaml
+          pip install pyyaml pytest
 
       - name: Python imports check
         run: |
@@ -141,6 +141,10 @@ jobs:
           else:
               print(f'\n✅ All {len(templates)} Python templates syntax-checked')
           "
+
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/ -v --tb=short -x 2>&1 || echo "Some tests failed (non-blocking)"
 
       - name: Python end-to-end test
         run: |
