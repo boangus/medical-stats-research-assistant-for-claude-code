@@ -247,10 +247,14 @@ jobs:
           df = pd.read_csv('shared/calibration/gold_standard_example.csv')
           required_cols = ['analysis_id', 'gold_method', 'gold_estimate', 'gold_significant']
           for col in required_cols:
-              assert col in df.columns, f'Missing column: {col}'
+            assert col in df.columns, f'Missing column: {col}'
           methods = df['gold_method'].nunique()
           print(f'  Records: {len(df)}, Methods: {methods}')
           assert len(df) >= 50, f'Gold standard too small: {len(df)} < 50'
           assert methods >= 10, f'Too few methods: {methods} < 10'
           print(f'✅ Gold standard validated ({len(df)} records, {methods} methods)')
           "
+
+      - name: Quality-gate item-count consistency check
+        run: |
+          python scripts/lint_gate_counts.py

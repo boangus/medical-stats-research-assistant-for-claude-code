@@ -2,6 +2,38 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.7.4] - 2026-06-14
+
+### Fixed
+- **Quality-gate item-count inconsistency**: Stage 1.5 (data) and Stage 3.5 (results)
+  gates actually contain 9 checklist items each, but were documented as "8 项" in the
+  Pipeline §1 flow diagram, §3 stage headers, §4.1 M-table, the QC Inspector dispatch
+  table, and `data-prep/SKILL.md` §7. All occurrences now read **9 项** (Stage 2.5
+  remains 8 项).
+- **MANDATORY Checkpoint numbering drift**: §3 stage headers labelled the gates
+  M2/M3/M4 while §4.1 defines them as M1/M2/M3 (M1=Stage 1.5, M2=Stage 2.5,
+  M3=Stage 3.5, M4=Stage 4 compliance). All in-stage labels corrected to M1/M2/M3.
+- **report/SKILL.md** referenced a non-existent `MANDATORY-M5` for the compliance
+  checkpoint; corrected to **MANDATORY-M4**.
+- **§7.3 convergence section** referenced a non-existent "M6 Checkpoint". The
+  convergence/acceptance decision point is now formally defined as **MANDATORY-M5**
+  in the §4.1 table, and §7.3 references it consistently.
+- **Version drift**: `manifest.json` (0.7.1) and all `SKILL.md` frontmatter
+  (0.6.0 / 0.7.1) lagged behind the released 0.7.3. All bumped to **0.7.4**.
+
+### Changed
+- `data-prep/SKILL.md` §7 product table: added row #9 mapping the Phase 1 PHI/隐私
+  compliance report to gate item □9.
+
+### Added
+- `scripts/lint_gate_counts.py`: CI lint that asserts, for each blocking gate
+  (Stage 1.5 / 2.5 / 3.5), the actual checklist length, the stage header "N 项" claim,
+  and the §4.1 M-table row claim all agree. Wired into `.github/workflows/ci.yml`
+  so a future edit that adds/removes a checklist item without updating the prose
+  fails CI.
+- README project-structure tree: `statistics-methods/` chapter count corrected
+  from 41 to **48** (chapters ch42–ch48 added in 0.7.0–0.7.3).
+
 ## [0.6.0] - 2026-06-13
 
 ### Added

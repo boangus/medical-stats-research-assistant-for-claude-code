@@ -141,7 +141,7 @@ medical-stats-research-assistant/
 │   ├── reproducibility/          # 可重复性验证
 │   ├── calibration/              # 校准框架
 │   ├── passport/                 # Material Passport 产物追踪
-│   ├── statistics-methods/       # 统计与方法指南 (41章) + 方法目录
+│   ├── statistics-methods/       # 统计与方法指南 (48章) + 方法目录
 │   ├── value-normalization/      # 值规范化（TCM术语+数值变体）
 │   ├── chart-styles/             # 图表样式库（期刊配色、图表类型、字体规范）
 │   ├── error-diagnostics/        # 错误诊断知识库（错误模式、自动修复建议）

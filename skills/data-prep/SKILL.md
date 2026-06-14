@@ -1,5 +1,5 @@
 ---
-version: "0.6.0"
+version: "0.7.4"
 name: MSRA Data Preparation
 description: |
   数据验证、清洗与 EDA 数据质量检查。先全面验证原始数据质量，再与用户交互式讨论
@@ -52,8 +52,8 @@ Phase 5: 盲态审核 → 输入:清洗后数据 → 输出:审核记录
 Phase 6: 数据库锁定 → 输入:审核记录 → 输出:锁定记录
   │ 🔴 [MANDATORY] 用户最终确认🛑STOP后才锁定 (合并M1)
   ▼
-Phase 7: 数据质量门闸 (阻断式) → 输入:8项前置产物 → 输出:门闸报告
-         (由Pipeline Stage 1.5触发, 🔴 MANDATORY-M2)
+Phase 7: 数据质量门闸 (阻断式) → 输入:9项前置产物 → 输出:门闸报告
+         (由Pipeline Stage 1.5触发, 🔴 MANDATORY-M1)
 ```
 
 ### Phase 1: 数据验证（自动执行）
@@ -501,7 +501,7 @@ EDA 数据质量报告
 
 ### Phase 7: 数据质量门闸（阻断式检查）
 
-> 由 Pipeline Orchestrator 在 Stage 1.5 触发。此阶段仅执行 8 项阻断检查，**不修改任何数据或清洗脚本**。
+> 由 Pipeline Orchestrator 在 Stage 1.5 触发。此阶段仅执行 9 项阻断检查，**不修改任何数据或清洗脚本**。
 > 完整检查清单见 Pipeline §3 Stage 1.5；此处定义本 Skill 的前置产物、输入映射和输出格式。
 > 参考：shared/reproducibility/pipeline_auditor.py — 数据清洗审计追踪（优先使用）；shared/reporting-guidelines/quality_checklist.md — 清洗完整性检查
 
@@ -517,13 +517,14 @@ EDA 数据质量报告
 | 6 | 清洗后数据 | Phase 3 | □6 逻辑一致性验证 |
 | 7 | 规范化日志 | Phase 2.5 | □7 值规范化完成 |
 | 8 | 清洗脚本 | Phase 3 | □8 可重复性 |
+| 9 | 数据隐私合规报告 | Phase 1 (PHI检测) | □9 隐私合规完成 |
 
 > **注意**：分析所需的衍生变量（如 BMI、年龄分组、Charlson 指数）不在 Stage 1 构造。构造逻辑在 SAP（Stage 2）中预定义，实际构造在 Stage 3（分析执行）按 SAP 执行。Stage 1 仅输出原始变量和清洗修正后的变量。
 
 **quality-gate 模式执行逻辑**：
 
 ```
-逐项检查 □1-□8（检查标准见 Pipeline §3）
+逐项检查 □1-□9（检查标准见 Pipeline §3）
   → 每项标记: ✅通过 / ❌未通过 / ⬜不适用
   → 统计通过数 → 按 Pipeline 判定规则输出结论
 ```

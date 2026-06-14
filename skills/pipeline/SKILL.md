@@ -1,5 +1,5 @@
 ---
-version: "0.6.0"
+version: "0.7.4"
 name: MSRA Pipeline
 description: |
   医学统计分析流水线编排器。从任意阶段切入，自动识别当前位置，
@@ -37,7 +37,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
 │  🔴 Stage 1.5: DATA QUALITY GATE  (阻断式检查)               │
-│  8 项检查 → ❌退回 Stage 1 / ✅进入 Stage 2                  │
+│  9 项检查 → ❌退回 Stage 1 / ✅进入 Stage 2                  │
 └────────────────────────────┬─────────────────────────────────┘
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
@@ -62,7 +62,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
 │  🔴 Stage 3.5: RESULTS QUALITY GATE  (阻断式检查)            │
-│  8 项检查 → ❌退回 Stage 3 / ✅进入 Stage 4                  │
+│  9 项检查 → ❌退回 Stage 3 / ✅进入 Stage 4                  │
 └────────────────────────────┬─────────────────────────────────┘
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
@@ -217,7 +217,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
 - **Mode**: `quality-gate`（只检查，不修改）
 - **输入**: 清洗后数据 + 清洗日志 + 盲态审核记录 + 数据库锁定记录
 - **输出**: 数据质量门闸报告（通过/不通过 + 具体问题清单）
-- **阻断检查清单 (8 项)**:
+- **阻断检查清单 (9 项)**:
 
   ```
   □ 1. 清洗日志完整: 所有数据变更是否记录在案（变更原因、影响记录数）？
@@ -244,7 +244,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
   - **全部通过** → ✅ 进入 Stage 2
   - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 2（记录风险）
   - **3+ 项未通过 或 项目 5/6/7/9 未通过** → ❌ **强制退回 Stage 1 修订**
-- **Checkpoint**: [MANDATORY-M2] 门闸通过后进入 Stage 2
+- **Checkpoint**: [MANDATORY-M1] 门闸通过后进入 Stage 2
 
 ### Stage 2: ANALYSIS PLAN
 - **Skill**: `analysis-plan`
@@ -288,7 +288,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
   - **全部通过** → ✅ 进入 Stage 3
   - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 3（记录偏差）
   - **3+ 项未通过 或 项目 3/5/7 未通过** → ❌ **强制退回 Stage 2 修订**
-- **Checkpoint**: [MANDATORY-M3] 门闸通过后进入 Stage 3
+- **Checkpoint**: [MANDATORY-M2] 门闸通过后进入 Stage 3
 
 ### Stage 3: ANALYSIS EXEC
 - **Skill**: `analysis-exec`
@@ -344,7 +344,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
   - **全部通过** → ✅ 进入 Stage 4
   - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 4
   - **3+ 项未通过 或 项目 1/3/4 未通过** → ❌ **强制退回 Stage 3 修正**
-- **Checkpoint**: [MANDATORY-M4] 门闸通过后进入 Stage 4
+- **Checkpoint**: [MANDATORY-M3] 门闸通过后进入 Stage 4
 
 ### Stage 4: REPORT
 - **Skill**: `report`
@@ -380,14 +380,15 @@ works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_sche
 
 ### 4.1 MANDATORY Checkpoint（阻断式，所有模式均强制执行）
 
-以下 4 个检查点**不可跳过**，无论用户选择哪种模式都必须暂停展示结果：
+以下 5 个检查点**不可跳过**，无论用户选择哪种模式都必须暂停展示结果：
 
 | # | 位置 | 触发条件 | 展示内容 | 用户决策选项 |
 |---|------|---------|---------|-------------|
-| M1 | Stage 1.5 通过后 | 数据门闸结果 | 8 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修订 / 带条件通过 |
+| M1 | Stage 1.5 通过后 | 数据门闸结果 | 9 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修订 / 带条件通过 |
 | M2 | Stage 2.5 通过后 | SAP 门闸结果 | 8 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修订 / 带条件通过 |
-| M3 | Stage 3.5 通过后 | 结果门闸结果 | 8 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修正 / 带条件通过 |
+| M3 | Stage 3.5 通过后 | 结果门闸结果 | 9 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修正 / 带条件通过 |
 | M4 | Stage 4 完成时 | 合规检查 | 规范合规报告 + 最终 checklist | 通过交付 / 修改 / 标记草稿 |
+| M5 | 任一门闸回退≥3次（收敛失败） | 收敛检测触发 | 未通过项清单 + 回退历史 + 风险评估 | 书面接受风险继续 / 退回根本原因排查 / 换方法换人 |
 
 **MANDATORY Checkpoint 简化 Dashboard**（一行即可，不再展示 ASCII 框）：
 
@@ -528,12 +529,12 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase
 | 阶段 | 角色 | Agent 文件 | 核心行为 | 禁止行为 |
 |------|------|-----------|---------|---------|
 | Stage 1 | [Data Validator](../../agents/data_validator_agent.md) | `agents/data_validator_agent.md` | 验证/清洗/构造 | 决定统计方法 |
-| Stage 1.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 数据 8 项阻断检查 | 修改数据或清洗脚本 |
+| Stage 1.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 数据 9 项阻断检查 | 修改数据或清洗脚本 |
 | Stage 2 | [Method Consultant](../../agents/method_consultant_agent.md) | `agents/method_consultant_agent.md` | EDA/Estimands/SAP | 写代码执行分析 |
 | Stage 2.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | SAP 8 项阻断检查 | 修改 SAP 内容 |
 | Stage 3 (Phase 0-6) | [Exec Runner](../../agents/exec_runner_agent.md) | `agents/exec_runner_agent.md` | 代码生成/执行/自愈 Debug | 偏离 SAP/自行解读结果 |
 | Stage 3 (Phase 7-9) | [Exec Inference](../../agents/exec_inference_agent.md) | `agents/exec_inference_agent.md` | 独立假设检验/质检/输出 | 修改代码/跳过假设验证 |
-| Stage 3.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 结果 8 项阻断检查 + Generator-Evaluator 差异审查 | 修改结果 |
+| Stage 3.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 结果 9 项阻断检查 + Generator-Evaluator 差异审查 | 修改结果 |
 | Stage 4 | Report Expert | `skills/report/SKILL.md` | 解读/制表/生成 | 修改数据 |
 
 详细接棒协议（Handoff 格式）、异常上报规则（INFO/WARN/BLOCK 三级别及阻断触发条件）及跨 Agent 约束见 [agents/AGENTS.md](../../agents/AGENTS.md) 和 [agents/protocol.md](../../agents/protocol.md)。
@@ -593,7 +594,7 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase
 第 1 次退回 → 正常修改，记录偏差原因
 第 2 次退回 → 警告："已退回 2 次，建议检查根本原因或降低标准"
 第 3 次退回 → BLOCK: "同阶段已退回 3 次，自动转入偏差记录模式"
-                → 必须走 M6 Checkpoint，用户需书面接受风险
+                → 必须走 M5 Checkpoint，用户需书面接受风险
                 → 后续分析结果标注 ⚠️ [CONVERGED WITH DEVIATIONS]
 ```
 

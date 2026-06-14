@@ -1,5 +1,5 @@
 ---
-version: "0.6.0"
+version: "0.7.4"
 name: MSRA Analysis Execution
 description: |
   按已批准的 SAP 执行分析：先验证样本量、按 SAP 构造分析变量，
