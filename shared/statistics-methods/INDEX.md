@@ -96,6 +96,20 @@
 | `cheatsheet.md` | 研究设计、统计方法、偏倚类型速查 |
 | `patterns.md` | 8 种常见方法学模式 |
 
+## 共享知识库扩展
+
+### 报告规范（shared/reporting-guidelines/）
+- CONSORT 2025 30项 / SPIRIT 2025 34项 / STROBE / PRISMA-NMA / TRIPOD-AI / TRIPOD-LLM / CARE / ARRIVE / REMARK / TRUE-AIM / statcheck / **CHEERS 2022 28项** 🆕
+
+### 偏倚评估工具（shared/risk-of-bias/）🆕
+- **RoB 2** — RCT 偏倚风险（5 域信号问题 → Low/Some/High）
+- **ROBINS-I V2** — 非随机干预研究偏倚（7 域 → 5 级判断）
+- **PROBAST+AI** — 预测模型偏倚（4 域 20 信号问题 + AI 扩展）
+- **QUADAS-2** — 诊断准确性研究偏倚（4 域 → RoB + 适用性）
+- **GRADE** — 证据确定性框架（5 降级 + 3 升级 → ⊕⊕⊕⊕~⊕○○○）
+
+> 与报告规范的互补关系：报告规范（CONSORT/STROBE/TRIPOD）检查"是否报告了必要信息"；偏倚评估工具（RoB 2/ROBINS-I/PROBAST）检查"结果是否可能被偏倚扭曲"。两者在系统综述/Meta 分析中配合使用。
+
 ## 与 MSRA 各阶段的对应关系
 
 ```

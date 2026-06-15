@@ -2,6 +2,58 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.7.6-R6] - 2026-06-15
+
+Research-fusion round 6: risk-of-bias assessment tools + CHEERS 2022
+health economic reporting standard. Targets structural gaps identified
+via GitHub + literature search (not marginal polish). Branch
+`auto-optimize/research-fusion`.
+
+### Risk-of-bias assessment framework (5 new files)
+- **`shared/risk-of-bias/RoB_2_checklist.md` NEW** — Cochrane RoB 2
+  risk-of-bias tool for RCTs (Sterne 2019, BMJ). 5 domains with
+  signaling questions → Low/Some/High judgments. Complements CONSORT
+  2025 (reporting) with bias assessment (quality).
+- **`shared/risk-of-bias/ROBINS_I_V2_checklist.md` NEW** — ROBINS-I V2
+  for non-randomized studies of interventions (Sterne 2016, BMJ;
+  Cochrane 2024 update). 7 domains → 5-level judgment. Includes
+  target trial emulation framework. Complements STROBE.
+- **`shared/risk-of-bias/PROBAST_checklist.md` NEW** — PROBAST+AI
+  (Wolff 2019 + Collins 2025 BMJ) for prediction model bias. 4 domains,
+  20 signaling questions. AI-specific extensions for ML/fairness.
+  Complements TRIPOD-AI/LLM.
+- **`shared/risk-of-bias/QUADAS_2_checklist.md` NEW** — QUADAS-2
+  (Whiting 2011) for diagnostic accuracy studies. 4 domains → RoB +
+  applicability. Complements STARD.
+- **`shared/risk-of-bias/GRADE_framework.md` NEW** — GRADE certainty
+  of evidence framework (Guyatt 2008). 5 downgrade + 3 upgrade factors
+  → ⊕⊕⊕⊕~⊕○○○. Includes Summary of Findings (SoF) table template.
+
+### Reporting guidelines (1 new)
+- **`shared/reporting-guidelines/CHEERS_checklist.md` NEW** — CHEERS
+  2022 health economic evaluation reporting (Husereau 2022, Value
+  Health). 28 items. Complements ch40 cost-effectiveness analysis
+  (methods) with reporting standards. 🆕 2022 new items marked.
+
+### Skills integration
+- **`report` SKILL.md** — Phase 2/6 updated with risk-of-bias tool
+  selection table + CHEERS compliance check row + mandatory bias
+  assessment for systematic reviews.
+- **`analysis-plan` SKILL.md** — Phase 4/5 updated with bias assessment
+  plan review references.
+
+### Documentation updates
+- `shared/statistics-methods/INDEX.md` — new "Shared knowledge base
+  extensions" section with risk-of-bias + CHEERS references.
+- `README.md` — updated project structure (risk-of-bias directory),
+  reporting guidelines count (13→14), new "Risk-of-bias tools" section
+  with 5-tool comparison table.
+
+> **Gap analysis**: GitHub + literature search confirmed zero coverage
+> for RoB 2, ROBINS-I, PROBAST, QUADAS-2, GRADE, and CHEERS 2022 —
+> all structural gaps, not marginal polish. These tools are essential
+> for systematic reviews and evidence synthesis workflows.
+
 ## [0.7.5] - 2026-06-14
 
 Research-fusion optimization loop: 5 rounds of targeted literature/GitHub

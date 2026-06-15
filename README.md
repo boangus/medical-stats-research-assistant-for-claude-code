@@ -146,7 +146,8 @@ medical-stats-research-assistant/
 │   ├── chart-styles/             # 图表样式库（期刊配色、图表类型、字体规范）
 │   ├── error-diagnostics/        # 错误诊断知识库（错误模式、自动修复建议）
 │   ├── anti-patterns/            # 反模式黑名单
-│   ├── reporting-guidelines/     # 报告规范检查清单（CONSORT 2025/SPIRIT 2025/STROBE/PRISMA-NMA/TRIPOD+AI/TRIPOD-LLM/CARE/REMARK/ARRIVE/statcheck）
+│   ├── reporting-guidelines/     # 报告规范检查清单（CONSORT 2025/SPIRIT 2025/STROBE/PRISMA-NMA/TRIPOD+AI/TRIPOD-LLM/CARE/REMARK/ARRIVE/statcheck/CHEERS 2022）
+│   ├── risk-of-bias/             # 🆕 偏倚评估工具（RoB 2/ROBINS-I V2/PROBAST+AI/QUADAS-2/GRADE）
 │   ├── journal-templates/        # 期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ/AIM/CJE）
 │   ├── report-assembler/         # 报告组装器（DOCX/HTML输出）
 │   ├── sensitivity-agreement/    # 敏感性分析一致性评估
@@ -269,7 +270,19 @@ Rscript script/02_var_define.R
 
 ## 支持的报告规范
 
-CONSORT 2025 (RCT, 30项) · **SPIRIT 2025 (试验协议, 34项) 🆕** · STROBE (观察性) · PRISMA (系统综述) · PRISMA-NMA (网络Meta) · STARD (诊断) · TRIPOD+AI (预测模型, 27项) · **TRIPOD-LLM (LLM研究, 19+50项) 🆕** · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物) · **statcheck 统计一致性校验 🆕**
+CONSORT 2025 (RCT, 30项) · **SPIRIT 2025 (试验协议, 34项) 🆕** · STROBE (观察性) · PRISMA (系统综述) · PRISMA-NMA (网络Meta) · STARD (诊断) · TRIPOD+AI (预测模型, 27项) · **TRIPOD-LLM (LLM研究, 19+50项) 🆕** · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物) · **statcheck 统计一致性校验 🆕** · **CHEERS 2022 (卫生经济学, 28项) 🆕**
+
+## 偏倚评估工具
+
+> 系统综述/Meta 分析中评估纳入研究偏倚风险和证据确定性的专用工具，与报告规范互补使用。
+
+| 工具 | 适用研究类型 | 域数 | 判断等级 | 文件 |
+|------|------------|------|---------|------|
+| **RoB 2** | 随机对照试验 (RCT) | 5 域 | Low/Some/High | `shared/risk-of-bias/RoB_2_checklist.md` |
+| **ROBINS-I V2** | 非随机干预研究 (NRSI) | 7 域 | Low/Mod/Serious/Critical | `shared/risk-of-bias/ROBINS_I_V2_checklist.md` |
+| **PROBAST+AI** | 临床预测模型 | 4 域 20 信号问题 | Low/High/Unclear | `shared/risk-of-bias/PROBAST_checklist.md` |
+| **QUADAS-2** | 诊断准确性研究 | 4 域 | Low/High/Unclear | `shared/risk-of-bias/QUADAS_2_checklist.md` |
+| **GRADE** | 证据确定性汇总 | 5 降级+3 升级 | ⊕⊕⊕⊕ ~ ⊕○○○ | `shared/risk-of-bias/GRADE_framework.md` |
 
 ---
 

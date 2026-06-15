@@ -235,6 +235,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 > 参考：shared/sap/sap_standard.md — SAP标准格式定义
 > 参考：shared/sap/variable_selection_guide.md — 变量选择与方法推荐指南
 > 参考：shared/reporting-guidelines/SPIRIT_checklist.md — **SPIRIT 2025 试验协议 34 项清单**（RCT 协议完整性）
+> 参考：shared/risk-of-bias/ — **偏倚评估工具**（RoB 2/ROBINS-I V2/PROBAST+AI/QUADAS-2/GRADE）🆕 — 用于 SAP 中预设偏倚评估计划
 
 确认方法后，**严格按照SAP标准格式**生成正式的统计分析计划文档。SAP必须包含：
 1. 变量选择推荐（强制纳入/建议纳入/不纳入）
@@ -335,6 +336,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 
 > 参考：shared/reporting-guidelines/quality_checklist.md — SAP 审查清单
 > 参考：shared/statistics-methods/chapters/ch25-case-control-studies.md — 数据库研究检查清单 (统计指南第43章)
+> 参考：shared/risk-of-bias/ — **偏倚评估计划审查**（是否在 SAP 中预设了适当的偏倚评估工具和 GRADE 确定性等级评估）🆕
 
 SAP 制定完成后，自动进行独立审查：
 
