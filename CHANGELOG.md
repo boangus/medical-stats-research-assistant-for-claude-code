@@ -2,6 +2,28 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.7.6-R7] - 2026-06-15
+
+Research-fusion round 7: PRISMA 2020 + STARD 2015 reporting standards.
+Fills checklist gaps where the project referenced these standards but
+had no structured checklist files.
+
+### Reporting guidelines (2 new)
+- **`shared/reporting-guidelines/PRISMA_2020_checklist.md` NEW** —
+  PRISMA 2020 systematic review reporting (Page 2021, BMJ). 27 items.
+  Previously the project had PRISMA-NMA but no main PRISMA checklist.
+  Includes PRISMA 2020 flow chart template, GRADE integration,
+  and bias assessment tool cross-references.
+- **`shared/reporting-guidelines/STARD_checklist.md` NEW** — STARD 2015
+  diagnostic accuracy reporting (Bossuyt 2015, BMJ). 30 items.
+  Previously referenced but had no checklist file. Includes 2×2
+  contingency table template, calculation formulas, and QUADAS-2
+  cross-reference.
+
+### Skills integration
+- **`report` SKILL.md** — Phase 2/6 updated with PRISMA 2020 (27 items)
+  and STARD 2015 (30 items) compliance check rows.
+
 ## [0.7.6-R6] - 2026-06-15
 
 Research-fusion round 6: risk-of-bias assessment tools + CHEERS 2022
