@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "medical-stats-research-assistant",
+  "displayName": "MSRA — Medical Statistics Research Assistant",
+  "version": "0.7.6",
+  "description": "Pipeline-driven medical statistical analysis toolkit: 4 stages, 6 commands, from raw data to publication-ready report (CONSORT/STROBE/STARD).",
+  "author": {
+    "name": "boangus",
+    "url": "https://github.com/boangus"
+  },
+  "homepage": "https://github.com/boangus/medical-stats-research-assistant",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boangus/medical-stats-research-assistant.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "medical-statistics",
+    "biostatistics",
+    "pipeline",
+    "clinical-research"
+  ],
+  "commands": [
+    "./commands"
+  ],
+  "skills": [
+    "./skills"
+  ],
+  "agents": [
+    "./agents"
+  ]
+}

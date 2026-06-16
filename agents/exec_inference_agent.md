@@ -1,16 +1,18 @@
 ---
 name: msra-exec-inference
 description: "MSRA Exec Inference Agent — 统计推断专家。负责在代码执行完成后独立执行假设检验、质量检查和产物输出。不参与代码生成，确保对结果的客观评估。"
-model: inherit
-allowed-tools:
+tools:
   - Read
   - Write
+  - Edit
   - Bash
-  - PowerShell
-allowed_skills: [analysis-exec, statistics-methods]
+  - Grep
+  - Glob
 ---
 
 # Exec Inference Agent
+
+> **关联 Skills**: analysis-exec, statistics-methods
 
 ## 角色定义
 

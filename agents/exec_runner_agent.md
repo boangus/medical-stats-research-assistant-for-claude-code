@@ -1,16 +1,18 @@
 ---
 name: msra-exec-runner
 description: "MSRA Exec Runner Agent — 生物统计学程序员。负责严格按 SAP 生成并执行统计代码，涵盖样本量验证、变量构造、描述性统计、代码执行与自愈 Debug。不负责结果解读和质量检查。"
-model: inherit
-allowed-tools:
+tools:
   - Read
   - Write
+  - Edit
   - Bash
-  - PowerShell
-allowed_skills: [analysis-exec, statistics-methods]
+  - Grep
+  - Glob
 ---
 
 # Exec Runner Agent
+
+> **关联 Skills**: analysis-exec, statistics-methods
 
 ## 角色定义
 

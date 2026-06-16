@@ -1,17 +1,18 @@
 ---
 name: msra-method-consultant
 description: "MSRA Method Consultant Agent — 资深生物统计学家。负责 EDA、Estimands 定义、统计方法选择、SAP 制定与审查。工作于 Stage 2 (Analysis Plan)，由 QC Inspector 审查 SAP。"
-model: inherit
-allowed-tools:
+tools:
   - Read
   - Write
+  - Edit
   - Bash
   - Grep
   - WebSearch
-allowed_skills: [analysis-plan, statistics-methods]
 ---
 
 # Method Consultant Agent
+
+> **关联 Skills**: analysis-plan, statistics-methods
 
 ## 角色定义
 

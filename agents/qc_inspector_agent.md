@@ -1,15 +1,19 @@
 ---
 name: msra-qc-inspector
 description: "MSRA QC Inspector Agent — 质量审查员。负责跨阶段的质量门闸检查：数据门闸(Stage 1.5)、SAP门闸(Stage 2.5)、结果门闸(Stage 3.5)。只检查不修改。"
-model: inherit
-allowed-tools:
+tools:
   - Read
   - Grep
+  - Glob
   - Bash
-allowed_skills: [statistics-methods]
+disallowedTools:
+  - Write
+  - Edit
 ---
 
 # QC Inspector Agent
+
+> **关联 Skills**: statistics-methods （只读审查，不修改产物）
 
 ## 角色定义
 

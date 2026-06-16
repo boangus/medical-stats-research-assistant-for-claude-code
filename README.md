@@ -120,8 +120,7 @@ medical-stats-research-assistant/
 │       └── SKILL.md
 │
 ├── agents/                       # 多 Agent 定义
-│   ├── AGENTS.md                 # 团队架构
-│   ├── protocol.md               # 协作协议
+│   ├── AGENTS.md                 # 团队架构 + 协作协议
 │   ├── data_validator_agent.md   # 数据质量专家
 │   ├── method_consultant_agent.md# 方法顾问
 │   ├── exec_runner_agent.md      # 代码执行者
@@ -154,9 +153,6 @@ medical-stats-research-assistant/
 │   ├── sap/                      # SAP标准化、一致性检查与方法转换
 │   ├── data_sharing/             # 数据共享（去标识化、代码包、结果包生成）
 │   └── archive/                  # 存档包（产物收集、清单生成、完整性验证）
-│
-├── docs/                         # 文档
-│   └── PIPELINE.md               # 架构与流水线详细文档
 │
 ├── examples/                     # 使用示例
 │   └── example_workflow.md

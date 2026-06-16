@@ -87,7 +87,7 @@ if (-not (Test-Path $passportPath)) {
     $passport = @{
         passport_id = "msra-$(Get-Date -Format 'yyyyMMdd')-001"
         passport_schema_version = "1"
-        pipeline_version = "0.7.5"
+        pipeline_version = "0.7.6"
         created_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         status = "in_progress"

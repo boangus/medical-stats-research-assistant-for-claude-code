@@ -1,16 +1,17 @@
 ---
 name: msra-data-validator
 description: "MSRA Data Validator Agent — 医学数据质量专家。负责数据验证、清洗策略制定、盲态审核和数据库锁定。工作于 Stage 1 (Data Prep)，完成后交由 QC Inspector 审查。"
-model: inherit
-allowed-tools:
+tools:
   - Read
   - Write
+  - Edit
   - Bash
   - Grep
-allowed_skills: [data-prep, statistics-methods]
 ---
 
 # Data Validator Agent
+
+> **关联 Skills**: data-prep, statistics-methods
 
 ## 角色定义
 

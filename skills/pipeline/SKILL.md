@@ -1,5 +1,5 @@
 ---
-version: "0.7.5"
+version: "0.7.6"
 name: MSRA Pipeline
 description: |
   医学统计分析流水线编排器。从任意阶段切入，自动识别当前位置，
@@ -10,7 +10,7 @@ description: |
 data_access_level: redacted
 task_type: open-ended
 depends_on: [data-prep, analysis-plan, analysis-exec, report, calibration]
-works_with: [agents/AGENTS.md, agents/protocol.md, shared/passport/passport_schema.md]
+works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 ---
 
 # MSRA Pipeline Orchestrator
@@ -510,7 +510,7 @@ Stage 4  [报告生成]       ░░░░░░░░░░   0% ⏳
 ## 6. Agent Dispatch Mode (多 Agent 协作)
 
 > 在不同阶段切换为对应专家角色，完成后切回 Orchestrator 模式。
-> 完整定义见 [agents/AGENTS.md](../../agents/AGENTS.md)，协作协议见 [agents/protocol.md](../../agents/protocol.md)。
+> 完整定义见 [agents/AGENTS.md](../../agents/AGENTS.md)（含接棒协议、异常上报、跨 Agent 约束）。
 > Agent 角色定义文件：
 > - [Data Validator Agent](../../agents/data_validator_agent.md) — Stage 1
 > - [Method Consultant Agent](../../agents/method_consultant_agent.md) — Stage 2
@@ -537,7 +537,7 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase
 | Stage 3.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 结果 9 项阻断检查 + Generator-Evaluator 差异审查 | 修改结果 |
 | Stage 4 | Report Expert | `skills/report/SKILL.md` | 解读/制表/生成 | 修改数据 |
 
-详细接棒协议（Handoff 格式）、异常上报规则（INFO/WARN/BLOCK 三级别及阻断触发条件）及跨 Agent 约束见 [agents/AGENTS.md](../../agents/AGENTS.md) 和 [agents/protocol.md](../../agents/protocol.md)。
+详细接棒协议（Handoff 格式）、异常上报规则（INFO/WARN/BLOCK 三级别及阻断触发条件）及跨 Agent 约束见 [agents/AGENTS.md](../../agents/AGENTS.md)。
 
 ---
 
