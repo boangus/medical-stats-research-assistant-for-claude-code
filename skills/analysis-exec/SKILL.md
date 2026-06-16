@@ -8,6 +8,7 @@ description: |
   触发: 分析执行 / 跑结果 / 做分析 / 执行SAP / 构造变量 / run analysis / 检查结果 / 质检 / 质量检查 / 假设检验
 data_access_level: verified_only
 task_type: outcome-gradable
+depends_on: [analysis-plan]
 works_with: [analysis-plan, report]
 ---
 

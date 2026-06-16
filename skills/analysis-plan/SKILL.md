@@ -7,6 +7,7 @@ description: |
   触发: 分析计划 / 统计方法 / SAP / 制定计划 / 方法选择 / RCT / 观察性 / diagnosis / 诊断试验 / 队列研究 / 混杂控制 / 协变量调整 / 样本量计算 / 估计目标 / 审查SAP / 方法探讨 / 深度EDA / analysis plan / study design / sample size / SAP review / estimands / covariate adjustment
 data_access_level: verified_only
 task_type: open-ended
+depends_on: [data-prep]
 works_with: [data-prep, analysis-exec]
 ---
 

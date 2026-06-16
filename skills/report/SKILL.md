@@ -7,6 +7,7 @@ description: |
   触发: 报告 / 生成报告 / 表格 / 图表 / CONSORT / STROBE / PRISMA / 方法学 / 统计报告 / 合规检查 / 三线表 / 最终报告 / report / table / figure / manuscript
 data_access_level: verified_only
 task_type: open-ended
+depends_on: [analysis-exec]
 works_with: [analysis-exec, analysis-plan, pipeline]
 ---
 
