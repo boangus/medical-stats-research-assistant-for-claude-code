@@ -62,3 +62,9 @@ shared/reproducibility/_test_output/
 
 # 运行时缓存
 .msra/
+
+# WorkBuddy 项目级数据（对话记录、检查点、状态）
+.workbuddy/
+
+# 流水线评估生成产物（由 eval_pipeline_gold.py 运行生成）
+evals/gold/pipeline/results/eval_results.json
