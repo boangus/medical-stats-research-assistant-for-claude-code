@@ -8,6 +8,7 @@ description: |
   触发: 数据验证 / 清洗 / 数据准备 / 数据库锁定 / data cleaning / data validation / EDA / 盲态审核 / 锁定 / 数据质量 / 清洗报告 / 数据验证报告 / blind review / database lock / data quality / 数据字典 / 缺失模式
 data_access_level: raw
 task_type: open-ended
+depends_on: []
 works_with: [pipeline, analysis-plan]
 ---
 
