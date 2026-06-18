@@ -10,6 +10,10 @@ data_access_level: raw
 task_type: open-ended
 depends_on: []
 works_with: [pipeline, analysis-plan]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, data-cleaning, data-validation, CDISC, PHI]
 ---
 
 # 数据准备 (Data Preparation)
@@ -26,6 +30,33 @@ works_with: [pipeline, analysis-plan]
 > - 盲法试验数据审核必须在盲态下进行
 > - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（C1 异常值自动静默修正）
 
+## 快速开始
+
+### 1. Quick mode 快速示例
+
+```
+用户: "/msra-data data.csv --quick"
+
+执行路径（3步）:
+1. Phase 1: 仅检查Critical问题（重复ID、数据损坏、关键变量全缺失）
+2. Phase 3: 自动修复明显格式问题（日期格式统一、空白值→NA）
+3. Phase 7: 输出简化验证报告
+
+跳过: Phase 0画像、Phase 2交互讨论、Phase 2.5值规范化、Phase 4 EDA、Phase 5盲态审核
+输出: cleaned_data.csv + quick_validation_report.md
+```
+
+### 2. Standard mode 快速示例
+
+```
+用户: "/msra-data data.csv"
+
+执行路径（8步）:
+Phase 0 → 0.5 → 1 → 2 → 2.5 → 3 → 4 → 5 → 6 → 7
+完整流程，每个Phase有明确输入输出和Checkpoint
+预计交互次数: 3-5次（Phase 2清洗策略 + Phase 2.5值规范化 + Phase 6锁定确认）
+```
+
 ## 工作流程
 
 ```
@@ -37,6 +68,7 @@ Phase 1: 数据验证 (自动) → 输入:原始数据 → 输出:验证报告
   ▼
 Phase 0: 数据画像 (Quick Profile) → 输入:原始数据 → 输出:data_profile.md
   │ [SLIM] 展示数据概览后自动继续 (极端情况升级MANDATORY)
+  │ 注: Phase 0 是"快速概览"（1页摘要），Phase 1 是"详细验证"（7项深度检查）
   ▼
 Phase 1: 数据验证 (自动执行) → 输入:原始数据 → 输出:验证报告
   │ [ADAPTIVE] 仅Critical或≥3 Warning时暂停
@@ -437,6 +469,43 @@ Phase 2.5 与 Phase 2 的关系：**平行但不重叠**。
 | 2 | sbp | 缺失插补 | NA | mean(SBP)=128 | 3 | MICE 插补，种子=42 | 2026-05-29T10:32 |
 
 变更类型枚举: 缺失插补 / 异常值修正 / 格式修正 / 逻辑修正 / 删除记录 / 添加记录
+```
+
+## 常见清洗代码示例
+
+```python
+# 常见清洗操作代码示例
+import pandas as pd
+import numpy as np
+
+# 1. 异常值修正（基于临床参考范围）
+df.loc[df['age'] > 120, 'age'] = np.nan  # 标记为缺失，不自动删除
+df.loc[df['age'] < 0, 'age'] = np.nan
+
+# 2. 缺失值处理（需用户确认策略）
+# 完全记录分析
+df_complete = df.dropna(subset=['primary_endpoint'])
+# 多重插补（MICE）
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+imputer = IterativeImputer(random_state=42)
+df_imputed = pd.DataFrame(imputer.fit_transform(df[numeric_cols]), columns=numeric_cols)
+
+# 3. 值规范化（Phase 2.5 输出）
+# 检测下限值处理
+df.loc[df['psa'] == '<1.5', 'psa'] = 1.5  # 阈值替代
+df['psa_below_loq'] = (df['psa_original'] == '<1.5').astype(int)  # 截断指示变量
+
+# 4. 生成清洗日志
+cleaning_log = pd.DataFrame({
+    'variable': ['age', 'psa'],
+    'change_type': ['异常值修正', '检测下限替代'],
+    'before': ['age=250', '<1.5'],
+    'after': ['NaN', '1.5'],
+    'affected_rows': [1, 2],
+    'reason': ['超出合理范围', '阈值替代策略'],
+    'timestamp': pd.Timestamp.now()
+})
 ```
 
 ### Phase 4: EDA 数据质量检查 🆕
