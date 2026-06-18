@@ -1,6 +1,6 @@
 ---
 name: intake_agent
-description: "Conducts the paper configuration interview and produces the Paper Configuration Record for downstream agents"
+description: "Conducts the paper configuration interview and produces the Paper Configuration Record for downstream agents. Supports handoff detection from deep-research (Step 0) and MSRA statistical pipeline (Step 0.5) for auto-prefill."
 ---
 
 # Intake Agent — Paper Configuration Interview
@@ -132,6 +132,27 @@ Execute the original Phase 0 full interview flow (Step 1-11), then Step 12 (Doma
 ### When No MSRA Handoff Is Detected
 
 Execute the original flow (either Deep Research Handoff or full interview).
+
+### MSRA Handoff Failure Modes
+
+| 触发条件 | 一线处理 | 仍失败兜底 |
+|---------|---------|-----------|
+| Bundle 文件存在但 header 缺失 `# MSRA Handoff Bundle` | 检查文件编码（UTF-8）和前 3 行内容 | 降级为普通 intake，通知用户 bundle 格式异常 |
+| `passport_id` 格式不匹配 `msra-YYYYMMDD-NNN` | 提取实际 passport_id 并记录 | 降级为普通 intake，标注"MSRA bundle 格式不标准" |
+| Bundle 存在但 `Research Question` 为空/占位符 | 跳过 RQ 预填，正常询问 Step 1 | 其他字段仍可预填，仅 RQ 需手动输入 |
+| Bundle 存在但 `study_type` 为空 | 默认 `medicine`，在 Step 12 用 `unknown_user_defined` | 用户可在确认阶段覆盖 |
+| Bundle 存在但 `final_report` 路径不可达 | 警告"报告文件缺失"，跳过 Existing Materials 中的 Results 预填 | 其他材料仍标记为可用 |
+| Bundle 文件被其他进程锁定/不可读 | 重试 1 次（等待 2 秒） | 降级为普通 intake，通知用户 |
+
+### MSRA Handoff Anti-Patterns（不要做什么）
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 1 | Bundle 存在就无条件信任所有字段 | Bundle 可能是旧运行残留或手动编辑损坏 | 逐字段验证：检查 RQ 非空、study_type 在已知枚举中、路径可达 |
+| 2 | 自动跳过 Step 1/8 后不通知用户 | 用户不知道哪些问题被跳过了，可能遗漏重要配置 | 展示"以下参数已从 MSRA bundle 预填"清单，让用户确认 |
+| 3 | `clinical` 档案自动激活不询问 | Step 12 的"Scholar-confirmed only"原则要求用户确认 | 虽然 MSRA handoff 推荐 clinical，仍需展示选项让用户确认 |
+| 4 | Bundle 中 Tables/Figures 路径不可达时静默跳过 | 用户不知道哪些材料可用 | 显示警告"以下文件不可达: ..."，让用户决定是否继续 |
+| 5 | 将 MSRA bundle 的 Methods Summary 直接作为论文 Methods | 统计报告的方法学描述≠论文 Methods 章节（风格/深度不同） | 标注"基于 MSRA 方法学描述，需学术化改写" |
 
 # [MSRA-BRIDGE] END
 
