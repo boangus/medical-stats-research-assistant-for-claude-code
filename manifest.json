@@ -1,7 +1,7 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.7.6",
-  "description": "Medical Statistics Research Assistant for Claude Code - A pipeline-driven toolkit for medical statistical analysis from data cleaning to final report",
+  "version": "0.8.0",
+  "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper via ARS academic-pipeline integration",
   "author": "boangus",
   "license": "MIT",
   "min_claude_code_version": "3.7.0",
@@ -10,13 +10,21 @@
       "id": "msra-pipeline",
       "name": "MSRA Pipeline",
       "entry_point": "skills/pipeline/SKILL.md",
-      "description": "Launch pipeline with auto-detect entry point",
+      "description": "Launch unified pipeline: data → stats report → (optional) paper track. Auto-detect entry point.",
       "usage": "/msra [context]",
       "examples": [
         "/msra 我有原始数据要分析",
         "/msra --from plan",
         "/msra --status"
       ]
+    },
+    "/msra-paper": {
+      "id": "msra-paper-track",
+      "name": "MSRA Paper Track",
+      "entry_point": "skills/pipeline/SKILL.md",
+      "description": "Enter Paper Track (Stage 5.0): convert stats report into a submittable paper via academic-pipeline. Requires completed Stage 4 with track=full_paper.",
+      "usage": "/msra-paper",
+      "examples": ["/msra-paper"]
     },
     "/msra-data": {
       "id": "msra-data-prep",
