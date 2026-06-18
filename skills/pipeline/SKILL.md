@@ -67,15 +67,28 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
 │  Stage 4: REPORT  (/msra-report)                             │
-│  结果解读 → 确定规范 → 选择模板(期刊/自定义) → 表格/图表     │
-│  → 表格导出 → 方法学描述 → 规范检查 → 报告组装                │
+│  结果解读 → 表格/图表 → 方法学描述 → 统计质量检查 → 报告组装   │
 │  输出: final_report.md + final_report.html + figures/*.png   │
 │        + tables/*.docx                                        │
-│  [RCT] CONSORT / [观察性] STROBE                            │
-│  模板: NEJM/JAMA/Lancet/BMJ/CMJ/Other                       │
+│  ★ STAGE 4 CHECKPOINT: [A] 结束 / [B] Paper Track            │
 └────────────────────────────┬─────────────────────────────────┘
                              ▼
-       最终报告 (图文HTML+纯文本MD+PNG图+三线表DOCX)
+          ┌────────────────────────────────────────────┐
+          │ ★ STAGE 4 CHECKPOINT (MANDATORY-M4')       │
+          │ [A] 统计报告完成，结束 → track=report_only  │
+          │ [B] 继续写论文 → Paper Track               │
+          │     守卫检查: final_report + figures/tables │
+          └───────┬──────────────────┬────────────────┘
+                  │                  │
+            [A] ↓                    ↓ [B]
+         ═════════════      ┌─────────────────────────────────┐
+         │  Pipeline 结束   │  Stage 5: PAPER TRACK           │
+         │  (report_only)   │  Stage 5.0: Paper Intake        │
+         ═════════════      │  (msra → academic-pipeline)     │
+                            │  Stage 5.1-5.9: Write/Review/   │
+                            │  Revise/Finalize (ARS skills)   │
+                            │  Stage 6: Process Summary       │
+                            └─────────────────────────────────┘
 ```
 
 ---
@@ -93,6 +106,7 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 | "分析做完了，帮我检查" | 有分析结果 | **Stage 3** (质检) | 需确认SAP |
 | "帮我写报告" / "生成表格" | 报告生成意图 | **Stage 4** | 需确认分析结果 |
 | "完整流程" / "从头开始" | 全流程意图 | **Stage 1** | 无 |
+| "继续写论文" / "paper track" | Paper Track 意图 | **Stage 5.0** | 需确认 Stage 4 已完成 + passport.track == full_paper |
 | 提供论文要求review | 审稿意图 | **Stage 3** (质检) | 需先验证数据完整性 |
 
 ### Mid-Entry 前置检查
@@ -352,22 +366,60 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
   - 用户说"生成完整报告" → `guided` (交互式)
   - 用户说"生成Table 1" → `quick` (快速生成)
 - **研究类型分支**:
-  - RCT → CONSORT 规范
-  - 观察性 → STROBE 规范
-  - 诊断试验 → STARD 规范
-- **输入**: 分析结果 + 质检报告 + 研究类型 + (可选) 期刊模板
-- **输出**: 结果解读 + 模板结构化报告 + 图表(figures/*.png) + 三线表(tables/*.docx) + 方法学描述 + 规范合规报告 + 图文HTML报告
+  - RCT → CONSORT (报告规范选择移至 Stage 5.0，统计报告阶段不强制全文合规)
+  - 观察性 → STROBE
+  - 诊断试验 → STARD
+- **输入**: 分析结果 + 质检报告 + 研究类型
+- **输出**: 统计报告 + 图表(figures/*.png) + 三线表(tables/*.docx) + 方法学描述 + 统计质量检查 + 图文HTML报告
 - **子步骤**:
   1. 结果解读（临床意义、效应量解释、局限性、与文献对比）
-  2. 确定报告规范（CONSORT/STROBE/STARD等）
-  3. 选择输出模板（NEJM/JAMA/Lancet/BMJ/CMJ 或自定义检索）
-  4. 生成表格（Table 1、结果表、敏感性分析表）
-  5. 生成图表（执行模板→保存PNG：KM曲线、森林图、ROC等出版级图表）
-  6. 表格导出（三线表→docx）
-  7. 方法学描述（按模板结构化段落）
-  8. 规范检查 + 模板合规检查
-  9. 报告组装（Phase 7: JSON骨架→HTML图文报告，按模板章节组织）
-- **Checkpoint**: 仅 [MANDATORY-M4] 合规检查 → 最终确认交付。Stage 4 内部无额外确认点。
+  2. 生成表格（Table 1、结果表、敏感性分析表）
+  3. 表格导出（三线表→docx）
+  4. 生成图表（执行模板→保存PNG：KM曲线、森林图、ROC等出版级图表）
+  5. 方法学描述（按模板结构化段落）
+  6. 统计质量检查（statcheck + anti-patterns + 统计维度 quality_checklist）
+  7. 报告组装（Phase 7: JSON骨架→HTML图文报告，按模板章节组织）
+- **Checkpoint**: [MANDATORY-M4] 统计质量检查 → 确认 → [MANDATORY-M4'] ★ STAGE 4 CHECKPOINT: [A] 结束 / [B] Paper Track
+- **输出**: final_report.md + final_report.html + figures/*.png + tables/*.docx
+
+### Stage 5: PAPER TRACK（可选 — Stage 4 checkpoint 选 [B] 时进入）
+
+> **入口守卫（IRON RULE）**：仅在 passport.track == "full_paper" 时进入。
+> Stage 1-4 必须全部 completed/consumed。Stage 4 报告产物（final_report + figures + tables）必须齐全。
+> **拒绝场景**：用户无数据处理需求直接要求写论文 → 拒绝，提示"纯写作请直接用 ARS academic-paper / academic-pipeline"。
+
+MSRA Pipeline 在 Paper Track 保持纯调度。Stage 5.1-5.9 **复用 academic-pipeline skill 的状态机**（spec §10 Q10），MSRA 只负责 Stage 5.0 Paper Intake + Handoff Bundle，然后 dispatch。
+
+- **Skill**: `report`（Stage 5.0）→ `academic-pipeline`（Stage 5.1-5.9）
+
+#### Stage 5.0: PAPER INTAKE（MSRA 负责）
+
+- **输入**: MSRA passport (track=full_paper) + final_report + SAP + Stage 3.5 门闸报告
+- **工作流**（详见 spec §5）:
+  1. 产物校验（passport stage_4 == completed + final_report 存在）
+  2. 生成 MSRA Handoff Bundle（调用 `scripts/generate_msra_handoff_bundle.py` → `MSRA/msra_handoff_bundle.md`）
+  3. 报告规范选择（基于 study_type 推荐 CONSORT/STROBE/STARD；用户可覆盖）
+  4. 期刊模板选择（`shared/journal-templates/`）
+  5. 论文配置确认（预填 RQ/Discipline/Method/Existing Materials/Citation=Vancouver）
+- **输出**: `msra_handoff_bundle.md` + 论文配置 → dispatch 到 academic-pipeline
+
+#### Stage 5.1-5.9: DISPATCH TO academic-pipeline
+
+- **调用**: `academic-pipeline` skill，传入 MSRA Handoff Bundle 上下文
+- **academic-pipeline 接管**: Literature Search (deep-research) → Paper Writing (academic-paper) → Integrity Check → Peer Review (academic-paper-reviewer) → Revise → Re-review → Final Integrity → Finalize
+- **academic-paper intake_agent.md**: `# [MSRA-BRIDGE]` 块自动检测 Handoff Bundle 并预填（spec §4.3 Component C）
+- **六大融合点生效**（详见 spec §4.2）:
+  - **A: Passport 统一** — 扩展 MSRA passport 增加 ARS 阶段字段
+  - **B: Quality Gate 复用** — Stage 3.5 门闸报告 → Stage 5.5 Integrity Check（统计数字已验证，不重复检查）
+  - **C: 文献 seed** — MSRA Phase 1 文献对比 → Stage 5.1 deep-research（已有关键文献作起点）
+  - **D: 方法学复用** — Stage 4 Phase 5 统计方法 → Stage 5.2 Methods（直接引用，不重新生成）
+  - **E: 期刊模板传递** — Phase 2.5 期刊选择 → Stage 5.0 intake（已选期刊直接传递）
+  - **F: 表格图表复用** — figures/*.png + tables/*.docx → Stage 5.2 Results（直接引用，不重新生成）
+
+#### Stage 6: PROCESS SUMMARY
+
+- Pipeline 结束，统一过程记录（MSRA Stage 1-4 + Paper Track Stage 5）
+- passport 标记 `stage_5_paper` = completed, `status` = "completed"
 
 ---
 
@@ -387,7 +439,7 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 | M1 | Stage 1.5 通过后 | 数据门闸结果 | 9 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修订 / 带条件通过 |
 | M2 | Stage 2.5 通过后 | SAP 门闸结果 | 8 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修订 / 带条件通过 |
 | M3 | Stage 3.5 通过后 | 结果门闸结果 | 9 项门闸检查结果 + 阻断判定 | 通过继续 / 退回修正 / 带条件通过 |
-| M4 | Stage 4 完成时 | 合规检查 | 规范合规报告 + 最终 checklist | 通过交付 / 修改 / 标记草稿 |
+| M4 | Stage 4 完成时 | 统计质量检查 + 报告交付决策 | 统计质量报告 + ★[A]结束/[B]继续Paper Track | [A]结束 / [B]进入Stage 5.0 |
 | M5 | 任一门闸回退≥3次（收敛失败） | 收敛检测触发 | 未通过项清单 + 回退历史 + 风险评估 | 书面接受风险继续 / 退回根本原因排查 / 换方法换人 |
 
 **MANDATORY Checkpoint 简化 Dashboard**（一行即可，不再展示 ASCII 框）：
