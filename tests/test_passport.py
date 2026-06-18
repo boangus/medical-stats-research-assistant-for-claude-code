@@ -134,8 +134,55 @@ class TestStageConstants:
     def test_stage_order(self):
         assert "stage_1" in STAGE_ORDER
         assert "stage_4" in STAGE_ORDER
-        assert len(STAGE_ORDER) == 7
+        assert "stage_5_0_intake" in STAGE_ORDER
+        assert "stage_5_paper" in STAGE_ORDER
+        assert len(STAGE_ORDER) == 9
 
     def test_prerequisites(self):
         assert STAGE_PREREQUISITES["stage_1"] == []
         assert "cleaned_data" in STAGE_PREREQUISITES["stage_1.5"]
+
+
+class TestPaperTrack:
+    """Paper Track 扩展测试（track 字段 + Stage 5）"""
+
+    def test_track_defaults_to_none(self, pm):
+        assert pm.get_track() is None
+        assert pm.data.get("track") is None
+
+    def test_set_track_report_only(self, pm):
+        pm.set_track("report_only")
+        assert pm.get_track() == "report_only"
+        assert pm.data["track"] == "report_only"
+
+    def test_set_track_full_paper(self, pm):
+        pm.set_track("full_paper")
+        assert pm.get_track() == "full_paper"
+
+    def test_set_track_invalid_raises(self, pm):
+        with pytest.raises(PassportError, match="无效 track"):
+            pm.set_track("bogus")
+
+    def test_stage_5_0_prerequisites_require_final_report(self, pm):
+        """stage_5_0_intake 需要 final_report 和 gate_stage_3.5"""
+        pm.add_artifact({"id": "gate_stage_3.5", "stage": "stage_3.5", "name": "gate", "type": "gate_report", "format": "md"})
+        pm.update_status("gate_stage_3.5", "passed")
+        ok, missing = pm.verify_prerequisites("stage_5_0_intake")
+        assert not ok
+        assert "final_report" in missing
+
+    def test_stage_5_0_prerequisites_pass_when_complete(self, pm):
+        """stage_5_0_intake 前置条件满足时返回 True"""
+        pm.add_artifact({"id": "final_report", "stage": "stage_4", "name": "report", "type": "report", "format": "md"})
+        pm.update_status("final_report", "completed")
+        pm.add_artifact({"id": "gate_stage_3.5", "stage": "stage_3.5", "name": "gate", "type": "gate_report", "format": "md"})
+        pm.set_gate_result("stage_3.5", "passed", 9, 9)
+        ok, missing = pm.verify_prerequisites("stage_5_0_intake")
+        assert ok
+        assert missing == []
+
+    def test_stage_5_paper_requires_handoff_bundle(self, pm):
+        """stage_5_paper 需要 msra_handoff_bundle"""
+        ok, missing = pm.verify_prerequisites("stage_5_paper")
+        assert not ok
+        assert "msra_handoff_bundle" in missing

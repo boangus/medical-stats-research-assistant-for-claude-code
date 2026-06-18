@@ -35,7 +35,8 @@ DEFAULT_ARTIFACT_TEMPLATE = {
 
 STAGE_ORDER = [
     "stage_1", "stage_1.5", "stage_2", "stage_2.5",
-    "stage_3", "stage_3.5", "stage_4"
+    "stage_3", "stage_3.5", "stage_4",
+    "stage_5_0_intake", "stage_5_paper",
 ]
 
 STAGE_PREREQUISITES = {
@@ -46,6 +47,8 @@ STAGE_PREREQUISITES = {
     "stage_3":      ["cleaned_data", "sap", "gate_stage_2.5"],
     "stage_3.5":    ["analysis_results", "quality_check"],
     "stage_4":      ["analysis_results", "gate_stage_3.5"],
+    "stage_5_0_intake": ["final_report", "gate_stage_3.5"],
+    "stage_5_paper":    ["msra_handoff_bundle"],
 }
 
 MID_ENTRY_ARTIFACTS = {
@@ -145,6 +148,7 @@ class PassportManager:
         "stage_2": "stage_1.5",
         "stage_3": "stage_2.5",
         "stage_4": "stage_3.5",
+        "stage_5_0_intake": "stage_3.5",   # Paper Track needs results gate passed
     }
 
     def verify_prerequisites(self, stage: str) -> tuple:
@@ -247,6 +251,24 @@ class PassportManager:
         }
         self._save()
 
+    # ── Paper Track ──
+
+    def get_track(self) -> Optional[str]:
+        """返回当前 track: None | 'report_only' | 'full_paper'"""
+        return self.data.get("track")
+
+    def set_track(self, track: str):
+        """设置 track（Stage 4 checkpoint 选择）
+        
+        Args:
+            track: "report_only" 或 "full_paper"
+        """
+        if track not in ("report_only", "full_paper"):
+            raise PassportError(f"无效 track: {track}（允许: report_only / full_paper）")
+        self.data["track"] = track
+        self.data["updated_at"] = self._now()
+        self._save()
+
     # ── 快照 ──
 
     def create_snapshot(self) -> dict:
@@ -320,6 +342,7 @@ class PassportManager:
             "updated_at": self._now(),
             "status": "in_progress",
             "study_type": None,
+            "track": None,  # None | "report_only" | "full_paper"
             "current_stage": "stage_1",
             "artifacts": [],
             "checkpoints": {
