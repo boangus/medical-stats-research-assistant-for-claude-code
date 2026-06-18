@@ -15,7 +15,7 @@ Write-Host "Project root: $ProjectRoot`n"
 
 # 1. Check Python
 if (-not $SkipPython) {
-    Write-Host "[1/5] Checking Python..." -ForegroundColor Yellow
+    Write-Host "[1/6] Checking Python..." -ForegroundColor Yellow
     try {
         $pyVersion = python --version 2>&1
         Write-Host "  Found: $pyVersion" -ForegroundColor Green
@@ -34,12 +34,12 @@ if (-not $SkipPython) {
         Write-Host "  No requirements.txt found, skipping pip install." -ForegroundColor DarkGray
     }
 } else {
-    Write-Host "[1/5] Skipping Python check (-SkipR)" -ForegroundColor DarkGray
+    Write-Host "[1/6] Skipping Python check (-SkipR)" -ForegroundColor DarkGray
 }
 
 # 2. Check R
 if (-not $SkipR) {
-    Write-Host "`n[2/5] Checking R..." -ForegroundColor Yellow
+    Write-Host "`n[2/6] Checking R..." -ForegroundColor Yellow
     try {
         $rVersion = Rscript --version 2>&1
         Write-Host "  Found: $rVersion" -ForegroundColor Green
@@ -58,11 +58,11 @@ if (-not $SkipR) {
     Rscript $tempR
     Remove-Item $tempR -ErrorAction SilentlyContinue
 } else {
-    Write-Host "[2/5] Skipping R check (-SkipR)" -ForegroundColor DarkGray
+    Write-Host "[2/6] Skipping R check (-SkipR)" -ForegroundColor DarkGray
 }
 
 # 3. Create output directories
-Write-Host "`n[3/5] Creating output directories..." -ForegroundColor Yellow
+Write-Host "`n[3/6] Creating output directories..." -ForegroundColor Yellow
 $dirs = @(
     "MSRA\data",
     "MSRA\reports\figures",
@@ -81,17 +81,18 @@ foreach ($dir in $dirs) {
 }
 
 # 4. Initialize passport.json
-Write-Host "`n[4/5] Initializing passport..." -ForegroundColor Yellow
+Write-Host "`n[4/6] Initializing passport..." -ForegroundColor Yellow
 $passportPath = Join-Path $ProjectRoot "MSRA\passport\passport.json"
 if (-not (Test-Path $passportPath)) {
     $passport = @{
         passport_id = "msra-$(Get-Date -Format 'yyyyMMdd')-001"
         passport_schema_version = "1"
-        pipeline_version = "0.7.6"
+        pipeline_version = "0.8.0"
         created_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         status = "in_progress"
         study_type = $null
+        track = $null
         current_stage = "stage_1"
         artifacts = @()
         checkpoints = @{
@@ -108,7 +109,7 @@ if (-not (Test-Path $passportPath)) {
 }
 
 # 5. Initialize calibration_db.json
-Write-Host "`n[5/5] Initializing calibration database..." -ForegroundColor Yellow
+Write-Host "`n[5/6] Initializing calibration database..." -ForegroundColor Yellow
 $calibPath = Join-Path $ProjectRoot "MSRA\calibration\calibration_db.json"
 if (-not (Test-Path $calibPath)) {
     $calibDb = @()  # CalibrationDatabase expects a JSON array of entries
@@ -117,6 +118,34 @@ if (-not (Test-Path $calibPath)) {
     Write-Host "  Created: calibration_db.json" -ForegroundColor Green
 } else {
     Write-Host "  Exists:  calibration_db.json" -ForegroundColor DarkGray
+}
+
+# 6. Verify ARS shared dependencies (Paper Track readiness)
+Write-Host "`n[6/6] Verifying ARS shared dependencies..." -ForegroundColor Yellow
+$arsCheckFiles = @(
+    "shared\handoff_schemas.md",
+    "shared\contracts\passport\claim_audit_result.schema.json",
+    "shared\contracts\reviewer\full.json",
+    "shared\contracts\writer\full.json",
+    "shared\references\intent_clarification_protocol.md",
+    "shared\.claude\CLAUDE.md",
+    "shared\collaboration_depth_rubric.md",
+    "shared\style_calibration_protocol.md",
+    "shared\mode_spectrum.md",
+    "shared\compliance_checkpoint_protocol.md"
+)
+$missing = @()
+foreach ($f in $arsCheckFiles) {
+    $fullPath = Join-Path $ProjectRoot $f
+    if (-not (Test-Path $fullPath)) { $missing += $f }
+}
+if ($missing.Count -gt 0) {
+    Write-Host "  WARNING: ARS shared files missing (Paper Track will not work):" -ForegroundColor DarkYellow
+    foreach ($m in $missing) { Write-Host "    - $m" -ForegroundColor DarkYellow }
+    Write-Host "  These files should be merged from upstream ARS (academic-research-skills)." -ForegroundColor DarkYellow
+    Write-Host "  See docs/superpowers/specs/2026-06-17-msra-ars-integration-design.md Task 1." -ForegroundColor DarkYellow
+} else {
+    Write-Host "  All ARS shared dependencies present." -ForegroundColor Green
 }
 
 # Dev mode: install dev dependencies
@@ -133,4 +162,5 @@ Write-Host "`n=== MSRA Installation Complete ===" -ForegroundColor Cyan
 Write-Host "Quick start:" -ForegroundColor White
 Write-Host "  1. Place your data in MSRA\data\" -ForegroundColor White
 Write-Host "  2. Run: /msra in Claude Code" -ForegroundColor White
-Write-Host "  3. Or:  /msra-calibrate --status to check calibration" -ForegroundColor White
+Write-Host "  3. At Stage 4 checkpoint: [A] stats report done / [B] continue to paper" -ForegroundColor White
+Write-Host "  4. Or:  /msra-calibrate --status to check calibration" -ForegroundColor White
