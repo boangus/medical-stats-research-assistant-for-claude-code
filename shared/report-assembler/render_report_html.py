@@ -493,6 +493,202 @@ def parse_args():
     return parser.parse_args()
 
 
+def generate_table_semantic_description(table_content: str) -> Dict:
+    """
+    生成表格的语义化描述
+    
+    使用TableMaster方法提取表格关键信息
+    
+    Parameters
+    ----------
+    table_content : str
+        Markdown格式的表格内容
+        
+    Returns
+    -------
+    Dict
+        表格语义化描述
+    """
+    try:
+        # 导入表格理解模块
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        
+        from table_understanding import TableMasterExtractor
+        
+        # 解析表格数据
+        lines = [l.strip() for l in table_content.strip().split("\n") if l.strip()]
+        if not lines:
+            return {'error': '空表格'}
+        
+        # 提取表头和数据行
+        table_lines = [l for l in lines if l.startswith("|")]
+        if not table_lines:
+            return {'error': '无法解析表格'}
+        
+        # 简单的表格解析
+        headers = []
+        rows = []
+        for i, line in enumerate(table_lines):
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            if i == 0:
+                headers = cells
+            elif not all(c.replace('-', '').replace(':', '').strip() == '' for c in cells):
+                rows.append(cells)
+        
+        table_data = {
+            'headers': headers,
+            'rows': rows
+        }
+        
+        # 使用TableMaster提取语义信息
+        extractor = TableMasterExtractor(table_data)
+        semantic_info = extractor.extract()
+        
+        return {
+            'table_structure': {
+                'headers': headers,
+                'row_count': len(rows),
+                'column_count': len(headers)
+            },
+            'semantic_info': semantic_info,
+            'summary': f"表格包含{len(headers)}列{len(rows)}行数据"
+        }
+        
+    except Exception as e:
+        return {'error': f"表格语义描述生成失败: {e}"}
+
+
+def generate_chart_structured_description(chart_data: Dict) -> Dict:
+    """
+    生成图表的结构化描述
+    
+    使用FDV方法将图表转化为结构化文本描述
+    
+    Parameters
+    ----------
+    chart_data : Dict
+        图表数据，包含类型、数据点、坐标轴等信息
+        
+    Returns
+    -------
+    Dict
+        图表结构化描述
+    """
+    try:
+        # 导入图表理解模块
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        
+        from chart_understanding import ChartFDVGenerator
+        
+        # 使用FDV生成结构化描述
+        generator = ChartFDVGenerator(chart_data)
+        fdv_description = generator.generate_description()
+        
+        return {
+            'chart_type': chart_data.get('type', 'unknown'),
+            'fdv_description': fdv_description,
+            'data_summary': {
+                'data_points': len(chart_data.get('data_points', [])),
+                'has_confidence_interval': 'confidence_interval' in chart_data,
+                'has_p_value': 'p_value' in chart_data,
+                'has_sample_size': 'sample_size' in chart_data
+            }
+        }
+        
+    except Exception as e:
+        return {'error': f"图表结构化描述生成失败: {e}"}
+
+
+def generate_table_chart_verification_report(skeleton: Dict) -> Dict:
+    """
+    生成表格和图表的自动化核查报告
+    
+    Parameters
+    ----------
+    skeleton : Dict
+        报告JSON骨架
+        
+    Returns
+    -------
+    Dict
+        核查报告
+    """
+    report = {
+        'table_verification': [],
+        'chart_verification': [],
+        'overall_score': 0.0,
+        'recommendations': []
+    }
+    
+    # 遍历所有章节
+    for section in skeleton.get('sections', []):
+        section_type = section.get('type', '')
+        
+        # 检查表格
+        if section_type == 'table':
+            table_content = section.get('content', '')
+            if table_content:
+                table_desc = generate_table_semantic_description(table_content)
+                report['table_verification'].append({
+                    'section_id': section.get('id', ''),
+                    'section_title': section.get('title', ''),
+                    'description': table_desc
+                })
+        
+        # 检查图表
+        elif section_type == 'figure':
+            figure_file = section.get('figure_file', '')
+            if figure_file:
+                # 这里可以添加图表文件分析逻辑
+                chart_data = {
+                    'type': 'figure',
+                    'file': figure_file,
+                    'caption': section.get('caption', '')
+                }
+                chart_desc = generate_chart_structured_description(chart_data)
+                report['chart_verification'].append({
+                    'section_id': section.get('id', ''),
+                    'section_title': section.get('title', ''),
+                    'description': chart_desc
+                })
+        
+        # 检查复合章节
+        elif section_type == 'multi':
+            for child in section.get('children', []):
+                child_type = child.get('type', '')
+                if child_type == 'table':
+                    table_content = child.get('content', '')
+                    if table_content:
+                        table_desc = generate_table_semantic_description(table_content)
+                        report['table_verification'].append({
+                            'section_id': section.get('id', ''),
+                            'section_title': section.get('title', ''),
+                            'child_title': child.get('caption', ''),
+                            'description': table_desc
+                        })
+                elif child_type == 'figure':
+                    figure_file = child.get('figure_file', '')
+                    if figure_file:
+                        chart_data = {
+                            'type': 'figure',
+                            'file': figure_file,
+                            'caption': child.get('caption', '')
+                        }
+                        chart_desc = generate_chart_structured_description(chart_data)
+                        report['chart_verification'].append({
+                            'section_id': section.get('id', ''),
+                            'section_title': section.get('title', ''),
+                            'child_title': child.get('caption', ''),
+                            'description': chart_desc
+                        })
+    
+    return report
+
+
 def main():
     args = parse_args()
 
@@ -519,6 +715,13 @@ def main():
     output_path.write_text(html, encoding="utf-8")
     print(f"✅ HTML 报告已生成: {output_path.resolve()}")
     print(f"   文件大小: {output_path.stat().st_size / 1024:.1f} KB")
+    
+    # 生成表格和图表核查报告
+    verification_report = generate_table_chart_verification_report(skeleton)
+    verification_path = output_path.with_suffix('.verification.json')
+    with open(verification_path, "w", encoding="utf-8") as f:
+        json.dump(verification_report, f, ensure_ascii=False, indent=2)
+    print(f"📊 表格图表核查报告已生成: {verification_path}")
 
 
 if __name__ == "__main__":

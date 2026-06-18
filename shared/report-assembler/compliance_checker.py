@@ -191,16 +191,196 @@ def run_compliance_check(
     return results
 
 
+def check_table_understanding(table_data: Dict) -> Dict:
+    """
+    检查表格理解质量
+    
+    使用Chain-of-Table、Tree-of-Table、TableMaster方法分析表格
+    
+    Parameters
+    ----------
+    table_data : Dict
+        表格数据，包含headers和rows
+        
+    Returns
+    -------
+    Dict
+        表格理解分析结果
+    """
+    try:
+        # 导入表格理解模块
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        
+        from table_understanding import TableChainVerifier, TableTreeAnalyzer, TableMasterExtractor
+        
+        results = {
+            'chain_verification': {},
+            'tree_analysis': {},
+            'master_extraction': {},
+            'overall_score': 0.0,
+            'recommendations': []
+        }
+        
+        # Chain-of-Table 验证
+        try:
+            verifier = TableChainVerifier(table_data)
+            chain_results = verifier.verify()
+            results['chain_verification'] = chain_results
+        except Exception as e:
+            results['chain_verification'] = {'error': str(e)}
+            results['recommendations'].append(f"Chain-of-Table验证失败: {e}")
+        
+        # Tree-of-Table 分析
+        try:
+            analyzer = TableTreeAnalyzer(table_data)
+            tree_analysis = analyzer.analyze()
+            results['tree_analysis'] = tree_analysis
+        except Exception as e:
+            results['tree_analysis'] = {'error': str(e)}
+            results['recommendations'].append(f"Tree-of-Table分析失败: {e}")
+        
+        # TableMaster 提取
+        try:
+            extractor = TableMasterExtractor(table_data)
+            master_extraction = extractor.extract()
+            results['master_extraction'] = master_extraction
+        except Exception as e:
+            results['master_extraction'] = {'error': str(e)}
+            results['recommendations'].append(f"TableMaster提取失败: {e}")
+        
+        # 计算总体分数
+        scores = []
+        if 'score' in results['chain_verification']:
+            scores.append(results['chain_verification']['score'])
+        if 'score' in results['tree_analysis']:
+            scores.append(results['tree_analysis']['score'])
+        if 'score' in results['master_extraction']:
+            scores.append(results['master_extraction']['score'])
+        
+        if scores:
+            results['overall_score'] = sum(scores) / len(scores)
+        
+        return results
+        
+    except ImportError as e:
+        return {
+            'error': f"无法导入表格理解模块: {e}",
+            'overall_score': 0.0,
+            'recommendations': ["请确保表格理解模块已正确安装"]
+        }
+
+
+def check_chart_understanding(chart_data: Dict) -> Dict:
+    """
+    检查图表理解质量
+    
+    使用FDV方法分析图表
+    
+    Parameters
+    ----------
+    chart_data : Dict
+        图表数据，包含类型、数据点、坐标轴等信息
+        
+    Returns
+    -------
+    Dict
+        图表理解分析结果
+    """
+    try:
+        # 导入图表理解模块
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        
+        from chart_understanding import ChartFDVGenerator
+        
+        results = {
+            'fdv_description': {},
+            'quality_assessment': {},
+            'consistency_check': {},
+            'overall_score': 0.0,
+            'recommendations': []
+        }
+        
+        # FDV 描述生成
+        try:
+            generator = ChartFDVGenerator(chart_data)
+            fdv_description = generator.generate_description()
+            results['fdv_description'] = fdv_description
+        except Exception as e:
+            results['fdv_description'] = {'error': str(e)}
+            results['recommendations'].append(f"FDV描述生成失败: {e}")
+        
+        # 质量评估
+        try:
+            generator = ChartFDVGenerator(chart_data)
+            quality_assessment = generator.assess_quality()
+            results['quality_assessment'] = quality_assessment
+        except Exception as e:
+            results['quality_assessment'] = {'error': str(e)}
+            results['recommendations'].append(f"质量评估失败: {e}")
+        
+        # 一致性检查
+        try:
+            generator = ChartFDVGenerator(chart_data)
+            consistency_check = generator.check_consistency()
+            results['consistency_check'] = consistency_check
+        except Exception as e:
+            results['consistency_check'] = {'error': str(e)}
+            results['recommendations'].append(f"一致性检查失败: {e}")
+        
+        # 计算总体分数
+        scores = []
+        if 'score' in results['quality_assessment']:
+            scores.append(results['quality_assessment']['score'])
+        if 'score' in results['consistency_check']:
+            scores.append(results['consistency_check']['score'])
+        
+        if scores:
+            results['overall_score'] = sum(scores) / len(scores)
+        
+        return results
+        
+    except ImportError as e:
+        return {
+            'error': f"无法导入图表理解模块: {e}",
+            'overall_score': 0.0,
+            'recommendations': ["请确保图表理解模块已正确安装"]
+        }
+
+
 def main():
     parser = argparse.ArgumentParser(description="MSRA 自动化报告合规检查器")
     parser.add_argument("--report", required=True, help="报告文件路径 (MD/HTML)")
     parser.add_argument("--guideline", required=True, choices=list(CHECKLISTS.keys()), help="报告规范")
     parser.add_argument("--verbose", action="store_true", help="详细输出")
     parser.add_argument("--output", help="输出 JSON 文件路径")
+    parser.add_argument("--check-table", help="检查表格数据 (JSON格式)")
+    parser.add_argument("--check-chart", help="检查图表数据 (JSON格式)")
     args = parser.parse_args()
 
     report_text = load_report(args.report)
     results = run_compliance_check(report_text, args.guideline, args.verbose)
+
+    # 添加表格理解检查
+    if args.check_table:
+        try:
+            table_data = json.loads(args.check_table)
+            table_results = check_table_understanding(table_data)
+            results['table_understanding'] = table_results
+        except json.JSONDecodeError as e:
+            results['table_understanding'] = {'error': f"JSON解析失败: {e}"}
+
+    # 添加图表理解检查
+    if args.check_chart:
+        try:
+            chart_data = json.loads(args.check_chart)
+            chart_results = check_chart_understanding(chart_data)
+            results['chart_understanding'] = chart_results
+        except json.JSONDecodeError as e:
+            results['chart_understanding'] = {'error': f"JSON解析失败: {e}"}
 
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
