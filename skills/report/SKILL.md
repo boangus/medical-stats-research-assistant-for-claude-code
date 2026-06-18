@@ -428,7 +428,7 @@ JSON 骨架格式（`report_sections.json`）：
 
 ```json
 {
-  "title": "...", "report_guideline": "STROBE",
+  "title": "...", "study_type": "RCT",
   "sections": [
     {"id": "methods", "type": "text", "content": "..."},
     {"id": "table1", "type": "table", "content": "| 变量 | ... |"},
@@ -480,21 +480,19 @@ python shared/report-assembler/render_report_html.py \
 
 | 命令 | 说明 |
 |------|------|
-| `/msra-report` | 启动报告生成流程 (完整阶段 + 报告组装) |
-| `/msra-report CONSORT` | 指定报告规范 |
-| `/msra-report --template NEJM` | 指定期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ） |
-| `/msra-report --template Other` | 自定义期刊模板（AI检索后生成） |
+| `/msra-report` | 启动报告生成流程（统计报告 + Stage 4 checkpoint） |
 | `/msra-report --type table1` | 仅生成Table 1 |
 | `/msra-report --type figure` | 仅生成图表 |
 | `/msra-report --type methods` | 仅生成方法学描述 |
 | `/msra-report --output html` | 指定输出格式 (html / md) |
+| `/msra-report CONSORT` | ⚠️ 已移至 Paper Track Stage 5.0（仅写论文时选择规范） |
+| `/msra-report --template NEJM` | ⚠️ 已移至 Paper Track Stage 5.0（仅写论文时选择期刊模板） |
 
 ## Mode
 
 ### guided（默认）
-完整流程：结果解读 → 确定规范 → 选择模板 → 表格 → 图表 → 方法学 → 合规检查 → 报告组装
+完整流程：结果解读 → 表格 → 图表 → 方法学 → 统计质量检查 → 报告组装 → ★ Stage 4 Checkpoint [A]/[B]
 输出: final_report.html + final_report.md + figures/*.png + tables/*.docx
-按模板章节组织报告结构
 
 ### quick
 通过 `--type` 参数快速生成指定元素（单个表格/图表/段落），跳过其他 Phase。
