@@ -9,6 +9,10 @@ data_access_level: verified_only
 task_type: open-ended
 depends_on: [data-prep]
 works_with: [data-prep, analysis-exec]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, SAP, statistical-analysis-plan, estimands, RCT, observational]
 ---
 
 # 分析计划 (Analysis Planning)
@@ -24,6 +28,36 @@ works_with: [data-prep, analysis-exec]
 > - EDA 为方法选择服务，不能用于修改 SAP 中已定的分析框架
 > - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
 
+## 快速开始
+
+### 迷你SAP示例（RCT连续终点）
+
+输入: "RCT，治疗组vs安慰剂，主要终点HbA1c变化，n=200"
+
+输出SAP概要:
+```
+── 统计分析计划概要 ──
+研究设计: RCT，平行对照，1:1随机化
+Estimands: 治疗组 vs 安慰剂 | ITT人群 | HbA1c基线到24周变化 | 疗法策略 | 均值差
+主分析: ANCOVA，调整基线HbA1c
+次要分析: PP分析，按方案人群
+敏感性: 1) 多重插补 2) Tipping Point分析
+亚组: 年龄(<65/≥65)、基线HbA1c(<8/≥8)
+效应量: 均值差 + 95%CI + Cohen's d
+多重比较: 层次检验（主→次→探索），无alpha消耗
+样本量: 200人，80%效能检测0.3%差异，α=0.05
+
+确认以上计划? [继续 / 修改]
+```
+
+### Quick模式
+触发: `/msra-plan --quick`
+- 跳过Phase 1.5文献检索
+- 使用标准SAP模板（按研究类型自动选择）
+- 合并Phase 2+3为单次确认
+- 跳过Phase 6.5 DAG预览
+- 输出: 标准SAP框架，用户自行补充细节
+
 ## 研究类型分支
 
 Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
@@ -37,6 +71,22 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
 | 多重性 | 强控制（层次检验） | 探索性（FDR） | 探索性（FDR） |
 
 **IRON RULE**: 不能将 RCT 的分析方法（如未调整的 t 检验）套用在观察性研究上，反之亦然。研究类型决定方法论体系。
+
+## Phase 流转指南
+
+| 当前Phase | 完成标志 | 下一Phase | 转换条件 |
+|-----------|---------|-----------|---------|
+| Phase 1 (EDA) | EDA报告生成 | Phase 1.5 | 自动流转，无异常时无需暂停 |
+| Phase 1.5 (Lit-Seeding) | 文献种子表生成 | Phase 2 | [SLIM]自动继续，用户可补充 |
+| Phase 2 (Estimands) | 五要素定义完成 | Phase 3 | 自动合并到Phase 3确认点 |
+| Phase 3 (方法探讨) | 用户确认方法 | Phase 4 | 🔴[MANDATORY]用户确认后 |
+| Phase 4 (SAP制定) | SAP文档生成 | Phase 5 | 自动进入审查 |
+| Phase 5 (审查) | 审查通过 | Phase 6 | 🔴[MANDATORY]审查通过后 |
+| Phase 6 (变量构造) | 构造定义完成 | Phase 6.5 | 🔴[MANDATORY-S6]检查通过后 |
+| Phase 6.5 (DAG预览) | DAG图生成 | Phase 6.7 | [SLIM]自动继续 |
+| Phase 6.7 (多中心) | 策略选择完成 | 定稿 | [SLIM]自动继续（仅multi-dataset） |
+
+注: Phase 2和Phase 3合并为单一确认点，减少用户交互次数。
 
 ## 工作流程
 
