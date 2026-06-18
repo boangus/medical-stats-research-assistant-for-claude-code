@@ -25,6 +25,9 @@ works_with: [analysis-exec, analysis-plan, pipeline]
 
 ## 工作流程
 
+> Phase 编号保留历史序号（原 Phase 2/2.5 已移至 Paper Track Stage 5.0）。
+> 实际执行顺序: Phase 1 → 3 → 3.5 → 4 → 5 → 6(精简) → 7 → ★Checkpoint
+
 ```
 Phase 1: 结果解读 → 输入:分析结果+SAP → 输出:解读文档
   │ [SLIM-S4] 异常发现自动升级为 ADAPTIVE

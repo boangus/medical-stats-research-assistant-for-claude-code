@@ -92,20 +92,42 @@ Execute the original Phase 0 full interview flow (Step 1-11), then Step 12 (Doma
    - Citation Format ← Vancouver (medical default)
    - Paper Type ← IMRaD
    - Target Journal ← from bundle "Journal Template" section (if not "General")
+```
 
+**Bundle → PCR 字段精确映射表**：
+
+| PCR 字段 | Bundle 来源 | 提取方式 | 默认值 |
+|----------|-----------|---------|--------|
+| Topic / Research Question | `## Research Question` 段落 | 直接取文本 | `[待填写]` 若为空 |
+| Discipline | `study_type` in `## Source` | RCT/观察性→临床医学; 诊断→诊断试验 | `medicine` |
+| Paper Type | 固定 | — | `IMRaD` |
+| Target Journal | `template` in `## Journal Template` | 取值 | `General` |
+| Citation Format | 固定 | — | `Vancouver` |
+| Output Format | 固定 | — | `Markdown` |
+| Body Language | 跟随 MSRA 报告语言 | 从 bundle 推断 | `Bilingual` |
+| Existing Materials | `## Results Bundle` + `### Tables` + `### Figures` | 检查列表非空 | 全部 ✅ |
+| Reporting Guideline | `Reporting Guideline` in `## Paper Configuration` | 直接取值 | study_type 推导 |
+| Domain Evidence Profile | 固定（MSRA handoff 激活 clinical） | — | `clinical` |
+
+```
 2. Skip redundant questions:
    - Skip Step 1 (Topic & RQ) — already available from bundle
    - Skip Step 8 (Existing Materials) — already fully populated from MSRA artifacts
    - Still need to confirm: Target Journal, Output Format, Language, Co-Authors, Funding
 
-3. Notify the user:
-   "I detected an MSRA Handoff Bundle. The following parameters have been auto-populated from your statistical analysis:
-   - Research question: {RQ}
-   - Discipline: {discipline}
-   - Reporting guideline: {guideline} (from MSRA study type)
-   - Existing materials: Data ✅ | Results ✅ | Tables ✅ | Figures ✅
+3. Notify the user and await confirmation:
 
-   We only need a few more settings before we can begin writing your paper."
+   > 🔴 **CHECKPOINT · MSRA Handoff Detected**
+   > The following parameters have been auto-populated from your statistical analysis:
+   > - Research question: {RQ}
+   > - Discipline: {discipline}
+   > - Reporting guideline: {guideline} (from MSRA study type)
+   > - Existing materials: Data ✅ | Results ✅ | Tables ✅ | Figures ✅
+   >
+   > **Confirm to proceed** with the pre-filled configuration, or say **"override"** to re-enter manually.
+   > We only need a few more settings: Target Journal, Output Format, Language, Co-Authors, Funding.
+
+   🛑 **STOP: Wait for user confirmation before skipping Steps 1 and 8.** Do not auto-skip silently.
 
 4. Reporting-guideline injection:
    - Load the corresponding checklist from shared/reporting-guidelines/
