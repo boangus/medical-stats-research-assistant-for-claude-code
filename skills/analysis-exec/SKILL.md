@@ -77,6 +77,31 @@ tags: [medical-statistics, clinical-trial, analysis-execution, code-generation, 
 简化流程: Phase 0(验证) → Phase 4(构造) → Phase 6(主分析) → Phase 8(质检) → Phase 10(审计)
 跳过: Phase 1-3(已在SAP中完成)、Phase 5(次要分析)、Phase 7(无违反时)、Phase 9(图表在报告中生成)
 
+### 执行时间估算
+
+| 分析类型 | 数据规模 | 预计时间 | 自愈轮数 | 主要耗时 |
+|---------|---------|---------|---------|---------|
+| 描述统计 | 500行 | 1-2分钟 | 0-1轮 | Table 1生成 |
+| ANCOVA | 500行 | 2-5分钟 | 0-2轮 | 代码生成+假设检验 |
+| Cox回归 | 500行×10变量 | 3-8分钟 | 0-2轮 | PH检验+模型拟合 |
+| IPTW+Logistic | 5000行 | 5-15分钟 | 1-3轮 | 权重计算+模型拟合 |
+| 多重插补 | 1000行×30%缺失 | 10-20分钟 | 1-3轮 | MICE迭代+收敛检查 |
+| 发表级图表(5张) | - | 5-10分钟 | 0-1轮 | SVG渲染+质量检查 |
+| 完整分析(主+次+敏感) | 500行 | 15-40分钟 | 2-5轮 | 全流程+自愈 |
+
+### 常见执行错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| 代码执行ImportError | 缺少statsmodels/scipy | 自愈Layer 1: 添加import+pip install提示 |
+| 数据类型不匹配 | ValueError: could not convert | 自愈Layer 2: 添加pd.to_numeric(errors='coerce') |
+| Cox模型不收敛 | ConvergenceWarning | 自愈Layer 3: 减少变量/检查分离→Firth惩罚 |
+| IPTW权重极端 | weight>20 | Phase 6.2触发S-R06→用户决策: 截断/重设/放弃 |
+| P值输出为0.000 | float精度问题 | 代码输出原始值，Phase 8检查P-R01→报告层格式化 |
+| 图表样式不合规 | 使用默认matplotlib | Phase 9强制apply_publication_style()→重新生成 |
+| 审计日志缺失 | 无执行环境记录 | Phase 10强制记录: Python版本/包版本/种子/时间 |
+| 自愈5轮仍失败 | 代码无法执行 | 标记[SKIP: code_execution_failed]→记录偏差→继续其他分析 |
+
 ## 双 Agent 编排（Generator-Evaluator 模式）
 
 ```
@@ -442,6 +467,50 @@ if (normal_ok) {
 | 统计错误 | 共线性、分离问题、样本量不足 | 40-50% | 标记 [SKIP: statistical] |
 | 数据错误 | 缺失数据过多、异常值极端 | 30-40% | 标记 [SKIP: data] |
 | 环境错误 | 内存不足、包版本冲突 | 60-70% | 标记 [SKIP: environment] |
+
+### 自愈机制详细流程
+
+```
+代码执行失败
+    │
+    ▼
+Layer 1: 语法修复 (0-1轮)
+├── ImportError → 添加缺失import
+├── SyntaxError → 修正语法
+├── NameError → 修正变量名
+└── 修复后重试 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 2: 数据适配 (1-2轮)
+├── ValueError → 类型转换(pd.to_numeric/errors='coerce')
+├── KeyError → 列名映射/模糊匹配
+├── IndexError → 边界检查/空值处理
+└── 修复后重试 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 3: 方法降级 (1-2轮)
+├── 不收敛 → 减少变量/增加迭代次数
+├── 完全分离 → Firth惩罚回归
+├── PH违反 → 分层Cox/时依协变量
+├── 多重共线性 → 岭回归/剔除VIF>10变量
+└── 修复后重试 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 4: 用户介入 (1轮)
+├── 展示错误详情+已尝试方案
+├── 请求用户: 修改SAP/提供数据/手动编码
+└── 用户响应 → 执行 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 5: 标记跳过
+├── 标记 [SKIP: code_execution_failed]
+├── 记录偏差到审计日志
+├── 继续执行其他分析项
+└── 在报告中标注未完成分析
+```
+
+> **自愈原则**: 自愈仅修复代码错误，不改变SAP预定义的分析方法。需修改方法时走Phase 7.5 SAP修正流程。
+> **自愈上限**: 最多5轮，每轮记录修复详情。超过5轮标记[SKIP]。
 
 **常见错误处理代码示例**：
 
