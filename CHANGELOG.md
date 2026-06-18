@@ -2,6 +2,40 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.8.0] - 2026-06-18
+
+MSRA × ARS integration — unified pipeline: raw data → statistical report → (optional) submittable paper.
+
+### Summary
+Merges ARS (Academic Research Skills) capability into MSRA, forming a single project.
+Users flow from Stage 1 through Stage 4 (stats report), then choose [A] done / [B] write paper.
+The Paper Track dispatches to ARS's `academic-pipeline` skill (literature → write → review → revise → finalize).
+MSRA provides clinical reporting expertise (CONSORT/STROBE/STARD/16 checklists) that ARS natively lacks.
+
+### Added
+- **`shared/` ARS dependencies merged** (44 files): handoff_schemas, contracts, references, templates, .claude/CLAUDE.md
+- **`commands/ars-*.md`** (14 files): ARS slash commands (ars-full, ars-reviewer, ars-revision, etc.)
+- **Paper Track (Stage 5)**: Stage 5.0 Paper Intake + dispatch to academic-pipeline for Stage 5.1-5.9
+- **`scripts/generate_msra_handoff_bundle.py`**: generates MSRA Handoff Bundle (spec §4.4) for academic-paper bridge
+- **`commands/msra-paper.md`**: new `/msra-paper` command for direct Paper Track entry
+- **`shared/passport/passport.py`**: `track` field (`report_only`|`full_paper`), `get_track()`/`set_track()`, Stage 5 stages in STAGE_ORDER
+- **`skills/academic-paper/agents/intake_agent.md`**: `# [MSRA-BRIDGE]` MSRA Handoff Detection block + `clinical` Domain Evidence Profile activation
+- **`install.ps1`**: [6/6] ARS shared dependency verification step (non-blocking WARNING)
+- **`skills/pipeline/SKILL.md`**: Stage 4 checkpoint (M4'), Stage 5 Paper Track dispatch, intent detection update
+- **`skills/report/SKILL.md`**: Stage 4 checkpoint section (M4'), slimmed to 7-step statistical-only flow
+
+### Changed
+- **Stage 4 slimmed**: Phase 2 (reporting-guideline selection) and Phase 2.5 (journal template) moved to Paper Track Stage 5.0
+- **Phase 6 slimmed**: full reporting-guideline compliance → statistical quality check only (statcheck + anti-patterns + statistical dimensions)
+- **Manifest**: v0.7.6 → v0.8.0, `/msra` description updated, `/msra-paper` added
+- **Passport schema**: `track` field added, `stage_5_0_intake` + `stage_5_paper` stages added (9 total)
+- **`test_passport.py`**: updated STAGE_ORDER count 7→9, added `TestPaperTrack` class (6 tests)
+
+### Architecture
+- MSRA stays a **pure orchestrator** (IRON RULE) — Paper Track delegates to `academic-pipeline` skill
+- Six fusion points: Passport unified / Quality Gate reuse / Literature seed / Methods reuse / Journal template pass / Tables+Figures reuse
+- Data-driven positioning: this plugin is for data-processing projects only; pure writing uses ARS directly
+
 ## [0.7.6-R7] - 2026-06-15
 
 Research-fusion round 7: PRISMA 2020 + STARD 2015 reporting standards.
