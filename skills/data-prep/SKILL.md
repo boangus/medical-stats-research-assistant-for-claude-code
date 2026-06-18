@@ -57,6 +57,29 @@ Phase 0 → 0.5 → 1 → 2 → 2.5 → 3 → 4 → 5 → 6 → 7
 预计交互次数: 3-5次（Phase 2清洗策略 + Phase 2.5值规范化 + Phase 6锁定确认）
 ```
 
+### 执行时间估算
+
+| 模式 | 数据规模 | 预计时间 | 瓶颈 |
+|------|---------|---------|------|
+| Quick Mode | 500行×20列 | 1-3分钟 | Critical检查+格式修复 |
+| Standard Mode | 500行×20列 | 10-20分钟 | 完整验证+交互讨论+EDA |
+| Standard Mode | 5000行×50列 | 20-40分钟 | CDISC检查+PHI扫描+EDA |
+| Multi-dataset | 3中心×1000行 | 30-60分钟 | 跨中心一致性+逐中心验证 |
+| Quality-gate | - | <30秒 | 9项门闸检查 |
+
+### 常见数据准备错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| 文件编码不一致 | 读取乱码/UnicodeDecodeError | 自动检测编码(chardet)，尝试UTF-8/GBK/GB2312 |
+| 日期格式混乱 | "2025/01/01"/"2025-01-01"/"01-Jan-2025" | Phase 2.5统一为ISO 8601(2025-01-01) |
+| 数值列含文本 | "N/A"/"缺失"/"<0.05"混在数值列 | Phase 2.5检测变体→策略选择→规范化 |
+| 重复ID未检测 | 主键列有重复值 | Phase 1结构检查标记为Critical→必须处理 |
+| 缺失模式误判 | MCAR误判为MNAR | 结合Little's MCAR检验+缺失图综合判断 |
+| CDISC映射失败 | 数据无法映射到SDTM域 | 提示用户确认数据来源→自定义映射或标记"非SDTM" |
+| PHI检测遗漏 | 自由文本中包含姓名/电话 | 正则+NER双重检测→[REDACTED]替换 |
+| 清洗后引入新错误 | 逻辑一致性检查失败 | Phase 4 EDA复查→发现则退回Phase 2 |
+
 ## 工作流程
 
 ```
@@ -506,6 +529,45 @@ cleaning_log = pd.DataFrame({
     'reason': ['超出合理范围', '阈值替代策略'],
     'timestamp': pd.Timestamp.now()
 })
+```
+
+### 缺失模式诊断代码
+
+```python
+# 缺失模式诊断（Phase 1 / Phase 4 使用）
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+def diagnose_missing_pattern(df):
+    """诊断缺失数据模式: MCAR / MAR / MNAR"""
+    missing_rate = df.isnull().mean()
+    missing_vars = missing_rate[missing_rate > 0].index.tolist()
+
+    if not missing_vars:
+        return {"pattern": "NO_MISSING", "details": "无缺失数据"}
+
+    # Little's MCAR检验
+    try:
+        from statsmodels.imputation.mice import mice
+        # 简化版: 比较缺失组vs非缺失组的分布
+        results = {}
+        for var in missing_vars:
+            for other_var in df.select_dtypes(include=[np.number]).columns:
+                if other_var == var:
+                    continue
+                missing_group = df[df[var].isnull()][other_var].dropna()
+                present_group = df[~df[var].isnull()][other_var].dropna()
+                if len(missing_group) > 5 and len(present_group) > 5:
+                    _, p_val = stats.ttest_ind(missing_group, present_group)
+                    if p_val < 0.05:
+                        results[var] = {"pattern": "MAR", "correlated_with": other_var, "p": p_val}
+                        break
+
+        pattern = "MCAR" if not results else "MAR"
+        return {"pattern": pattern, "details": results, "missing_rates": missing_rate[missing_vars].to_dict()}
+    except Exception:
+        return {"pattern": "UNKNOWN", "details": "无法执行检验，建议人工评估"}
 ```
 
 ### Phase 4: EDA 数据质量检查 🆕

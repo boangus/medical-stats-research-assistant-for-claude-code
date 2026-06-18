@@ -35,6 +35,39 @@ tags: [medical-statistics, clinical-trial, report, CONSORT, STROBE, publication]
 > - 参考：shared/chart-styles/variable_naming_conventions.md — 变量命名规范
 > - 参考：shared/templates/publication_figure_template.py — 发表级图表 Python 模板
 
+## 报告生成流程图
+
+```
+分析结果 (JSON/CSV)
+    │
+    ▼
+Phase 0: 输入验证 ─── 结果文件完整？─── 否 → 报错退出
+    │ 是
+    ▼
+Phase 1: 结果解析 ─── 提取效应量/P值/CI
+    │
+    ▼
+Phase 2: 报告框架 ─── 按研究类型选择模板
+    │ RCT→CONSORT | 观察性→STROBE | 诊断→STARD
+    ▼
+Phase 3: 内容生成 ─── 变量命名规范化 + P值格式化
+    │ V-R01~R07 + P-R01~R07
+    ▼
+Phase 4: 图表生成 ─── 发表级图表(SVG+PNG, 300dpi)
+    │ apply_publication_style()
+    ▼
+Phase 5: statcheck ── 统计结果验证
+    │ 通过 → 继续 | 失败 → 标记[STATCHECK_FAILED]
+    ▼
+Phase 6: 合规检查 ─── 6d约束检查 + 6e图表质量
+    │ 全通过 → 继续 | 违规 → 修复→重新检查
+    ▼
+Phase 7: 报告组装 ─── HTML + MD + DOCX
+    │
+    ▼
+输出: final_report.html + figures/*.svg + tables/*.docx
+```
+
 ## 快速开始
 
 ### 1. P值格式化示例（before/after）
@@ -77,6 +110,27 @@ tags: [medical-statistics, clinical-trial, report, CONSORT, STROBE, publication]
 完整报告（7步）:
 Phase 0-7 完整流程
 ```
+
+### 执行时间估算
+
+| 报告类型 | 分析数量 | 预计时间 | 瓶颈 |
+|---------|---------|---------|------|
+| 简单报告(3步) | 1个主分析 | 1-2分钟 | P值格式化+表格生成 |
+| 标准报告(7步) | 3-5个分析 | 5-10分钟 | 图表生成+statcheck |
+| 完整报告(含CONSORT) | 10+分析 | 10-20分钟 | 流程图+所有表格+statcheck |
+| Quick Mode | 1-2个分析 | <1分钟 | 仅基础表格，无图表 |
+
+### 常见报告错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| P值格式化遗漏 | 表格中出现P=0.000 | Phase 3强制执行P-R01~R07，用正则扫描所有P值 |
+| 变量名不一致 | 同一变量出现多种写法 | Phase 3加载variable_dictionary.yaml，自动替换 |
+| SVG文件过大 | >1MB导致加载缓慢 | 压缩SVG(remove metadata)+提供PNG fallback |
+| statcheck超时 | >60秒无响应 | 降级为[STATCHECK_SKIPPED]，推荐手动核查 |
+| HTML渲染异常 | 表格/图表错位 | 降级为Markdown报告[HTML_FALLBACK] |
+| 三线表格式错误 | 出现竖线或多余横线 | 使用标准三线表模板(顶线+表头线+底线) |
+| 图表分辨率不足 | PNG<300dpi | 强制300dpi重新导出，SVG作为主格式 |
 
 ## 报告模板速查
 
