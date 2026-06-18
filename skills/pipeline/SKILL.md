@@ -348,7 +348,7 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
   □ 7. 结果复现: 3 次重跑关键结论是否一致？（详见 shared/reproducibility/）
   □ 8. [SKIP] 标记: 跳过的分析是否有合理记录？
   □ 9. [校准联动] 校准置信度: 该方法类型的历史校准指标是否达标？
-      - 读取 calibration_db.json 中该方法类型的累计 TPR/FPR
+      - 读取 MSRA/calibration/calibration_db.json 中该方法类型的累计 TPR/FPR
       - TPR ≥ 90% 且 FPR ≤ 10% → ✅ 高置信度
       - TPR 80-90% 或 FPR 10-15% → ⚠️ 低置信度，必须人工复核
       - TPR < 80% 或 FPR > 15% → ❌ 不可信，强制人工复核
