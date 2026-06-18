@@ -49,15 +49,13 @@ class TestGenerateBundle:
 
     def test_bundle_created(self, pm):
         pm_obj, tmp_dir = pm
-        os.chdir(tmp_dir)
-        bundle_path = generate_handoff_bundle(pm_obj, sap_path=None, output_dir=None)
+        bundle_path = generate_handoff_bundle(pm_obj, project_root=tmp_dir)
         assert os.path.exists(bundle_path)
         assert bundle_path.endswith("msra_handoff_bundle.md")
 
     def test_bundle_contains_required_sections(self, pm):
         pm_obj, tmp_dir = pm
-        os.chdir(tmp_dir)
-        bundle_path = generate_handoff_bundle(pm_obj)
+        bundle_path = generate_handoff_bundle(pm_obj, project_root=tmp_dir)
         with open(bundle_path, "r", encoding="utf-8") as f:
             content = f.read()
         # 检查所有 8 个必要章节（spec §4.4）
@@ -80,8 +78,7 @@ class TestGenerateBundle:
 
     def test_bundle_paper_config_prefilled(self, pm):
         pm_obj, tmp_dir = pm
-        os.chdir(tmp_dir)
-        bundle_path = generate_handoff_bundle(pm_obj)
+        bundle_path = generate_handoff_bundle(pm_obj, project_root=tmp_dir)
         with open(bundle_path, "r", encoding="utf-8") as f:
             content = f.read()
         # 预填项
@@ -95,15 +92,13 @@ class TestGenerateBundle:
         path = os.path.join(tmp_dir, "passport.json")
         pm_obj = PassportManager(path)
         # track 默认为 None
-        os.chdir(tmp_dir)
         with pytest.raises(ValueError, match="full_paper"):
-            generate_handoff_bundle(pm_obj)
+            generate_handoff_bundle(pm_obj, project_root=tmp_dir)
 
     def test_bundle_requires_final_report_artifact(self, tmp_dir):
         """没有 final_report 产物时抛出 FileNotFoundError"""
         path = os.path.join(tmp_dir, "passport.json")
         pm_obj = PassportManager(path)
         pm_obj.set_track("full_paper")
-        os.chdir(tmp_dir)
         with pytest.raises(FileNotFoundError, match="final_report"):
-            generate_handoff_bundle(pm_obj)
+            generate_handoff_bundle(pm_obj, project_root=tmp_dir)

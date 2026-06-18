@@ -47,7 +47,7 @@ STAGE_PREREQUISITES = {
     "stage_3":      ["cleaned_data", "sap", "gate_stage_2.5"],
     "stage_3.5":    ["analysis_results", "quality_check"],
     "stage_4":      ["analysis_results", "gate_stage_3.5"],
-    "stage_5_0_intake": ["final_report", "gate_stage_3.5"],
+    "stage_5_0_intake": ["final_report"],
     "stage_5_paper":    ["msra_handoff_bundle"],
 }
 

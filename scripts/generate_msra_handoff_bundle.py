@@ -148,6 +148,7 @@ def generate_handoff_bundle(
     pm: PassportManager,
     sap_path: str = None,
     output_dir: str = None,
+    project_root: str = None,
 ) -> str:
     """
     生成 MSRA Handoff Bundle 文件。
@@ -156,6 +157,7 @@ def generate_handoff_bundle(
         pm: 已初始化的 PassportManager（track 必须为 full_paper）
         sap_path: SAP 文件路径（相对于项目根目录，默认 MSRA/SAP.md）
         output_dir: 输出目录（默认 MSRA/）
+        project_root: 项目根目录（默认自动检测；测试时传入 tmp_dir）
 
     Returns:
         生成的 bundle 文件绝对路径
@@ -173,7 +175,8 @@ def generate_handoff_bundle(
         )
 
     # 获取路径
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if project_root is None:
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if sap_path is None:
         sap_path = os.path.join(project_root, "MSRA", "SAP.md")
     if output_dir is None:

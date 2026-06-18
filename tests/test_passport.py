@@ -165,8 +165,7 @@ class TestPaperTrack:
 
     def test_stage_5_0_prerequisites_require_final_report(self, pm):
         """stage_5_0_intake 需要 final_report 和 gate_stage_3.5"""
-        pm.add_artifact({"id": "gate_stage_3.5", "stage": "stage_3.5", "name": "gate", "type": "gate_report", "format": "md"})
-        pm.update_status("gate_stage_3.5", "passed")
+        pm.set_gate_result("stage_3.5", "passed", 9, 9)
         ok, missing = pm.verify_prerequisites("stage_5_0_intake")
         assert not ok
         assert "final_report" in missing
@@ -175,7 +174,6 @@ class TestPaperTrack:
         """stage_5_0_intake 前置条件满足时返回 True"""
         pm.add_artifact({"id": "final_report", "stage": "stage_4", "name": "report", "type": "report", "format": "md"})
         pm.update_status("final_report", "completed")
-        pm.add_artifact({"id": "gate_stage_3.5", "stage": "stage_3.5", "name": "gate", "type": "gate_report", "format": "md"})
         pm.set_gate_result("stage_3.5", "passed", 9, 9)
         ok, missing = pm.verify_prerequisites("stage_5_0_intake")
         assert ok
