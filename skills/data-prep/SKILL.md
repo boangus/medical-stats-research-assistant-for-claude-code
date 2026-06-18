@@ -35,6 +35,12 @@ works_with: [pipeline, analysis-plan]
 Phase 1: 数据验证 (自动) → 输入:原始数据 → 输出:验证报告
   │ [ADAPTIVE] 仅严重问题时暂停
   ▼
+Phase 0: 数据画像 (Quick Profile) → 输入:原始数据 → 输出:data_profile.md
+  │ [SLIM] 展示数据概览后自动继续 (极端情况升级MANDATORY)
+  ▼
+Phase 1: 数据验证 (自动执行) → 输入:原始数据 → 输出:验证报告
+  │ [ADAPTIVE] 仅Critical或≥3 Warning时暂停
+  ▼
 Phase 2: 清洗策略讨论 (交互式) → 输入:验证报告 → 输出:清洗方案
   │ 🔴 [MANDATORY] 必须确认,否则🛑STOP
   ▼
@@ -56,6 +62,51 @@ Phase 6: 数据库锁定 → 输入:审核记录 → 输出:锁定记录
 Phase 7: 数据质量门闸 (阻断式) → 输入:9项前置产物 → 输出:门闸报告
          (由Pipeline Stage 1.5触发, 🔴 MANDATORY-M1)
 ```
+
+### Phase 0: 数据画像（Quick Profile）🆕
+
+> 目的：在正式数据验证之前，快速生成一页式数据概览，让用户对数据全貌有直观认知。
+
+**输入**：原始数据文件路径
+
+**输出**：`data_profile.md`（Markdown 格式数据画像报告）
+
+**执行内容**（使用 `shared/templates/data_profile_template.py`）：
+
+1. **数据规模**：行数 × 列数、内存占用（MB）
+2. **变量类型分布**：连续 / 分类 / 日期 / 文本 各多少个（饼图式文字描述）
+3. **缺失率排名**：Top 10 高缺失变量（变量名、缺失数、缺失率%）
+4. **数值变量概要**：各数值变量的 min / max / mean / median / sd（表格）
+5. **分类变量概要**：各分类变量的层级数、最大层级名称及频次（表格）
+6. **时间跨度**：如有日期列，展示最早/最晚日期及跨度天数
+
+**Checkpoint**：
+- 正常情况：[SLIM] 展示画像后自动继续，不阻断流程
+- 极端情况（升级为 MANDATORY）：
+  - 任何变量缺失率 > 50%
+  - 变量数 < 3（可能数据读取错误）
+  - 样本量 < 10
+
+**产物记录**：`data_profile` 记入 passport artifacts（可选产物，非 stage prerequisite，不阻断后续流程）
+
+---
+
+### Phase 0.5: 多数据集模式检测 🆕
+
+> 目的：自动检测输入是否为多数据集（多中心研究），并进入相应模式。
+
+**检测逻辑**：
+- 输入为**目录**（含多个 CSV 文件）→ 自动进入 multi-dataset 模式
+- 输入为**单个文件** → 正常单数据集模式
+
+**Multi-dataset 模式激活后**：
+1. 逐文件执行 Phase 0（数据画像）和 Phase 1（数据验证）
+2. 激活 Phase 1b（跨中心一致性检查）
+3. 后续流程按多中心分支执行
+
+**产物记录**：`multi_dataset_mode` 记入 passport metadata
+
+---
 
 ### Phase 1: 数据验证（自动执行）
 
@@ -229,6 +280,31 @@ CDISC/SDTM 合规报告
 | 数据无法读取 | 检查文件路径和格式 | 提示用户确认文件类型（CSV/Excel/其他） |
 
 > [ADAPTIVE] 数据验证完成后：展示验证报告摘要（Critical/Warning/Info 分级）给用户。**仅在出现 Critical 问题或 ≥3 个 Warning 时**暂停讨论处理策略；无严重问题时自动进入清洗阶段，仅记录验证摘要。
+
+### Phase 1b: 跨中心一致性检查 🆕（仅 multi-dataset 模式）
+
+> 目的：在多中心研究中，检查各中心数据的一致性，确保汇总分析的可行性。
+> 使用：`shared/templates/multicenter_template.py` 的 `MultiCenterAnalyzer`
+
+**检查内容**（使用 `cross_site_consistency_check()`）：
+
+| 检查项 | 方法 | 不一致阈值 |
+|--------|------|-----------|
+| 变量名一致性 | 比较各中心列名 | 任何差异即警告 |
+| 变量类型一致性 | 同名字段的 dtype 比较 | 任何差异即警告 |
+| 样本量汇总 | 各中心行数统计 | 最小/最大中心差异 > 5x |
+| 缺失率比较 | 各变量缺失率 | 差异 > 20% |
+| 基线特征分布 | Kruskal-Wallis 检验 | p < 0.05 |
+
+**输出**：`cross_site_consistency_report.md`
+
+**Checkpoint**：
+- [SLIM] 展示一致性报告后自动继续
+- 仅在发现严重不一致（变量名缺失、类型冲突）时升级为 ADAPTIVE
+
+**产物记录**：`cross_site_consistency` 记入 passport artifacts
+
+---
 
 ### Phase 2: 清洗策略讨论（交互式）
 

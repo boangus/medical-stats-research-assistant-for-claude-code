@@ -96,5 +96,22 @@
     "figure_format": "tiff",
     "color_scheme": "AIM_green",
     "supplement_as_separate_file": true
+  },
+  "review_profile": {
+    "review_style": "evidence_graded",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.2,
+      "methodological_rigor": 1.2,
+      "evidence_sufficiency": 1.2,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "evidence_based_reviewer",
+    "common_concerns": [
+      "Is GRADE evidence quality reported?",
+      "Are clinical implications clear?",
+      "Is the sample size justified?"
+    ],
+    "devils_advocate_focus": "grade_framework_rigor",
+    "tone": "balanced_academic"
   }
 }

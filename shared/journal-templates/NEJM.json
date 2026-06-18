@@ -85,6 +85,23 @@
     "figure_format": "tiff",
     "color_scheme": "NEJM_blue",
     "supplement_as_separate_file": true
+  },
+  "review_profile": {
+    "review_style": "concise_clinical",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.5,
+      "methodological_rigor": 1.0,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "pragmatic_clinician",
+    "common_concerns": [
+      "Is the effect size clinically meaningful?",
+      "Are the confidence intervals narrow enough for practice guidance?",
+      "Is the supplementary material well-organized?"
+    ],
+    "devils_advocate_focus": "clinical_generalizability",
+    "tone": "direct_efficient"
   }
 }
 

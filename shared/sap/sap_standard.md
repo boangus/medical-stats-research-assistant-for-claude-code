@@ -171,6 +171,19 @@ study_type: "RCT"  # RCT / observational / diagnostic
 | comorbidity_score | 连续 | Charlson指数计算 | - | 标准计算 | 归入0分 |
 ```
 
+### 2.6b 变量依赖图 (Section 7.7) 🆕
+
+```markdown
+## 7.7 变量依赖图
+
+> Phase 6.5 自动生成变量依赖 DAG，附在 SAP 文档末尾。
+
+- 节点类型：原始变量（圆形）vs 衍生变量（方形）
+- 边：构造依赖关系（箭头从源变量指向目标变量）
+- 输出格式：graphviz PNG（首选）或 ASCII 文本图（降级）
+- 生成脚本：`shared/templates/variable_dag_template.py`
+```
+
 ### 2.7 分析规范表 (Section 8) ⭐ 关键
 
 ```markdown
@@ -324,6 +337,143 @@ deviations:
 ```
 
 ---
+
+## 8.5 中心效应处理策略 🆕（仅 multi-dataset 模式）
+
+> 触发条件：passport 中 multi_dataset_mode artifact 存在且状态为 completed
+> 参考：shared/statistics-methods/chapters/ch34-treatment-effects-in-multicenter-rcts.md
+
+### 8.5.1 汇总层面 Estimands 定义
+- Overall estimand：跨中心汇总效应量
+- Per-site estimand：各中心内效应量（如需）
+
+### 8.5.2 中心效应处理策略（三选一，需在 SAP 中预声明）
+| 策略 | 适用条件 | 模型 | 输出 |
+|------|---------|------|------|
+| 固定效应 | 中心间同质（I²<25%） | 中心作为协变量的回归模型 | 汇总效应量 + 中心调整效应 |
+| 随机效应 | 中心间异质（I² 25-75%） | 混合效应模型（中心随机截距） | 汇总效应量 + 中心间方差 |
+| 两步法 meta | 中心间方法差异大 | 逐中心分析 + meta 汇总 | 汇总效应量 + I²/τ²/Q |
+
+### 8.5.3 异质性评估
+- I² 统计量：<25%低异质，25-75%中异质，>75%高异质
+- τ² 统计量：研究间方差
+- Cochran's Q 检验：p<0.10 提示显著异质
+
+### 8.5.4 敏感性分析
+- leave-one-out：逐一排除各中心，评估结论稳健性
+- 结果不一致（I²>75%）时，必须报告各中心单独效应量
+
+## 9. SAP 修正协议 🆕
+
+### 9.1 修正触发条件
+
+在 Stage 3 执行过程中，当 Phase 7 独立验证发现 SAP 预设方法与数据特征不一致时，可触发 SAP 修正。
+
+| 触发条件 | 检测方式 | 示例 |
+|---------|---------|------|
+| 正态性不满足 | Shapiro-Wilk p < 0.05 | SAP 预设参数方法，但数据非正态 |
+| 多重共线性 | VIF > 10 | SAP 预设包含全部协变量，但存在高共线性 |
+| 样本量不足 | 实际 < SAP 预设的 70% | Phase 0 警告升级 |
+| 完全分离 | Logistic 收敛警告 | Firth 校正仍失败 |
+
+### 9.2 修正分类
+
+| 类别 | 说明 | 审批级别 | 记录方式 |
+|------|------|---------|---------|
+| A-Method Swap | 方法替换（参数→非参数） | MANDATORY checkpoint | SAP amendment log + audit log |
+| B-Covariate Adjust | 协变量增删 | SLIM checkpoint | SAP amendment log |
+| C-Cutpoint Revise | 切点修改 | MANDATORY checkpoint（仅非预设切点） | SAP amendment log + 标注"事后分析" |
+| D-Sample Restriction | 人群重新定义 | MANDATORY checkpoint | SAP amendment log + 标注"事后分析" |
+
+### 9.3 修正记录格式
+
+```json
+{
+  "amendment_id": "AMD-001",
+  "original_spec": "ANCOVA with 5 covariates",
+  "amended_spec": "Kruskal-Wallis (non-parametric)",
+  "trigger": "Shapiro-Wilk p < 0.01, Box-Cox failed",
+  "justification": "正态性严重违反且转换无效",
+  "user_approval": true,
+  "timestamp": "2026-06-18T10:30:00Z",
+  "post_hoc_flag": true
+}
+```
+
+### 9.4 防护措施
+
+为防止 SAP 修正被滥用为"数据驱动假设"（data-driven hypothesis），Stage 3 设置以下硬性防护：
+
+- **硬性上限**：整个 Stage 3 最多 3 次 Amendment（`SAP_AMENDMENT_MAX=3`，已在 `shared/passport/passport.py` 中定义为模块级常量）。该上限覆盖所有类别（A/B/C/D）的修正总和，不按类别分别计数。
+- **D 类修正双 checkpoint**：D-Sample Restriction（人群重定义）由于可能引入选择偏倚，需要 2 次 MANDATORY checkpoint：
+  - 第一次：确认修正必要性（即原始人群分析确实无法继续，而非"结果不理想"）
+  - 第二次：确认修正方案（即新人群定义的合理性、剔除标准的预先声明性）
+- **Amendment 计数器**：`passport.py` 的 `add_sap_amendment()` 方法自动计数，每次记录时调用 `get_sap_amendment_count()` 检查当前次数；超限抛出 `PassportError`，错误消息明确提示"如需继续修正，请退回 Stage 2 重新制定 SAP"。
+- **报告标注**：所有修正后的分析在最终报告中标注为 "post-hoc analysis" 或 "amended from original SAP"，并在结果表的脚注中引用对应的 `amendment_id`。
+- **不可回退**：一旦某次 Amendment 被记录并通过 checkpoint，不可撤销或修改；如需变更，必须作为新的 Amendment 记录（计入上限）。
+
+### 9.5 审计日志格式
+
+所有 SAP 修正必须在审计日志中完整记录以下字段，并标记为 `post_hoc_amendment`：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `amendment_id` | string | 唯一标识符，格式 `AMD-NNN`（如 `AMD-001`） |
+| `original_spec` | string | SAP 原始规范（方法、协变量、切点等） |
+| `amended_spec` | string | 修正后的规范 |
+| `trigger` | string | 触发条件（如 "Shapiro-Wilk p<0.01"） |
+| `justification` | string | 修正理由（必须基于数据特征，不可基于结果方向） |
+| `user_approval` | bool | 用户审批状态（MANDATORY checkpoint 必须为 `true`） |
+| `timestamp` | ISO 8601 | 修正记录时间（UTC） |
+| `post_hoc_flag` | bool | 固定为 `true`，标记为事后分析 |
+
+**审计日志写入规则**：
+- 所有修正必须在审计日志中标记为 `post_hoc_amendment`
+- 审计日志在 Phase 10 质检报告中完整呈现，不可省略
+- 若 Stage 3 结束时审计日志为空（无修正），需在 Phase 10 报告中显式声明 "No SAP amendment during Stage 3"
+
+### 9.6 修正流程示例
+
+以下给出一个完整的 A-Method Swap 修正示例，展示从触发到记录的全流程：
+
+**场景**：SAP 预设使用 ANCOVA（参数方法）比较两组主要结局，但 Phase 7 独立验证发现正态性假设不满足。
+
+**Step 1 — 触发检测（Phase 7）**：
+- 独立验证脚本对残差执行 Shapiro-Wilk 检验，得到 p=0.003（<0.05）
+- `SAPConsistencyCheck.check_normality()` 返回 `consistency: false`
+- `_classify_amendment_trigger()` 将其分类为 `A-Method Swap`
+
+**Step 2 — 方案制定**：
+- 原方案：ANCOVA（参数方法，含 3 个协变量）
+- 修正方案：Wilcoxon rank-sum（非参数方法，不依赖正态性假设）
+- 备选考虑：Box-Cox 转换已尝试但未改善正态性，故排除转换路径
+
+**Step 3 — MANDATORY checkpoint 审批**：
+- 系统暂停执行，向用户呈现：触发证据、原方案、修正方案、对结论稳健性的预期影响
+- 用户确认后 `user_approval: true`，方可继续
+
+**Step 4 — 记录写入**：
+
+```json
+{
+  "amendment_id": "AMD-001",
+  "original_spec": "ANCOVA with 3 covariates (age, baseline_score, site)",
+  "amended_spec": "Wilcoxon rank-sum test (non-parametric)",
+  "trigger": "Shapiro-Wilk p=0.003 on ANCOVA residuals",
+  "justification": "正态性严重违反，Box-Cox 转换无效，非参数方法为预设 SAP 的合规替代",
+  "user_approval": true,
+  "timestamp": "2026-06-18T10:30:00Z",
+  "post_hoc_flag": true
+}
+```
+
+**Step 5 — 双重记录**：
+- `amendment_log`：通过 `passport_manager.add_sap_amendment("AMD-001", amendment_data)` 写入 Material Passport，计数器自动递增
+- `audit log`：写入 Phase 10 质检报告的审计日志章节，标记为 `post_hoc_amendment`
+
+**Step 6 — 报告标注**：
+- 最终结果表中该分析脚注标注："Amended from original SAP (AMD-001): ANCOVA → Wilcoxon rank-sum due to normality violation"
+- 讨论章节单独段落说明修正原因及对结论稳健性的影响
 
 ## 6. 工具脚本
 

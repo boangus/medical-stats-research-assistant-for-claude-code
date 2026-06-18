@@ -212,10 +212,14 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 - **研究类型分支**:
   - RCT → 启用盲态审核、随机化检查
   - 观察性 → 启用混杂偏倚评估、数据源描述
-- **输入**: 原始数据文件路径
+- **输入**: 原始数据文件路径（单文件或多文件目录）
 - **输出**: 清洗后数据 + 清洗日志 + EDA报告(数据质量) + 验证报告 + 盲态审核记录 + 数据库锁定记录
+- **🆕 多数据集模式**: 输入为目录（含多个 CSV）时自动进入 multi-dataset 模式，逐文件验证 + 跨中心一致性检查（Phase 1b）
 - **子步骤**:
+  0. **数据画像**（Quick Profile）：自动生成数据概览——变量数、样本量、变量类型分布、缺失率排名 Top10、数值变量概要（min/max/mean/median/sd）、分类变量层级数、时间跨度。[SLIM] 展示后继续（极端情况如缺失率>50%或变量数<3 时升级为 MANDATORY）。
+  0.5. **多数据集检测**（仅目录输入时）：自动检测多中心数据，激活 multi-dataset 模式
   1. 数据验证（结构、类型、缺失、逻辑、范围）
+  1b. **跨中心一致性检查**（仅 multi-dataset 模式）：变量名/类型一致性、缺失率比较、基线分布差异
   2. 交互式清洗（与用户讨论策略 → 批准 → 执行）
   3. **值规范化**（新增：检测TCM术语变体 + 数值格式变体，用户确认后执行）
   4. EDA 数据质量检查（缺失模式、异常值、分布特征——仅用于数据质量评估，不用于方法选择）
@@ -263,6 +267,9 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 ### Stage 2: ANALYSIS PLAN
 - **Skill**: `analysis-plan`
 - **Mode 匹配**:
+  - 用户说"帮我制定分析计划" / "讨论统计方法" → `guided` (交互式，逐步讨论 Estimands/方法)
+  - 用户说"快速生成SAP" / "我有方法了直接写" → `quick` (快速生成，用户事后审阅)
+  - 用户说"我想探索一下数据特征再决定" → `exploratory` (先 EDA 再制定)
 - **研究类型分支**:
   - RCT → ITT/PP/Safety 人群定义、ANCOVA 推荐、随机化验证、多重性控制
   - 观察性 → DAG 混杂结构、倾向性评分(PSM/IPTW)推荐、E-value 敏感性分析
@@ -270,10 +277,12 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 - **输入**: 清洗后数据 + EDA 数据质量报告 + 研究问题 + 研究类型
 - **输出**: 估计目标定义 + 分析方法决策 + 统计分析计划(SAP) + 分析规范表
 - **子步骤**:
-  1. 估计目标定义（ICH E9(R1) Estimands：治疗效应、伴发事件处理策略）
-  2. 方法探讨（基于研究类型和数据特征，与用户讨论方法选择）
+  1. 深度 EDA（方法选择用，与 Stage 1 EDA 区分）
+  1.5. 文献种子检索（3-5 篇核心文献，为方法选择提供实证依据）🆕
+  2. 估计目标定义 + 方法探讨（基于研究类型、数据特征和文献种子，与用户讨论方法选择）
   3. 制定 SAP（人群定义、终点、方法、敏感性分析、期中分析、多重性控制）
   4. 计划审查（适当性、有效性、完整性、可行性）
+- **🆕 多数据集模式**（仅 multi-dataset 模式）：Phase 6.7 多中心分析计划，制定中心效应处理策略
 - **Checkpoint**: 仅 [MANDATORY-M2] SAP 门闸检查。Stage 2 内部无额外确认点。
 
 ### Stage 2.5: SAP QUALITY GATE 🔴（阻断式检查）
@@ -326,7 +335,9 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
   9. 亚组分析和补充分析
   10. 假设检验（SAP中计划的所有诊断检验）
   11. 质量检查（方法正确性、假设满足、结果合理性、报告完整性）
+- **🆕 多数据集模式**（仅 multi-dataset 模式）：Phase 7.7 多中心汇总分析，含森林图 + 异质性检验 + leave-one-out
 - **Checkpoint**: 仅 [MANDATORY-ME1] 主要分析结果确认（Phase 6 完成后）。其余阶段无确认点。
+- **🆕 SAP Amendment**: Phase 7.5 支持透明的 SAP 修正流程（最多 3 次，详见 analysis-exec/SKILL.md Phase 7.5）
 
 ### Stage 3.5: RESULTS QUALITY GATE 🔴（阻断式检查）
 
@@ -358,7 +369,26 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
   - **全部通过** → ✅ 进入 Stage 4
   - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 4
   - **3+ 项未通过 或 项目 1/3/4 未通过** → ❌ **强制退回 Stage 3 修正**
-- **Checkpoint**: [MANDATORY-M3] 门闸通过后进入 Stage 4
+- **Checkpoint**: [MANDATORY-M3] 门闸通过后进入 Stage 3.7
+
+### Stage 3.7: RESULTS INTERPRETATION SESSION 🆕（交互式会话）
+
+- **Skill**: `report`（预览模式）
+- **输入**: analysis_results + quality_check
+- **执行流程**:
+  1. 系统展示分析结果摘要：
+     - 主要终点：效应量 + p值 + 95% CI
+     - 次要终点：显著性列表
+     - 安全性信号：AE/SAE 摘要
+     - 异常发现：与预期不符的结果
+  2. 用户交互：
+     - "哪些发现你认为是最重要的？" → 记录为报告核心重点
+     - "哪些结果需要进一步探索？" → 触发额外分析请求
+     - "哪些结果可能需要谨慎解读？" → 标记为报告中的注意事项
+  3. 输出：`interpretation_priorities.md`（用户确认的结果优先级）
+- **Checkpoint**: 🔴 [MANDATORY] 必须确认结果优先级后才进入 Stage 4
+- **设计原则**：不修改任何分析结果，仅调整报告的关注重点和叙述框架
+- **注意**：Stage 3.7 不允许用户修改分析结果——如需修改应退回 Stage 3
 
 ### Stage 4: REPORT
 - **Skill**: `report`
@@ -397,7 +427,7 @@ MSRA Pipeline 在 Paper Track 保持纯调度。Stage 5.1-5.9 **复用 academic-
 - **输入**: MSRA passport (track=full_paper) + final_report + SAP + Stage 3.5 门闸报告
 - **工作流**（详见 spec §5）:
   1. 产物校验（passport stage_4 == completed + final_report 存在）
-  2. 生成 MSRA Handoff Bundle（调用 `scripts/generate_msra_handoff_bundle.py` → `MSRA/msra_handoff_bundle.md`）
+  2. 生成 MSRA Handoff Bundle（调用 `scripts/generate_msra_handoff_bundle.py` → `MSRA/msra_handoff_bundle.md`）— 包含 RQ、方法摘要、表格/图表列表、核心发现、安全性发现、局限性讨论、论文级方法文本
   3. 报告规范选择（基于 study_type 推荐 CONSORT/STROBE/STARD；用户可覆盖）
   4. 期刊模板选择（`shared/journal-templates/`）
   5. 论文配置确认（预填 RQ/Discipline/Method/Existing Materials/Citation=Vancouver）

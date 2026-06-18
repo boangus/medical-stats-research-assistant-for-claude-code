@@ -26,10 +26,13 @@ works_with: [analysis-exec, analysis-plan, pipeline]
 ## 工作流程
 
 > Phase 编号保留历史序号（原 Phase 2/2.5 已移至 Paper Track Stage 5.0）。
-> 实际执行顺序: Phase 1 → 3 → 3.5 → 4 → 5 → 6(精简) → 7 → ★Checkpoint
+> 实际执行顺序: Phase 0(交互) → Phase 1 → 3 → 3.5 → 4 → 5 → 6(精简) → 7 → 8 → ★Checkpoint
 
 ```
-Phase 1: 结果解读 → 输入:分析结果+SAP → 输出:解读文档
+Phase 0: 结果解读会话 → 输入:analysis_results+quality_check → 输出:interpretation_priorities.md
+  │ 🔴 [MANDATORY] 交互式会话，确认结果优先级
+  ▼
+Phase 1: 结果解读 → 输入:分析结果+SAP+priorities → 输出:解读文档
   │ [SLIM-S4] 异常发现自动升级为 ADAPTIVE
   ▼
 Phase 3: 生成表格 → 输入:解读文档+分析结果 → 输出:Markdown表格
@@ -53,6 +56,35 @@ Phase 7: 报告组装 → 输入:JSON骨架+图表 → 输出:HTML+MD
   [A] 统计报告完成，结束 → track = report_only
   [B] 继续写论文 → Paper Track (Stage 5.0, 见 pipeline/SKILL.md §Stage 5)
 ```
+
+### Phase 0: 结果解读会话（Interactive Interpretation）🆕
+
+> 目的：在正式报告撰写前，让用户聚焦关键发现，确定报告的叙述重点。
+
+**输入**：analysis_results + quality_check
+
+**执行流程**：
+
+1. **系统展示分析结果摘要**：
+   - 主要终点：效应量 + p值 + 95% CI
+   - 次要终点：显著性列表
+   - 安全性信号：AE/SAE 摘要
+   - 异常发现：与预期不符的结果
+
+2. **用户交互**：
+   - "哪些发现你认为是最重要的？" → 记录为报告核心重点
+   - "哪些结果需要进一步探索？" → 触发额外分析请求
+   - "哪些结果可能需要谨慎解读？" → 标记为报告中的注意事项
+
+3. **输出**：`interpretation_priorities.md`（用户确认的结果优先级）
+
+**Checkpoint**：
+- 🔴 [MANDATORY] 必须确认结果优先级后才进入 Phase 1
+- 不修改任何分析结果，仅调整报告的关注重点和叙述框架
+
+**产物记录**：`interpretation_priorities` 记入 passport artifacts
+
+---
 
 ### Phase 1: 结果解读
 

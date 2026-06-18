@@ -735,6 +735,72 @@ for group in df['treatment'].unique():
 >
 > 用户确认后才能进入质量检查。
 
+### Phase 7.5: SAP 修正请求（SAP Amendment Request）🆕
+
+> 目的：当 Phase 7 假设检验发现 SAP 预设方法与数据特征不一致时，提供透明的修正流程。
+
+**触发条件**：
+
+| 条件 | 检测方式 | 示例 |
+|------|---------|------|
+| 正态性严重违反 | Shapiro-Wilk p < 0.05 但 SAP 预设参数方法 | 需切换非参数方法 |
+| 多重共线性 | VIF > 10 但 SAP 预设包含全部协变量 | 需移除高共线性变量 |
+| 样本量严重不足 | 实际样本量 < SAP 预设的 70% | 需调整分析策略 |
+
+**修正分类**：
+
+| 类别 | 说明 | 审批级别 | 记录方式 |
+|------|------|---------|---------|
+| A-Method Swap | 方法替换（参数→非参数） | MANDATORY checkpoint | SAP amendment log + audit log |
+| B-Covariate Adjust | 协变量增删 | SLIM checkpoint | SAP amendment log |
+| C-Cutpoint Revise | 切点修改 | MANDATORY checkpoint（仅非预设切点） | SAP amendment log + 标注"事后分析" |
+| D-Sample Restriction | 人群重新定义 | MANDATORY checkpoint | SAP amendment log + 标注"事后分析" |
+
+**修正记录格式**：
+```json
+{
+  "amendment_id": "AMD-001",
+  "original_spec": "ANCOVA with 5 covariates",
+  "amended_spec": "Kruskal-Wallis (non-parametric)",
+  "trigger": "Shapiro-Wilk p < 0.01, Box-Cox failed",
+  "justification": "正态性严重违反且转换无效",
+  "user_approval": true,
+  "timestamp": "2026-06-18T10:30:00Z",
+  "post_hoc_flag": true
+}
+```
+
+**防护措施**：
+- 整个 Stage 3 最多 3 次 Amendment
+- D 类修正（人群重定义）需要 2 次 MANDATORY checkpoint
+- 所有修正在审计日志中标记为 `post_hoc_amendment`
+
+### Phase 7.7: 多中心汇总分析 🆕（仅 multi-dataset 模式）
+
+> 触发条件：passport 中 multi_dataset_mode artifact 存在且 SAP 含"中心效应处理策略"章节
+
+- **目的**：执行多中心汇总分析，评估中心间效应一致性
+- **输入**：各中心分析结果 + SAP 中心效应策略
+- **执行内容**：
+  1. 中心间森林图（基线特征）：
+     - 各中心主要基线特征森林图
+     - 使用 shared/templates/forest_plot_template.py
+  2. 汇总分析（按 SAP 策略执行）：
+     - 固定效应模型：中心作为协变量的回归模型
+     - 随机效应模型：混合效应模型（中心随机截距）
+     - 两步法 meta-analysis：逐中心效应量 + meta 汇总
+  3. 异质性检验：
+     - I²、τ²、Cochran's Q
+     - 使用 shared/templates/multicenter_template.py 的 heterogeneity_report()
+  4. leave-one-out 敏感性分析：
+     - 逐一排除各中心，重新汇总
+     - 使用 shared/templates/multicenter_template.py 的 leave_one_out()
+- **输出**：multicenter_analysis_report.md + forest_plots/*.png
+- **Checkpoint**: [SLIM] 展示汇总结果后继续
+- **Anti-pattern**: 不得忽略高异质性（I²>75%）直接报告汇总效应量
+
+---
+
 ### Phase 8: 质量检查
 
 > 参考：shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单；shared/reproducibility/reproducibility_check.py — 复现验证脚本

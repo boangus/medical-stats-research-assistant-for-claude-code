@@ -89,6 +89,23 @@
     "figure_format": "tiff",
     "color_scheme": "JAMA_default",
     "supplement_as_separate_file": true
+  },
+  "review_profile": {
+    "review_style": "rigorous_methods",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.0,
+      "methodological_rigor": 1.5,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "statistician_editor",
+    "common_concerns": [
+      "Are statistical methods described in sufficient detail?",
+      "Is the eTable supplement comprehensive?",
+      "Are sensitivity analyses adequate?"
+    ],
+    "devils_advocate_focus": "methodological_shortcuts",
+    "tone": "thorough_systematic"
   }
 }
 

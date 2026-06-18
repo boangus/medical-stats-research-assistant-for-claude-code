@@ -90,6 +90,23 @@
     "color_scheme": "BMJ_default",
     "supplement_as_separate_file": true,
     "code_availability_required": true
+  },
+  "review_profile": {
+    "review_style": "reproducibility_focused",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.0,
+      "methodological_rigor": 1.2,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "open_science_advocate",
+    "common_concerns": [
+      "Is the statistical code available?",
+      "Are data sharing statements complete?",
+      "Is the E-value reported?"
+    ],
+    "devils_advocate_focus": "code_data_transparency",
+    "tone": "transparent_rigorous"
   }
 }
 

@@ -98,6 +98,274 @@ def _extract_methods_summary(sap_path: str, final_report_path: str) -> str:
     return "[待填写: 未能从 SAP 或报告自动提取方法学描述]"
 
 
+def _extract_key_findings(final_report_path: str) -> str:
+    """从 final_report 中提取核心发现（用于 Introduction/Discussion）"""
+    if not os.path.exists(final_report_path):
+        return "[待填写: final_report 不存在]"
+    with open(final_report_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    findings = []
+    # 提取显著性结果：p < 0.05 的行
+    for line in content.split("\n"):
+        if re.search(r"p\s*[<≤]\s*0\.05", line, re.IGNORECASE) and len(line.strip()) > 15:
+            findings.append(line.strip().strip("- *").strip())
+    # 提取效应量相关行
+    for line in content.split("\n"):
+        if re.search(r"(?:Cohen|效应量|effect size|OR|HR|RR|d\s*=\s*\d)", line, re.IGNORECASE):
+            cleaned = line.strip().strip("- *").strip()
+            if cleaned and cleaned not in findings:
+                findings.append(cleaned)
+
+    if findings:
+        # 去重并取前 8 条
+        seen = set()
+        unique = []
+        for f in findings:
+            key = f[:60]
+            if key not in seen:
+                seen.add(key)
+                unique.append(f)
+        return "\n".join(f"- {f}" for f in unique[:8])
+    return "[待填写: 未能自动提取核心发现]"
+
+
+def _extract_safety_findings(final_report_path: str) -> str:
+    """从 final_report 中提取安全性分析结果"""
+    if not os.path.exists(final_report_path):
+        return "[无安全性数据]"
+    with open(final_report_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # 查找安全性相关段落
+    for pattern in [
+        r"## (?:安全性|Safety|Adverse Events)\s*\n(.+?)(?:\n##|\Z)",
+        r"### (?:安全性|Safety)\s*\n(.+?)(?:\n###|\Z)",
+    ]:
+        m = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
+        if m:
+            text = m.group(1).strip()[:800]
+            if len(text) > 20:
+                return text
+    return "[无安全性数据]"
+
+
+def _extract_limitations(final_report_path: str) -> str:
+    """从 final_report 中提取局限性讨论"""
+    if not os.path.exists(final_report_path):
+        return "[待填写: final_report 不存在]"
+    with open(final_report_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    for pattern in [
+        r"## (?:局限性|Limitations?)\s*\n(.+?)(?:\n##|\Z)",
+        r"### (?:局限性|Limitations?)\s*\n(.+?)(?:\n###|\Z)",
+        r"(?:局限性|Limitations?)[：:\s]*\n?(.+?)(?:\n\n|\Z)",
+    ]:
+        m = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
+        if m:
+            text = m.group(1).strip()[:800]
+            if len(text) > 20:
+                return text
+    return "[待填写: 未能自动提取局限性讨论]"
+
+
+def _extract_methods_for_paper(sap_path: str, final_report_path: str) -> str:
+    """提取论文 Methods 段落可直接引用的结构化文本"""
+    methods_blocks = []
+
+    # 从 SAP 提取（更权威）
+    if os.path.exists(sap_path):
+        with open(sap_path, "r", encoding="utf-8") as f:
+            sap_content = f.read()
+        # 提取统计方法
+        for pattern in [
+            r"## (?:统计方法|Statistical Methods)\s*\n(.+?)(?:\n##|\Z)",
+            r"### (?:主分析|Primary Analysis)\s*\n(.+?)(?:\n###|\Z)",
+        ]:
+            m = re.search(pattern, sap_content, re.DOTALL | re.IGNORECASE)
+            if m:
+                methods_blocks.append(f"**主分析方法**:\n{m.group(1).strip()[:600]}")
+                break
+        # 提取样本量
+        for pattern in [
+            r"(?:样本量|Sample Size)[：:\s]*\n?(.+?)(?:\n\n|\n#|\Z)",
+        ]:
+            m = re.search(pattern, sap_content, re.DOTALL | re.IGNORECASE)
+            if m:
+                methods_blocks.append(f"**样本量计算**:\n{m.group(1).strip()[:300]}")
+                break
+
+    # 从 final_report 补充敏感性分析
+    if os.path.exists(final_report_path):
+        with open(final_report_path, "r", encoding="utf-8") as f:
+            report_content = f.read()
+        for pattern in [
+            r"## (?:敏感性|Sensitivity Analysis)\s*\n(.+?)(?:\n##|\Z)",
+            r"### (?:敏感性|Sensitivity)\s*\n(.+?)(?:\n###|\Z)",
+        ]:
+            m = re.search(pattern, report_content, re.DOTALL | re.IGNORECASE)
+            if m:
+                methods_blocks.append(f"**敏感性分析**:\n{m.group(1).strip()[:400]}")
+                break
+
+    if methods_blocks:
+        return "\n\n".join(methods_blocks)
+    return "[待填写: 未能提取论文 Methods 文本]"
+
+
+def _extract_rq_consistency(sap_path: str, final_report_path: str) -> str:
+    """比较 SAP 与 final_report 中的研究问题（RQ）一致性
+
+    用于论文 Introduction 的 RQ 与 SAP 的 RQ 一致性校验。
+    输出一致性报告（一致/不一致+差异说明）。
+    """
+    # 从 SAP 提取 RQ（复用已有函数）
+    sap_rq = _extract_rq_from_sap(sap_path)
+
+    # 从 final_report 提取 RQ
+    report_rq = "[待填写: final_report 不存在]"
+    if os.path.exists(final_report_path):
+        with open(final_report_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        for pattern in [
+            r"(?:研究问题|研究目的|Research Question|Objectives?)[：:\s]*\n?(.+?)(?:\n\n|\n#|\Z)",
+            r"## (?:研究问题|Research Question|研究目的|Objectives?)\s*\n(.+?)(?:\n##|\Z)",
+        ]:
+            m = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
+            if m:
+                rq = m.group(1).strip()
+                if rq and len(rq) > 10:
+                    report_rq = rq[:500]
+                    break
+        else:
+            report_rq = "[待填写: 未能从 final_report 自动提取研究问题]"
+
+    # 归一化文本以便比较：去除空白与标点，统一小写
+    def _normalize(text: str) -> str:
+        return re.sub(
+            r"[\s\u3000.,;:!?，。；：！？、\"'“”‘’()（）\[\]【】]+",
+            "",
+            text,
+        ).lower()
+
+    sap_norm = _normalize(sap_rq)
+    report_norm = _normalize(report_rq)
+
+    # 判断一致性
+    if sap_norm and report_norm and "[待填写" not in sap_rq and "[待填写" not in report_rq:
+        if sap_norm == report_norm:
+            status = "✅ 一致"
+            diff_note = "SAP 与 final_report 中的研究问题完全一致。"
+        elif sap_norm in report_norm or report_norm in sap_norm:
+            status = "⚠️ 基本一致（存在表述差异）"
+            diff_note = "一方为另一方的子集，核心研究问题一致但表述详略不同。"
+        else:
+            status = "❌ 不一致"
+            diff_note = "SAP 与 final_report 中的研究问题存在实质性差异，请人工核查。"
+    else:
+        status = "⚠️ 无法自动判定"
+        diff_note = "未能从 SAP 或 final_report 中完整提取研究问题，需人工核对。"
+
+    report = (
+        f"**一致性状态**: {status}\n\n"
+        f"**SAP 中的研究问题**:\n{sap_rq}\n\n"
+        f"**final_report 中的研究问题**:\n{report_rq}\n\n"
+        f"**差异说明**:\n{diff_note}"
+    )
+    return report
+
+
+def _extract_results_to_claims_mapping(final_report_path: str) -> str:
+    """从 final_report 提取主要统计结果并生成 Claim 映射表
+
+    为每个统计结果（效应量、p值、CI）生成一个 Claim ID（如 CLAIM-001），
+    输出结果到论文 Claim 的映射表（Markdown 表格格式），
+    用于建立统计结果与论文 Claim 的双向追溯链。
+    """
+    if not os.path.exists(final_report_path):
+        return "[待填写: final_report 不存在]"
+
+    with open(final_report_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # 识别包含统计结果的行：效应量 / p值 / CI
+    result_patterns = [
+        r"(?:OR|HR|RR|IRR)\s*=?\s*\d+\.?\d*",
+        r"(?:Cohen'?s?\s*d|Hedges'?\s*g)\s*=?\s*[-+]?\d+\.?\d*",
+        r"(?:β|beta|B)\s*=?\s*[-+]?\d+\.?\d*",
+        r"p\s*[<≤>=]\s*0\.\d+",
+        r"(?:95%?\s*CI|confidence interval)\s*[:\(]?\s*\d+\.?\d*\s*[-–,]\s*\d+\.?\d*",
+        r"(?:MD|mean diff|差值)\s*=?\s*[-+]?\d+\.?\d*",
+    ]
+
+    # 提取关键统计量的正则（用于表格展示）
+    key_stat_regex = re.compile(
+        r"((?:OR|HR|RR|IRR|Cohen'?s?\s*d|Hedges'?\s*g|MD|β|beta|B)\s*=?\s*[-+]?\d+\.?\d*"
+        r"|p\s*[<≤>=]\s*0\.\d+"
+        r"|(?:95%?\s*CI|confidence interval)\s*[:\(]?\s*\d+\.?\d*\s*[-–,]\s*\d+\.?\d*)",
+        re.IGNORECASE,
+    )
+
+    claims = []
+    claim_counter = 0
+    seen = set()
+
+    for line in content.split("\n"):
+        line_stripped = line.strip()
+        if len(line_stripped) < 10:
+            continue
+        for pattern in result_patterns:
+            if re.search(pattern, line_stripped, re.IGNORECASE):
+                # 基于前60字符去重
+                key = line_stripped[:60]
+                if key not in seen:
+                    seen.add(key)
+                    claim_counter += 1
+                    claim_id = f"CLAIM-{claim_counter:03d}"
+                    stat_match = key_stat_regex.search(line_stripped)
+                    key_stat = stat_match.group(1).strip() if stat_match else "-"
+                    claims.append(
+                        {
+                            "id": claim_id,
+                            "result_text": line_stripped[:200],
+                            "key_statistic": key_stat,
+                        }
+                    )
+                break  # 一行只生成一个 claim
+
+    if not claims:
+        return "[待填写: 未能从 final_report 自动提取统计结果]"
+
+    # 生成 Markdown 表格
+    header = "| Claim ID | 关键统计量 | 结果描述（来源行） | 论文对应章节建议 |\n"
+    separator = "|----------|-----------|-------------------|------------------|\n"
+    rows = ""
+    for c in claims:
+        stat = c["key_statistic"].lower()
+        if stat.startswith("p") or "ci" in stat:
+            section = "Results"
+        elif any(k in stat for k in ["or", "hr", "rr", "β", "beta", "d"]):
+            section = "Results / Abstract"
+        else:
+            section = "Results"
+        # 转义管道符避免破坏表格
+        result_text = c["result_text"].replace("|", "\\|")
+        rows += f"| {c['id']} | {c['key_statistic']} | {result_text} | {section} |\n"
+
+    mapping_table = header + separator + rows
+
+    report = (
+        f"共识别 {len(claims)} 个可追溯的统计结果 Claim。\n\n"
+        f"{mapping_table}\n"
+        f"**使用说明**:\n"
+        f"- 每个 CLAIM-NNN 对应 final_report 中的一条统计结果\n"
+        f"- 论文写作时，在 Results 段落引用对应 Claim ID 以建立双向追溯链\n"
+        f"- 论文定稿后，可通过 Claim ID 反查 final_report 中的原始统计输出\n"
+    )
+    return report
+
+
 def _extract_study_type(pm: PassportManager) -> str:
     """从 passport 推导研究类型"""
     study_type = pm.data.get("study_type")
@@ -201,6 +469,16 @@ def generate_handoff_bundle(
     tables = _find_tables(msra_dir)
     figures = _find_figures(msra_dir)
 
+    # 论文素材提取（Optimization #4: Enhanced Handoff）
+    key_findings = _extract_key_findings(final_report_path)
+    safety_findings = _extract_safety_findings(final_report_path)
+    limitations = _extract_limitations(final_report_path)
+    methods_for_paper = _extract_methods_for_paper(sap_path, final_report_path)
+
+    # Sprint D: MSRA-ARS 融合点强化（RQ 一致性 + 结果到 Claim 映射）
+    rq_consistency = _extract_rq_consistency(sap_path, final_report_path)
+    results_to_claims_mapping = _extract_results_to_claims_mapping(final_report_path)
+
     # 门闸报告路径
     gate_artifact = pm.get_artifact("gate_stage_3.5")
     gate_path = gate_artifact.get("path", "MSRA/reports/gate_stage_3_5.md") if gate_artifact else "[门闸报告未找到]"
@@ -232,6 +510,24 @@ def generate_handoff_bundle(
 
 ## Methods Summary
 {methods}
+
+## Key Findings (for Introduction/Discussion)
+{key_findings}
+
+## Safety Findings (for Discussion)
+{safety_findings}
+
+## Limitations (for Discussion)
+{limitations}
+
+## Methods (Paper-Ready Format)
+{methods_for_paper}
+
+## RQ Consistency Check (SAP vs Report)
+{rq_consistency}
+
+## Results to Claims Mapping (for Paper Traceability)
+{results_to_claims_mapping}
 
 ## Quality Gate Report
 [{gate_path}]

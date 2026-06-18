@@ -97,5 +97,22 @@
     "color_scheme": "CJE_blue",
     "supplement_as_separate_file": true,
     "language": "Chinese"
+  },
+  "review_profile": {
+    "review_style": "causal_rigorous",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.0,
+      "methodological_rigor": 1.5,
+      "evidence_sufficiency": 1.2,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "epidemiology_purist",
+    "common_concerns": [
+      "Is confounding adequately controlled?",
+      "Is the dose-response relationship analyzed?",
+      "Are causal assumptions stated?"
+    ],
+    "devils_advocate_focus": "confounding_residual",
+    "tone": "rigorous_methodological"
   }
 }

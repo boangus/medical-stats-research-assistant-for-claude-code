@@ -291,7 +291,8 @@ class SAPConsistencyCheck:
             "recommendations": []
         }
         
-        # 生成建议
+        # 生成建议 + SAP修正触发条件（Optimization #7）
+        amendment_triggers = []
         for result in self.consistency_results:
             if not result.get("consistency", True):
                 report["recommendations"].append({
@@ -301,9 +302,93 @@ class SAPConsistencyCheck:
                     "recommendation": result.get("alternative_method", ""),
                     "code": result.get("code_suggestion", "")
                 })
-        
+                # 生成 SAP 修正触发条件
+                trigger = self._classify_amendment_trigger(result)
+                if trigger:
+                    amendment_triggers.append(trigger)
+
+        report["amendment_triggers"] = amendment_triggers
         return report
-    
+
+    def _classify_amendment_trigger(self, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        将一致性检查结果分类为 SAP 修正触发条件
+
+        Returns:
+            修正触发条件字典，或 None（无需修正）
+        """
+        check_type = result.get("check_type", "")
+        if result.get("consistency", True):
+            return None
+
+        # 根据检查类型确定修正类别
+        amendment_class_map = {
+            "normality": "A-Method Swap",
+            "homogeneity": "A-Method Swap",
+            "multicollinearity": "B-Covariate Adjust",
+            "sample_size": "D-Sample Restriction",
+        }
+
+        return {
+            "trigger_type": check_type,
+            "amendment_class": amendment_class_map.get(check_type, "unknown"),
+            "original_spec": result.get("sap_method", ""),
+            "suggested_amendment": result.get("alternative_method", ""),
+            "trigger_detail": result.get("mismatch_details", ""),
+        }
+
+    def check_amendment_limit(self, passport_manager) -> Dict[str, Any]:
+        """检查 SAP Amendment 是否接近或达到硬性上限
+
+        集成 passport_manager 的计数器，在执行新修正前提供预警/阻断信号。
+        上限定义于 passport.py 的 SAP_AMENDMENT_MAX（=3）。
+
+        Args:
+            passport_manager: PassportManager 实例，需实现 get_sap_amendment_count()
+
+        Returns:
+            dict with keys:
+                - status: "ok" / "warning" / "blocked"
+                - current_count: 当前已记录的修正次数
+                - max_limit: 硬性上限（SAP_AMENDMENT_MAX）
+                - message: 人类可读的状态说明
+        """
+        # 动态导入以避免循环依赖
+        from shared.passport.passport import SAP_AMENDMENT_MAX
+
+        current_count = passport_manager.get_sap_amendment_count()
+
+        if current_count >= SAP_AMENDMENT_MAX:
+            return {
+                "status": "blocked",
+                "current_count": current_count,
+                "max_limit": SAP_AMENDMENT_MAX,
+                "message": (
+                    f"SAP Amendment 已达硬性上限 ({SAP_AMENDMENT_MAX} 次)，"
+                    f"不可再执行修正。请退回 Stage 2 重新制定 SAP。"
+                ),
+            }
+
+        if current_count >= SAP_AMENDMENT_MAX - 1:
+            return {
+                "status": "warning",
+                "current_count": current_count,
+                "max_limit": SAP_AMENDMENT_MAX,
+                "message": (
+                    f"SAP Amendment 接近上限 ({current_count}/{SAP_AMENDMENT_MAX})，"
+                    f"仅剩 {SAP_AMENDMENT_MAX - current_count} 次修正额度，请审慎使用。"
+                ),
+            }
+
+        return {
+            "status": "ok",
+            "current_count": current_count,
+            "max_limit": SAP_AMENDMENT_MAX,
+            "message": (
+                f"SAP Amendment 计数正常 ({current_count}/{SAP_AMENDMENT_MAX})。"
+            ),
+        }
+
     def _generate_nonparametric_code(self, variable: str, group_col: Optional[str]) -> str:
         """生成非参数检验代码"""
         if group_col:

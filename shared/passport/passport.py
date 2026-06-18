@@ -35,7 +35,7 @@ DEFAULT_ARTIFACT_TEMPLATE = {
 
 STAGE_ORDER = [
     "stage_1", "stage_1.5", "stage_2", "stage_2.5",
-    "stage_3", "stage_3.5", "stage_4",
+    "stage_3", "stage_3.5", "stage_3.7", "stage_4",
     "stage_5_0_intake", "stage_5_paper",
 ]
 
@@ -46,7 +46,8 @@ STAGE_PREREQUISITES = {
     "stage_2.5":    ["sap"],
     "stage_3":      ["cleaned_data", "sap", "gate_stage_2.5"],
     "stage_3.5":    ["analysis_results", "quality_check"],
-    "stage_4":      ["analysis_results", "gate_stage_3.5"],
+    "stage_3.7":    ["analysis_results", "gate_stage_3.5"],  # 🆕 Sprint A: 结果解读会话前置
+    "stage_4":      ["analysis_results", "gate_stage_3.5", "interpretation_priorities"],  # 🆕 Sprint A: 增加 interpretation_priorities
     "stage_5_0_intake": ["final_report"],
     "stage_5_paper":    ["msra_handoff_bundle"],
 }
@@ -57,6 +58,24 @@ MID_ENTRY_ARTIFACTS = {
     "stage_3":      ["cleaned_data", "sap"],
     "stage_4":      ["analysis_results"],
 }
+
+# 🆕 Sprint A: 可选产物注册（不阻断流程，仅追踪存在性）
+# 设计依据：OPTIMIZATION_PLAN.md 优化 #1/#2/#5/#7/#8
+# - data_profile: 数据画像（优化#1，可选产物，非 stage prerequisite）
+# - literature_seeds: 文献种子（优化#2，可降级跳过）
+# - interpretation_priorities: 结果解读优先级（优化#5，MANDATORY，已注册到 STAGE_PREREQUISITES）
+# - sap_amendment: SAP 修正记录（优化#7，累积追踪，最多3次）
+# - multi_dataset_mode / cross_site_consistency: 多数据集支持（优化#8）
+OPTIONAL_ARTIFACTS = {
+    "stage_1":      ["data_profile"],  # 优化#1: 数据画像（Quick Profile）
+    "stage_2":      ["literature_seeds"],  # 优化#2: 文献种子（Lit-Seeding）
+    "stage_3":      ["sap_amendment"],  # 优化#7: SAP 修正记录（累积，最多3次）
+    "stage_3.7":    ["interpretation_priorities"],  # 优化#5: 结果解读优先级
+    "stage_1.5":    ["multi_dataset_mode", "cross_site_consistency"],  # 优化#8: 多数据集模式
+}
+
+# 🆕 Sprint A: SAP Amendment 硬性上限（优化#7 防护措施）
+SAP_AMENDMENT_MAX = 3
 
 
 class PassportError(Exception):
@@ -147,6 +166,7 @@ class PassportManager:
     STAGE_GATE_MAP = {
         "stage_2": "stage_1.5",
         "stage_3": "stage_2.5",
+        "stage_3.7": "stage_3.5",  # 🆕 Sprint A: Stage 3.7 需要 stage_3.5 门闸通过
         "stage_4": "stage_3.5",
         "stage_5_0_intake": "stage_3.5",   # Paper Track needs results gate passed
     }
@@ -158,12 +178,18 @@ class PassportManager:
         1. 所有前置 artifact 状态不为 planned/error/rollback
         2. 对应 gate 的 result 不为 blocked（passed 或 conditional 均可）
         
+        注意：STAGE_PREREQUISITES 中以 "gate_" 开头的条目由 STAGE_GATE_MAP
+        专门处理，此处跳过，避免重复检查。
+        
         Returns:
             (ok: bool, missing: list[str])
         """
         required = STAGE_PREREQUISITES.get(stage, [])
         missing = []
         for art_id in required:
+            # 🆕 Sprint A: 跳过 gate 条目，由 STAGE_GATE_MAP 专门处理
+            if art_id.startswith("gate_"):
+                continue
             a = self.get_artifact(artifact_id=art_id)
             if not a or a["status"] in ("planned", "error", "rollback"):
                 missing.append(art_id)
@@ -191,6 +217,79 @@ class PassportManager:
             if not a or a["status"] in ("planned", "error", "rollback"):
                 missing.append(art_id)
         return len(missing) == 0, missing
+
+    # ── 可选产物验证（🆕 Sprint A）──
+
+    def verify_optional_artifacts(self, stage: str) -> tuple:
+        """检查某阶段的可选产物是否存在（不阻断，仅报告）
+        
+        Returns:
+            (present: list[str], absent: list[str])
+        """
+        optional = OPTIONAL_ARTIFACTS.get(stage, [])
+        present = []
+        absent = []
+        for art_id in optional:
+            a = self.get_artifact(art_id)
+            if a and a["status"] not in ("planned", "error", "rollback"):
+                present.append(art_id)
+            else:
+                absent.append(art_id)
+        return present, absent
+
+    # ── SAP Amendment 追踪（🆕 Sprint A，优化#7）──
+
+    def add_sap_amendment(self, amendment_id: str, amendment_data: dict) -> str:
+        """记录一次 SAP 修正
+        
+        防护措施（OPTIMIZATION_PLAN.md 优化#7）：
+        - 硬性上限：整个 Stage 3 最多 SAP_AMENDMENT_MAX 次
+        - 超限抛出 PassportError
+        
+        Args:
+            amendment_id: 修正记录ID（如 "amendment_001"）
+            amendment_data: 修正详情（original_spec, amended_spec, trigger, justification, user_approval）
+        
+        Returns:
+            amendment_id
+        
+        Raises:
+            PassportError: 超过 SAP_AMENDMENT_MAX 上限
+        """
+        count = self.get_sap_amendment_count()
+        if count >= SAP_AMENDMENT_MAX:
+            raise PassportError(
+                f"SAP Amendment 超过硬性上限 ({SAP_AMENDMENT_MAX} 次)，"
+                f"当前已记录 {count} 次。如需继续修正，请退回 Stage 2 重新制定 SAP。"
+            )
+
+        artifact = {
+            "id": amendment_id,
+            "stage": "stage_3",
+            "name": f"SAP Amendment #{count + 1}",
+            "type": "amendment",
+            "format": "json",
+            "status": "completed",
+            "produced_by": "analysis-exec Phase 7.5",
+            "amendment_data": amendment_data,
+        }
+        self.add_artifact(artifact)
+        return amendment_id
+
+    def get_sap_amendment_count(self) -> int:
+        """获取已记录的 SAP 修正次数"""
+        count = 0
+        for a in self.data.get("artifacts", []):
+            if a.get("type") == "amendment" and a["stage"] == "stage_3":
+                count += 1
+        return count
+
+    def get_sap_amendments(self) -> list[dict]:
+        """获取所有 SAP 修正记录"""
+        return [
+            a for a in self.data.get("artifacts", [])
+            if a.get("type") == "amendment" and a["stage"] == "stage_3"
+        ]
 
     # ── 恢复 / 回滚 ──
 

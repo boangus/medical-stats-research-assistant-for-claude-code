@@ -96,5 +96,22 @@
     "color_scheme": "CMJ_red",
     "supplement_as_separate_file": true,
     "language": "Chinese"
+  },
+  "review_profile": {
+    "review_style": "tcm_integrated",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.2,
+      "methodological_rigor": 1.0,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "integrative_medicine_expert",
+    "common_concerns": [
+      "Is TCM-Western integration justified?",
+      "Are diagnostic criteria clearly defined?",
+      "Is the treatment protocol reproducible?"
+    ],
+    "devils_advocate_focus": "western_validation_gap",
+    "tone": "bilingual_academic"
   }
 }
