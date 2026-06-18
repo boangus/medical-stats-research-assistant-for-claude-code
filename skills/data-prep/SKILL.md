@@ -10,6 +10,10 @@ data_access_level: raw
 task_type: open-ended
 depends_on: []
 works_with: [pipeline, analysis-plan]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, data-cleaning, data-validation, CDISC, PHI]
 ---
 
 # 数据准备 (Data Preparation)
@@ -26,6 +30,106 @@ works_with: [pipeline, analysis-plan]
 > - 盲法试验数据审核必须在盲态下进行
 > - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（C1 异常值自动静默修正）
 
+## 架构集成图
+
+```
+┌─────────────────────────────────────────────────────┐
+│                 Data Preparation 架构                  │
+│                                                        │
+│  输入                                                  │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐         │
+│  │ 单文件CSV  │  │ 多文件目录 │  │ Excel/其他│         │
+│  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘         │
+│        │              │              │                │
+│        ▼              ▼              ▼                │
+│  ┌─────────────────────────────────────────────┐     │
+│  │  Phase 0: 数据画像 (1页概览)                  │     │
+│  │  Phase 0.5: 多数据集模式检测                  │     │
+│  └─────────────────────┬───────────────────────┘     │
+│                        ▼                              │
+│  ┌─────────────────────────────────────────────┐     │
+│  │  Phase 1: 7项深度验证                        │     │
+│  │  ├─ 结构/类型/缺失/逻辑/范围检查              │     │
+│  │  ├─ CDISC/SDTM合规检查                       │     │
+│  │  └─ PHI隐私检测                              │     │
+│  └─────────────────────┬───────────────────────┘     │
+│                        ▼                              │
+│  ┌─────────────────────────────────────────────┐     │
+│  │  Phase 2: 交互式清洗策略讨论 (MANDATORY)      │     │
+│  │  Phase 2.5: 值规范化 (检测到变体时)           │     │
+│  │  Phase 3: 执行清洗 + 清洗日志                 │     │
+│  └─────────────────────┬───────────────────────┘     │
+│                        ▼                              │
+│  ┌─────────────────────────────────────────────┐     │
+│  │  Phase 4: EDA质量检查                         │     │
+│  │  Phase 5: 盲态审核                            │     │
+│  │  Phase 6: 数据库锁定 (MANDATORY)              │     │
+│  └─────────────────────┬───────────────────────┘     │
+│                        ▼                              │
+│  ┌─────────────────────────────────────────────┐     │
+│  │  Phase 7: 数据质量门闸 (9项阻断检查)          │     │
+│  │  → Pipeline Stage 1.5 消费                    │     │
+│  └─────────────────────────────────────────────┘     │
+└─────────────────────────────────────────────────────┘
+```
+
+**架构设计原则**:
+1. 数据验证(MANDATORY)先于清洗讨论(MANDATORY)先于执行(SLIM)
+2. 值规范化(Phase 2.5)与清洗策略(Phase 2)平行但不重叠
+3. 盲态审核在锁定前执行，锁定后数据不可修改
+4. 质量门闸为只读检查，不修改数据或脚本
+5. 所有变更必须记录日志(清洗日志+规范化日志+审核记录)
+
+## 快速开始
+
+### 1. Quick mode 快速示例
+
+```
+用户: "/msra-data data.csv --quick"
+
+执行路径（3步）:
+1. Phase 1: 仅检查Critical问题（重复ID、数据损坏、关键变量全缺失）
+2. Phase 3: 自动修复明显格式问题（日期格式统一、空白值→NA）
+3. Phase 7: 输出简化验证报告
+
+跳过: Phase 0画像、Phase 2交互讨论、Phase 2.5值规范化、Phase 4 EDA、Phase 5盲态审核
+输出: cleaned_data.csv + quick_validation_report.md
+```
+
+### 2. Standard mode 快速示例
+
+```
+用户: "/msra-data data.csv"
+
+执行路径（8步）:
+Phase 0 → 0.5 → 1 → 2 → 2.5 → 3 → 4 → 5 → 6 → 7
+完整流程，每个Phase有明确输入输出和Checkpoint
+预计交互次数: 3-5次（Phase 2清洗策略 + Phase 2.5值规范化 + Phase 6锁定确认）
+```
+
+### 执行时间估算
+
+| 模式 | 数据规模 | 预计时间 | 瓶颈 |
+|------|---------|---------|------|
+| Quick Mode | 500行×20列 | 1-3分钟 | Critical检查+格式修复 |
+| Standard Mode | 500行×20列 | 10-20分钟 | 完整验证+交互讨论+EDA |
+| Standard Mode | 5000行×50列 | 20-40分钟 | CDISC检查+PHI扫描+EDA |
+| Multi-dataset | 3中心×1000行 | 30-60分钟 | 跨中心一致性+逐中心验证 |
+| Quality-gate | - | <30秒 | 9项门闸检查 |
+
+### 常见数据准备错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| 文件编码不一致 | 读取乱码/UnicodeDecodeError | 自动检测编码(chardet)，尝试UTF-8/GBK/GB2312 |
+| 日期格式混乱 | "2025/01/01"/"2025-01-01"/"01-Jan-2025" | Phase 2.5统一为ISO 8601(2025-01-01) |
+| 数值列含文本 | "N/A"/"缺失"/"<0.05"混在数值列 | Phase 2.5检测变体→策略选择→规范化 |
+| 重复ID未检测 | 主键列有重复值 | Phase 1结构检查标记为Critical→必须处理 |
+| 缺失模式误判 | MCAR误判为MNAR | 结合Little's MCAR检验+缺失图综合判断 |
+| CDISC映射失败 | 数据无法映射到SDTM域 | 提示用户确认数据来源→自定义映射或标记"非SDTM" |
+| PHI检测遗漏 | 自由文本中包含姓名/电话 | 正则+NER双重检测→[REDACTED]替换 |
+| 清洗后引入新错误 | 逻辑一致性检查失败 | Phase 4 EDA复查→发现则退回Phase 2 |
+
 ## 工作流程
 
 ```
@@ -37,6 +141,7 @@ Phase 1: 数据验证 (自动) → 输入:原始数据 → 输出:验证报告
   ▼
 Phase 0: 数据画像 (Quick Profile) → 输入:原始数据 → 输出:data_profile.md
   │ [SLIM] 展示数据概览后自动继续 (极端情况升级MANDATORY)
+  │ 注: Phase 0 是"快速概览"（1页摘要），Phase 1 是"详细验证"（7项深度检查）
   ▼
 Phase 1: 数据验证 (自动执行) → 输入:原始数据 → 输出:验证报告
   │ [ADAPTIVE] 仅Critical或≥3 Warning时暂停
@@ -437,6 +542,98 @@ Phase 2.5 与 Phase 2 的关系：**平行但不重叠**。
 | 2 | sbp | 缺失插补 | NA | mean(SBP)=128 | 3 | MICE 插补，种子=42 | 2026-05-29T10:32 |
 
 变更类型枚举: 缺失插补 / 异常值修正 / 格式修正 / 逻辑修正 / 删除记录 / 添加记录
+```
+
+## 检查点量化标准
+
+| 检查点 | 类型 | 通过标准 | 阻断标准 | 降级策略 |
+|--------|------|---------|---------|---------|
+| Phase 0 画像 | SLIM | 数据可读取 | 文件不存在/格式错误 | 提示用户确认文件格式 |
+| Phase 1 验证 | ADAPTIVE | 0 Critical + ≤2 Warning | ≥1 Critical 或 ≥3 Warning | Critical→必须修复; Warning→用户接受风险 |
+| Phase 2 清洗策略 | MANDATORY | 用户明确确认 | 用户未确认 | 🛑STOP，不执行清洗 |
+| Phase 2.5 规范化 | ADAPTIVE | 无变体或用户确认策略 | 检测到变体未处理 | 无变体→静默跳过 |
+| Phase 4 EDA | SLIM | 无异常发现 | 发现Critical异常 | 异常→退回Phase 2 |
+| Phase 5 盲态审核 | MANDATORY-S5 | 所有质疑已解决 | 有未解决质疑 | 未解决→禁止锁定 |
+| Phase 6 锁定 | MANDATORY-M1 | 用户最终确认 | 用户未确认 | 🛑STOP，不锁定 |
+| Phase 7 门闸 | BLOCKING | 9/9通过 | ≤6/9或项5/6/7/9未通过 | 7-8/9→条件通过; ≤6→阻断退回 |
+
+> **硬阻断项**: Phase 7的项5(锁定确认)/6(逻辑一致)/7(规范化)/9(隐私合规)为硬阻断，不可条件通过
+> **修复上限**: 同一Phase退回≥3次→BLOCK→用户书面接受风险→[CONVERGED WITH DEVIATIONS]
+
+## 常见清洗代码示例
+
+```python
+# 常见清洗操作代码示例
+import pandas as pd
+import numpy as np
+
+# 1. 异常值修正（基于临床参考范围）
+df.loc[df['age'] > 120, 'age'] = np.nan  # 标记为缺失，不自动删除
+df.loc[df['age'] < 0, 'age'] = np.nan
+
+# 2. 缺失值处理（需用户确认策略）
+# 完全记录分析
+df_complete = df.dropna(subset=['primary_endpoint'])
+# 多重插补（MICE）
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+imputer = IterativeImputer(random_state=42)
+df_imputed = pd.DataFrame(imputer.fit_transform(df[numeric_cols]), columns=numeric_cols)
+
+# 3. 值规范化（Phase 2.5 输出）
+# 检测下限值处理
+df.loc[df['psa'] == '<1.5', 'psa'] = 1.5  # 阈值替代
+df['psa_below_loq'] = (df['psa_original'] == '<1.5').astype(int)  # 截断指示变量
+
+# 4. 生成清洗日志
+cleaning_log = pd.DataFrame({
+    'variable': ['age', 'psa'],
+    'change_type': ['异常值修正', '检测下限替代'],
+    'before': ['age=250', '<1.5'],
+    'after': ['NaN', '1.5'],
+    'affected_rows': [1, 2],
+    'reason': ['超出合理范围', '阈值替代策略'],
+    'timestamp': pd.Timestamp.now()
+})
+```
+
+### 缺失模式诊断代码
+
+```python
+# 缺失模式诊断（Phase 1 / Phase 4 使用）
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+def diagnose_missing_pattern(df):
+    """诊断缺失数据模式: MCAR / MAR / MNAR"""
+    missing_rate = df.isnull().mean()
+    missing_vars = missing_rate[missing_rate > 0].index.tolist()
+
+    if not missing_vars:
+        return {"pattern": "NO_MISSING", "details": "无缺失数据"}
+
+    # Little's MCAR检验
+    try:
+        from statsmodels.imputation.mice import mice
+        # 简化版: 比较缺失组vs非缺失组的分布
+        results = {}
+        for var in missing_vars:
+            for other_var in df.select_dtypes(include=[np.number]).columns:
+                if other_var == var:
+                    continue
+                missing_group = df[df[var].isnull()][other_var].dropna()
+                present_group = df[~df[var].isnull()][other_var].dropna()
+                if len(missing_group) > 5 and len(present_group) > 5:
+                    _, p_val = stats.ttest_ind(missing_group, present_group)
+                    if p_val < 0.05:
+                        results[var] = {"pattern": "MAR", "correlated_with": other_var, "p": p_val}
+                        break
+
+        pattern = "MCAR" if not results else "MAR"
+        return {"pattern": pattern, "details": results, "missing_rates": missing_rate[missing_vars].to_dict()}
+    except Exception:
+        return {"pattern": "UNKNOWN", "details": "无法执行检验，建议人工评估"}
 ```
 
 ### Phase 4: EDA 数据质量检查 🆕

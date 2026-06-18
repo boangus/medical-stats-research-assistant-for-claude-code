@@ -11,6 +11,10 @@ data_access_level: verified_only
 task_type: outcome-gradable
 depends_on: [analysis-exec]
 works_with: [pipeline]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, calibration, quality-assurance]
 ---
 
 # 度量校准 (Calibration)
@@ -25,6 +29,147 @@ works_with: [pipeline]
 > - 假阳性(FP)和假阴性(FN)同等重要，不得只报告其中一个
 > - 校准报告必须包含改进建议，不能只报数字不给方向
 > - 参考: shared/anti-patterns/medical_stats_anti_patterns.md
+
+## 校准模式选择流程图
+
+```
+用户请求校准
+    │
+    ▼
+┌─ 需要什么类型的校准？─┐
+│                        │
+├─ 对比金标准 ──────────→ standard (标准校准)
+├─ 查看校准状态 ────────→ status (状态查看)
+├─ 更新校准数据库 ──────→ update (增量更新)
+├─ Pipeline门闸检查 ────→ gate-check (门闸校验)
+├─ 复现已有分析 ────────→ replicate (复现验证)
+├─ 公平性评估 ──────────→ fairness (公平性校准)
+└─ 外部基准对比 ────────→ external-bench (外部基准)
+    │
+    ▼
+输出校准报告 → 更新校准数据库（如需）
+```
+
+## 架构集成图
+
+```
+┌─────────────────────────────────────────────────┐
+│                  Pipeline Orchestrator           │
+│                    (Stage 3.5)                    │
+│                       │                           │
+│              调用 gate-check 模式                 │
+│                       ▼                           │
+│ ┌─────────────────────────────────────────────┐  │
+│ │           Calibration Skill                  │  │
+│ │                                              │  │
+│ │  ┌──────────┐  ┌──────────┐  ┌──────────┐  │  │
+│ │  │ standard │  │ fairness │  │ external │  │  │
+│ │  │  校准    │  │  校准    │  │  基准    │  │  │
+│ │  └────┬─────┘  └────┬─────┘  └────┬─────┘  │  │
+│ │       │              │              │        │  │
+│ │       ▼              ▼              ▼        │  │
+│ │  ┌─────────────────────────────────────┐    │  │
+│ │  │        校准数据库 (SQLite)           │    │  │
+│ │  │  - 方法匹配记录                      │    │  │
+│ │  │  - 数值偏差记录                      │    │  │
+│ │  │  - 公平性指标                        │    │  │
+│ │  │  - 历史趋势                          │    │  │
+│ │  └─────────────────────────────────────┘    │  │
+│ │       │                                     │  │
+│ │       ▼                                     │  │
+│ │  ┌─────────────────────────────────────┐    │  │
+│ │  │     校准报告 (Markdown + JSON)       │    │  │
+│ │  └─────────────────────────────────────┘    │  │
+│ └──────────────────────────────────────────────┘  │
+│                       │                           │
+│              gate-check 结果                       │
+│                       ▼                           │
+│              PASS → Stage 4 继续                   │
+│              FAIL → 阻断退回 Stage 3               │
+└─────────────────────────────────────────────────┘
+```
+
+**架构设计原则**:
+1. 校准数据库为单一数据源，所有模式共享读写
+2. gate-check 模式为只读，不修改校准数据库
+3. 校准报告统一格式(Markdown+JSON)，供Pipeline和用户消费
+4. 外部基准评估独立于本地校准，结果合并到校准数据库
+
+## 快速开始
+
+### 标准校准示例（Python）
+
+```python
+# 标准校准示例
+from shared.calibration.calibration_core import CalibrationChecker
+
+checker = CalibrationChecker()
+result = checker.compare(
+    msra_output={"method": "ANCOVA", "effect": -2.3, "ci": [-2.8, -1.8], "p": "<0.001"},
+    gold_standard={"method": "ANCOVA", "effect": -2.31, "ci": [-2.82, -1.80], "p": "<0.001"}
+)
+print(result.summary())  # PASS: method match, Δ=0.01, conclusion match
+```
+
+### 快速决策树
+
+```
+需要校准？
+├── 是 → 什么类型？
+│   ├── RCT 分析 → standard（模式 1）
+│   ├── 模型评估 → fairness（模式 7）
+│   ├── 外部验证 → external-bench（模式 5）
+│   ├── 论文复现 → replicate（模式 6）
+│   └── 门闸检查 → gate-check（模式 4）
+└── 否 → 仅查看状态？→ status（模式 2）
+```
+
+### 简化执行路径（标准校准常用场景）
+
+3 步完成标准校准（替代完整 4-Phase 工作流）：
+
+1. **加载金标准**：`checker.load_gold("gold.csv")` → 自动验证字段
+2. **执行对比**：`result = checker.compare(msra_output, gold_standard)` → 四维对比
+3. **输出报告**：`print(result.summary())` → PASS/FAIL + 关键指标
+
+> 完整工作流（含数据库更新、门闸联动）见下文「模式 1: 标准校准」。
+
+### 校准指标公式
+
+| 指标 | 公式 | 用途 | 阈值 |
+|------|------|------|------|
+| Brier Score | BS = (1/N)Σ(p_i - o_i)² | 预测准确性 | <0.25为良好 |
+| ECE (期望校准误差) | ECE = Σ(|B_m|/N)×|acc(B_m)-conf(B_m)| | 校准误差 | <0.05为良好 |
+| HL统计量 | H = Σ(O_k-E_k)²/E_k | 拟合优度（10分组） | P>0.05为良好 |
+| 方法匹配率 | MMR = 正确方法数/总分析数 | 方法选择准确性 | >0.90为良好 |
+| 数值偏差 | Δ = |MSRA值-金标准值|/金标准值 | 数值准确性 | <0.05为良好 |
+| FPR | FPR = FP/(FP+TN) | 假阳性率 | <0.05为良好 |
+| FNR | FNR = FN/(FN+TP) | 假阴性率 | <0.10为良好 |
+| MSF (模型分离度) | MSF = max(|AUC_s1-AUC_s2|) | 公平性-性能差异 | <0.05为公平 |
+| ESF (误差分离度) | ESF = max(|FPR_s1-FPR_s2|) | 公平性-误差差异 | <0.10为公平 |
+
+### 执行时间估算
+
+| 模式 | 数据规模 | 预计时间 | 瓶颈 |
+|------|---------|---------|------|
+| standard | 100分析 | 2-5分钟 | 结果对比+指标计算 |
+| status | 1000条记录 | <10秒 | 数据库查询 |
+| update | 100分析 | 1-3分钟 | 数据库写入+索引更新 |
+| gate-check | 50分析 | 30秒-1分钟 | 门闸条件检查 |
+| replicate | 1个分析 | 1-5分钟 | 代码执行+结果对比 |
+| fairness | 5000样本×3亚组 | 5-15分钟 | 亚组分析+指标计算 |
+| external-bench | 4任务×20分析 | 10-30分钟 | 外部API调用+评估 |
+
+### 常见错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| 金标准数据格式不匹配 | KeyError或TypeError | 统一列名和类型后再对比，使用`CalibrationChecker.align_columns()` |
+| 校准曲线点数过少 | 曲线粗糙/不可靠 | 增加分组数（默认10→20），或使用LOESS平滑 |
+| 公平性亚组样本不均 | 小亚组指标不稳定 | 使用Bootstrap CI，标注小样本亚组(n<30) |
+| 外部基准API超时 | 请求挂起>60秒 | 设置timeout=60，超时后降级为本地验证[DEGRADED] |
+| 复现验证随机种子不一致 | 数值微小差异 | 统一random_state=42，记录种子到审计日志 |
+| 校准数据库锁冲突 | 写入失败 | 重试3次（间隔1秒），仍失败则跳过更新[DB_LOCKED] |
 
 ## 工作模式
 
@@ -64,13 +209,15 @@ works_with: [pipeline]
 
 ## 模式 1: 标准校准
 
+> **[CHECKPOINT] standard**: [SLIM] 展示校准报告，自动继续
+
 ### 工作流程
 
 ```
 Phase 1: 加载与验证
   │ 输入: 金标准 CSV 文件
   │ 验证: 必填字段完整性 + 数据类型正确性 + analysis_id 唯一性
-  │ 🔴 格式错误 → 🛑STOP 报告具体缺失字段
+  │ 🔴 [MANDATORY] 格式错误 → 🛑STOP 报告具体缺失字段
   ▼
 Phase 2: 执行对比
   │ 调用 shared/calibration/calibration_runner.py (或 .R)
@@ -79,21 +226,28 @@ Phase 2: 执行对比
   │   2. 数值偏差: gold_estimate vs msra_estimate → MAE/RMSE/MAPE
   │   3. 结论准确: gold_significant vs msra_significant → 混淆矩阵
   │   4. 代码输出: gold_output vs msra_output (如有)
-  │ 🔴 对比失败 → 🛑STOP 展示错误信息，检查数据格式
+  │ 🔴 [MANDATORY] 对比失败 → 🛑STOP 展示错误信息，检查数据格式
   ▼
 Phase 3: 生成校准报告
   │ 混淆矩阵 + TPR/TNR/FPR/FNR/PPV/NPV/F1/ACC
   │ 方法匹配率 + 不匹配详情
   │ 数值偏差 (MAE/RMSE/MAPE/PCC)
   │ 改进建议（短板领域识别）
-  │ 🔴 报告生成后 → 🛑STOP 展示摘要，等待用户确认
+  │ 🔴 [MANDATORY] 报告生成后 → 🛑STOP 展示摘要，等待用户确认
   ▼
 Phase 4: 更新校准数据库
   │ 追加到 calibration_db.json
   │ 更新累计校准指标
   │ 输出: 校准报告 + 数据库更新确认
-  │ 🔴 数据库写入失败 → 🛑STOP 展示错误，提供手动保存方案
+  │ 🔴 [MANDATORY] 数据库写入失败 → 🛑STOP 展示错误，提供手动保存方案
 ```
+
+### 检查点总览
+
+- **[SLIM] Phase 1 加载完成后**: 仅在数据格式正确时继续，错误时立即停止
+- **[MANDATORY] Phase 2 对比完成后**: 必须展示对比摘要，用户确认后才生成报告
+- **[MANDATORY] Phase 3 报告生成后**: 必须展示校准摘要，等待用户确认后才更新数据库
+- **[ADAPTIVE] 校准数据不足(<10条)时**: 升级为 MANDATORY，提示人工复核
 
 ### 金标准数据格式
 
@@ -162,6 +316,8 @@ cat(sprintf("方法匹配率: %.1f%%\n", result$method_match_rate * 100))
 
 ## 模式 2: 状态查看
 
+> **[CHECKPOINT] status**: [SLIM] 展示状态摘要，自动继续
+
 ```
 输入: /msra-calibrate --status [--method TYPE] [--last N]
 
@@ -200,6 +356,8 @@ cat(sprintf("方法匹配率: %.1f%%\n", result$method_match_rate * 100))
 
 ## 模式 3: 增量更新
 
+> **[CHECKPOINT] update**: [MANDATORY] 更新校准数据库前必须确认
+
 ```
 输入: /msra-calibrate --update correction.json
 
@@ -237,6 +395,8 @@ correction.json 格式:
 ---
 
 ## 模式 4: 门闸校验
+
+> **[CHECKPOINT] gate-check**: [BLOCKING] Pipeline 中必须通过才能继续
 
 检查当前校准指标是否满足 Pipeline 质量门闸的动态阈值：
 
@@ -357,6 +517,8 @@ anti-pattern A1 "正态性假定默认化":
 - 金标准示例: [gold_standard_example.csv](../../shared/calibration/gold_standard_example.csv)
 - 框架文档: [calibration_framework.md](../../shared/calibration/calibration_framework.md)
 - 反模式目录: [medical_stats_anti_patterns.md](../../shared/anti-patterns/medical_stats_anti_patterns.md)
+- 方法验证目录: [methods_catalog.md](../../shared/statistics-methods/methods_catalog.md) — 统计方法选择验证与映射
+- 审计追踪工具: [pipeline_auditor.py](../../shared/reproducibility/pipeline_auditor.py) — 校准全流程审计日志
 
 ---
 
@@ -469,6 +631,8 @@ anti-pattern A1 "正态性假定默认化":
 ---
 
 ## 模式 5: 外部基准评估 🆕
+
+> **[CHECKPOINT] external-bench**: [MANDATORY] 确认外部基准结果后记录
 
 > 解决 dim8 核心短板：合成金标准（gold_standard_example.csv）无法反映真实场景。
 > 借鉴 **StatLLM**（Nature SciData 2026, human-centered gold standard, 90 数据集×5 学科）、
@@ -642,6 +806,8 @@ def gate_check(calibration_db, method_type=None):
 
 ## 模式 6: 复现验证 🆕
 
+> **[CHECKPOINT] replicate**: [MANDATORY] 确认复现结果后记录
+
 > 借鉴 LLM-Assisted Replication (arXiv:2602.18453) 的"文本解读→代码生成→执行→差异分析"迭代循环。
 > 核心思路：从已发表论文中自动提取统计结果，MSRA 独立生成分析代码并执行，比对两者差异。
 > 这是一种比金标准对比更严格的验证——不仅检查结果是否一致，还检查过程是否可复现。
@@ -734,6 +900,8 @@ source 标记为 "replication_verification"。
 ---
 
 ## 模式 7: 公平性校准 🆕
+
+> **[CHECKPOINT] fairness**: [SLIM] 展示公平性报告，自动继续
 
 > 借鉴 BiasScan (arXiv 2025) 的 LLM 偏见检测方法和医疗 AI 公平性研究。
 > 医学统计分析中的偏见可能导致不公平的临床决策，影响不同人群的健康结局。
@@ -868,3 +1036,50 @@ fairness_check.conclusion_consistency(
 | 5 | 公平性指标不达标时仍输出报告 | 可能导致不公平的临床决策 | 标记为"公平性风险"，需人工审核 |
 
 > [IRON RULE] 当公平性指标 ESF < 0.80 或 CC < 0.85 时，必须标记为"公平性高风险"，强制人工审核后才能继续。
+
+---
+
+## 检查点量化标准
+
+| 模式 | 检查点类型 | 通过标准 | 阻断标准 | 升级条件 |
+|------|-----------|---------|---------|---------|
+| standard | 校准结果 | 方法匹配率≥90% + 数值偏差<5% | 方法匹配率<80% 或 数值偏差>10% | 偏差>10% → 建议退回analysis-exec |
+| status | 状态查询 | 数据库存在且有记录 | 数据库为空 | 空库 → 返回UNCALIBRATED |
+| update | 数据库更新 | 新记录写入成功 | 写入冲突/格式错误 | 冲突3次 → [DB_LOCKED] |
+| gate-check | 门闸校验 | 全部检查项PASS | 任何CRITICAL项FAIL | FAIL → 阻断Pipeline |
+| replicate | 复现验证 | 数值差异<1% + 方法一致 | 数值差异>5% 或 方法不一致 | 差异>5% → 标记[REPLICATION_FAILED] |
+| fairness | 公平性校准 | MSF<0.05 + ESF<0.10 | MSF>0.10 或 ESF>0.20 | MSF>0.10 → 标记[UNFAIR] |
+| external-bench | 外部基准 | 4任务全PASS | 任何任务FAIL | 2+任务FAIL → [BENCHMARK_FAILED] |
+
+> **升级规则**: 任何阻断标准触发时，自动升级为[MANDATORY]检查点，必须用户确认后才能继续。
+> **降级规则**: [SLIM]检查点在无异常时自动继续，仅记录摘要。
+
+## 边缘场景与异常处理
+
+> 以下场景在各模式中可能遇到，需按表中的降级策略执行，确保校准流程不中断且结果可追溯。
+
+| 场景 | 触发条件 | 降级策略 | 标记 |
+|------|---------|---------|------|
+| 公平性校准亚组样本不足 | subgroup 样本量 < 30 | 回退到聚合校准（aggregate calibration），在报告中标注亚组不可评估 | ⚠️ [SUBGROUP_INSUFFICIENT] |
+| 外部基准 API 不可用 | StatLLM/MedHELM 等外部 API 超时或不可达 | 回退到本地验证数据集，仅报告本地基准结果 | [DEGRADED] |
+| 复现验证原始代码缺失 | 论文未提供可执行原始代码 | 标记为 [CANNOT_VERIFY]，仅对比论文报告值与 MSRA 独立结果，不编造复现结果 | [CANNOT_VERIFY] |
+| 门闸校验数据库为空 | calibration_db.json 不存在或为空 | 自动通过门闸，标注为首次运行 | [FIRST_RUN] |
+| 状态模式无历史数据 | 无任何校准记录 | 返回 "UNCALIBRATED" 状态，提示用户运行首次校准 | [UNCALIBRATED] |
+| 增量更新结果冲突 | 新校准记录与已有记录结论矛盾 | 保留最新记录，归档冲突的旧记录并附时间戳 | [CONFLICT_ARCHIVED] |
+
+---
+
+## 反例与黑名单（核心八条）
+
+> **以下 8 条为核心禁止行为**，违反任何一条将导致校准结果不可信或门闸判定失效。
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 1 | 修改金标准结果以匹配 MSRA 输出 | 自欺欺人，校准失去意义，无法发现真实偏差 | 金标准不可变，MSRA 输出与金标准的偏差必须如实报告 |
+| 2 | 跳过方法匹配检查只比较数值 | 方法选错但数值碰巧接近时掩盖根本性错误 | 四维对比必须全部执行，方法匹配率与数值偏差独立报告 |
+| 3 | 公平性校准只评估一个亚组 | 单亚组无法检测跨群体系统性偏见 | 必须覆盖所有预定义分层变量（性别、年龄、种族等） |
+| 4 | 外部基准评估使用非标准数据集 | 非标准数据集无公认答案，评估结果不可比 | 使用 StatLLM/MIMIC/NHANES 等带公认答案的基准数据集 |
+| 5 | 校准数据库未加密存储 | 校准数据含分析结果和用户纠正，泄露会暴露研究细节 | calibration_db.json 必须加密存储，访问需认证 |
+| 6 | 复现验证时修改原始代码 | 修改原始代码后复现结果不再反映原始研究 | 原始代码只读，MSRA 独立生成代码进行对比 |
+| 7 | 门闸校验时同时修改分析结果 | 既当裁判又当选手，门闸判定失去独立性 | 门闸校验只读分析结果，修改必须退回 Stage 3 |
+| 8 | 增量更新覆盖历史记录不保留版本 | 丢失历史趋势，无法追踪改进效果 | 增量追加到 calibration_db.json，保留时间戳和版本号 |

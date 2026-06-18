@@ -9,6 +9,10 @@ data_access_level: verified_only
 task_type: open-ended
 depends_on: [data-prep]
 works_with: [data-prep, analysis-exec]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, SAP, statistical-analysis-plan, estimands, RCT, observational]
 ---
 
 # 分析计划 (Analysis Planning)
@@ -24,6 +28,60 @@ works_with: [data-prep, analysis-exec]
 > - EDA 为方法选择服务，不能用于修改 SAP 中已定的分析框架
 > - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
 
+## 快速开始
+
+### 迷你SAP示例（RCT连续终点）
+
+输入: "RCT，治疗组vs安慰剂，主要终点HbA1c变化，n=200"
+
+输出SAP概要:
+```
+── 统计分析计划概要 ──
+研究设计: RCT，平行对照，1:1随机化
+Estimands: 治疗组 vs 安慰剂 | ITT人群 | HbA1c基线到24周变化 | 疗法策略 | 均值差
+主分析: ANCOVA，调整基线HbA1c
+次要分析: PP分析，按方案人群
+敏感性: 1) 多重插补 2) Tipping Point分析
+亚组: 年龄(<65/≥65)、基线HbA1c(<8/≥8)
+效应量: 均值差 + 95%CI + Cohen's d
+多重比较: 层次检验（主→次→探索），无alpha消耗
+样本量: 200人，80%效能检测0.3%差异，α=0.05
+
+确认以上计划? [继续 / 修改]
+```
+
+### Quick模式
+触发: `/msra-plan --quick`
+- 跳过Phase 1.5文献检索
+- 使用标准SAP模板（按研究类型自动选择）
+- 合并Phase 2+3为单次确认
+- 跳过Phase 6.5 DAG预览
+- 输出: 标准SAP框架，用户自行补充细节
+
+### 执行时间估算
+
+| 模式 | 研究类型 | 预计时间 | 交互次数 | 主要耗时 |
+|------|---------|---------|---------|---------|
+| Quick Mode | RCT | 3-5分钟 | 1次 | 模板填充+确认 |
+| Quick Mode | 观察性 | 5-8分钟 | 1次 | 混杂评估+模板 |
+| Guided Mode | RCT | 15-30分钟 | 3-5次 | EDA+Estimands+方法讨论 |
+| Guided Mode | 观察性 | 20-40分钟 | 4-6次 | DAG+PS方法+敏感性 |
+| Guided Mode | 诊断试验 | 15-25分钟 | 3-4次 | ROC分析+切点选择 |
+| Guided+多中心 | 任意 | +10-15分钟 | +1-2次 | 中心效应+异质性评估 |
+
+### 常见SAP制定错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| 研究类型判断错误 | RCT数据用了观察性方法 | Phase 0检查pipeline传入的study_type标志，不自动推断 |
+| Estimands五要素不完整 | 缺少伴发事件策略 | Phase 2强制要求5要素全部填写，缺失时用默认"疗法策略" |
+| 方法与数据不匹配 | 小样本用复杂模型 | Phase 3检查样本量→不足时标记[SKIP]或推荐简化方法 |
+| 混杂控制策略缺失 | 观察性研究无PSM/IPTW | SAP §4.1必须包含至少一种混杂控制方法 |
+| 敏感性分析不足 | 仅1种或无敏感性分析 | SAP §4.2必须列出至少2种敏感性分析方法 |
+| 变量构造无依据 | 切点按中位数分组 | Phase 6检查切点来源→无文献依据时标注"探索性切点" |
+| 审查不收敛 | 连续3次退回同一问题 | 触发收敛检测→BLOCK→用户书面接受风险→[CONVERGED] |
+| Targeted-Context失效 | 所有分析项相同context_scope | 每项分析必须根据用途定义最小必要字段(≤5个) |
+
 ## 研究类型分支
 
 Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
@@ -37,6 +95,108 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支：
 | 多重性 | 强控制（层次检验） | 探索性（FDR） | 探索性（FDR） |
 
 **IRON RULE**: 不能将 RCT 的分析方法（如未调整的 t 检验）套用在观察性研究上，反之亦然。研究类型决定方法论体系。
+
+## Phase 流转指南
+
+| 当前Phase | 完成标志 | 下一Phase | 转换条件 |
+|-----------|---------|-----------|---------|
+| Phase 1 (EDA) | EDA报告生成 | Phase 1.5 | 自动流转，无异常时无需暂停 |
+| Phase 1.5 (Lit-Seeding) | 文献种子表生成 | Phase 2 | [SLIM]自动继续，用户可补充 |
+| Phase 2 (Estimands) | 五要素定义完成 | Phase 3 | 自动合并到Phase 3确认点 |
+| Phase 3 (方法探讨) | 用户确认方法 | Phase 4 | 🔴[MANDATORY]用户确认后 |
+| Phase 4 (SAP制定) | SAP文档生成 | Phase 5 | 自动进入审查 |
+| Phase 5 (审查) | 审查通过 | Phase 6 | 🔴[MANDATORY]审查通过后 |
+| Phase 6 (变量构造) | 构造定义完成 | Phase 6.5 | 🔴[MANDATORY-S6]检查通过后 |
+| Phase 6.5 (DAG预览) | DAG图生成 | Phase 6.7 | [SLIM]自动继续 |
+| Phase 6.7 (多中心) | 策略选择完成 | 定稿 | [SLIM]自动继续（仅multi-dataset） |
+
+注: Phase 2和Phase 3合并为单一确认点，减少用户交互次数。
+
+## 架构集成图
+
+```
+┌─────────────────────────────────────────────────────┐
+│               Analysis Planning 架构                   │
+│                                                        │
+│  输入: Pipeline Stage 2 触发                            │
+│  ┌──────────────────────────────────────────┐          │
+│  │  data-prep 输出: cleaned_data + passport  │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  ┌──────────────────────────────────────────┐          │
+│  │  Phase 1: 深度EDA (方法选择用)             │          │
+│  │  → 分布/缺失/相关/异常值/基线比较           │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  ┌──────────────────────────────────────────┐          │
+│  │  Phase 1.5: 文献种子检索 (3-5篇)           │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  ┌──────────────────────────────────────────┐          │
+│  │  Phase 2+3: Estimands + 方法选择           │          │
+│  │  ┌─────────┬─────────┬──────────┐        │          │
+│  │  │  RCT    │观察性   │诊断试验   │        │          │
+│  │  │ANCOVA   │PSM/IPTW │ROC/AUC   │        │          │
+│  │  │Logistic │DAG/E-val│敏感度/   │        │          │
+│  │  │Cox      │NCO      │特异度    │        │          │
+│  │  └─────────┴─────────┴──────────┘        │          │
+│  │  [MANDATORY] 单一确认点                    │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  ┌──────────────────────────────────────────┐          │
+│  │  Phase 4: SAP制定 (Targeted-Context机制)   │          │
+│  │  Phase 5: 独立审查 (收敛检测)              │          │
+│  │  Phase 6: 变量构造定义                     │          │
+│  │  Phase 6.5: DAG预览                        │          │
+│  │  Phase 6.7: 多中心计划 (如适用)            │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  输出: SAP + variable_spec → Pipeline Stage 2.5 门闸    │
+│  → 通过后 → analysis-exec (Stage 3)                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**架构设计原则**:
+1. 研究类型(RCT/观察性/诊断)决定方法论体系，贯穿全流程
+2. Phase 2+3合并为单一确认点，减少用户交互
+3. Targeted-Context机制为每个分析项提供最小必要上下文
+4. [SKIP]预定义机制避免LLM"硬做"不可行分析
+5. 审查收敛检测防止无限退回循环
+
+### Phase 3 方法选择速查表
+
+| 研究类型 | 终点类型 | 推荐方法 | 效应量 | 假设检查 | 替代方案 |
+|---------|---------|---------|--------|---------|---------|
+| RCT | 连续 | ANCOVA(调整基线) | 均值差+d | 正态/方差齐 | Welch ANCOVA/非参数 |
+| RCT | 二分类 | Logistic回归 | OR | 独立性/线性 | Firth/Penalized |
+| RCT | 生存 | Cox回归 | HR | PH假设(Schoenfeld) | 分层Cox/RMST |
+| RCT | 计数 | Poisson/负二项 | IRR | 过度离散检验 | 负二项/GEE |
+| 观察性 | 连续 | IPTW+线性回归 | 均值差 | 权重诊断+正态 | PSM+ANCOVA |
+| 观察性 | 二分类 | IPTW+Logistic | OR | 权重诊断+分离 | PSM+条件Logistic |
+| 观察性 | 生存 | IPTW+Cox | HR | 权重诊断+PH | PSM+Cox/双重稳健 |
+| 诊断试验 | 二分类 | ROC+AUC | AUC+敏感度/特异度 | 金标准无偏 | PRISM/Bayesian |
+
+### 检查点量化标准
+
+| 检查点 | 类型 | 通过标准 | 阻断标准 | 降级策略 |
+|--------|------|---------|---------|---------|
+| Phase 1 EDA | SLIM | EDA报告生成 | 发现严重数据问题 | 异常→ADAPTIVE讨论 |
+| Phase 1.5 Lit-Seeding | SLIM | 3-5篇文献种子 | deep-research不可用 | 降级: 用户手动提供/跳过[SKIP] |
+| Phase 2+3 确认 | MANDATORY | 用户确认方法+参数 | 用户未确认 | 🛑STOP，不制定SAP |
+| Phase 4 SAP制定 | 自动 | SAP结构完整(7章) | 缺失章节≥3 | 补充默认值→标记"草稿" |
+| Phase 5 审查 | MANDATORY | ✅通过 | ❌需重做 | ⚠️需修改→修改后重审 |
+| Phase 6 变量构造 | MANDATORY-S6 | 4项检查全通过 | 缺失构造公式/切点无依据 | 标记"需补充"→不通过 |
+| Phase 6.5 DAG | SLIM | DAG图生成 | graphviz不可用 | 降级: ASCII文本图 |
+
+**审查收敛检测**:
+| 退回次数 | 动作 |
+|---------|------|
+| 1次 | 修改问题→重新审查 |
+| 2次 | 警告: "已退回2次，检查根本原因" |
+| 3次 | BLOCK→用户书面接受风险→[CONVERGED WITH DEVIATIONS] |
+
+> **硬阻断项**: Phase 2+3确认和Phase 5审查为硬阻断，不可跳过
+> **Estimands完整性**: Phase 2必须定义全部5要素，缺失时用默认值并标注
 
 ## 工作流程
 

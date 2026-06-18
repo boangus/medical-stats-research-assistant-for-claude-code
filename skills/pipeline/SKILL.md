@@ -1,16 +1,21 @@
 ---
-version: "0.7.6"
+version: "0.8.0"
 name: MSRA Pipeline
 description: |
-  医学统计分析流水线编排器。从任意阶段切入，自动识别当前位置，
-  引导完成后续所有流程。纯调度架构——不做实质性工作，只负责检测、
-  选择、调度、转换和追踪。
-  输出: 7阶段完整流水线 + 3个阻断式门闸 + 最终报告(figures/*.png + tables/*.docx + HTML+MD)。
+  医学统计分析 + 学术写作统一流水线编排器。从任意阶段切入，自动识别当前位置，
+  引导完成后续所有流程。Stage 4 完成后可选择继续 Paper Track（论文写作）。
+  纯调度架构——不做实质性工作，只负责检测、选择、调度、转换和追踪。
+  输出: 完整流水线（Stage 1-4 统计分析 + Stage 5-6 论文写作）+ 3个阻断式门闸
+  + 最终报告(figures/*.png + tables/*.docx + HTML+MD) + 可选论文。
   触发: /msra / 流水线 / pipeline / 数据分析流程 / 统计流程 / 完整流程 / 从头开始 / 数据清洗 / 统计分析 / 分析报告 / 结果解读 / 统计咨询 / orchestrator / 编排 / 调度 / 质量门闸
 data_access_level: redacted
 task_type: open-ended
-depends_on: [data-prep, analysis-plan, analysis-exec, report, calibration]
-works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
+depends_on: [data-prep, analysis-plan, analysis-exec, report, calibration, academic-pipeline, academic-paper, academic-paper-reviewer, deep-research]
+works_with: [agents/AGENTS.md, shared/passport/passport_schema.md, .claude/CLAUDE.md]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, pipeline, orchestrator, quality-gate]
 ---
 
 # MSRA Pipeline Orchestrator
@@ -68,8 +73,8 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 ┌──────────────────────────────────────────────────────────────┐
 │  Stage 4: REPORT  (/msra-report)                             │
 │  结果解读 → 表格/图表 → 方法学描述 → 统计质量检查 → 报告组装   │
-│  输出: final_report.md + final_report.html + figures/*.png   │
-│        + tables/*.docx                                        │
+│  输出: final_report.md + final_report.html + figures/*.svg   │
+│        + figures/*.png + tables/*.docx                        │
 │  ★ STAGE 4 CHECKPOINT: [A] 结束 / [B] Paper Track            │
 └────────────────────────────┬─────────────────────────────────┘
                              ▼
@@ -82,12 +87,48 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
                   │                  │
             [A] ↓                    ↓ [B]
          ═════════════      ┌─────────────────────────────────┐
-         │  Pipeline 结束   │  Stage 5: PAPER TRACK           │
-         │  (report_only)   │  Stage 5.0: Paper Intake        │
-         ═════════════      │  (msra → academic-pipeline)     │
-                            │  Stage 5.1-5.9: Write/Review/   │
-                            │  Revise/Finalize (ARS skills)   │
-                            │  Stage 6: Process Summary       │
+         │  Pipeline 结束   │  Stage 5.0: PAPER INTAKE        │
+         │  (report_only)   │  Handoff Bundle + 论文配置      │
+         ═════════════      └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 5.1: LITERATURE SEARCH   │
+                            │  文献检索 + 综述撰写            │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 5.2: PAPER WRITING       │
+                            │  IMRaD 章节撰写                 │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  🔴 Stage 5.5: INTEGRITY CHECK  │
+                            │  完整性检查（阻断式）            │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 5.6: PEER REVIEW         │
+                            │  5人评审团                     │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 5.7: REVISION            │
+                            │  修订 + Response to Reviewers   │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 5.8: FINAL INTEGRITY     │
+                            │  最终完整性检查（阻断式）        │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 5.9: FINALIZE            │
+                            │  定稿导出（MD → DOCX → PDF）     │
+                            └──────────────┬──────────────────┘
+                                           ▼
+                            ┌─────────────────────────────────┐
+                            │  Stage 6: PROCESS SUMMARY       │
+                            │  完整过程记录                    │
                             └─────────────────────────────────┘
 ```
 
@@ -155,12 +196,15 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 | 报告规范 | CONSORT | STROBE | STARD |
 | 敏感性分析 | 偏离 ITT 的敏感性 | E-value / 未测量混杂 | 不同切点的分析 |
 
-**入口响应格式**（研究类型识别 + 交互模式询问后输出）：
+**入口响应格式**（研究类型识别 + 交互模式 + 语言选择后输出）：
 ```
 ── Pipeline Orchestrator ──
 检测到: 研究类型=RCT | 入口=Stage 1 (原始数据)
 前置检查: 无前置产物，从 Stage 1 开始
+
 交互模式: [1] 详细引导 [2] 高效模式
+分析语言: [1] R (推荐) [2] Python
+
 输入编号或描述需求:
 ```
 
@@ -197,6 +241,38 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 - 用户可在 SAP 文档中修改参数后，说"重新执行"即可
 - 用户说"继续吧别问太细" → 切换至高效模式
 - 用户说"这块你定就行" → 该 Checkpoint 降级为仅记录，不询问
+
+---
+
+## 2.6 分析语言选择
+
+在确定交互模式后，询问用户期望的分析语言。此后全程使用该语言生成代码、执行分析和输出结果。
+
+**入口处提示**：
+```
+选择分析语言：
+
+[1] R (推荐)
+    使用 R 语言进行统计分析。
+    优势：统计方法丰富、医学统计生态成熟、gtsummary/flextable 生成三线表、
+          survival 包做生存分析、WeightIt 做因果推断。
+    适合：临床研究、生存分析、因果推断、需要专业统计包。
+
+[2] Python
+    使用 Python 语言进行统计分析。
+    优势：机器学习生态强大、Pandas 数据处理灵活、Plotly 交互式可视化。
+    适合：大数据分析、机器学习、需要与其他 Python 工具链集成。
+```
+
+| 用户选择 | 默认包 | 适用场景 |
+|---------|--------|---------|
+| **[1] R** (默认) | survival, survey, WeightIt, gtsummary, flextable | 临床研究、生存分析、因果推断 |
+| **[2] Python** | pandas, numpy, scipy, scikit-learn, lifelines | 大数据、机器学习、Python 工具链 |
+
+**语言影响**：
+- **Stage 3**: 生成对应语言的分析代码
+- **Stage 4**: 使用对应语言的包生成表格和图表
+- **模板**: 使用 `shared/templates/` 下对应的语言模板
 
 ---
 
@@ -347,7 +423,7 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 - **Mode**: `quality-gate`（只检查，不修改）
 - **输入**: 分析结果 + 质检报告 + SAP
 - **输出**: 结果质量门闸报告（通过/不通过 + 具体问题清单）
-- **阻断检查清单 (9 项)**:
+- **阻断检查清单 (14 项)**:
 
   ```
   □ 1. 结果完整性: 所有 SAP 中计划的分析是否都已执行？
@@ -364,11 +440,17 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
       - TPR 80-90% 或 FPR 10-15% → ⚠️ 低置信度，必须人工复核
       - TPR < 80% 或 FPR > 15% → ❌ 不可信，强制人工复核
       - 校准数据不足 (<10条) → ⚠️ 无法评估，必须人工复核
+  □ 10. P值格式合规 🆕: 所有P值符合 P-R01~R07（无 P=0.000，无二元化表述）
+      - 参考: shared/statistics-methods/statistical_constraints.md
+  □ 11. 方法一致性 🆕: 加权分析链无混用（M-R01~R08），方法一致性追踪表已填写
+  □ 12. 数据集一致性 🆕: 数据集差异已提醒用户抉择（D-R01~R05），追踪表已填写
+  □ 13. 统计原则违反处理 🆕: 所有统计原则违反已记录并经用户确认（S-R01~S-R08）
+  □ 14. 图表发表级质量 🆕: 图表符合 publication_figure_standards.md（rcParams/SVG/配色/变量名/P值标注）
   ```
 
   - **全部通过** → ✅ 进入 Stage 4
   - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 4
-  - **3+ 项未通过 或 项目 1/3/4 未通过** → ❌ **强制退回 Stage 3 修正**
+  - **3+ 项未通过 或 项目 1/3/4/10/11/12/13 未通过** → ❌ **强制退回 Stage 3 修正**
 - **Checkpoint**: [MANDATORY-M3] 门闸通过后进入 Stage 3.7
 
 ### Stage 3.7: RESULTS INTERPRETATION SESSION 🆕（交互式会话）
@@ -416,40 +498,129 @@ works_with: [agents/AGENTS.md, shared/passport/passport_schema.md]
 
 > **入口守卫（IRON RULE）**：仅在 passport.track == "full_paper" 时进入。
 > Stage 1-4 必须全部 completed/consumed。Stage 4 报告产物（final_report + figures + tables）必须齐全。
-> **拒绝场景**：用户无数据处理需求直接要求写论文 → 拒绝，提示"纯写作请直接用 ARS academic-paper / academic-pipeline"。
 
-MSRA Pipeline 在 Paper Track 保持纯调度。Stage 5.1-5.9 **复用 academic-pipeline skill 的状态机**（spec §10 Q10），MSRA 只负责 Stage 5.0 Paper Intake + Handoff Bundle，然后 dispatch。
+MSRA Pipeline 在 Paper Track 保持纯调度，依次调用各写作 skill 完成论文从选题到定稿的全流程。
 
-- **Skill**: `report`（Stage 5.0）→ `academic-pipeline`（Stage 5.1-5.9）
+#### Stage 5.0: PAPER INTAKE
 
-#### Stage 5.0: PAPER INTAKE（MSRA 负责）
-
+- **Skill**: `report`
 - **输入**: MSRA passport (track=full_paper) + final_report + SAP + Stage 3.5 门闸报告
-- **工作流**（详见 spec §5）:
+- **工作流**:
   1. 产物校验（passport stage_4 == completed + final_report 存在）
   2. 生成 MSRA Handoff Bundle（调用 `scripts/generate_msra_handoff_bundle.py` → `MSRA/msra_handoff_bundle.md`）— 包含 RQ、方法摘要、表格/图表列表、核心发现、安全性发现、局限性讨论、论文级方法文本
   3. 报告规范选择（基于 study_type 推荐 CONSORT/STROBE/STARD；用户可覆盖）
   4. 期刊模板选择（`shared/journal-templates/`）
   5. 论文配置确认（预填 RQ/Discipline/Method/Existing Materials/Citation=Vancouver）
-- **输出**: `msra_handoff_bundle.md` + 论文配置 → dispatch 到 academic-pipeline
+- **输出**: `msra_handoff_bundle.md` + 论文配置
+- **Checkpoint**: [MANDATORY] 确认论文配置后进入 Stage 5.1
 
-#### Stage 5.1-5.9: DISPATCH TO academic-pipeline
+#### Stage 5.1: LITERATURE SEARCH
 
-- **调用**: `academic-pipeline` skill，传入 MSRA Handoff Bundle 上下文
-- **academic-pipeline 接管**: Literature Search (deep-research) → Paper Writing (academic-paper) → Integrity Check → Peer Review (academic-paper-reviewer) → Revise → Re-review → Final Integrity → Finalize
-- **academic-paper intake_agent.md**: `# [MSRA-BRIDGE]` 块自动检测 Handoff Bundle 并预填（spec §4.3 Component C）
-- **六大融合点生效**（详见 spec §4.2）:
-  - **A: Passport 统一** — 扩展 MSRA passport 增加 ARS 阶段字段
-  - **B: Quality Gate 复用** — Stage 3.5 门闸报告 → Stage 5.5 Integrity Check（统计数字已验证，不重复检查）
-  - **C: 文献 seed** — MSRA Phase 1 文献对比 → Stage 5.1 deep-research（已有关键文献作起点）
-  - **D: 方法学复用** — Stage 4 Phase 5 统计方法 → Stage 5.2 Methods（直接引用，不重新生成）
-  - **E: 期刊模板传递** — Phase 2.5 期刊选择 → Stage 5.0 intake（已选期刊直接传递）
-  - **F: 表格图表复用** — figures/*.png + tables/*.docx → Stage 5.2 Results（直接引用，不重新生成）
+- **Skill**: `deep-research`
+- **输入**: MSRA Handoff Bundle（含文献 seed）+ 研究问题
+- **工作流**:
+  1. 读取 MSRA Phase 1 文献对比作为 seed
+  2. 基于 seed 扩展检索（Forward/Backward citation）
+  3. 针对性补充检索（Introduction 需要的背景文献、Discussion 需要的对比文献）
+  4. 质量评估（证据层级、相关性评分）
+  5. 主题综合（非逐篇罗列）
+- **输出**: 完整 Bibliography + Synthesis Report
+- **复用机制**: MSRA Phase 1 文献直接纳入，不重复检索
+- **Checkpoint**: [MANDATORY] 文献覆盖评估确认
+
+#### Stage 5.2: PAPER WRITING
+
+- **Skill**: `academic-paper`
+- **输入**: MSRA Handoff Bundle + Bibliography + Synthesis Report + figures/*.png + tables/*.docx
+- **工作流**:
+  1. **Introduction**: 文献综述 + 研究背景 + 研究空白 + RQ 陈述
+  2. **Methods**: 直接引用 MSRA Stage 4 Phase 5 方法学描述（不重新生成）
+  3. **Results**: 直接引用 MSRA figures/tables（不重新生成）+ 结果描述
+  4. **Discussion**: 结果解读 + 与文献对比 + 局限性 + 临床意义
+  5. **Abstract**: 结构化摘要生成
+  6. **Compliance Check**: 基于 study_type 的报告规范检查（CONSORT/STROBE/STARD）
+- **输出**: 完整论文草稿（IMRaD 结构）
+- **复用机制**: 融合点 D（方法学）+ 融合点 F（表格图表）
+- **Checkpoint**: [MANDATORY] 草稿审查确认
+
+#### Stage 5.5: INTEGRITY CHECK 🔴（阻断式检查）
+
+> **IRON RULE**: 这是阻断式检查点。Stage 5.5 未通过 → 必须退回 Stage 5.2 修订。
+
+- **Skill**: 内置完整性验证
+- **输入**: 论文草稿 + Stage 3.5 门闸报告 + MSRA Handoff Bundle
+- **检查清单**:
+  1. 引用完整性（所有引用是否真实存在）
+  2. 数字一致性（论文中数字与 MSRA 分析结果是否一致）
+  3. 引用格式合规（所选 Citation Format 是否正确应用）
+  4. 报告规范合规（CONSORT/STROBE/STARD 检查清单）
+  5. 重复内容检测（无自我抄袭）
+  6. 伦理合规（IRB 声明、知情同意）
+- **复用机制**: Stage 3.5 门闸报告已验证统计数字，不重复检查
+- **检查结果**:
+  - 全部通过 → ✅ 进入 Stage 5.6
+  - 1-2 项未通过 → ⚠️ 带条件进入（记录风险）
+  - 3+ 项未通过 → ❌ 强制退回 Stage 5.2
+- **Checkpoint**: [MANDATORY] 完整性报告确认
+
+#### Stage 5.6: PEER REVIEW
+
+- **Skill**: `academic-paper-reviewer`
+- **输入**: 论文草稿 + 完整性报告 + 研究类型
+- **工作流**:
+  1. 5 位独立审稿人评审：EIC + 方法学审稿人 + 领域审稿人 + 写作审稿人 + Devil's Advocate
+  2. 7 维评分：Originality、Methodological Rigor、Evidence Sufficiency、Argument Coherence、Writing Quality、Literature Integration、Significance
+  3. 编辑决策：Accept / Minor Revision / Major Revision / Reject
+  4. 生成 Revision Roadmap（优先级排序的修改建议）
+- **输出**: Review Report + Revision Roadmap + Editorial Decision
+- **Checkpoint**: [MANDATORY] 评审结果确认 → 决定是否修订
+
+#### Stage 5.7: REVISION
+
+- **Skill**: `academic-paper`
+- **输入**: 论文草稿 + Revision Roadmap + Review Report
+- **工作流**:
+  1. 逐项修改论文（按 Revision Roadmap）
+  2. 生成 Response to Reviewers（逐条回应）
+  3. 更新论文草稿
+- **输出**: 修订后论文 + Response to Reviewers
+- **Checkpoint**: [MANDATORY] 修订完成确认
+
+#### Stage 5.8: FINAL INTEGRITY CHECK 🔴（阻断式检查）
+
+> **IRON RULE**: 这是阻断式检查点。Stage 5.8 未通过 → 必须退回 Stage 5.7 修订。
+
+- **Skill**: 内置完整性验证（最终版）
+- **输入**: 修订后论文 + Response to Reviewers + Revision Roadmap
+- **检查清单**:
+  1. 所有评审意见是否已回应
+  2. 所有修改是否已落实
+  3. 新引入的内容是否合规
+  4. R&R Traceability Matrix 是否完整
+- **检查结果**:
+  - 全部通过 → ✅ 进入 Stage 5.9
+  - 未通过 → ❌ 强制退回 Stage 5.7
+- **Checkpoint**: [MANDATORY] 最终完整性报告确认
+
+#### Stage 5.9: FINALIZE
+
+- **Skill**: `academic-paper`
+- **输入**: 最终论文 + 期刊模板
+- **工作流**:
+  1. 格式转换：MD → DOCX（via Pandoc）
+  2. PDF 导出
+  3. 排版调整（期刊模板适配）
+  4. 最终检查（格式、页码、参考文献）
+- **输出**: final_paper.md + final_paper.docx + final_paper.pdf
 
 #### Stage 6: PROCESS SUMMARY
 
-- Pipeline 结束，统一过程记录（MSRA Stage 1-4 + Paper Track Stage 5）
-- passport 标记 `stage_5_paper` = completed, `status` = "completed"
+- **输入**: MSRA passport + 所有阶段产物
+- **工作流**:
+  1. 汇总 Stage 1-5 全过程记录
+  2. 更新 passport：所有阶段标记 completed，status = "completed"
+  3. 生成过程摘要报告
+- **输出**: process_summary.md + 更新后的 passport.json
 
 ---
 
@@ -593,6 +764,48 @@ Stage 5  [论文写作]       ░░░░░░░░░░   --  ⏸ (track=fu
 
 ---
 
+## 5.2 Material Passport JSON Schema
+
+> 以下为 `.msra/passport.json` 的完整 JSON Schema 定义。所有阶段调度、前置检查、门闸记录均基于此结构。
+
+```json
+{
+  "passport_version": "1.0",
+  "study_id": "string",
+  "current_stage": "Stage 0|1|1.5|2|2.5|3|3.5|4|5",
+  "artifacts": {
+    "raw_data": {"path": "string", "status": "pending|completed", "hash": "string"},
+    "cleaned_data": {"path": "string", "status": "pending|completed", "hash": "string"},
+    "sap": {"path": "string", "status": "pending|completed|approved", "hash": "string"},
+    "analysis_results": {"path": "string", "status": "pending|completed", "hash": "string"},
+    "report": {"path": "string", "status": "pending|completed", "hash": "string"}
+  },
+  "gates": {
+    "stage_1_5": {"status": "pending|passed|blocked", "checks_passed": 0, "checks_total": 9},
+    "stage_2_5": {"status": "pending|passed|blocked"},
+    "stage_3_5": {"status": "pending|passed|blocked", "checks_passed": 0, "checks_total": 14}
+  },
+  "deviations": [],
+  "timestamp": "ISO 8601"
+}
+```
+
+**字段说明**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `passport_version` | string | Schema 版本号，当前为 "1.0" |
+| `study_id` | string | 研究唯一标识符 |
+| `current_stage` | string | 当前所处阶段 |
+| `artifacts.*.status` | string | 产物状态：pending → completed（SAP 可为 approved） |
+| `artifacts.*.hash` | string | 产物文件哈希，用于完整性校验 |
+| `gates.*.status` | string | 门闸状态：pending → passed / blocked |
+| `gates.*.checks_passed/total` | number | 门闸检查项通过数/总数 |
+| `deviations` | array | 偏差记录列表，每条含阶段、内容、影响评估、用户确认状态 |
+| `timestamp` | string | 最后更新时间（ISO 8601） |
+
+---
+
 ## 6. Agent Dispatch Mode (多 Agent 协作)
 
 > 在不同阶段切换为对应专家角色，完成后切回 Orchestrator 模式。
@@ -693,6 +906,42 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase
 
 ---
 
+## 检查点量化标准
+
+| 门闸 | 检查项 | 通过标准 | 条件通过 | 阻断标准 |
+|------|--------|---------|---------|---------|
+| Stage 1.5 | 9项检查 | 9/9通过 | 7-8/9通过(记录风险) | ≤6/9 或 项5/6/7/9未通过 |
+| Stage 2.5 | SAP审查 | ✅通过 | ⚠️需修改(修改后重审) | ❌需重做(回Phase 2) |
+| Stage 3.5 | 14项检查 | 14/14通过 | 10-13/14通过(记录风险) | <10/14 或 项10/11/12/13未通过 |
+
+**Stage 3.5 关键项量化标准**:
+
+| 项号 | 检查项 | 通过标准 | 阻断标准 |
+|------|--------|---------|---------|
+| 10 | P值格式 | 全部P值符合P-R01~R07 | 任何P=0.000出现 |
+| 11 | 方法一致性 | 加权/非加权不混用(M-R01) | 检测到混用 |
+| 12 | 数据集一致性 | 全程使用同一锁定数据集(D-R02) | 检测到数据集切换 |
+| 13 | 统计原则 | 所有假设检验已执行(S-R01~R08) | 跳过假设检验 |
+| 14 | 图表质量 | SVG+PNG 300dpi双格式 | 仅PNG或<300dpi |
+
+> **升级规则**: Stage 3.5项10/11/12/13为硬阻断项，不可条件通过。
+> **收敛规则**: 同一Stage退回≥3次 → BLOCK → 用户书面接受风险 → [CONVERGED WITH DEVIATIONS]
+
+## 7.4 边缘场景处理
+
+> 以下场景在流水线执行中可能遇到，需按表中的降级策略执行，确保流程可追踪且不静默失败。
+
+| 场景 | 触发条件 | 处理策略 | 标记 |
+|------|---------|---------|------|
+| analysis-exec 产出为空 | Stage 3 执行后无任何分析输出 | BLOCK，使用简化 SAP 重试，最多重试 3 次 | [EMPTY_OUTPUT] |
+| 代码执行超时 | 单次执行耗时 > 300s | 终止执行，记录超时日志，建议用户简化分析 | [TIMEOUT] |
+| 部分阶段失败 | 部分分析成功、部分失败 | 继续使用成功结果，失败项标记为部分失败 | [PARTIAL_FAIL] |
+| Material Passport 损坏 | passport.json 格式异常或字段缺失 | 从各阶段产物重建 passport，记录重建事件 | [PASSPORT_REBUILT] |
+| Skill 依赖缺失 | 所需 skill（如 academic-pipeline）未安装 | 跳过对应阶段（如 Paper Track），提示用户安装 | [SKIP: dependency missing] |
+| 用户中途中止 | 用户在阶段执行中主动中止 | 保存当前状态到 passport，允许从最后检查点恢复 | [USER_ABORTED] |
+
+---
+
 ## 8. Quick Reference Commands
 
 | 命令 | 触发 | 入口 |
@@ -745,6 +994,190 @@ Stage 1 → [MANDATORY] → Stage 1.5(9项) → [MANDATORY]
 
 ---
 
+## Stage 流转图
+
+```
+Stage 0: 入口诊断
+    │ 自动识别研究类型/数据规模/用户意图
+    ▼
+Stage 1: 数据准备 (data-prep)
+    │ 输出: cleaned_data + cleaning_log + validation_report
+    ▼
+┌─ Stage 1.5: 数据质量门闸 ─┐
+│  9项阻断检查 (□1-□9)      │
+│  全通过 → 继续             │
+│  ≤6项通过 → 阻断退回       │
+└──────────────────────────┘
+    │
+    ▼
+Stage 2: 分析计划 (analysis-plan)
+    │ 输出: SAP + variable_spec
+    ▼
+┌─ Stage 2.5: SAP质量门闸 ─┐
+│  审查通过/需修改/需重做    │
+│  收敛检测 (3次退回→BLOCK)  │
+└──────────────────────────┘
+    │
+    ▼
+Stage 3: 分析执行 (analysis-exec)
+    │ 输出: analysis_code + results + figures + audit_log
+    ▼
+┌─ Stage 3.5: 分析质量门闸 ─┐
+│  14项阻断检查 (含P值/方法  │
+│  一致性/图表质量)          │
+│  10-14项通过 → 继续        │
+│  <10项通过 → 阻断退回      │
+└──────────────────────────┘
+    │
+    ▼
+Stage 4: 报告生成 (report)
+    │ 输出: HTML报告 + SVG图表 + DOCX表格
+    ▼
+Stage 5: 论文写作 (Paper Track, 可选)
+    │ 输出: 论文初稿 + 审稿回复
+```
+
+## 架构集成图
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    MSRA Pipeline 架构                      │
+│                                                            │
+│  ┌─────────┐   ┌──────────┐   ┌──────────┐   ┌────────┐  │
+│  │ data-   │   │ analysis-│   │ analysis-│   │ report │  │
+│  │ prep    │   │ plan     │   │ exec     │   │        │  │
+│  └────┬────┘   └────┬─────┘   └────┬─────┘   └───┬────┘  │
+│       │             │              │              │       │
+│       ▼             ▼              ▼              ▼       │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │              Material Passport (JSON)               │  │
+│  │  ┌──────────┬──────────┬──────────┬──────────┐    │  │
+│  │  │ artifacts│  gates   │deviations│ timestamp│    │  │
+│  │  └──────────┴──────────┴──────────┴──────────┘    │  │
+│  └────────────────────────────────────────────────────┘  │
+│       │             │              │              │       │
+│       ▼             ▼              ▼              ▼       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐   │
+│  │ Stage 1.5│  │ Stage 2.5│  │     Stage 3.5        │   │
+│  │ 数据门闸  │  │ SAP门闸  │  │     分析门闸         │   │
+│  │ (9项)    │  │(审查)    │  │     (14项)           │   │
+│  └──────────┘  └──────────┘  └──────────────────────┘   │
+│       │             │              │              │       │
+│       └─────────────┴──────────────┴──────────────┘       │
+│                         │                                  │
+│                    ┌────▼────┐                             │
+│                    │calibration│ (gate-check 模式)         │
+│                    └─────────┘                             │
+│                         │                                  │
+│                    ┌────▼────┐                             │
+│                    │  Stage 5 │ (Paper Track, 可选)        │
+│                    └─────────┘                             │
+└──────────────────────────────────────────────────────────┘
+```
+
+**架构设计原则**:
+1. Pipeline为纯调度器，不做实质性分析工作
+2. Material Passport是唯一的跨Stage状态传递机制
+3. 质量门闸为阻断式，不可跳过(MANDATORY)
+4. 每个Stage的Skill独立运行，通过Passport解耦
+5. calibration作为Stage 3.5的子检查集成，不独立成Stage
+
+## 10. 快速模式 (Quick Mode)
+
+> 面向简单数据集和快速探索场景的精简流水线。在保证核心质量门闸的前提下跳过非必要步骤。
+
+### 触发条件
+
+满足以下任一条件即自动进入 Quick Mode：
+- 用户输入包含"快速"、"quick"、"快速分析"等关键词
+- 数据集变量数 < 10 且行数 < 100
+
+### 简化流程
+
+```
+Stage 0: 入口检测 → 识别为 Quick Mode
+   ▼
+Stage 1: 数据准备（仅快速验证，跳过数据画像 Phase 0）
+   ▼
+Stage 1.5: 数据质量门闸（缩减为 5 项关键检查）
+   ▼
+Stage 2: 分析计划（使用模板 SAP，跳过文献种子检索）
+   ▼
+Stage 3: 分析执行（仅核心分析，跳过敏感性/亚组/安全性分析）
+   ▼
+Stage 3.5: 结果质量门闸（缩减为 7 项关键检查）
+   ▼
+Stage 4: 报告生成（标准 HTML 报告，PNG 图表，无 SVG）
+```
+
+### 跳过的阶段/步骤
+
+| 跳过项 | 原因 | 风险 |
+|--------|------|------|
+| Phase 0 数据画像 | 小数据集可快速概览 | 低 |
+| Phase 2.5 值规范化 | 简单数据集通常无需 | 中（需人工确认） |
+| Stage 3 敏感性/亚组/安全性分析 | 快速模式仅做核心分析 | 中（报告标注"未执行"） |
+| Stage 3.7 结果解读会话 | 快速模式自动生成解读 | 低 |
+| Phase 5 盲态审核 | 仅 RCT 需要，快速模式默认非 RCT | 低 |
+| Stage 5 Paper Track | 快速模式不进入论文写作 | 无 |
+
+### 质量门闸缩减规则
+
+| 门闸 | 标准模式 | Quick Mode |
+|------|---------|------------|
+| Stage 1.5 | 9 项检查 | 5 项关键检查（项目 1/3/5/6/9） |
+| Stage 2.5 | 8 项检查 | 跳过（使用模板 SAP） |
+| Stage 3.5 | 14 项检查 | 7 项关键检查（项目 1/2/3/5/9/10/11） |
+
+### 输出格式
+
+- 报告：HTML 格式，无 SVG 图表，仅 PNG
+- 表格：标准三线表（docx）
+- 标注：报告头部标注"[Quick Mode] — 精简流程，非完整分析"
+
+### 示例
+
+```
+用户："快速分析这个CSV"
+→ Pipeline 检测: 数据 8 变量 × 85 行 → 自动进入 Quick Mode
+→ Stage 1 快速验证 → Stage 1.5 (5项) → Stage 2 模板 SAP
+→ Stage 3 核心分析 → Stage 3.5 (7项) → Stage 4 HTML 报告
+→ 5 分钟内输出基础报告
+```
+
+> [IRON RULE] Quick Mode 不得用于复杂研究设计（多中心 RCT、复杂观察性研究等）。检测到复杂设计时自动升级为标准模式并提示用户。
+
+### Stage 执行时间估算
+
+| Stage | 数据规模 | 预计时间 | 主要耗时 |
+|-------|---------|---------|---------|
+| Stage 0 | 任意 | <30秒 | 数据类型识别 |
+| Stage 1 | 500行×20列 | 5-15分钟 | 数据验证+清洗+EDA |
+| Stage 1.5 | - | <30秒 | 门闸检查 |
+| Stage 2 | 任意 | 10-30分钟 | EDA+方法讨论+SAP制定 |
+| Stage 2.5 | - | 1-5分钟 | SAP审查 |
+| Stage 3 | 500行×20列 | 10-30分钟 | 代码生成+执行+自愈 |
+| Stage 3.5 | - | <1分钟 | 门闸检查(14项) |
+| Stage 4 | - | 5-15分钟 | 报告生成+statcheck |
+| Stage 5 | - | 30-120分钟 | 论文写作 |
+| **总计(Stage 1-4)** | **500行×20列** | **30-90分钟** | - |
+| **Quick Mode** | **500行×20列** | **10-20分钟** | - |
+
+### 常见流水线错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| Stage 1 数据读取失败 | FileNotFoundError/EncodingError | 检查文件路径和编码(UTF-8/GBK)，提示用户确认格式 |
+| Stage 1.5 门闸阻断 | 缺失清洗日志/锁定记录 | 退回Stage 1补充产物，不跳过门闸 |
+| Stage 2 SAP审查不收敛 | 连续3次退回 | 触发收敛检测→BLOCK→用户书面接受风险→标注[CONVERGED] |
+| Stage 3 代码执行失败 | Python/R报错 | 自愈机制5轮重试→仍失败则标记[SKIP]并记录 |
+| Stage 3.5 P值格式不合规 | P=0.000 | 退回Stage 3修复(P-R01规则)→重新通过门闸 |
+| Stage 4 statcheck失败 | 统计结果不一致 | 标记[STATCHECK_FAILED]→退回Stage 3核查 |
+| Passport状态丢失 | 无法恢复进度 | 从stage产物重建passport→验证一致性→继续 |
+| 用户中途切换研究类型 | 类型不匹配 | 重置Stage 2-4→保留Stage 1产物→重新规划 |
+
+---
+
 ## 反例与黑名单
 
 > **以下行为必须避免**。作为编排器，你的核心职责是**调度和追踪**，而非执行实质性工作。
@@ -794,6 +1227,23 @@ Stage 1 → [MANDATORY] → Stage 1.5(9项) → [MANDATORY]
 | 14 | 在高效模式下跳过 MANDATORY 检查点 | MANDATORY 是所有模式的硬性要求，SLIM 和 ADAPTIVE 才可按模式跳过 | 5 个 MANDATORY 检查点（M1-M5）在任何模式下都必须展示并等待用户决策 |
 | 15 | 多个 MANDATORY 检查点同时触发时只展示最新的 | 当前阶段的信息不足以让用户做出跨阶段的风险决策 | 同时触发的 MANDATORY 检查点必须依次展示，上一点决策后再展示下一点 |
 | 16 | 用户选择详细引导模式但自动降级为高效模式 | 交互密度是用户显式选择的，自动降级违反信任 | 记录用户选择的模式，除非用户主动要求切换，不得自动升降级 |
+
+---
+
+## 流水线反例与黑名单（核心八条）
+
+> **以下 8 条为流水线编排核心禁止行为**，违反任何一条将导致流程不可追踪或结果不可信。
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 1 | 跳过质量门闸直接进入下一阶段 | 门闸是质量保证的核心机制，跳过会导致未经验证的结果流入下游 | 必须通过 Stage 1.5/2.5/3.5 门闸，未通过时退回或书面接受风险 |
+| 2 | Material Passport 不记录偏差就修改分析结果 | 无偏差记录的修改破坏可审计性，无法追溯变更原因 | 任何偏离 SAP 的修改必须先记录偏差到 passport.deviations |
+| 3 | Stage 3.5 门闸检查时修改分析代码 | 门闸检查应只读，同时修改代码既当裁判又当选手 | 门闸检查只读分析结果，修改必须退回 Stage 3 |
+| 4 | 多数据集模式不检查跨中心一致性就汇总 | 跨中心差异可能导致汇总结果误导，掩盖中心效应 | 必须执行 Phase 1b 跨中心一致性检查后再汇总 |
+| 5 | Quick Mode 用于复杂研究设计（如多中心 RCT） | 精简流程跳过敏感性/亚组分析，复杂设计下会遗漏关键发现 | 检测到复杂设计时自动升级为标准模式 |
+| 6 | 用户中止后不保存状态直接退出 | 用户丢失已完成的工作，无法恢复 | 必须保存当前状态到 passport，允许 `/msra --resume` 恢复 |
+| 7 | Paper Track 在 Stage 4 未完成时启动 | 论文写作依赖 Stage 4 的报告、图表和表格，未完成时启动会导致论文缺失素材 | 入口守卫检查 passport stage_4 == completed，未完成时拒绝进入 |
+| 8 | 收敛检测触发后仍继续退回而不转入偏差记录模式 | 无限循环退回浪费资源，且无法推进流程 | 回退 ≥ 3 次后必须走 M5 Checkpoint，转入偏差记录模式 |
 
 
 

@@ -10,6 +10,10 @@ data_access_level: verified_only
 task_type: outcome-gradable
 depends_on: [analysis-plan]
 works_with: [analysis-plan, report]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [medical-statistics, clinical-trial, analysis-execution, code-generation, self-healing, audit-log]
 ---
 
 # 分析执行 (Analysis Execution)
@@ -23,7 +27,130 @@ works_with: [analysis-plan, report]
 > - 严格按 SAP 执行。任何偏离都必须记录为偏差并征得用户同意
 > - 代码执行和结果解读必须分两步：先生成代码和输出，再独立解读
 > - 假设检验必须先于推断分析执行。不满足假设时必须降级到预定义的替代方法
-> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A1/A3/B1/E1）
+> - P值<0.001统一展示为 P < 0.001，禁止 P = 0.000（P-R01）
+> - 加权分析链中不得混用非加权数据，切换必须标注（M-R01~R05）
+> - 不同分析使用不同数据集时必须提醒用户抉择（D-R02）
+> - 统计原则违反时必须暂停并让用户抉择处理方案（S-R01~R08）
+> - 结果图表必须达到发表级标准（publication_figure_standards.md）
+> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A1/A3/B1/E1/M1-M6）
+> - 参考：shared/statistics-methods/statistical_constraints.md — 统计约束规则全文
+> - 参考：shared/chart-styles/publication_figure_standards.md — 发表级图表标准
+> - 参考：shared/chart-styles/variable_naming_conventions.md — 变量命名规范
+
+## 架构集成图
+
+```
+┌─────────────────────────────────────────────────────┐
+│               Analysis Execution 架构                  │
+│                                                        │
+│  输入: Pipeline Stage 3 触发                            │
+│  ┌──────────────────────────────────────────┐          │
+│  │  analysis-plan 输出: SAP + variable_spec  │          │
+│  │  data-prep 输出: cleaned_data + passport  │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  ┌──────────────────────────────────────────┐          │
+│  │  Generator (Exec Runner)                  │          │
+│  │  ┌──────────────────────────────────┐    │          │
+│  │  │ Phase 0: 样本量验证               │    │          │
+│  │  │ Phase 1-3: SAP解析+环境准备       │    │          │
+│  │  │ Phase 4: 变量构造                 │    │          │
+│  │  │ Phase 5: 描述统计                 │    │          │
+│  │  │ Phase 6: 推断分析 (Hybrid Prompt) │    │          │
+│  │  │   ┌─────────────────────────┐     │    │          │
+│  │  │   │  自愈机制 (5轮)          │     │    │          │
+│  │  │   │  L1语法→L2数据→L3方法   │     │    │          │
+│  │  │   │  →L4用户→L5跳过         │     │    │          │
+│  │  │   └─────────────────────────┘     │    │          │
+│  │  └──────────────────────────────────┘    │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  ┌──────────────────────────────────────────┐          │
+│  │  Evaluator (Exec Inference)               │          │
+│  │  Phase 7: 假设检验+S-R01~R08用户决策       │          │
+│  │  Phase 7.5: SAP修正 (如需)                │          │
+│  │  Phase 8: 质量检查 (P值+方法+图表)         │          │
+│  │  Phase 9: 发表级图表 (SVG+PNG)            │          │
+│  │  Phase 10: 审计日志 (不可变)              │          │
+│  └──────────────────┬───────────────────────┘          │
+│                     ▼                                   │
+│  输出: code + results + figures + audit_log             │
+│  → Pipeline Stage 3.5 门闸 (14项检查)                   │
+│  → 通过后 → report (Stage 4)                            │
+└─────────────────────────────────────────────────────┘
+```
+
+**架构设计原则**:
+1. Generator-Evaluator双Agent分离，生成与评估独立
+2. Hybrid Prompting三层策略确保代码质量
+3. 自愈机制仅修复代码错误，不改变SAP方法
+4. 统计约束追踪(P-R/M-R/D-R/S-R)贯穿全流程
+5. 审计日志为不可变记录，确保可复现性
+
+## 快速开始
+
+### Hybrid Prompting 代码生成示例
+
+**输入SAP条目**: "主要分析: ANCOVA，比较治疗组vs对照组HbA1c变化，调整基线HbA1c"
+
+**Layer 1 - 显式指令**:
+```python
+# 任务: ANCOVA比较两组HbA1c变化
+# 因变量: hba1c_change (连续)
+# 自变量: treatment (分类, 2水平)
+# 协变量: baseline_hba1c (连续)
+# 效应量: 均值差 + 95%CI + Cohen's d
+# P值格式: 原始精度输出，不格式化
+```
+
+**Layer 2 - 推理脚手架**:
+```python
+# 步骤1: 检查数据完整性 (hba1c_change, treatment, baseline_hba1c无缺失)
+# 步骤2: 验证假设 (残差正态性、方差齐性、线性关系)
+# 步骤3: 拟合ANCOVA模型 (smf.ols("hba1c_change ~ treatment + baseline_hba1c", data=df))
+# 步骤4: 提取结果 (系数、CI、P值、效应量)
+# 步骤5: 假设诊断 (残差图、Q-Q图)
+# 步骤6: 输出结果表 (含所有统计约束检查项)
+```
+
+**Layer 3 - 格式约束**:
+```python
+# 输出格式:
+# 1. 结果表: | 方法 | 效应量 | 95%CI | P值 | 效应量大小 | 假设检验 |
+# 2. 诊断图: 残差Q-Q图 + 残差vs拟合值图 (SVG+PNG, 300dpi)
+# 3. 约束检查: P-R01(P值) ✓ | M-R01(方法一致) ✓ | S-R01(假设检验) ✓
+# 4. 审计日志: 记录模型公式、随机种子、包版本
+```
+
+### 快速执行路径
+触发: SAP已批准 + 用户说"执行"
+简化流程: Phase 0(验证) → Phase 4(构造) → Phase 6(主分析) → Phase 8(质检) → Phase 10(审计)
+跳过: Phase 1-3(已在SAP中完成)、Phase 5(次要分析)、Phase 7(无违反时)、Phase 9(图表在报告中生成)
+
+### 执行时间估算
+
+| 分析类型 | 数据规模 | 预计时间 | 自愈轮数 | 主要耗时 |
+|---------|---------|---------|---------|---------|
+| 描述统计 | 500行 | 1-2分钟 | 0-1轮 | Table 1生成 |
+| ANCOVA | 500行 | 2-5分钟 | 0-2轮 | 代码生成+假设检验 |
+| Cox回归 | 500行×10变量 | 3-8分钟 | 0-2轮 | PH检验+模型拟合 |
+| IPTW+Logistic | 5000行 | 5-15分钟 | 1-3轮 | 权重计算+模型拟合 |
+| 多重插补 | 1000行×30%缺失 | 10-20分钟 | 1-3轮 | MICE迭代+收敛检查 |
+| 发表级图表(5张) | - | 5-10分钟 | 0-1轮 | SVG渲染+质量检查 |
+| 完整分析(主+次+敏感) | 500行 | 15-40分钟 | 2-5轮 | 全流程+自愈 |
+
+### 常见执行错误与解决方案
+
+| 错误场景 | 症状 | 解决方案 |
+|---------|------|---------|
+| 代码执行ImportError | 缺少statsmodels/scipy | 自愈Layer 1: 添加import+pip install提示 |
+| 数据类型不匹配 | ValueError: could not convert | 自愈Layer 2: 添加pd.to_numeric(errors='coerce') |
+| Cox模型不收敛 | ConvergenceWarning | 自愈Layer 3: 减少变量/检查分离→Firth惩罚 |
+| IPTW权重极端 | weight>20 | Phase 6.2触发S-R06→用户决策: 截断/重设/放弃 |
+| P值输出为0.000 | float精度问题 | 代码输出原始值，Phase 8检查P-R01→报告层格式化 |
+| 图表样式不合规 | 使用默认matplotlib | Phase 9强制apply_publication_style()→重新生成 |
+| 审计日志缺失 | 无执行环境记录 | Phase 10强制记录: Python版本/包版本/种子/时间 |
+| 自愈5轮仍失败 | 代码无法执行 | 标记[SKIP: code_execution_failed]→记录偏差→继续其他分析 |
 
 ## 双 Agent 编排（Generator-Evaluator 模式）
 
@@ -299,7 +426,9 @@ cleaned_data %>%
 6. 结果摘要（效应量+CI+p值+临床解读）
 
 #### Layer 3: 格式约束 (Format Constraints)
-- 数值精度: p值4位小数, 效应量2位小数, CI 2位小数
+- P值格式: 遵循 statistical_constraints.md P-R01~R07（P<0.001展示为"P < 0.001"，禁止P=0.000）
+- 数值精度: p值3位小数, 效应量2位小数, CI 2位小数
+- 变量命名: 遵循 variable_naming_conventions.md 三列命名体系（代码变量名/规范显示名/英文显示名）
 - 标记规范: [SKIP:原因] / [DEVIATION:描述] / [EXPLORATORY]
 - 输出格式: 表格必须含列名、单位、注释行
 ```
@@ -388,6 +517,68 @@ if (normal_ok) {
 | 统计错误 | 共线性、分离问题、样本量不足 | 40-50% | 标记 [SKIP: statistical] |
 | 数据错误 | 缺失数据过多、异常值极端 | 30-40% | 标记 [SKIP: data] |
 | 环境错误 | 内存不足、包版本冲突 | 60-70% | 标记 [SKIP: environment] |
+
+### 自愈机制详细流程
+
+```
+代码执行失败
+    │
+    ▼
+Layer 1: 语法修复 (0-1轮)
+├── ImportError → 添加缺失import
+├── SyntaxError → 修正语法
+├── NameError → 修正变量名
+└── 修复后重试 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 2: 数据适配 (1-2轮)
+├── ValueError → 类型转换(pd.to_numeric/errors='coerce')
+├── KeyError → 列名映射/模糊匹配
+├── IndexError → 边界检查/空值处理
+└── 修复后重试 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 3: 方法降级 (1-2轮)
+├── 不收敛 → 减少变量/增加迭代次数
+├── 完全分离 → Firth惩罚回归
+├── PH违反 → 分层Cox/时依协变量
+├── 多重共线性 → 岭回归/剔除VIF>10变量
+└── 修复后重试 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 4: 用户介入 (1轮)
+├── 展示错误详情+已尝试方案
+├── 请求用户: 修改SAP/提供数据/手动编码
+└── 用户响应 → 执行 → 成功？→ 是 → 完成
+    │ 否
+    ▼
+Layer 5: 标记跳过
+├── 标记 [SKIP: code_execution_failed]
+├── 记录偏差到审计日志
+├── 继续执行其他分析项
+└── 在报告中标注未完成分析
+```
+
+> **自愈原则**: 自愈仅修复代码错误，不改变SAP预定义的分析方法。需修改方法时走Phase 7.5 SAP修正流程。
+> **自愈上限**: 最多5轮，每轮记录修复详情。超过5轮标记[SKIP]。
+
+### 检查点量化标准
+
+| 检查点 | 类型 | 通过标准 | 阻断标准 | 降级策略 |
+|--------|------|---------|---------|---------|
+| Phase 0 样本量 | 自动 | 事件数≥10×变量数 | 事件数<10×变量数 | 标记[SKIP: 事件数不足] |
+| Phase 4 变量构造 | 自动 | 全部变量构造成功 | 构造失败 | 记录缺失→标记[PARTIAL] |
+| Phase 6 代码执行 | 自动 | 代码执行成功 | 执行失败 | 自愈5轮→[SKIP] |
+| Phase 6.2 约束追踪 | 自动 | P/M/D/S约束全通过 | 任何约束违规 | 记录违规→Phase 7处理 |
+| Phase 7 假设检验 | MANDATORY-EXEC7 | 所有假设通过 | S-R01~R08违反 | 用户决策→记录选择 |
+| Phase 7.5 SAP修正 | MANDATORY | 用户确认修正 | 用户未确认 | 🛑STOP，不继续 |
+| Phase 8 质量检查 | 自动 | 全部检查通过 | P值/方法/图表不合规 | 修复→重新检查(3次) |
+| Phase 9 图表生成 | 自动 | SVG+PNG生成成功 | 生成失败 | 降级: 表格替代[FIGURE_SKIP] |
+| Phase 10 审计日志 | 自动 | 日志写入成功 | 写入失败 | 重试3次→[AUDIT_FAIL] |
+
+> **硬阻断项**: Phase 7(S-R01~R08)和Phase 7.5(SAP修正)为硬阻断，必须用户确认
+> **自愈上限**: 最多5轮，每轮记录修复详情，超过5轮标记[SKIP]
+> **审计日志**: 必须包含Python版本/包版本/随机种子/执行时间/错误详情
 
 **常见错误处理代码示例**：
 
@@ -663,6 +854,77 @@ for group in df['treatment'].unique():
 
 **必须报告**：各亚组 HR+95%CI、交互作用 p 值、森林图
 
+### Phase 6.2: 统计约束追踪 🆕
+
+> 参考：shared/statistics-methods/statistical_constraints.md — 统计约束规则全文
+> 参考：shared/chart-styles/variable_naming_conventions.md — 变量命名规范
+
+在 Phase 6/6.1 分析执行过程中，必须同步维护以下三张约束追踪表，供 Phase 8 质检和 Stage 3.5 门闸消费。
+
+#### 6.2.1 方法一致性追踪表
+
+> 约束规则 M-R01~R08：加权分析链中不得混用非加权数据；参数/非参数方法不得随意切换。
+
+每项分析执行时必须填写：
+
+| 分析编号 | 分析名称 | 数据集类型 | 方法类型 | 加权状态 | 与主分析一致性 | 备注 |
+|---------|---------|-----------|---------|---------|--------------|------|
+| A01 | 主分析 | 加权数据集 | 参数 | IPTW加权 | — (基准) | — |
+| A02 | Table 1 | 加权数据集 | 描述性 | IPTW加权 | ✅ 一致 | — |
+| A03 | 敏感性分析 | 加权数据集 | 参数 | IPTW加权 | ✅ 一致 | — |
+| A04 | 非加权补充 | 原始数据集 | 参数 | 非加权 | ⚠️ 已标注 | 补充分析 |
+
+**违反处理**：
+- M-R01/M-R02 违反（加权混用且未标注）→ 🛑 质检不通过，强制重跑
+- M-R07 违反（方法族切换且未说明）→ ⚠️ 质检警告，需补充理由
+
+#### 6.2.2 数据集一致性追踪表
+
+> 约束规则 D-R01~R05：每项分析标注数据集；不同数据集需提醒用户抉择。
+
+| 分析编号 | 分析名称 | 数据集 | 人群定义 | 样本量 | 与主分析一致性 |
+|---------|---------|-------|---------|-------|---------------|
+| A01 | 主分析 | ITT 人群 | 所有随机化受试者 | N=200 | — (基准) |
+| A02 | Table 1 | ITT 人群 | 所有随机化受试者 | N=200 | ✅ 一致 |
+| A03 | 安全性分析 | Safety 人群 | 至少接受1次给药 | N=195 | ⚠️ SAP预定义 |
+| A04 | 敏感性分析 | 完整病例 | 无缺失值 | N=170 | 🛑 需用户确认 |
+
+**违反处理**：
+- D-R02 触发（数据集不一致且不在 SAP 预定义中）→ 🛑 STOP，展示数据集差异清单，由用户抉择：
+  - [A] 统一使用同一数据集（推荐）
+  - [B] 接受差异，在报告中明确标注
+  - [C] 修改 SAP 以纳入此数据集定义
+
+#### 6.2.3 变量命名一致性检查
+
+> 约束规则 V-R01~R07：变量名在 SAP/代码/表格/图表/正文中必须一致。
+
+分析代码中使用的变量名必须与 SAP 变量构造规格书完全一致。输出结果中的变量展示名必须使用规范显示名（含单位）。
+
+**检查清单**：
+- [ ] 代码变量名与 SAP 定义一致（V-R01）
+- [ ] 输出表格使用规范显示名（V-R02）
+- [ ] 输出图表标签使用规范显示名（V-R03）
+- [ ] 单位标注完整且一致（V-R05）
+
+#### 6.2.4 P 值格式化执行
+
+> 约束规则 P-R01~R07：P<0.001 统一展示为 "P < 0.001"。
+
+所有分析代码中 P 值输出必须调用格式化函数：
+
+```python
+# Python
+from shared.templates.publication_figure_template import format_p_value
+p_str = format_p_value(p_value)  # P<0.001 → "P < 0.001"
+```
+
+```r
+# R
+source("shared/templates/publication_figure_template.R")
+p_str <- format_p_value(p_value)
+```
+
 ### Phase 7: 假设检验
 
 > 参考：shared/statistics-methods/methods_catalog.md — 假设检验方法速查
@@ -700,7 +962,19 @@ for group in df['treatment'].unique():
    - 查询错误诊断知识库获取修复方案
    - 生成降级方案（如参数→非参数）
 
-4. **SAP一致性检查**
+4. **统计原则违反用户抉择**（S-R01~R08）🆕
+   - 参考：shared/statistics-methods/statistical_constraints.md 第四节
+   - 检测到以下违反时必须 🛑 STOP，展示用户抉择模板：
+     - S-R01: 正态性违反但 SAP 预设参数方法 → 提供参数→非参数降级方案
+     - S-R03: 比例风险假设违反 → 提供分层 Cox / 时依系数方案
+     - S-R04: 多重共线性严重（VIF>10）→ 提供变量删除/合并方案
+     - S-R06: 样本量不足（EPV<10）→ 提供简化模型/转探索性方案
+     - S-R07: 回归斜率齐性违反（ANCOVA）→ 提供分层分析方案
+     - S-R08: 缺失率过高（>30%）→ 提供多重插补/敏感性分析方案
+   - 用户抉择选项：[A] 降级方法（推荐）/ [B] 数据变换 / [C] 维持原方法标注局限性 / [D] 修改SAP
+   - 处理结果记录在统计原则违反日志中
+
+5. **SAP一致性检查**
    - 比较SAP预设方法与数据特征
    - 如不匹配，自动推荐替代方法
    - 记录偏差并征得用户同意
@@ -734,6 +1008,21 @@ for group in df['treatment'].unique():
 > 3. SAP一致性检查结果
 >
 > 用户确认后才能进入质量检查。
+
+**Phase 7 检查点标准**:
+
+> 🔴 [MANDATORY-EXEC7] 以下情况必须暂停等待用户决策：
+> 1. S-R01: 比例风险假设违反（Schoenfeld P<0.05）→ 选择: 分层Cox / 时依协变量 / RMST
+> 2. S-R02: 正态性违反（Shapiro-Wilk P<0.01）且转换无效 → 选择: 非参数方法 / Bootstrap / 继续参数方法(记录风险)
+> 3. S-R03: 方差齐性违反（Levene P<0.05）→ 选择: Welch校正 / 变换 / 非参数
+> 4. S-R04: 完全分离（Logistic回归）→ 选择: Firth惩罚回归 / 精确Logistic / 合并类别
+> 5. S-R05: 多重共线性（VIF>10）→ 选择: 剔除变量 / 岭回归 / PCA降维
+> 6. S-R06: 权重极端值（IPTW weight>20）→ 选择: 截断 / 重新指定PS模型 / 放弃IPTW
+> 7. S-R07: 信息分离（事件数<10/变量）→ 选择: 减少变量 / 惩罚回归 / 标记[SKIP]
+> 8. S-R08: 竞争风险存在 → 选择: 起因特异性Cox / Fine-Gray子分布 / 复合终点
+>
+> 用户决策记录格式:
+> | 违反规则 | 检测值 | 用户选择 | 理由 | 时间戳 |
 
 ### Phase 7.5: SAP 修正请求（SAP Amendment Request）🆕
 
@@ -831,6 +1120,24 @@ for group in df['treatment'].unique():
   - [ ] 分母（样本量）明确
   - [ ] 假设检验结果
 
+✅ 统计约束合规 🆕
+  - [ ] P值格式符合 P-R01~R07（无 P=0.000，无二元化表述）
+  - [ ] 方法一致性追踪表已填写（M-R01~R08）
+  - [ ] 加权分析链无混用（M-R01/M-R02）
+  - [ ] 数据集一致性追踪表已填写（D-R01~R05）
+  - [ ] 数据集差异已提醒用户抉择（D-R02）
+  - [ ] 统计原则违反已记录并经用户确认（S-R01~R08）
+  - [ ] 变量命名一致性检查通过（V-R01~R07）
+
+✅ 图表发表级质量 🆕
+  - [ ] 强制 rcParams 已设置（font.family, svg.fonttype='none'）
+  - [ ] SVG 格式已导出（首要）
+  - [ ] PNG 300dpi 已导出（预览）
+  - [ ] 变量名使用规范显示名+单位
+  - [ ] P值标注符合 P-R01~R07
+  - [ ] 仅左+下轴线，无边框图例
+  - [ ] 多面板无冗余（反冗余检查通过）
+
 ⚠️ 偏差记录
   - [ ] 与SAP的任何偏差已记录
   - [ ] 偏差理由已说明
@@ -879,7 +1186,15 @@ for group in df['treatment'].unique():
 6. **依从性分析报告**: 用药依从率、合并用药汇总
 7. **安全性分析报告**: AE/SAE汇总、实验室检查、生命体征
 8. **结果表格**: 按SAP格式（主要/次要/探索性）
-9. **图表**: 出版级质量
+9. **图表**: 发表级质量，遵循 shared/chart-styles/publication_figure_standards.md
+   - 强制 rcParams: font.family=sans-serif, font.sans-serif=['Arial',...], svg.fonttype='none'
+   - 导出格式: SVG（首要）+ PNG 300dpi（预览）
+   - 配色: 语义化调色板或期刊配色（journal_color_schemes.json）
+   - 变量名: 遵循 variable_naming_conventions.md 规范显示名+单位
+   - P值标注: 遵循 P-R01~R07（P<0.001 展示为 "P < 0.001"）
+   - 模板: shared/templates/publication_figure_template.py
+   - 多面板: 遵循三级信息层级（概览→偏差→关系），无冗余面板
+   - 轴线: 仅左+下轴线，无边框图例
 10. **假设检验报告**: 所有诊断结果
 11. **质检报告**: 检查结果摘要
 12. **偏差日志**: 与SAP的任何偏差
@@ -1067,6 +1382,11 @@ audit_log.export_compliance_report(format="FDA_21CFR11")
 | 18 | 仅报告 AUC 不报告校准度(Brier Score/校准曲线) | AUC=0.85 但校准差的模型会高/低估实际风险 | 必须报告 Brier Score + 校准曲线；校准斜率应接近 1 |
 | 19 | IPTW/OW 加权后不检查权重分布和极端权重 | 极端权重导致方差膨胀，点估计不稳定 | 必须报告权重分布(min/median/max)；IPTW 需截断极端值；OW 自动截断 |
 | 20 | 预测模型不进行内部验证(Bootstrap/CV)就报告性能 | 未校正的性能指标虚高 | 必须使用 Bootstrap optimism correction 或 K-fold CV 校正性能指标 |
+| 21 | 自愈机制修改SAP预定义的分析方法 | 违反SAP一致性原则 | 自愈仅修复代码错误，不改变分析方法；需修改方法时走Phase 7.5 SAP修正流程 |
+| 22 | 审计日志记录分析代码但不记录执行环境 | 无法复现（包版本/随机种子缺失） | Phase 10审计日志必须包含: Python/R版本、包版本、随机种子、执行时间 |
+| 23 | P值格式化在代码层面而非报告层面处理 | 分析代码输出应保留原始精度 | 代码输出原始P值，报告Phase按P-R01规则格式化 |
+| 24 | 发表级图表使用默认matplotlib样式 | 不满足发表标准 | 必须使用shared/templates/publication_figure_template.py的apply_publication_style() |
+| 25 | 加权分析后使用非加权描述统计 | 违反M-R01方法一致性 | 加权后所有分析（含描述统计）必须使用加权数据，标注"weighted" |
 
 
 
