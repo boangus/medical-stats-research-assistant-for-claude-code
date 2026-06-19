@@ -8,7 +8,7 @@
   {
     "id": "pipe-02",
     "prompt": "我的观察性研究有3个中心的数据，需要使用IPTW进行混杂控制。数据准备阶段已完成，但跨中心一致性检查发现变量名不一致。Pipeline应该如何处理？",
-    "expected_behavior": "应识别multi-dataset模式，Stage 1.5门闸检查跨中心一致性产物，不一致时阻断退回Stage 1，修复后重新进入流程；Stage 2应激活Phase 6.7多中心分析计划",
+    "expected_behavior": "应识别multi-dataset模式，Stage 1.5门闸检查跨中心一致性产物，不一致时阻断退回Stage 1，修复后重新进入流程；Stage 2应激活Phase 3多中心分析计划（条件章节）",
     "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "resource_integration"]
   },
   {

@@ -67,7 +67,7 @@ tags: [medical-statistics, clinical-trial, pipeline, orchestrator, quality-gate]
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
 │  🔴 Stage 3.5: RESULTS QUALITY GATE  (阻断式检查)            │
-│  9 项检查 → ❌退回 Stage 3 / ✅进入 Stage 4                  │
+│  14 项检查 → ❌退回 Stage 3 / ✅进入 Stage 4                  │
 └────────────────────────────┬─────────────────────────────────┘
                              ▼
 ┌──────────────────────────────────────────────────────────────┐
@@ -838,7 +838,7 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-3 为 Exec Runner，Phase
 | Stage 2.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | SAP 8 项阻断检查 | 修改 SAP 内容 |
 | Stage 3 (Phase 0-3) | [Exec Runner](../../agents/exec_runner_agent.md) | `agents/exec_runner_agent.md` | 代码生成/执行/自愈 Debug | 偏离 SAP/自行解读结果 |
 | Stage 3 (Phase 4-6) | [Exec Inference](../../agents/exec_inference_agent.md) | `agents/exec_inference_agent.md` | 独立假设检验/质检/输出 | 修改代码/跳过假设验证 |
-| Stage 3.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 结果 9 项阻断检查 + Generator-Evaluator 差异审查 | 修改结果 |
+| Stage 3.5 | [QC Inspector](../../agents/qc_inspector_agent.md) | `agents/qc_inspector_agent.md` | 结果 14 项阻断检查 + Generator-Evaluator 差异审查 | 修改结果 |
 | Stage 4 | Report Expert | `skills/report/SKILL.md` | 解读/制表/生成 | 修改数据 |
 
 详细接棒协议（Handoff 格式）、异常上报规则（INFO/WARN/BLOCK 三级别及阻断触发条件）及跨 Agent 约束见 [agents/AGENTS.md](../../agents/AGENTS.md)。
@@ -980,7 +980,7 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-3 为 Exec Runner，Phase
 
 Stage 1 → [MANDATORY] → Stage 1.5(9项) → [MANDATORY]
 → Stage 2 → [SLIM] → [MANDATORY] → Stage 2.5(8项) → [MANDATORY]
-→ Stage 3 → [SLIM] → Stage 3.5(9项) → [MANDATORY]
+→ Stage 3 → [SLIM] → Stage 3.5(14项) → [MANDATORY]
 → Stage 4 → [MANDATORY] 合规检查 → 完成 ✅
 共 6 次 MANDATORY + 2 次 SLIM
 ```
