@@ -1,0 +1,20 @@
+[
+  {
+    "id": "dr-01",
+    "prompt": "我需要全面检索关于「中医药治疗2型糖尿病」的文献，用于撰写系统综述。请执行完整的文献检索。",
+    "expected_behavior": "应进入Full Mode，确认RQ后制定检索策略，从多源（PubMed/Cochrane/Web of Science/中文数据库）检索≥15篇文献，输出RQ Brief+Bibliography+Synthesis Report",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "resource_integration"]
+  },
+  {
+    "id": "dr-02",
+    "prompt": "快速帮我了解「孟德尔随机化在中医药研究中的应用」这个方向，给5篇核心文献和简要综述。",
+    "expected_behavior": "应进入Quick Mode，关键词检索→5篇核心文献→快速综述，输出Bibliography(5篇)+简要综述，不要求PRISMA合规",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity"]
+  },
+  {
+    "id": "dr-03",
+    "prompt": "我有一个MSRA Phase 1的文献对比结果（3篇关键文献），需要在此基础上补充检索，用于论文写作的Introduction和Discussion。",
+    "expected_behavior": "应检测到MSRA文献seed，以这3篇为起点扩展检索，标注Bibliography source = MSRA seed + extension，输出扩展后的Bibliography",
+    "test_dimensions": ["resource_integration", "workflow_clarity", "actionable_specificity"]
+  }
+]

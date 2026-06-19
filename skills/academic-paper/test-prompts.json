@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ap-01",
+    "prompt": "我需要写一篇关于中医药治疗代谢综合征的RCT论文。已有MSRA Handoff Bundle（包含SAP、Table 1、森林图、方法学描述），目标期刊为Journal of Integrative Medicine，Vancouver引文格式。",
+    "expected_behavior": "应检测到MSRA Handoff Bundle，自动预填RQ/Discipline/Method/Existing Materials/Citation(Vancouver)，激活clinical Domain Evidence Profile，跳过Step 1和Step 8，进入Stage 5.0 Paper Intake流程",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "resource_integration"]
+  },
+  {
+    "id": "ap-02",
+    "prompt": "帮我规划一篇关于机器学习预测ICU脓毒症患者预后的论文。我还没有明确的研究问题，需要先探索方向。",
+    "expected_behavior": "应进入Plan Mode，通过苏格拉底式对话帮助用户细化研究问题，输出章节规划文档+研究洞察集，使用FINER标准评估RQ",
+    "test_dimensions": ["workflow_clarity", "checkpoint_design", "actionable_specificity"]
+  },
+  {
+    "id": "ap-03",
+    "prompt": "我的论文被审稿人要求修订。审稿意见包括：1)方法学部分缺少样本量计算依据 2)Discussion未讨论局限性 3)表格P值格式不统一。请帮我修订。",
+    "expected_behavior": "应进入Revision Mode，读取Revision Roadmap，逐项修改对应章节，生成Response to Reviewers文档，每条回复包含修改位置+修改内容+回应理由",
+    "test_dimensions": ["failure_mode_encoding", "actionable_specificity", "workflow_clarity"]
+  }
+]

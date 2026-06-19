@@ -1,0 +1,20 @@
+[
+  {
+    "id": "apr-01",
+    "prompt": "请对我的论文进行完整评审。论文主题：针刺治疗慢性疼痛的随机对照试验，目标期刊为Pain杂志。",
+    "expected_behavior": "应启动Full Review模式，5位审稿人（EIC+方法学+领域+写作+Devil's Advocate）独立评审，输出Review Report+Revision Roadmap+Editorial Decision",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "checkpoint_design"]
+  },
+  {
+    "id": "apr-02",
+    "prompt": "我的论文修订后需要重审。审稿人要求：1)补充亚组分析 2)修正统计方法 3)加强Discussion。请验证修订是否满足要求。",
+    "expected_behavior": "应进入Re-Review模式，对照Response to Reviewers逐项验证，输出更新后的Review Report+R&R Traceability Matrix，标记每条意见的满足状态",
+    "test_dimensions": ["failure_mode_encoding", "actionable_specificity", "workflow_clarity"]
+  },
+  {
+    "id": "apr-03",
+    "prompt": "请聚焦评审我论文的方法学部分。研究使用倾向性评分匹配（PSM）控制混杂，主要终点为连续变量。",
+    "expected_behavior": "应进入Methodology Focus模式，重点审查PSM方法学严谨性（平衡性检验、敏感性分析、假设条件），输出方法学专项评审报告",
+    "test_dimensions": ["actionable_specificity", "workflow_clarity", "resource_integration"]
+  }
+]
