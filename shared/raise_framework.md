@@ -11,9 +11,9 @@ related: "Position Statement on AI Use in Evidence Synthesis (Cochrane, Campbell
 
 ## Scope disclaimer (required, do not remove)
 
-RAISE's official scope is **evidence synthesis** (systematic review, meta-analysis, scoping review, rapid review, evidence mapping). When ARS applies RAISE **principles** to non-evidence-synthesis work — e.g., `academic-paper full` on primary research — this is a **principle extension**, not official RAISE compliance. ARS's `compliance_agent` will only claim RAISE compliance for outputs produced in `systematic_review` or `other_evidence_synthesis` modes.
+RAISE's official scope is **evidence synthesis** (systematic review, meta-analysis, scoping review, rapid review, evidence mapping). When ARS applies RAISE **principles** to non-evidence-synthesis work — e.g., `academic-paper full` on primary research — this is a **principle extension**, not official RAISE compliance. The compliance checker will only claim RAISE compliance for outputs produced in `systematic_review` or `other_evidence_synthesis` modes.
 
-**Used by**: `compliance_agent` (Task 8).
+**Used by**: pipeline skill (Stage 2.5 / 4.5).
 
 ## Four principles
 
@@ -120,7 +120,7 @@ Used when `raise.mode == "full"` (SR and other_evidence_synthesis). Each role ca
 
 **ARS note:** Out of direct scope.
 
-## Usage in compliance_agent
+## Usage in compliance checker
 
 - SR mode: `raise.mode = "full"`, both principles AND roles populated
 - primary_research mode: `raise.mode = "principles_only"`, `roles` field absent or empty

@@ -1,5 +1,20 @@
 [
-  {"id": 1, "prompt": "分析已完成，帮我生成完整的统计报告", "expected": "Phase 1-7 流程（精简版：无 Phase 2/2.5），Phase 6 仅统计质量检查，完成后展示 Stage 4 checkpoint [A]/[B]"},
-  {"id": 2, "prompt": "帮我生成 Table 1", "expected": "quick 模式：直接生成基线特征表，跳过 Phase 1 解读"},
-  {"id": 3, "prompt": "Stage 4 checkpoint，我选 B 继续写论文", "expected": "设置 track=full_paper，生成 Handoff Bundle，dispatch 到 pipeline Stage 5.0"}
+  {
+    "id": "report-01",
+    "prompt": "基于以下分析结果生成完整的统计报告：ANCOVA显示治疗组HbA1c下降2.3%（95%CI: -2.8, -1.8），P<0.001，Cohen's d=0.45。次要终点：体重变化P=0.032。请生成HTML格式报告。",
+    "expected_behavior": "Phase 3变量命名规范化+P值格式化（P<0.001不显示P=0.000），Phase 4发表级图表标准，Phase 6d统计约束合规检查，Phase 6e图表发表质量检查，Phase 7组装HTML报告含SVG图表",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+  },
+  {
+    "id": "report-02",
+    "prompt": "检查以下报告片段的合规性：'P=0.000，治疗组效果显著。BMI分组按中位数分为两组。使用t检验（加权数据）。图表为PNG格式，分辨率150dpi。'",
+    "expected_behavior": "Phase 6d应检出4个违规：P-R01（P=0.000应为P<0.001）、V-R01（BMI按中位数分组无临床依据）、M-R01（加权数据用t检验不当）、发表标准（PNG 150dpi不达标，应为SVG+300dpi PNG）",
+    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "actionable_specificity"]
+  },
+  {
+    "id": "report-03",
+    "prompt": "生成符合CONSORT规范的RCT报告，包含流程图、Table 1（基线特征）、主要结果表、安全性分析表和KM曲线。",
+    "expected_behavior": "Phase 3引用CONSORT checklist，Phase 4生成CONSORT流程图+Table 1+效应量表+安全性表，Phase 5 statcheck验证，Phase 6d/6e合规检查，Phase 7 HTML报告含所有CONSORT必需章节",
+    "test_dimensions": ["workflow_clarity", "resource_integration", "overall_architecture"]
+  }
 ]

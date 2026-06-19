@@ -4,6 +4,10 @@
 # 输出: outcome/tables/Table1b_IPTW_Baseline.docx
 #       outcome/figures/PSM_Balance_Plot.pdf
 #       outcome/figures/IPTW_Weight_Distribution.pdf
+#
+# 注意：本模板专注于IPTW加权流水线。
+# 平衡诊断和Love plot请使用 ps_diagnostics_template.R 的 ps_love_plot() 函数。
+# 完整PSM匹配流程请使用 propensity_score_template.R。
 
 rm(list = ls())
 

@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper via ARS academic-pipeline integration",
   "author": "boangus",
   "license": "MIT",
@@ -82,12 +82,113 @@
         "/msra-calibrate --status",
         "/msra-calibrate --update new_results.csv"
       ]
+    },
+    "/ars-full": {
+      "id": "ars-full-pipeline",
+      "name": "ARS Full Pipeline",
+      "entry_point": "commands/ars-full.md",
+      "description": "Full academic research pipeline: research → write → review → revise → finalize (requires external academic-pipeline skill)",
+      "usage": "/ars-full",
+      "examples": ["/ars-full"]
+    },
+    "/ars-plan": {
+      "id": "ars-paper-plan",
+      "name": "ARS Paper Planning",
+      "entry_point": "commands/ars-plan.md",
+      "description": "Socratic chapter-by-chapter paper planning (requires external academic-paper skill)",
+      "usage": "/ars-plan",
+      "examples": ["/ars-plan"]
+    },
+    "/ars-outline": {
+      "id": "ars-paper-outline",
+      "name": "ARS Paper Outline",
+      "entry_point": "commands/ars-outline.md",
+      "description": "Generate paper outline through Socratic dialogue (requires external academic-paper skill)",
+      "usage": "/ars-outline",
+      "examples": ["/ars-outline"]
+    },
+    "/ars-abstract": {
+      "id": "ars-abstract",
+      "name": "ARS Abstract",
+      "entry_point": "commands/ars-abstract.md",
+      "description": "Generate structured abstract from paper draft (requires external academic-paper skill)",
+      "usage": "/ars-abstract",
+      "examples": ["/ars-abstract"]
+    },
+    "/ars-revision": {
+      "id": "ars-revision",
+      "name": "ARS Revision",
+      "entry_point": "commands/ars-revision.md",
+      "description": "Paper revision + Response to Reviewers (requires external academic-paper skill)",
+      "usage": "/ars-revision",
+      "examples": ["/ars-revision"]
+    },
+    "/ars-revision-coach": {
+      "id": "ars-revision-coach",
+      "name": "ARS Revision Coach",
+      "entry_point": "commands/ars-revision-coach.md",
+      "description": "Guided revision coaching with commitment tracking (requires external academic-paper skill)",
+      "usage": "/ars-revision-coach",
+      "examples": ["/ars-revision-coach"]
+    },
+    "/ars-format-convert": {
+      "id": "ars-format-convert",
+      "name": "ARS Format Convert",
+      "entry_point": "commands/ars-format-convert.md",
+      "description": "Export paper: MD → DOCX → PDF (requires external academic-paper skill)",
+      "usage": "/ars-format-convert",
+      "examples": ["/ars-format-convert"]
+    },
+    "/ars-reviewer": {
+      "id": "ars-reviewer",
+      "name": "ARS Paper Reviewer",
+      "entry_point": "commands/ars-reviewer.md",
+      "description": "Multi-perspective paper review (5 reviewers, requires external academic-paper-reviewer skill)",
+      "usage": "/ars-reviewer",
+      "examples": ["/ars-reviewer"]
+    },
+    "/ars-lit-review": {
+      "id": "ars-lit-review",
+      "name": "ARS Literature Review",
+      "entry_point": "commands/ars-lit-review.md",
+      "description": "Systematic literature search and synthesis (requires external deep-research skill)",
+      "usage": "/ars-lit-review",
+      "examples": ["/ars-lit-review"]
+    },
+    "/ars-citation-check": {
+      "id": "ars-citation-check",
+      "name": "ARS Citation Check",
+      "entry_point": "commands/ars-citation-check.md",
+      "description": "Verify citation accuracy and completeness (requires external academic-paper skill)",
+      "usage": "/ars-citation-check",
+      "examples": ["/ars-citation-check"]
+    },
+    "/ars-disclosure": {
+      "id": "ars-disclosure",
+      "name": "ARS AI Disclosure",
+      "entry_point": "commands/ars-disclosure.md",
+      "description": "Generate AI usage disclosure statement (requires external academic-paper skill)",
+      "usage": "/ars-disclosure",
+      "examples": ["/ars-disclosure"]
+    },
+    "/ars-mark-read": {
+      "id": "ars-mark-read",
+      "name": "ARS Mark Read",
+      "entry_point": "commands/ars-mark-read.md",
+      "description": "Mark a paper as read in the literature corpus (requires external deep-research skill)",
+      "usage": "/ars-mark-read [paper_id]",
+      "examples": ["/ars-mark-read S01"]
+    },
+    "/ars-unmark-read": {
+      "id": "ars-unmark-read",
+      "name": "ARS Unmark Read",
+      "entry_point": "commands/ars-unmark-read.md",
+      "description": "Unmark a paper as read in the literature corpus (requires external deep-research skill)",
+      "usage": "/ars-unmark-read [paper_id]",
+      "examples": ["/ars-unmark-read S01"]
     }
   },
-  "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research"],
+  "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research", "academic-writing", "paper-review"],
   "languages": ["zh-CN", "en"],
   "repository": "https://github.com/boangus/medical-stats-research-assistant"
 }
-
-
-

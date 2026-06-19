@@ -374,6 +374,15 @@ Stage 3.5 (9 项):
 | Stage 2: Analysis Plan | Method Consultant | QC Inspector (Stage 2.5 阻断门闸) |
 | Stage 3: Analysis Exec | Exec Runner (Phase 0-6) → Exec Inference (Phase 7-9) | Exec Inference (Generator-Evaluator 比对) → QC Inspector (Stage 3.5 阻断门闸) |
 | Stage 4: Report | Pipeline -> Report Skill | QC Inspector (规范检查) |
+| **Stage 4 Checkpoint** | **Pipeline Orchestrator** | — (MANDATORY: [A] 结束 / [B] Paper Track) |
+| **Stage 5.0: Paper Intake** | **Pipeline Orchestrator** | — (生成 Handoff Bundle + 配置论文) |
+| **Stage 5.1: Literature** | **deep-research** | — (融合点 C: MSRA seed 扩展) |
+| **Stage 5.2: Writing** | **academic-paper** | — (融合点 D/F: 方法学+表格图表复用) |
+| **Stage 5.5: Integrity** | **integrity verification** | Pipeline (融合点 B: Stage 3.5 门闸复用) |
+| **Stage 5.6: Review** | **academic-paper-reviewer** | — (5 人评审团) |
+| **Stage 5.7: Revision** | **academic-paper** | — (修订 + Response to Reviewers) |
+| **Stage 5.8: Final Integrity** | **integrity verification** | Pipeline |
+| **Stage 5.9: Finalize** | **academic-paper** | — (MD → DOCX → PDF) |
 
 ### 调度规则
 
@@ -401,10 +410,28 @@ Pipeline Orchestrator
   │
   └── Stage 4 → 扮演 Report Expert 角色
                    → QC Inspector 规范检查
-                   → 最终交付
+                   → ★ Stage 4 Checkpoint: [A] 结束 / [B] Paper Track
+                   │
+                   ├── [A] → Pipeline 结束 (report_only)
+                   │
+                   └── [B] → Stage 5.0: Pipeline 生成 Handoff Bundle
+                            → dispatch 到 academic-pipeline
+                            │
+                            ├── Stage 5.1 → deep-research (文献检索)
+                            ├── Stage 5.2 → academic-paper (论文写作)
+                            ├── Stage 5.5 → integrity verification 🔴
+                            ├── Stage 5.6 → academic-paper-reviewer (评审)
+                            ├── Stage 5.7 → academic-paper (修订)
+                            ├── Stage 5.8 → integrity verification 🔴
+                            ├── Stage 5.9 → academic-paper (定稿)
+                            └── Stage 6  → Process Summary
 ```
 
 **核心原则**: Pipeline Orchestrator 始终持有控制权。Agent 角色是"帽子"——你在不同阶段戴不同的帽子，完成该阶段工作后切回 Orchestrator 帽子。
+
+**Stage 5 特殊规则**: Pipeline Orchestrator 在 Stage 5.0 完成 Handoff Bundle 生成后，
+将控制权交给 `academic-pipeline` skill 的 orchestrator。academic-pipeline 接管 Stage 5.1-5.9 的
+调度，完成后返回 MSRA Pipeline Orchestrator 进行 Stage 6 Process Summary。
 
 ---
 

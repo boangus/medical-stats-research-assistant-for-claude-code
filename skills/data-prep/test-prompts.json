@@ -1,107 +1,20 @@
 [
   {
-    "id": 1,
-    "name": "数据清洗完整流程",
-    "prompt": "请帮我清洗这个糖尿病研究数据。原始数据有500例，但发现有很多缺失值（HbA1c缺失15%，BMI缺失8%），还有异常值（年龄有负值，BMI有500的极端值），以及重复记录。请完成数据清洗并生成清洗报告。",
-    "expected": "执行完整7阶段数据准备流程：加载→验证→清洗→转换→文档→质量门闸→产物打包，处理缺失值、异常值、重复值，生成数据清洗日志和质量报告",
-    "test_focus": ["dim2", "dim3", "dim8"]
+    "id": "data-01",
+    "prompt": "我有一个临床数据文件clinical_trial.csv，包含患者ID、年龄、性别、治疗组、HbA1c基线、HbA1c_24周、不良事件等列。请帮我验证数据质量并制定清洗策略。数据中年龄列有一个值为250，HbA1c基线有15%缺失。",
+    "expected_behavior": "Phase 0生成数据画像，Phase 1验证报告标记age=250为Critical、HbA1c缺失率15%为Warning，Phase 2交互式讨论清洗策略（异常值修正+缺失处理），Phase 2.5检测值变体，不自动清洗",
+    "test_dimensions": ["workflow_clarity", "failure_mode_encoding", "actionable_specificity"]
   },
   {
-    "id": 2,
-    "name": "值规范化处理",
-    "prompt": "我的数据中有一些不规范的值需要处理：性别列有'男'/'女'/'M'/'F'/'male'/'female'多种写法，吸烟状态有'是'/'否'/'1'/'0'/'Yes'/'No'，需要统一规范。",
-    "expected": "触发Phase 2.5值规范化，使用值规范化规则表统一编码，生成映射文档记录所有转换",
-    "test_focus": ["dim5", "dim9"]
+    "id": "data-02",
+    "prompt": "我的研究数据包含患者姓名、身份证号、电话号码和精确出生日期。数据需要上传到云端AI进行分析。请检查数据隐私合规性。",
+    "expected_behavior": "Phase 1第7项PHI检测应检出直接标识字段（姓名、身份证、电话），合规分级为🔴需脱敏，推荐哈希替换/日期偏移策略，提示需脱敏后才可分析，GDPR决策流程判断需DPA",
+    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "resource_integration"]
   },
   {
-    "id": 3,
-    "name": "数据质量门闸失败",
-    "prompt": "清洗后的数据质量检查显示：关键变量缺失率25%，这超过了我的阈值。但我需要继续分析，有什么办法？",
-    "expected": "触发质量门闸失败处理流程：展示问题清单→提供修复方案（多重插补/删除/放宽阈值）→用户选择后继续或退回清洗阶段",
-    "test_focus": ["dim3", "dim4", "dim8"]
-  },
-  {
-    "id": 4,
-    "name": "中医药术语规范化",
-    "prompt": "我的临床数据中有中医证型字段，但写法很不统一：'气虚'/'气虚证'/'气血亏虚'/'气虚血瘀'等，需要按GB/T 16751标准规范化。",
-    "expected": "触发TCM术语规范化→加载gb_t16751_syndrome.json映射表→匹配变体→规范化为标准术语→记录未匹配项供人工确认",
-    "test_focus": ["dim5", "dim9"]
-  },
-  {
-    "id": 5,
-    "name": "缺失模式评估",
-    "prompt": "我的数据有3种缺失模式：完全随机缺失(MCAR)、随机缺失(MAR)和非随机缺失(MNAR)。请帮我评估每种变量的缺失机制。",
-    "expected": "执行缺失模式评估：Little's MCAR检验→模式分析（单调/任意）→按变量分组评估→推荐处理策略（MI/CC/IPW）→记录评估结果",
-    "test_focus": ["dim5", "dim8"]
-  },
-  {
-    "id": 6,
-    "name": "盲态审核",
-    "prompt": "这是一个RCT数据，需要做盲态审核后才能锁定数据库。请帮我检查数据是否满足盲态要求。",
-    "expected": "执行盲态审核流程：检查是否按分组揭盲→验证随机化编号→检查数据锁定条件→生成盲态审核报告→确认数据库锁定",
-    "test_focus": ["dim4", "dim8"]
-  },
-  {
-    "id": 7,
-    "name": "EDA数据质量报告",
-    "prompt": "请对我的数据做探索性数据分析，重点关注数据质量问题：分布异常、离群值、变量间异常关联等。",
-    "expected": "执行EDA：分布检查(偏度/峰度)→离群值检测(IQR/Z-score)→变量关联热力图→缺失模式可视化→生成数据质量报告",
-    "test_focus": ["dim2", "dim5", "dim8"]
-  },
-  {
-    "id": 8,
-    "name": "数值格式变体处理",
-    "prompt": "我的数据中数值格式混乱：'1,234.56'/'1234,56'(欧洲格式)/'1.2e3'/'1,234'(千分位)，需要统一为标准数值格式。",
-    "expected": "触发数值规范化→检测格式模式→按PATTERNS.md规则转换→统一为标准浮点格式→记录转换日志",
-    "test_focus": ["dim5", "dim9"]
-  },
-  {
-    "id": 9,
-    "name": "数据字典验证",
-    "prompt": "我有一个数据字典文件dictionary.xlsx，请帮我验证数据是否与字典定义一致：变量类型、取值范围、编码规则等。",
-    "expected": "加载数据字典→逐变量验证类型一致性→检查取值范围→验证编码规则→生成验证报告（通过/不一致项）",
-    "test_focus": ["dim3", "dim8"]
-  },
-  {
-    "id": 10,
-    "name": "数据库锁定流程",
-    "prompt": "数据清洗完成了，请帮我执行数据库锁定流程，确保后续分析使用的是不可变的数据快照。",
-    "expected": "执行锁定流程：最终质量检查→生成数据指纹(SHA256)→创建锁定快照→更新passport状态为locked→生成锁定证明文件",
-    "test_focus": ["dim4", "dim8"]
-  },
-  {
-    "id": 11,
-    "name": "混合缺失模式处理",
-    "prompt": "我的数据有三种缺失：Age完全随机缺失5%，BMI随机缺失12%（与Age相关），HbA1c非随机缺失20%（重症患者更易缺失）。请评估缺失机制并推荐处理策略。",
-    "expected": "执行Little's MCAR检验→按变量分别评估机制→Age用均值/MI，BMI用MI(MAR)，HbA1c用pattern-mixture模型或敏感性分析→记录评估依据",
-    "test_focus": ["dim3", "dim5", "dim8"]
-  },
-  {
-    "id": 12,
-    "name": "多格式数据导入与合并",
-    "prompt": "我有3个数据源：patient_info.csv（人口学）、lab_results.xlsx（检验结果，多个sheet）、visit_log.json（就诊记录）。需要按PatientID合并为分析数据集。",
-    "expected": "加载多格式数据→检查各表主键一致性→左连接合并→处理合并冲突（同名不同义/同义不同名）→生成合并日志（匹配率、未匹配记录）",
-    "test_focus": ["dim2", "dim3", "dim8"]
-  },
-  {
-    "id": 13,
-    "name": "离群值处理策略决策",
-    "prompt": "我的连续变量中有明显离群值：收缩压有200+的极端值（可能是真实高血压危象），住院天数有>365天的极端值（可能是数据录入错误）。如何处理？",
-    "expected": "区分真实极端值vs录入错误→对可疑值溯源→提供3种处理方案（保留/Winsorize/删除）并说明各自假设→用户选择后执行→记录处理决策",
-    "test_focus": ["dim3", "dim4", "dim5"]
-  },
-  {
-    "id": 14,
-    "name": "时间序列数据验证",
-    "prompt": "我的纵向研究数据有多个访视时间点，需要检查：访视顺序是否合理、是否有时间逻辑错误（如随访日期早于入组日期）、是否所有受试者都有基线数据。",
-    "expected": "检查时间变量完整性→验证访视顺序（baseline→follow-up）→检测时间逻辑矛盾→检查基线数据覆盖率→生成时间线验证报告",
-    "test_focus": ["dim3", "dim8"]
-  },
-  {
-    "id": 15,
-    "name": "数据编码转换",
-    "prompt": "我的数据编码是GBK中文，需要转UTF-8。另外性别列用0/1编码但标签含义不明确（不知道0=男还是0=女），需要从数据字典确认并添加值标签。",
-    "expected": "检测文件编码→转码处理→从数据字典提取编码映射→添加值标签→验证转换后数据完整性→记录所有编码变更",
-    "test_focus": ["dim2", "dim5"]
+    "id": "data-03",
+    "prompt": "多中心研究有3个CSV文件（center_A.csv, center_B.csv, center_C.csv），各中心变量名不一致（如age vs Age vs 年龄）。请执行跨中心一致性检查。",
+    "expected_behavior": "Phase 0.5检测为multi-dataset模式，Phase 1b执行cross_site_consistency_check()，变量名一致性检查标记差异，生成cross_site_consistency_report.md，[SLIM]展示后继续",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
   }
 ]

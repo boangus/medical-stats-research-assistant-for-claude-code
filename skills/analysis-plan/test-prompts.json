@@ -1,72 +1,20 @@
 [
   {
-    "id": 1,
-    "name": "SAP完整制定",
-    "prompt": "我要做一个关于新型降糖药的心血管结局研究，是回顾性队列研究。请帮我制定完整的统计分析计划，包括研究问题、目标人群、暴露定义、结局定义、统计方法、样本量计算等。",
-    "expected": "执行完整6阶段SAP制定：研究类型识别→研究问题精炼→分析人群定义→统计方法选择→假设检验层次→SAP文档生成，输出markdown格式的SAP文档",
-    "test_focus": ["dim2", "dim5", "dim8"]
+    "id": "plan-01",
+    "prompt": "基于清洗后的RCT数据（治疗组vs安慰剂，主要终点为HbA1c从基线到24周的变化，连续变量），请制定统计分析计划。基线HbA1c、年龄、性别可能影响结局。",
+    "expected_behavior": "Phase 1深度EDA检查分布/缺失/异常值，Phase 2定义Estimands五要素（疗法策略/ITT/HbA1c变化/停药/均值差），Phase 3推荐ANCOVA调整基线，Phase 4生成SAP含Targeted-Context和[SKIP]预定义，Phase 5独立审查",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
   },
   {
-    "id": 2,
-    "name": "方法选择咨询",
-    "prompt": "我的数据是配对设计的重复测量数据，每个患者在3个时间点测量了血糖值。我应该用重复测量方差分析还是混合效应模型？",
-    "expected": "触发方法选择决策树，分析数据结构（配对+重复测量），推荐使用线性混合效应模型(LMM)并说明理由，提供代码模板",
-    "test_focus": ["dim5", "dim9"]
+    "id": "plan-02",
+    "prompt": "观察性队列研究：评估某药物对心血管事件的影响。数据有大量混杂因素（年龄、性别、BMI、合并症、用药史），需要控制未测量混杂。请选择方法并制定SAP。",
+    "expected_behavior": "Phase 3观察性分支：推荐IPTW/PSM+多变量调整+DAG，Phase 3高级方法表推荐E-value+阴性对照NCO，SAP §4.1必须预定义混杂控制策略，SAP §4.2必须包含E-value敏感性分析",
+    "test_dimensions": ["actionable_specificity", "failure_mode_encoding", "resource_integration"]
   },
   {
-    "id": 3,
-    "name": "Estimands框架应用",
-    "prompt": "我的RCT研究中有15%的失访和5%的停药，需要定义处理效应的估计目标。请帮我用Estimands框架明确治疗效应的定义。",
-    "expected": "应用ICE（伴发事件）分类框架，识别失访和停药对应的策略（假设缺失随机/治疗政策/复合策略等），填写5要素Estimands表格",
-    "test_focus": ["dim5", "dim8"]
-  },
-  {
-    "id": 4,
-    "name": "SAP质量门闸验证",
-    "prompt": "我写好了SAP草稿，请帮我用validate_sap.py检查是否有遗漏或不一致的地方。",
-    "expected": "调用validate_sap.py→检查8项门闸条件→输出通过/不通过项→对不通过项给出具体修改建议→更新门闸状态",
-    "test_focus": ["dim4", "dim8"]
-  },
-  {
-    "id": 5,
-    "name": "RCT样本量计算",
-    "prompt": "我的RCT研究主要终点是收缩压变化，预期治疗组降低12mmHg，对照组降低6mmHg，标准差15mmHg，双侧α=0.05，power=0.80。请帮我计算样本量。",
-    "expected": "使用sample_size_calculator→输入参数→计算每组样本量→考虑10%脱落率→输出最终样本量及计算过程",
-    "test_focus": ["dim5", "dim8"]
-  },
-  {
-    "id": 6,
-    "name": "观察性研究混杂控制策略",
-    "prompt": "我的队列研究有10个潜在混杂变量，请帮我制定混杂控制策略：哪些用PSM，哪些用多变量回归，哪些需要IPTW？",
-    "expected": "构建DAG→识别最小充分调整集→根据混杂变量特征推荐策略（连续/高维→PSM；少量→回归；治疗异质性→IPTW）→写入SAP",
-    "test_focus": ["dim5", "dim8"]
-  },
-  {
-    "id": 7,
-    "name": "多重比较校正策略",
-    "prompt": "我的研究有1个主要终点、3个次要终点和5个探索性终点。请帮我设计多重比较校正策略。",
-    "expected": "设计层级检验策略：主要终点(α=0.05)→次要终点(Hochberg/Bonferroni)→探索性终点(不校正但标注)→写入SAP假设检验层次",
-    "test_focus": ["dim5", "dim8"]
-  },
-  {
-    "id": 8,
-    "name": "变量构造逻辑预定义",
-    "prompt": "我需要在SAP中预定义以下分析变量的构造逻辑：复合终点（MACE=心血管死亡+非致死性心梗+非致死性卒中）、治疗依从性（用药≥80%天数比例）、基线HbA1c分类（<7%/7-8%/>8%）。",
-    "expected": "在SAP中为每个变量定义：构造公式→数据来源→处理缺失规则→验证方法→写入SAP变量构造章节",
-    "test_focus": ["dim5", "dim8"]
-  },
-  {
-    "id": 9,
-    "name": "SAP一致性检查",
-    "prompt": "我的SAP中定义了用Logistic回归做主要分析，但敏感性分析部分又写了用Cox回归。请检查这个SAP的一致性。",
-    "expected": "调用sap_consistency_check→检测方法-设计不匹配（Logistic用于横截面/Cox用于生存数据）→标记不一致→建议修正为一致的框架",
-    "test_focus": ["dim4", "dim5", "dim8"]
-  },
-  {
-    "id": 10,
-    "name": "非劣效试验SAP",
-    "prompt": "我要做一个非劣效试验，新药对比标准治疗，主要终点是12周有效率。非劣效界值设定为-10%。请帮我制定SAP。",
-    "expected": "识别非劣效设计→应用ch01非劣效试验方法→定义非劣效界值→单侧检验→样本量计算→SAP中明确非劣效假设和决策规则",
-    "test_focus": ["dim5", "dim8"]
+    "id": "plan-03",
+    "prompt": "诊断试验研究：评估某生物标志物对早期肺癌的诊断价值，金标准为病理活检。数据包含标志物水平（连续）、病理结果（阳性/阴性）、年龄、吸烟史。请制定分析计划。",
+    "expected_behavior": "Phase 3诊断试验分支：推荐AUC+敏感度/特异度+不同切点分析，金标准偏倚评估，SAP中预定义ROC分析、Youden指数切点选择、阳性/阴性预测值计算",
+    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
   }
 ]

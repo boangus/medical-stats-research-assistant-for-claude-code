@@ -1,13 +1,13 @@
 ---
 title: Compliance Checkpoint Protocol (Stage 2.5 / 4.5 dual gate)
-applies_to: "shared/agents/compliance_agent.md"
+applies_to: "skills/pipeline/SKILL.md"
 ---
 
 # Compliance Checkpoint Protocol
 
-Defines how `compliance_agent` participates in Stage 2.5 and Stage 4.5 Integrity Gates, how its decision interacts with the existing FAIL loop, and how user overrides are processed.
+Defines how compliance checks participate in Stage 2.5 and Stage 4.5 Integrity Gates, how decisions interact with the existing FAIL loop, and how user overrides are processed.
 
-**Used by**: `compliance_agent` (Task 8), `academic-pipeline/SKILL.md` Stage 2.5 / 4.5.
+**Used by**: `pipeline` skill (Stage 2.5 / 4.5), `academic-pipeline/SKILL.md` Stage 2.5 / 4.5.
 
 ## Dual-gate summary
 
@@ -67,7 +67,7 @@ Bullet in dashboard, no flow interruption.
 
 ## Canonical gap-tag vocabulary
 
-Compliance reports and fixture templates use these canonical tags in `gaps[].reason`, `principle_evidence[]`, and narrative fields. They are lexical signals — `compliance_agent` (Task 8) and downstream readers pattern-match on them.
+Compliance reports and fixture templates use these canonical tags in `gaps[].reason`, `principle_evidence[]`, and narrative fields. They are lexical signals — the pipeline compliance checker and downstream readers pattern-match on them.
 
 | Tag | Where it appears | Meaning |
 |---|---|---|
@@ -89,7 +89,7 @@ Triggered when user picks "acknowledge limitation" on a block.
 
 Round count is per-stage-per-pipeline-run, stored in `compliance_history[].user_override` entries.
 
-> **Enforcement boundary.** This ladder is enforced at **runtime by `compliance_agent`** using the `compliance_history[]` round counter, NOT by Schema 12. Schema 12 intentionally permits `user_override.rationale.minLength: 1` so that legacy passports and cross-session resume do not fail validation on historical entries. The round-counter increment and ≥100-char rationale check live in the agent's write-path, not in the JSON Schema. If you bypass the agent and hand-write a `user_override` entry into the passport, Schema 12 will accept any rationale length — but that entry will not have gone through the friction ladder and must be treated as unaudited.
+> **Enforcement boundary.** This ladder is enforced at **runtime by the pipeline skill** using the `compliance_history[]` round counter, NOT by Schema 12. Schema 12 intentionally permits `user_override.rationale.minLength: 1` so that legacy passports and cross-session resume do not fail validation on historical entries. The round-counter increment and ≥100-char rationale check live in the agent's write-path, not in the JSON Schema. If you bypass the agent and hand-write a `user_override` entry into the passport, Schema 12 will accept any rationale length — but that entry will not have gone through the friction ladder and must be treated as unaudited.
 
 On any successful override, the agent generates `disclosure_addendum` text and the orchestrator **auto-injects** it into the manuscript's AI disclosure section. The addendum is non-removable — this is the concrete form of the `no detection evasion` iron rule in CONTRIBUTING.md.
 
@@ -101,7 +101,7 @@ The authors acknowledge the following compliance limitations for this <evidence 
 - RAISE principle <principle_name>: <partial|not met>. Rationale: <user text>.
 ```
 
-**Template fill rules** (compliance_agent uses these deterministically):
+**Template fill rules** (the compliance checker uses these deterministically):
 
 - `<evidence synthesis|manuscript>`: pick `evidence synthesis` when `mode in {systematic_review, other_evidence_synthesis}`; pick `manuscript` when `mode == primary_research`.
 - `<partial|not met>`: pick `partial` when the principle's original status was `warn`; pick `not met` when it was `fail`.

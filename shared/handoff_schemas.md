@@ -778,18 +778,18 @@ See `shared/style_calibration_protocol.md` for full consumption rules and confli
 
 **Source of truth:** [`shared/compliance_report.schema.json`](compliance_report.schema.json)
 
-Mode-aware output of [`compliance_agent`](agents/compliance_agent.md). Three top-level subtrees: `prisma_trAIce` (null for primary research), `raise` (always present), and decision aggregation fields.
+Mode-aware output of the compliance checker. Three top-level subtrees: `prisma_trAIce` (null for primary research), `raise` (always present), and decision aggregation fields.
 
-- **Emitted by:** `compliance_agent` at Stage 2.5 / 4.5 (pipeline) or pre-finalize (standalone skills)
+- **Emitted by:** the pipeline skill at Stage 2.5 / 4.5 or pre-finalize (standalone skills)
 - **Consumed by:** orchestrator (for checkpoint dashboard), `report_compiler_agent` (for AI Self-Reflection Report compliance summary at Stage 6)
 - **Appended to:** `material_passport.compliance_history[]` (append-only)
 
 ### Key fields
 
-- `mode`: dispatches payload (see [`shared/agents/compliance_agent.md`](agents/compliance_agent.md) §Dispatch logic)
+- `mode`: dispatches payload (see [`shared/compliance_checkpoint_protocol.md`](compliance_checkpoint_protocol.md) §Dispatch logic)
 - `stage`: `"2.5"` or `"4.5"`
 - `prisma_trAIce`: `null` when `mode != "systematic_review"`; otherwise tier-bucketed item results
-- `prisma_trAIce.protocol_maturity` *(optional, added per issue #95)*: snapshot of the upstream protocol's self-described maturity status (`foundational_proposal` / `delphi_consensus` / `empirically_validated`) plus citation, snapshot date, and a one-paragraph caveat summary. Populated by `compliance_agent` from [`shared/prisma_trAIce_protocol.md`](prisma_trAIce_protocol.md) — its frontmatter (`citation`, `snapshot_date`) is the deterministic source for `upstream_citation` and `snapshot_date`; `status` is derived from the protocol authors' self-description (currently `foundational_proposal` per Holst et al. 2025, until upstream graduates the checklist via formal consensus); `caveat_summary` is composed from the protocol's framing. (Issue #93 / PR #94 add a `§ Status disclaimer` section to the protocol file as the canonical prose source for `caveat_summary`; until that PR lands, agents derive the summary from the Holst 2025 framing.) Omittable for byte-equivalent compatibility with pre-#95 entries (zero-touch).
+- `prisma_trAIce.protocol_maturity` *(optional, added per issue #95)*: snapshot of the upstream protocol's self-described maturity status (`foundational_proposal` / `delphi_consensus` / `empirically_validated`) plus citation, snapshot date, and a one-paragraph caveat summary. Populated by the compliance checker from [`shared/prisma_trAIce_protocol.md`](prisma_trAIce_protocol.md) — its frontmatter (`citation`, `snapshot_date`) is the deterministic source for `upstream_citation` and `snapshot_date`; `status` is derived from the protocol authors' self-description (currently `foundational_proposal` per Holst et al. 2025, until upstream graduates the checklist via formal consensus); `caveat_summary` is composed from the protocol's framing. (Issue #93 / PR #94 add a `§ Status disclaimer` section to the protocol file as the canonical prose source for `caveat_summary`; until that PR lands, agents derive the summary from the Holst 2025 framing.) Omittable for byte-equivalent compatibility with pre-#95 entries (zero-touch).
 - `raise.mode`: `"full"` (SR + other_evidence_synthesis) or `"principles_only"` (primary_research)
 - `raise.principles`: 4 keys, each with `pass` / `warn` / `fail`
 - `raise.roles`: 8 keys, populated only when `raise.mode == "full"`

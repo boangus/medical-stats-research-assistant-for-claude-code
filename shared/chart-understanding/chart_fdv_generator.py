@@ -492,7 +492,7 @@ class ChartFDVGenerator:
         # 检查数据点标签
         labeled_points = [p for p in self.data_points if p.label]
         if labeled_points:
-            findings.append(f"其中{labeled_points.len()}个数据点有标签")
+            findings.append(f"其中{len(labeled_points)}个数据点有标签")
         
         # 检查数据点范围
         x_values = [p.x for p in self.data_points if p.x is not None]

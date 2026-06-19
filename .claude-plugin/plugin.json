@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "medical-stats-research-assistant",
   "displayName": "MSRA — Medical Statistics Research Assistant",
-  "version": "0.7.6",
-  "description": "Pipeline-driven medical statistical analysis toolkit: 4 stages, 6 commands, from raw data to publication-ready report (CONSORT/STROBE/STARD).",
+  "version": "0.8.1",
+  "description": "Unified medical statistics + academic writing pipeline: raw data → statistical report → (optional) submittable paper. 6 skills, 20 commands, integrated ARS academic-pipeline.",
   "author": {
     "name": "boangus",
     "url": "https://github.com/boangus"

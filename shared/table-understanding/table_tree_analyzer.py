@@ -716,7 +716,7 @@ class TableTreeAnalyzer:
                                 if cell.strip():
                                     float(cell.replace(',', ''))
                             except ValueError:
-                                inconsistent_cells +=
+                                inconsistent_cells += 1
         
         return {
             'total_cells': total_cells,

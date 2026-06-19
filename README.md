@@ -133,8 +133,6 @@ medical-stats-research-assistant/
 │   │   ├── 02_var_define_template.R  # 变量定义模板
 │   │   ├── 03_baseline_template.R    # 基线分析模板
 │   │   └── 04_iptw_template.R        # IPTW分析模板
-│   ├── project-templates/        # 项目结构模板
-│   │   └── structured-analysis-workflow.md  # input/script/outcome 结构
 │   ├── sample-size/              # 样本量计算
 │   ├── causal-inference/         # 因果推断工作流
 │   ├── reproducibility/          # 可重复性验证
@@ -149,10 +147,8 @@ medical-stats-research-assistant/
 │   ├── risk-of-bias/             # 🆕 偏倚评估工具（RoB 2/ROBINS-I V2/PROBAST+AI/QUADAS-2/GRADE）
 │   ├── journal-templates/        # 期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ/AIM/CJE）
 │   ├── report-assembler/         # 报告组装器（DOCX/HTML输出）
-│   ├── sensitivity-agreement/    # 敏感性分析一致性评估
 │   ├── sap/                      # SAP标准化、一致性检查与方法转换
-│   ├── data_sharing/             # 数据共享（去标识化、代码包、结果包生成）
-│   └── archive/                  # 存档包（产物收集、清单生成、完整性验证）
+│   └── data_sharing/             # 数据共享（去标识化）
 │
 ├── examples/                     # 使用示例
 │   └── example_workflow.md
@@ -251,7 +247,7 @@ Rscript script/02_var_define.R
 # ... 继续后续分析
 ```
 
-详细指南请查看: [shared/project-templates/structured-analysis-workflow.md](shared/project-templates/structured-analysis-workflow.md)
+详细指南请查看: `skills/pipeline/SKILL.md` 中的工作流程说明
 
 ---
 

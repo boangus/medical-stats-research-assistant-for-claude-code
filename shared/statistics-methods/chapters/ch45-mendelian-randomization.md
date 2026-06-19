@@ -2,7 +2,7 @@
 
 > 版本: 1.0 | 2026-06-13
 > MSRA 关联: `analysis-plan` Phase 3 方法选择, `analysis-exec` Phase 7 因果推断
-> 注: 基础概念见 ch27-mendelian-randomization.md，本章聚焦方法学进阶与实操规范
+> 注: 本章为孟德尔随机化完整章节（原ch27基础概念已合并至本章）
 
 ---
 

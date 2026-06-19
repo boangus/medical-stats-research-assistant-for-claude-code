@@ -1,5 +1,20 @@
 [
-  {"id": 1, "prompt": "我有一份 RCT 的原始数据 (data.csv)，想从头开始完成整个分析流程，并且最后想写成可投稿的论文", "expected": "pipeline 检测到 Stage 1 入口 + 研究类型 RCT + 交互模式选择 → 分发到 data-prep；Stage 4 checkpoint 后应提示 [A]/[B] 选择"},
-  {"id": 2, "prompt": "数据已清洗好，帮我从分析计划开始，做到报告就行，不需要写论文", "expected": "pipeline 检测到 Stage 2 入口 + mid-entry 前置检查；Stage 4 checkpoint 应选 [A] 结束"},
-  {"id": 3, "prompt": "帮我写一篇关于 AI 在教育中应用的论文", "expected": "pipeline 拒绝进入（无数据处理需求），提示用户直接使用 ARS academic-paper"}
+  {
+    "id": "pipe-01",
+    "prompt": "我有一个RCT临床试验数据集（CSV格式，包含500名患者，治疗组/对照组各250人，主要终点为HbA1c从基线到24周的变化），请启动完整的MSRA流程，从数据准备到最终报告。",
+    "expected_behavior": "应按 Stage 0→1→1.5→2→2.5→3→3.5→4 顺序执行，在每个质量门闸处检查前置产物，Stage 3.5 检查14项阻断条件，最终输出HTML报告+SVG图表",
+    "test_dimensions": ["workflow_clarity", "checkpoint_design", "actionable_specificity"]
+  },
+  {
+    "id": "pipe-02",
+    "prompt": "我的观察性研究有3个中心的数据，需要使用IPTW进行混杂控制。数据准备阶段已完成，但跨中心一致性检查发现变量名不一致。Pipeline应该如何处理？",
+    "expected_behavior": "应识别multi-dataset模式，Stage 1.5门闸检查跨中心一致性产物，不一致时阻断退回Stage 1，修复后重新进入流程；Stage 2应激活Phase 6.7多中心分析计划",
+    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "resource_integration"]
+  },
+  {
+    "id": "pipe-03",
+    "prompt": "在Stage 3.5质量门闸检查中，P值格式检查（第10项）未通过——分析代码输出了P=0.000而不是P<0.001。Pipeline应该如何处理？",
+    "expected_behavior": "Stage 3.5门闸第10项标记❌，触发阻断条件，退回Stage 3要求analysis-exec修复P值格式（P-R01规则），修复后重新通过门闸",
+    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "actionable_specificity"]
+  }
 ]

@@ -272,6 +272,169 @@ def check_table_understanding(table_data: Dict) -> Dict:
         }
 
 
+def check_table_structure_integrity(table_data: Dict) -> Dict:
+    """
+    检查表格结构完整性
+    
+    Parameters
+    ----------
+    table_data : Dict
+        表格数据，包含headers和rows
+        
+    Returns
+    -------
+    Dict
+        结构完整性检查结果
+    """
+    results = {
+        'structure_score': 0.0,
+        'issues': [],
+        'suggestions': []
+    }
+    
+    # 检查必要字段
+    required_fields = ['headers', 'rows']
+    for field in required_fields:
+        if field not in table_data:
+            results['issues'].append(f"缺少必要字段: {field}")
+            results['suggestions'].append(f"请添加 {field} 字段")
+    
+    if 'headers' not in table_data or 'rows' not in table_data:
+        return results
+    
+    headers = table_data['headers']
+    rows = table_data['rows']
+    
+    # 检查表头完整性
+    if not headers:
+        results['issues'].append("表头为空")
+        results['suggestions'].append("请添加表头信息")
+    elif len(headers) < 2:
+        results['issues'].append("表头列数过少")
+        results['suggestions'].append("表格至少需要2列数据")
+    
+    # 检查数据行完整性
+    if not rows:
+        results['issues'].append("数据行为空")
+        results['suggestions'].append("请添加数据行")
+    else:
+        # 检查每行列数是否与表头一致
+        header_len = len(headers)
+        for i, row in enumerate(rows):
+            if len(row) != header_len:
+                results['issues'].append(f"第{i+1}行列数({len(row)})与表头列数({header_len})不匹配")
+                results['suggestions'].append(f"请检查第{i+1}行的数据完整性")
+    
+    # 检查缺失值
+    missing_count = 0
+    total_cells = len(rows) * len(headers)
+    for row in rows:
+        for cell in row:
+            if cell is None or cell == '' or cell == 'NA' or cell == 'N/A':
+                missing_count += 1
+    
+    if total_cells > 0:
+        missing_rate = missing_count / total_cells
+        if missing_rate > 0.1:
+            results['issues'].append(f"缺失值比例过高: {missing_rate:.1%}")
+            results['suggestions'].append("请检查数据完整性，缺失值比例建议控制在10%以内")
+    
+    # 计算结构分数
+    if not results['issues']:
+        results['structure_score'] = 1.0
+    else:
+        results['structure_score'] = max(0.0, 1.0 - len(results['issues']) * 0.1)
+    
+    return results
+
+
+def check_table_data_consistency(table_data: Dict) -> Dict:
+    """
+    检查表格数据一致性
+    
+    Parameters
+    ----------
+    table_data : Dict
+        表格数据，包含headers和rows
+        
+    Returns
+    -------
+    Dict
+        数据一致性检查结果
+    """
+    results = {
+        'consistency_score': 0.0,
+        'issues': [],
+        'suggestions': []
+    }
+    
+    if 'headers' not in table_data or 'rows' not in table_data:
+        results['issues'].append("缺少必要字段")
+        return results
+    
+    headers = table_data['headers']
+    rows = table_data['rows']
+    
+    if not rows or not headers:
+        return results
+    
+    # 检查数据类型一致性
+    for col_idx, header in enumerate(headers):
+        col_values = [row[col_idx] for row in rows if col_idx < len(row)]
+        
+        # 检查数据类型
+        numeric_count = 0
+        string_count = 0
+        for val in col_values:
+            if val is None or val == '' or val == 'NA' or val == 'N/A':
+                continue
+            try:
+                float(val)
+                numeric_count += 1
+            except (ValueError, TypeError):
+                string_count += 1
+        
+        # 如果既有数字又有字符串，可能存在类型不一致
+        if numeric_count > 0 and string_count > 0:
+            results['issues'].append(f"列 '{header}' 数据类型不一致（数字: {numeric_count}, 字符串: {string_count}）")
+            results['suggestions'].append(f"请检查列 '{header}' 的数据格式是否统一")
+    
+    # 检查数值范围合理性
+    for col_idx, header in enumerate(headers):
+        col_values = []
+        for row in rows:
+            if col_idx < len(row):
+                try:
+                    val = float(row[col_idx])
+                    col_values.append(val)
+                except (ValueError, TypeError):
+                    continue
+        
+        if len(col_values) < 2:
+            continue
+        
+        # 检查异常值（使用IQR方法）
+        col_values.sort()
+        q1 = col_values[len(col_values) // 4]
+        q3 = col_values[3 * len(col_values) // 4]
+        iqr = q3 - q1
+        lower_bound = q1 - 1.5 * iqr
+        upper_bound = q3 + 1.5 * iqr
+        
+        outliers = [v for v in col_values if v < lower_bound or v > upper_bound]
+        if len(outliers) > len(col_values) * 0.05:  # 超过5%的异常值
+            results['issues'].append(f"列 '{header}' 存在较多异常值: {len(outliers)}个")
+            results['suggestions'].append(f"请检查列 '{header}' 的数据是否合理")
+    
+    # 计算一致性分数
+    if not results['issues']:
+        results['consistency_score'] = 1.0
+    else:
+        results['consistency_score'] = max(0.0, 1.0 - len(results['issues']) * 0.15)
+    
+    return results
+
+
 def check_chart_understanding(chart_data: Dict) -> Dict:
     """
     检查图表理解质量
@@ -351,6 +514,164 @@ def check_chart_understanding(chart_data: Dict) -> Dict:
         }
 
 
+def check_chart_text_consistency(chart_data: Dict, text_content: str) -> Dict:
+    """
+    检查图表与文本一致性
+    
+    Parameters
+    ----------
+    chart_data : Dict
+        图表数据，包含类型、数据点、坐标轴等信息
+    text_content : str
+        相关文本内容
+        
+    Returns
+    -------
+    Dict
+        一致性检查结果
+    """
+    results = {
+        'consistency_score': 0.0,
+        'issues': [],
+        'suggestions': []
+    }
+    
+    # 提取图表中的关键信息
+    chart_title = chart_data.get('title', '')
+    chart_xlabel = chart_data.get('xlabel', '')
+    chart_ylabel = chart_data.get('ylabel', '')
+    chart_legend = chart_data.get('legend', [])
+    chart_data_points = chart_data.get('data_points', [])
+    
+    # 检查标题一致性
+    if chart_title and chart_title not in text_content:
+        results['issues'].append(f"图表标题 '{chart_title}' 未在文本中提及")
+        results['suggestions'].append("请在文本中引用图表标题")
+    
+    # 检查坐标轴标签一致性
+    if chart_xlabel and chart_xlabel not in text_content:
+        results['issues'].append(f"X轴标签 '{chart_xlabel}' 未在文本中提及")
+        results['suggestions'].append("请在文本中解释X轴含义")
+    
+    if chart_ylabel and chart_ylabel not in text_content:
+        results['issues'].append(f"Y轴标签 '{chart_ylabel}' 未在文本中提及")
+        results['suggestions'].append("请在文本中解释Y轴含义")
+    
+    # 检查图例一致性
+    for legend_item in chart_legend:
+        if legend_item and legend_item not in text_content:
+            results['issues'].append(f"图例项 '{legend_item}' 未在文本中提及")
+            results['suggestions'].append(f"请在文本中解释 '{legend_item}' 的含义")
+    
+    # 检查数据点描述一致性
+    if chart_data_points:
+        # 提取数据点中的关键数值
+        key_values = []
+        for point in chart_data_points:
+            if isinstance(point, dict):
+                for key, value in point.items():
+                    if isinstance(value, (int, float)):
+                        key_values.append(str(value))
+        
+        # 检查关键数值是否在文本中提及
+        missing_values = []
+        for value in key_values[:5]:  # 只检查前5个关键数值
+            if value not in text_content:
+                missing_values.append(value)
+        
+        if missing_values:
+            results['issues'].append(f"图表中的关键数值 {missing_values} 未在文本中提及")
+            results['suggestions'].append("请在文本中引用图表中的关键数据")
+    
+    # 计算一致性分数
+    if not results['issues']:
+        results['consistency_score'] = 1.0
+    else:
+        results['consistency_score'] = max(0.0, 1.0 - len(results['issues']) * 0.2)
+    
+    return results
+
+
+def check_chart_quality_automated(chart_data: Dict) -> Dict:
+    """
+    图表质量自动化评估
+    
+    Parameters
+    ----------
+    chart_data : Dict
+        图表数据，包含类型、数据点、坐标轴等信息
+        
+    Returns
+    -------
+    Dict
+        质量评估结果
+    """
+    results = {
+        'quality_score': 0.0,
+        'issues': [],
+        'suggestions': []
+    }
+    
+    # 检查图表类型
+    chart_type = chart_data.get('type', '')
+    if not chart_type:
+        results['issues'].append("未指定图表类型")
+        results['suggestions'].append("请指定图表类型（如line, bar, scatter等）")
+    
+    # 检查标题
+    title = chart_data.get('title', '')
+    if not title:
+        results['issues'].append("缺少图表标题")
+        results['suggestions'].append("请添加图表标题")
+    elif len(title) < 5:
+        results['issues'].append("图表标题过短")
+        results['suggestions'].append("请提供更具描述性的标题")
+    
+    # 检查坐标轴标签
+    xlabel = chart_data.get('xlabel', '')
+    ylabel = chart_data.get('ylabel', '')
+    if not xlabel:
+        results['issues'].append("缺少X轴标签")
+        results['suggestions'].append("请添加X轴标签")
+    if not ylabel:
+        results['issues'].append("缺少Y轴标签")
+        results['suggestions'].append("请添加Y轴标签")
+    
+    # 检查数据点
+    data_points = chart_data.get('data_points', [])
+    if not data_points:
+        results['issues'].append("缺少数据点")
+        results['suggestions'].append("请添加数据点")
+    elif len(data_points) < 2:
+        results['issues'].append("数据点过少")
+        results['suggestions'].append("图表至少需要2个数据点")
+    
+    # 检查图例
+    legend = chart_data.get('legend', [])
+    if len(data_points) > 1 and not legend:
+        results['issues'].append("多数据系列缺少图例")
+        results['suggestions'].append("请添加图例以区分不同数据系列")
+    
+    # 检查数据范围
+    if data_points and isinstance(data_points[0], dict):
+        for key in data_points[0].keys():
+            values = [point.get(key) for point in data_points if isinstance(point.get(key), (int, float))]
+            if values:
+                min_val = min(values)
+                max_val = max(values)
+                if min_val == max_val:
+                    results['issues'].append(f"数据系列 '{key}' 所有值相同")
+                    results['suggestions'].append(f"请检查数据系列 '{key}' 是否有意义")
+    
+    # 计算质量分数
+    if not results['issues']:
+        results['quality_score'] = 1.0
+    else:
+        results['quality_score'] = max(0.0, 1.0 - len(results['issues']) * 0.1)
+    
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(description="MSRA 自动化报告合规检查器")
     parser.add_argument("--report", required=True, help="报告文件路径 (MD/HTML)")
@@ -359,6 +680,11 @@ def main():
     parser.add_argument("--output", help="输出 JSON 文件路径")
     parser.add_argument("--check-table", help="检查表格数据 (JSON格式)")
     parser.add_argument("--check-chart", help="检查图表数据 (JSON格式)")
+    parser.add_argument("--check-chart-text", help="检查图表与文本一致性 (JSON格式)")
+    parser.add_argument("--text-content", help="文本内容文件路径")
+    parser.add_argument("--check-table-structure", help="检查表格结构完整性 (JSON格式)")
+    parser.add_argument("--check-table-consistency", help="检查表格数据一致性 (JSON格式)")
+    parser.add_argument("--check-chart-quality", help="检查图表质量 (JSON格式)")
     args = parser.parse_args()
 
     report_text = load_report(args.report)
@@ -381,6 +707,45 @@ def main():
             results['chart_understanding'] = chart_results
         except json.JSONDecodeError as e:
             results['chart_understanding'] = {'error': f"JSON解析失败: {e}"}
+
+    # 添加表格结构完整性检查
+    if args.check_table_structure:
+        try:
+            table_data = json.loads(args.check_table_structure)
+            structure_results = check_table_structure_integrity(table_data)
+            results['table_structure_integrity'] = structure_results
+        except json.JSONDecodeError as e:
+            results['table_structure_integrity'] = {'error': f"JSON解析失败: {e}"}
+
+    # 添加表格数据一致性检查
+    if args.check_table_consistency:
+        try:
+            table_data = json.loads(args.check_table_consistency)
+            consistency_results = check_table_data_consistency(table_data)
+            results['table_data_consistency'] = consistency_results
+        except json.JSONDecodeError as e:
+            results['table_data_consistency'] = {'error': f"JSON解析失败: {e}"}
+
+    # 添加图表质量自动化评估
+    if args.check_chart_quality:
+        try:
+            chart_data = json.loads(args.check_chart_quality)
+            quality_results = check_chart_quality_automated(chart_data)
+            results['chart_quality_automated'] = quality_results
+        except json.JSONDecodeError as e:
+            results['chart_quality_automated'] = {'error': f"JSON解析失败: {e}"}
+
+    # 添加图表与文本一致性检查
+    if args.check_chart_text and args.text_content:
+        try:
+            chart_data = json.loads(args.check_chart_text)
+            text_content = load_report(args.text_content)
+            text_consistency_results = check_chart_text_consistency(chart_data, text_content)
+            results['chart_text_consistency'] = text_consistency_results
+        except json.JSONDecodeError as e:
+            results['chart_text_consistency'] = {'error': f"JSON解析失败: {e}"}
+        except FileNotFoundError as e:
+            results['chart_text_consistency'] = {'error': f"文本文件不存在: {e}"}
 
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:

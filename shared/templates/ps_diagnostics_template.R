@@ -33,6 +33,9 @@ library(dplyr)
 #' 加权前后的标准化均值差 (SMD)。理想情况下加权后所有
 #' 协变量的 SMD 应 < 0.1。
 #'
+#' 注意：本函数为PS诊断专用，如需完整PSM流程请使用
+#' propensity_score_template.R 中的 love_plot。
+#'
 #' @param data 数据框
 #' @param treatment 处理变量名（字符），应为二分类因子
 #' @param covariates 协变量名向量（字符）
@@ -41,7 +44,7 @@ library(dplyr)
 #' @param title 图表标题
 #'
 #' @return ggplot 对象
-love_plot <- function(data, treatment, covariates, weights,
+ps_love_plot <- function(data, treatment, covariates, weights,
                       threshold = 0.1,
                       title = "Love Plot: Standardized Mean Differences") {
 
@@ -265,6 +268,9 @@ ps_overlap_plot <- function(ps_treated, ps_control,
 #' 计算每个协变量在加权前后的标准化均值差 (SMD)，
 #' 并标注是否满足平衡标准 (SMD < 0.1)。
 #'
+#' 注意：本函数为PS诊断专用，如需完整PSM流程请使用
+#' propensity_score_template.R 中的 compute_smd / balance_diagnostics。
+#'
 #' @param data 数据框
 #' @param treatment 处理变量名（字符）
 #' @param covariates 协变量名向量（字符）
@@ -272,7 +278,7 @@ ps_overlap_plot <- function(ps_treated, ps_control,
 #' @param threshold SMD 阈值，默认 0.1
 #'
 #' @return data.frame 包含变量名、加权前后 SMD、是否平衡
-balance_table <- function(data, treatment, covariates, weights,
+ps_balance_table <- function(data, treatment, covariates, weights,
                           threshold = 0.1) {
 
   treat_vec <- as.numeric(as.factor(data[[treatment]])) - 1
@@ -355,7 +361,7 @@ balance_table <- function(data, treatment, covariates, weights,
 #' @param ps 倾向得分向量（可选，用于重叠图）
 #' @param save_dir 图片保存目录（可选，为 NULL 则不保存）
 #'
-#' @return list(love_plot, weight_dist, overlap_plot, balance_tbl)
+#' @return list(ps_love_plot, weight_dist, overlap_plot, ps_balance_table)
 ps_diagnostics_summary <- function(data, treatment, covariates, weights,
                                     ps = NULL, save_dir = NULL) {
 
@@ -370,7 +376,7 @@ ps_diagnostics_summary <- function(data, treatment, covariates, weights,
 
   # 1. Love plot
   cat("--- [1/4] Love Plot ---\n")
-  p_love <- love_plot(data, treatment, covariates, weights)
+  p_love <- ps_love_plot(data, treatment, covariates, weights)
 
   # 2. 权重分布
   cat("\n--- [2/4] 权重分布 ---\n")
@@ -391,7 +397,7 @@ ps_diagnostics_summary <- function(data, treatment, covariates, weights,
 
   # 4. 平衡表
   cat("\n--- [4/4] 协变量平衡表 ---\n")
-  bal_tbl <- balance_table(data, treatment, covariates, weights)
+  bal_tbl <- ps_balance_table(data, treatment, covariates, weights)
 
   # 保存图片
   if (!is.null(save_dir)) {
@@ -413,10 +419,10 @@ ps_diagnostics_summary <- function(data, treatment, covariates, weights,
   cat("============================================================\n")
 
   invisible(list(
-    love_plot      = p_love,
-    weight_dist    = wt_result,
-    overlap_plot   = p_overlap,
-    balance_table  = bal_tbl
+    ps_love_plot    = p_love,
+    weight_dist     = wt_result,
+    overlap_plot    = p_overlap,
+    ps_balance_table = bal_tbl
   ))
 }
 
@@ -462,11 +468,11 @@ if (FALSE) {
   ps_vec <- m_out$distance
 
   # 3. 单项诊断
-  love_plot(demo_data, "treat", covs, weights_vec)
+  ps_love_plot(demo_data, "treat", covs, weights_vec)
   weight_distribution(weights_vec, demo_data$treat)
   ps_overlap_plot(ps_vec[demo_data$treat == "Treatment"],
                   ps_vec[demo_data$treat == "Control"])
-  balance_table(demo_data, "treat", covs, weights_vec)
+  ps_balance_table(demo_data, "treat", covs, weights_vec)
 
   # 4. 综合诊断
   ps_diagnostics_summary(

@@ -11,7 +11,7 @@ citation: "Holst D, et al. Transparent Reporting of AI in Systematic Literature 
 
 Verbatim snapshot of the 17-item PRISMA-trAIce checklist from the GitHub canonical source (`cqh4046/PRISMA-trAIce`), dated 2025-12-10, with per-item ARS check procedures and tier-based behaviour.
 
-**Used by**: `compliance_agent` (Task 8), `scripts/check_prisma_trAIce_freshness.py` (Task 12).
+**Used by**: pipeline skill (Stage 2.5 / 4.5), `scripts/check_prisma_trAIce_freshness.py` (Task 12).
 
 > ⚠️ **Upstream sync warning.** If `cqh4046/PRISMA-trAIce` updates, a freshness CI check emits an annotation but does not block merges. Maintainers must manually re-sync this file and bump `snapshot_date` + `upstream_version_commit`. See `scripts/check_prisma_trAIce_freshness.py`.
 
