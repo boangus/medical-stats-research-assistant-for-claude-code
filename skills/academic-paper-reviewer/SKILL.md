@@ -6,7 +6,11 @@ description: |
   Devil's Advocate），提供结构化的论文评审反馈。
   支持多种模式：完整评审(full)、重审(re-review)、方法学聚焦(methodology-focus)、
   快速评估(quick-assessment)、校准(calibration)。
-  触发: /ars-reviewer / peer review / 论文评审 / 审稿 / 模拟审稿 / reviewer
+  何时用: 论文初稿需预审 / 收到审稿意见需重审验证 / 方法学专项评审 /
+  快速判断论文是否值得继续投入 / 校准评审严格度。
+  不适用于: 仅需语言润色(用humanizer)、仅需格式排版、论文尚未完成初稿。
+  触发: /ars-reviewer / peer review / 论文评审 / 审稿 / 模拟审稿 / reviewer /
+  review paper / 审稿意见 / 评审反馈
 data_access_level: verified_only
 task_type: open-ended
 depends_on: []
@@ -63,6 +67,16 @@ works_with: [academic-paper, academic-pipeline, shared/handoff_schemas.md,
   5. **Revision Roadmap** → 生成优先级排序的修改建议清单
 - **输出**: Schema 6 (Review Report) + Schema 7 (Revision Roadmap)
 
+> 🔴 **CHECKPOINT: 5-Reviewer Completion (五位审稿人完成评审后)**
+>
+> **检查项**:
+> - [ ] 5 位审稿人是否均已提交独立报告？
+> - [ ] DA 是否提出了至少 1 个挑战性质疑？
+> - [ ] 每份报告是否包含具体的 target_section + suggested_action？
+>
+> **通过条件**: 全部勾选 → 继续 Editorial Synthesis
+> **未通过**: 返回缺失项，补充后再汇总
+
 ### 2. Re-Review (重审验证)
 
 - **触发**: pipeline Stage 8，修订后验证
@@ -75,6 +89,13 @@ works_with: [academic-paper, academic-pipeline, shared/handoff_schemas.md,
   5. **回归检测** → 检查是否有维度评分下降（regression）
   6. **输出决策** → 更新后的 Editorial Decision
 - **输出**: 更新后的 Review Report + Schema 11 (R&R Traceability Matrix)
+
+> 🛑 **STOP: Regression Gate (回归检测后)**
+>
+> 如果存在 REGRESSION-ALERT（任何维度下降 ≥3 分）→ **必须停止自动输出决策**，升级为用户决策：
+> 1. 展示回归详情（哪个维度、下降多少、可能原因）
+> 2. 用户选择：回滚修改 / 接受回归并继续 / 手动修复后重审
+> 3. 仅用户明确确认后才输出最终 Editorial Decision
 
 ### 3. Methodology Focus (方法学聚焦)
 
@@ -300,3 +321,5 @@ works_with: [academic-paper, academic-pipeline, shared/handoff_schemas.md,
 | 6 | 审稿意见只说"不好"不说"怎么改" | 每个问题必须附带具体的修改建议（target_section + suggested_action） | 纯批评无建设性的评审浪费作者时间，也无法转化为可执行的修订计划 |
 | 7 | Quick Assessment 模式下给出 Full Review 级别的详细意见 | Quick Assessment 仅输出方向性建议 + 一句话理由 | 输入信息不足时过度评审会产生误导性结论，且浪费计算资源 |
 | 8 | Re-Review 时忽略 Score Trajectory 回归 | 必须检查每个维度的分数变化，标记任何下降 ≥3 分的情况 | 修订引入新问题（回归）比原始问题更危险，因为作者和审稿人都容易忽略 |
+| 9 | Re-Review 时引入原始评审未提及的新意见 | Re-Review 仅验证原始 Revision Roadmap 中的意见是否被回应，不得新增评审意见 | 新增意见违反审稿契约，作者无法预期也无从回应，导致审稿循环无限延长 |
+| 10 | Quick Assessment 模式下输出 Schema 6/7 | Quick Assessment 仅输出 Accept/Revise/Reject + 一句话理由，不生成完整 Review Report | 输入信息不足时生成完整报告会包含大量推测，误导作者且浪费计算资源 |
