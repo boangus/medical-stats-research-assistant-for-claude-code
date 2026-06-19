@@ -50,11 +50,11 @@ def parse(path: str) -> list[tuple[str, int, int, int]]:
             m = re.search(r"(\d+)\s*\u9879\u68c0\u67e5", block.group(0))  # N 项检查
             stage_claim = int(m.group(1)) if m else 0
 
-        # --- 3. the "N 项" claim in the §4.1 M-table row for this stage ---
-        #   row looks like: | M1 | Stage 1.5 通过后 | ... | 9 项门闸检查结果 + ... |
+        # --- 3. the "N 项" claim in the §4.1 GATE-table row for this stage ---
+        #   row looks like: | GATE-01 | Stage 1.5 通过后 | ... | 9 项门闸检查结果 + ... |
         mtable_claim = 0
         for line in content.splitlines():
-            if re.match(r"\| M\d \|", line) and f"Stage {stage}" in line:
+            if re.match(r"\| GATE-\d+ \|", line) and f"Stage {stage}" in line:
                 m2 = re.search(r"(\d+)\s*\u9879", line)
                 if m2:
                     mtable_claim = int(m2.group(1))
