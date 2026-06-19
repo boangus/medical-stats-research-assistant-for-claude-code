@@ -462,6 +462,18 @@ All inter-stage artifacts conform to `shared/handoff_schemas.md`:
 | `retry_max_attempts` | 2 | 子 skill 调用失败最大重试次数 |
 | `retry_delays` | [30s, 60s] | 重试间隔（递增） |
 | `checkpoint_timeout` | 24h | Checkpoint 等待用户响应超时时间 |
+| `default_citation_format` | APA 7 | 默认引用格式（APA 7 / MLA / Chicago / Vancouver） |
+| `default_language` | en | 论文输出语言（en=英语, zh=中文） |
+| `default_time_range_full` | 10 years | full mode 默认文献检索时间范围 |
+| `default_time_range_quick` | 5 years | quick mode 默认文献检索时间范围 |
+| `socratic_max_rounds` | 6 | Socratic Mode 最大对话轮次 |
+| `finer_min_pass` | 4/5 | FINER 评估最低通过项数（4/5 项达标才确认 RQ） |
+| `composite_score_threshold` | 7.0 | 文献质量综合分阈值（30% 文献须达标） |
+| `quality_weight_relevance` | 0.4 | 相关性评分在综合质量分中的权重 |
+| `quality_weight_evidence` | 0.3 | 证据层级在综合质量分中的权重 |
+| `quality_weight_tier` | 0.3 | 质量层级在综合质量分中的权重 |
+| `prisma_checklist_version` | PRISMA 2020 | 系统综述使用的 PRISMA 检查清单版本 |
+| `duplicate_threshold` | 0.9 | 去重阈值（title 相似度 > 此值视为重复） |
 
 ---
 
