@@ -335,9 +335,10 @@ tags: [medical-statistics, clinical-trial, pipeline, orchestrator, quality-gate]
       - 通过标准: 无未处理的直接标识字段；准标识符已泛化或用户确认接受风险
   ```
 
-  - **全部通过** → ✅ 进入 Stage 2
-  - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 2（记录风险）
-  - **3+ 项未通过 或 项目 5/6/7/9 未通过** → ❌ **强制退回 Stage 1 修订**
+  - **全部通过 (9/9)** → ✅ 进入 Stage 2
+  - **条件通过 (7-8/9，即 ≤2 项非关键项未通过)** → ⚠️ 记录风险后进入 Stage 2
+  - **阻断 (≤6/9 或 关键项 5/6/7/9 任一未通过)** → ❌ **强制退回 Stage 1 修订**
+  > 关键项定义：项5(数据库锁定)、项6(逻辑一致性)、项7(值规范化)、项9(隐私合规) 为硬阻断项，不可条件通过。
 - **Checkpoint**: [MANDATORY-M1] 门闸通过后进入 Stage 2
 
 ### Stage 2: ANALYSIS PLAN
@@ -384,9 +385,10 @@ tags: [medical-statistics, clinical-trial, pipeline, orchestrator, quality-gate]
   □ 8. 可重复性: SAP 是否足够详细以便独立复现？
   ```
 
-  - **全部通过** → ✅ 进入 Stage 3
-  - **1-2 项未通过** → ⚠️ 提示用户，可带条件进入 Stage 3（记录偏差）
-  - **3+ 项未通过 或 项目 3/5/7 未通过** → ❌ **强制退回 Stage 2 修订**
+  - **全部通过 (8/8)** → ✅ 进入 Stage 3
+  - **条件通过 (6-7/8，即 ≤2 项非关键项未通过)** → ⚠️ 记录偏差后进入 Stage 3
+  - **阻断 (≤5/8 或 关键项 3/5/7 任一未通过)** → ❌ **强制退回 Stage 2 修订**
+  > 关键项定义：项3(估计目标完整)、项5(假设条件验证)、项7(变量构造逻辑) 为硬阻断项，不可条件通过。
 - **Checkpoint**: [MANDATORY-M2] 门闸通过后进入 Stage 3
 
 ### Stage 3: ANALYSIS EXEC
@@ -810,12 +812,13 @@ Stage 5  [论文写作]       ░░░░░░░░░░   --  ⏸ (track=fu
 
 > 在不同阶段切换为对应专家角色，完成后切回 Orchestrator 模式。
 > 完整定义见 [agents/AGENTS.md](../../agents/AGENTS.md)（含接棒协议、异常上报、跨 Agent 约束）。
-> Agent 角色定义文件：
+> Agent 角色定义文件（均已验证存在于 agents/ 目录）：
 > - [Data Validator Agent](../../agents/data_validator_agent.md) — Stage 1
 > - [Method Consultant Agent](../../agents/method_consultant_agent.md) — Stage 2
 > - [Exec Runner Agent](../../agents/exec_runner_agent.md) — Stage 3 Phase 0-6
 > - [Exec Inference Agent](../../agents/exec_inference_agent.md) — Stage 3 Phase 7-9
 > - [QC Inspector Agent](../../agents/qc_inspector_agent.md) — Stage 1.5/2.5/3.5
+> - [AGENTS.md](../../agents/AGENTS.md) — 接棒协议与跨 Agent 约束总纲
 
 ### 6.1 角色切换规则
 
@@ -911,7 +914,7 @@ Stage 3 使用 Generator-Evaluator 双角色：Phase 0-6 为 Exec Runner，Phase
 | 门闸 | 检查项 | 通过标准 | 条件通过 | 阻断标准 |
 |------|--------|---------|---------|---------|
 | Stage 1.5 | 9项检查 | 9/9通过 | 7-8/9通过(记录风险) | ≤6/9 或 项5/6/7/9未通过 |
-| Stage 2.5 | SAP审查 | ✅通过 | ⚠️需修改(修改后重审) | ❌需重做(回Phase 2) |
+| Stage 2.5 | 8项检查 | 8/8通过 | 6-7/8通过(记录偏差) | ≤5/8 或 项3/5/7未通过 |
 | Stage 3.5 | 14项检查 | 14/14通过 | 10-13/14通过(记录风险) | <10/14 或 项10/11/12/13未通过 |
 
 **Stage 3.5 关键项量化标准**:
