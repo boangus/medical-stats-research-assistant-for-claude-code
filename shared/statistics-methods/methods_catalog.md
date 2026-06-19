@@ -6,7 +6,7 @@
 > - **因果推断**: `psm_template.py` (PSM) | `overlapping_weighting_template.py` (OW) | `causal_inference_dowhy.py` (DoWhy+EconML)
 > - **机器学习**: `ml_analysis_template.py` (完整 ML 流程) | `shap_plot_template.py` (SHAP 可解释性)
 > - **临床预测模型**: `prediction_model_template.py` (TRIPOD 合规：EPV→开发→Bootstrap→DCA→列线图→报告)
-> - **敏感性一致性**: 已整合到 `analysis-exec` skill 的 Phase 6.1 敏感性分析模块
+> - **敏感性一致性**: 已整合到 `analysis-exec` skill 的 Phase 3 敏感性分析模块
 >
 > **统计方法指南** :
 > - **完整索引**: `shared/statistics-methods/INDEX.md` — 55 章完整索引

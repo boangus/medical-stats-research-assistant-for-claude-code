@@ -82,7 +82,7 @@
 | `shared/causal-inference/psm_template.py` | PSM 匹配 + 平衡诊断 |
 | `shared/causal-inference/overlapping_weighting_template.py` | OW/IPTW 加权 |
 | `shared/templates/ps_diagnostics_template.R` | R 版 PS 诊断（Love plot + 重叠图） |
-| `analysis-exec skill Phase 6.1` | 主分析 vs 敏感性一致性（已整合） |
+| `analysis-exec skill Phase 3` | 主分析 vs 敏感性一致性（已整合） |
 
 ## 参考文献
 

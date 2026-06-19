@@ -14,7 +14,7 @@ statsmodels>=0.14
 # ── 生存分析 (analysis-exec Phase 6) ───────────────────────
 lifelines>=0.27           # Python KM/Cox/竞争风险
 
-# ── 因果推断 (analysis-exec Phase 6.1) ──────────────────────
+# ── 因果推断 (analysis-exec Phase 3) ──────────────────────
 dowhy>=0.11               # DAG + 因果推断框架
 econml>=0.15              # 因果 ML (DML/CATE)
 causalinference>=0.1      # 轻量因果推断

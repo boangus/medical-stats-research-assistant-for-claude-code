@@ -270,7 +270,7 @@ class PassportManager:
             "type": "amendment",
             "format": "json",
             "status": "completed",
-            "produced_by": "analysis-exec Phase 7.5",
+            "produced_by": "analysis-exec Phase 3",
             "amendment_data": amendment_data,
         }
         self.add_artifact(artifact)

@@ -412,7 +412,7 @@ LLM 在医学统计场景下存在三类系统性弱点：
 | 为何危险 | 残留混杂使效应估计有偏，可能颠倒效应方向 |
 | RWE-bench 数据 | 混杂遗漏占失败案例的 22% |
 | 防御规则 | 观察性研究必须：1) 构建 DAG 识别混杂路径 2) 列出所有潜在混杂 3) 逐项说明调整/不调整理由 |
-| 涉及 SKILL | analysis-plan Phase 3, analysis-exec Phase 6.1 |
+| 涉及 SKILL | analysis-plan Phase 3, analysis-exec Phase 3 |
 
 ### K4. 效应量方向错误
 

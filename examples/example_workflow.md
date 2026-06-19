@@ -37,13 +37,13 @@ Stage 2: 分析计划
 
 ```
 Stage 3: 分析执行
-  Phase 0: SAP 验证 + 样本量验证
-  Phase 1-2: 变量构造 + 执行前检查
-  Phase 3-5: 描述性统计(Table1) + 依从性 + 安全性
-  Phase 6: 代码生成与执行（ANCOVA → 假设检验 → 敏感性分析）
-  Phase 6.1: （RCT 跳过）
+  Phase 0: SAP验证 + 执行前检查
+  Phase 1: 变量构造
+  Phase 2: 描述性统计(Table1) + 依从性 + 安全性
+  Phase 3: 推断分析（ANCOVA → 假设检验 → 敏感性分析）
+  Step 3.1: （RCT 跳过）
   🔴 [MANDATORY-ME1] 主要分析结果确认
-  Phase 7-9: 假设检验 + 质检 + 输出
+  Phase 4-6: 质检 + 输出 + 审计
 
   → 进入 Stage 3.5 质量门闸（8 项检查）
 ```
@@ -51,12 +51,12 @@ Stage 3: 分析执行
 ```
 Stage 4: 报告生成
   Phase 1: 结果解读（统计显著性 vs 临床意义）
-  Phase 2: 确定报告规范（CONSORT）
-  Phase 3-3.5: 生成表格 + 导出 .docx 三线表
-  Phase 4: 生成图表（KM 曲线、森林图等）
-  Phase 5: 方法学描述
-  Phase 6: 合规检查 🔴 [MANDATORY]
-  Phase 7: 报告组装（HTML + MD + PNG + DOCX）
+  (报告规范选择已移至 Paper Track Stage 5.0)
+  Phase 2: 表格生成与导出（Markdown + .docx 三线表）
+  Phase 3: 图表整合（KM 曲线、森林图等）
+  Phase 4: 方法学描述
+  Phase 5: 一致性校验 🔴 [MANDATORY]
+  Phase 6: 报告组装（HTML + MD + PNG + DOCX）
 
   → 输出最终报告
 ```
@@ -122,16 +122,16 @@ Stage 2: 分析计划
 ```
 Stage 3: 分析执行
   Phase 0: SAP 验证 + 样本量验证
-  Phase 1-2: 变量构造（按 SAP 定义的变量构造规则）
-  Phase 3-5: Table 1 + 依从性 + 安全性
-  Phase 6: Cox 回归（主要分析）
-  Phase 6.1: 观察性研究高级方法
+  Phase 1: 变量构造（按 SAP 定义的变量构造规则）
+  Phase 2: Table 1 + 依从性 + 安全性
+  Phase 3: Cox 回归（主要分析）
+  Step 3.1: 观察性研究高级方法
     → IPTW 加权（WeightIt + cobalt 平衡性诊断）
     → RCS 剂量-反应曲线（rms 包）
     → E-value 敏感性分析
     → 亚组分析（森林图）
   🔴 [MANDATORY-ME1] 主要分析结果确认
-  Phase 7-9: 假设检验 + 质检 + 输出
+  Phase 4-6: 质检 + 输出 + 审计
 ```
 
 ```
@@ -139,8 +139,8 @@ Stage 4: 报告生成
   Phase 1: 结果解读
   → 必须讨论: 残留混杂的可能性
   → 必须讨论: E-value 解释
-  Phase 2: 确定报告规范（STROBE）
-  Phase 3-7: 表格 + 图表 + 方法学描述 + 合规检查 + 报告组装
+  (报告规范选择已移至 Paper Track Stage 5.0)
+  Phase 2-6: 表格 + 图表 + 方法学描述 + 一致性校验 + 报告组装
 ```
 
 ### 关键差异（vs RCT）
@@ -151,7 +151,7 @@ Stage 4: 报告生成
 | 主要分析 | ANCOVA | Cox 回归 |
 | 敏感性分析 | 偏离 ITT | E-value / 未测量混杂 |
 | 报告规范 | CONSORT | STROBE |
-| Phase 6.1 | 跳过 | IPTW/RCS/E-value/亚组 |
+| Step 3.1 | 跳过 | IPTW/RCS/E-value/亚组 |
 
 ---
 
@@ -179,17 +179,17 @@ Stage 2: 分析计划
 
 ```
 Stage 3: 分析执行
-  Phase 6: ROC 分析
+  Phase 3: ROC 分析
   → 生成 ROC 曲线 + AUC + 95%CI
   → 最优切点 + 敏感度/特异度
-  Phase 6.1: （可选）决策曲线分析(DCA)
-  Phase 7: 诊断性能总结
+  Step 3.1: （可选）决策曲线分析(DCA)
+  Phase 3: 诊断性能总结
 ```
 
 ```
 Stage 4: 报告生成
-  Phase 2: 报告规范（STARD 或自定义）
-  Phase 4: 图表
+  (报告规范选择已移至 Paper Track Stage 5.0)
+  Phase 3: 图表整合
   → ROC 曲线（ggplot2）
   → 校准曲线
   → DCA 决策曲线
