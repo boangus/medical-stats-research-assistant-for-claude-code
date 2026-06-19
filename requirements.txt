@@ -49,7 +49,7 @@ simpleNomo>=0.1           # 列线图生成
 linearmodels>=5.3         # 2SLS / IV 估计
 
 # ── 断点回归 (shared/templates/regression_discontinuity_template.py) ──
-rdrobust>=2.2             # RD 局部线性回归 + 最优带宽
+rdrobust>=2.0              # RD 局部线性回归 + 最优带宽
 
 # ── 合成控制法 (shared/templates/synthetic_control_template.py) ──
 cvxpy>=1.4                # 凸优化 (权重求解)
