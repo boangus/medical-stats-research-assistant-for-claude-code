@@ -157,8 +157,29 @@ works_with: [deep-research, academic-paper-reviewer, shared/handoff_schemas.md,
 
 ### Step 12: Paper Configuration Record
 - **输入**: Step 1-11 全部配置
-- **输出**: Paper Configuration Record（结构化配置文档）
+- **输出**: Paper Configuration Record（结构化配置文档，Markdown 表格格式）
 - 🔴 **CHECKPOINT**: 展示完整配置，用户确认后进入 Writing Flow
+- **模板**:
+
+  ```markdown
+  # Paper Configuration Record
+
+  | 字段 | 值 |
+  |------|-----|
+  | Research Question | （FINER 评估后的明确 RQ） |
+  | Discipline | medicine / nursing / public health / ... |
+  | Paper Type | IMRaD / Case Study / Review / ... |
+  | Target Journal | （期刊名称，含 IF 和字数要求） |
+  | Citation Format | Vancouver / APA 7 / IEEE / ... |
+  | Output Format | Markdown / DOCX / LaTeX |
+  | Language | English / Chinese / Bilingual |
+  | Existing Materials | [x] Data [ ] Literature [x] Results [ ] Figures [x] Tables |
+  | Reporting Guideline | CONSORT / STROBE / STARD / ... |
+  | Domain Evidence Profile | clinical / general / ... |
+  | Style Calibration | 已校准 / 未校准（默认学科风格） |
+  | MSRA Handoff | 是 / 否（如是，标注 bundle passport_id） |
+  | Bibliography Source | MSRA seed + ARS extension / ARS only |
+  ```
 
 ---
 
@@ -172,7 +193,17 @@ works_with: [deep-research, academic-paper-reviewer, shared/handoff_schemas.md,
 
 ### Phase 2: Argument Building
 - **输入**: Schema 1 (RQ Brief) + Schema 3 (Synthesis) + Literature Gap Analysis
-- **输出**: 论证结构图（claim → evidence → reasoning）
+- **输出**: 论证结构图（Markdown 表格，列：Claim | Evidence | Reasoning）
+  - **Claim**: 论文核心主张（每条一句完整陈述）
+  - **Evidence**: 支撑该主张的具体文献/数据来源（标注引用编号）
+  - **Reasoning**: 从 Evidence 到 Claim 的推理逻辑（1-2 句）
+  - 输出格式示例：
+
+  | # | Claim | Evidence | Reasoning |
+  |---|-------|----------|-----------|
+  | 1 | TCM acupuncture reduces chronic pain severity | Smith 2023 [R1]: RCT n=200, VAS decreased 2.3±0.8 vs control 0.9±0.6 (P<0.001) | 大样本 RCT 显示具有临床意义的差异，效应量 d=1.85 |
+  | 2 | Effect is comparable to standard pharmacotherapy | Jones 2024 [R2]: network MA, acupuncture vs NSAIDs risk ratio 0.95 (95%CI 0.88-1.02) | 间接比较显示等效性，CI 包含 1 但下限接近 |
+
 - **失败处理**: evidence 不足以支撑 claim → 标注弱论证点，提示用户补充检索或调整 claim
 
 ### Phase 3: Draft Writing
@@ -200,7 +231,7 @@ works_with: [deep-research, academic-paper-reviewer, shared/handoff_schemas.md,
 - **输出**: Compliance Report（通过/警告/阻断）
 - [MSRA-BRIDGE] → 引入 MSRA 临床报告规范（CONSORT/STROBE/STARD）
 - 独立模式 → 使用 ARS 原生 compliance（RAISE + PRISMA-trAIce）
-- **失败处理**: 阻断项未通过 → 退回 Phase 3 修改，max 2 rounds
+- **失败处理**: 阻断项未通过 → 退回 Phase 3 修改，max 2 rounds。2 轮仍失败 → 升级为用户决策：1) 跳过该检查项并标注 WARNING 2) 手动修复后重新检查 3) 接受当前版本并记录偏差
 
 ### Phase 6: Output
 - **输入**: 通过 compliance check 的 Paper Draft
