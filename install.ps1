@@ -132,7 +132,10 @@ $skillDirs = @(
     "skills\academic-paper",
     "skills\academic-paper-reviewer",
     "skills\academic-pipeline",
-    "skills\deep-research"
+    "skills\deep-research",
+    "skills\deepxiv-cli",
+    "skills\deepxiv-trending-digest",
+    "skills\deepxiv-baseline-table"
 )
 $keyFiles = @(
     "shared\handoff_schemas.md",
@@ -140,7 +143,8 @@ $keyFiles = @(
     "shared\sap\sap_standard.md",
     ".claude\CLAUDE.md",
     "commands\msra.md",
-    "commands\ars-full.md"
+    "commands\ars-full.md",
+    "manifest.json"
 )
 
 $missingDirs = @()
@@ -166,7 +170,21 @@ if ($missingDirs.Count -gt 0 -or $missingFiles.Count -gt 0) {
     }
     Write-Host "  This is a self-contained plugin. If files are missing, reinstall from source." -ForegroundColor DarkYellow
 } else {
-    Write-Host "  All 10 skills and key files present. Project is self-contained." -ForegroundColor Green
+    Write-Host "  All 13 skills and key files present. Project is self-contained." -ForegroundColor Green
+}
+
+# 7. Verify all SKILL.md files exist
+Write-Host "`n[7/7] Verifying SKILL.md files..." -ForegroundColor Yellow
+$missingSkillMd = @()
+foreach ($d in $skillDirs) {
+    $skillMdPath = Join-Path $ProjectRoot "$d\SKILL.md"
+    if (-not (Test-Path $skillMdPath)) { $missingSkillMd += "$d\SKILL.md" }
+}
+if ($missingSkillMd.Count -gt 0) {
+    Write-Host "  WARNING: Missing SKILL.md files:" -ForegroundColor DarkYellow
+    foreach ($m in $missingSkillMd) { Write-Host "    - $m" -ForegroundColor DarkYellow }
+} else {
+    Write-Host "  All 13 SKILL.md files present." -ForegroundColor Green
 }
 
 # Dev mode: install dev dependencies

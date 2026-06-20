@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Imbad0202/academic-research-skills/shared/contracts/passport/version_records.schema.json",
+  "$id": "./shared/contracts/passport/version_records.schema.json",
   "title": "Material Passport Version Records (phase2_investigation/version_records.yaml)",
   "description": "Aggregate schema for academic citation version-family reconciliation. Per Kong #258. Owned by timeline_extraction_agent; literature_corpus_entry.schema.json remains unmodified.",
   "type": "object",

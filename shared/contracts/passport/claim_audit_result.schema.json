@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Imbad0202/academic-research-skills/shared/contracts/passport/claim_audit_result.schema.json",
+  "$id": "./shared/contracts/passport/claim_audit_result.schema.json",
   "title": "Material Passport Claim Audit Result Entry",
-  "description": "One entry in Material Passport Schema 9 claim_audit_results[] aggregate. Per-claim audit result emitted by claim_ref_alignment_audit_agent (v3.8.0) after the Cite-Time Provenance Finalizer pass at the Stage 4 -> Stage 5 boundary. Cross-field invariants INV-1..INV-18 are lint-enforced in scripts/check_claim_audit_consistency.py — JSON Schema cannot express the conditional matrix relating (judgment, audit_status, defect_stage, ref_retrieval_method). Three sibling entry-types ride in their own aggregates because they cannot satisfy the required-field shape of this schema: uncited_assertion (no ref_slug; §3.3), claim_drift (no judge invocation; §3.4), constraint_violation (uncited HIGH-WARN; §3.5). See docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md §3.1 + §5 for full rationale.",
+  "description": "One entry in Material Passport Schema 9 claim_audit_results[] aggregate. Per-claim audit result emitted by claim_ref_alignment_audit_agent (v3.8.0) after the Cite-Time Provenance Finalizer pass at the Stage 4 -> Stage 5 boundary. Cross-field invariants INV-1..INV-18 are lint-enforced in scripts/check_claim_audit_consistency.py �?JSON Schema cannot express the conditional matrix relating (judgment, audit_status, defect_stage, ref_retrieval_method). Three sibling entry-types ride in their own aggregates because they cannot satisfy the required-field shape of this schema: uncited_assertion (no ref_slug; §3.3), claim_drift (no judge invocation; §3.4), constraint_violation (uncited HIGH-WARN; §3.5). See docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md §3.1 + §5 for full rationale.",
 
   "type": "object",
   "additionalProperties": false,
@@ -50,14 +50,14 @@
     },
     "judgment": {
       "enum": ["SUPPORTED", "UNSUPPORTED", "AMBIGUOUS", "RETRIEVAL_FAILED"],
-      "description": "Judge verdict per the §4 step 5 prompt template. RETRIEVAL_FAILED is NOT a judge label — it is set when retrieval / anchorless / tool-failure prevents the judge from running (per error-handling §4 step 9)."
+      "description": "Judge verdict per the §4 step 5 prompt template. RETRIEVAL_FAILED is NOT a judge label �?it is set when retrieval / anchorless / tool-failure prevents the judge from running (per error-handling §4 step 9)."
     },
     "audit_status": {
       "enum": ["completed", "inconclusive"],
       "description": "completed = judge ran (or RETRIEVAL_FAILED with deterministic verdict like retrieval_existence). inconclusive = judge could not run and no deterministic verdict was reached."
     },
     "defect_stage": {
-      "comment": "Three categories of finding are intentionally NOT defect_stages of claim_audit_result and use their own §3.3/§3.4/§3.5 entry-type schemas: (a) uncited_assertion findings — no ref_slug to evaluate, see uncited_assertion.schema.json (§3.3); (b) claim_intent drift findings — detected by manifest set-diff not by judge, see claim_drift.schema.json (§3.4) (drift never produces a claim_audit_result row because the judge is never invoked for these — the only signal is intended ≠ emitted manifest-set difference); (c) uncited constraint violations — claim has no ref_slug AND violates an MNC/NC rule, see constraint_violation.schema.json (§3.5) (HIGH-WARN gate-refuse but no ref to bind into a claim_audit_result row). 8 values listed below.",
+      "comment": "Three categories of finding are intentionally NOT defect_stages of claim_audit_result and use their own §3.3/§3.4/§3.5 entry-type schemas: (a) uncited_assertion findings �?no ref_slug to evaluate, see uncited_assertion.schema.json (§3.3); (b) claim_intent drift findings �?detected by manifest set-diff not by judge, see claim_drift.schema.json (§3.4) (drift never produces a claim_audit_result row because the judge is never invoked for these �?the only signal is intended �?emitted manifest-set difference); (c) uncited constraint violations �?claim has no ref_slug AND violates an MNC/NC rule, see constraint_violation.schema.json (§3.5) (HIGH-WARN gate-refuse but no ref to bind into a claim_audit_result row). 8 values listed below.",
       "enum": [
         "retrieval_existence",
         "metadata",

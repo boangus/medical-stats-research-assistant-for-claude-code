@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Imbad0202/academic-research-skills/shared/benchmark_report.schema.json",
+  "$id": "./shared/benchmark_report.schema.json",
   "title": "ARS Benchmark Report",
   "type": "object",
   "required": [
@@ -75,7 +75,7 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
       "minItems": 1,
-      "description": "Known limitations. Empty array not permitted â€” honest disclosure required."
+      "description": "Known limitations. Empty array not permitted â€?honest disclosure required."
     }
   }
 }

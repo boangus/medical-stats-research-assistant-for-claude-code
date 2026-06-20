@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Imbad0202/academic-research-skills/shared/sprint_contract.schema.json",
+  "$id": "./shared/sprint_contract.schema.json",
   "title": "ARS Sprint Contract (Schema 13.1)",
   "type": "object",
   "additionalProperties": false,
@@ -159,7 +159,7 @@
           "properties": {
             "check_writer_artifact": {
               "const": "pre_commitment_artifacts",
-              "$comment": "Pinned to the single writer source for v3.6.6. Field shape exists (rather than inlining the const) for forward compatibility — when v3.6.7+ may add additional writer artifacts, this can relax to an enum without a breaking schema change."
+              "$comment": "Pinned to the single writer source for v3.6.6. Field shape exists (rather than inlining the const) for forward compatibility �?when v3.6.7+ may add additional writer artifacts, this can relax to an enum without a breaking schema change."
             }
           }
         },
@@ -200,7 +200,7 @@
           "condition_id": {
             "type": "string",
             "pattern": "^F(0|[1-9][0-9]?)$",
-            "$comment": "F0 reserved for accept-grade conditions per shipped templates §6.1+§6.2; spec §3.2 line 174 mistakenly writes ^F[1-9][0-9]?$ — DO NOT 'align' the schema back. Leading-zero forms (F00, F01) rejected to keep ordinal-position tie-break (§3.2 severity precedence) unambiguous."
+            "$comment": "F0 reserved for accept-grade conditions per shipped templates §6.1+§6.2; spec §3.2 line 174 mistakenly writes ^F[1-9][0-9]?$ �?DO NOT 'align' the schema back. Leading-zero forms (F00, F01) rejected to keep ordinal-position tie-break (§3.2 severity precedence) unambiguous."
           },
           "severity": { "type": "integer", "minimum": 0, "maximum": 100 },
           "cross_reviewer_quantifier": { "enum": ["any", "majority", "all"] },

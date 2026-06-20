@@ -1,32 +1,39 @@
 # Medical Statistics Research Assistant (MSRA)
 
-医学统计研究助手 — 面向医学研究者的统计分析流水线
+医学统计研究助手 — 从原始数据到可投稿论文的统一流水线
 
 [![CI](https://github.com/boangus/medical-stats-research-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/boangus/medical-stats-research-assistant/actions/workflows/ci.yml)
 
-一个以 **Pipeline 驱动** 的医学统计分析工具集。从原始数据到最终报告，4 个阶段、6 个命令，覆盖完整的医学统计分析流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
+一个以 **Pipeline 驱动** 的医学统计分析 + 学术写作工具集。从原始数据到最终报告，再到可投稿论文，6 个统计阶段 + 6 个写作阶段，覆盖完整的医学研究流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
 
-兼容 Claude Code、Codex、Cursor 等支持 Agent Skills Standard 的 runtime。
+**13 个内置 Skill，开箱即用，无需额外安装**。
 
 ---
 
 ## 快速开始
 
 ```bash
-# 一行安装（auto-detect runtime）
-# Claude Code: /plugin marketplace add boangus/medical-stats-research-assistant
-# 手动安装: 将 skills/ 目录复制到对应 runtime 的 skills 目录
+# Windows
+.\install.ps1
+
+# Mac / Linux
+./install.sh
 
 # 启动流水线（自动检测入口）
 /msra 我有一份RCT的原始数据，想完成整个分析
+
+# 直接进入论文写作
+/ars-full 帮我写一篇关于肺癌靶向治疗的综述
 ```
 
 ---
 
-## Pipeline 流水线
+## Pipeline 流水线全景
+
+### Stage 1-4: 统计分析流水线
 
 ```
-原始数据
+原始数据 → 研究类型识别（RCT / 观察性 / 诊断准确性）
    │
    ▼
 ┌─────────────────────────────────────────────────────┐
@@ -36,7 +43,7 @@
                    ▼
 ┌─────────────────────────────────────────────────────┐
 │  🔴 Stage 1.5: 数据质量门闸 (阻断式检查)             │
-│  8 项数据质量检查 → ✅ 通过 / ❌ 退回修订             │
+│  9 项数据质量检查 → ✅ 通过 / ❌ 退回修订             │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
@@ -65,31 +72,123 @@
 │  结果解读 → 表格/图表 → 方法学 → 规范检查            │
 └──────────────────┬──────────────────────────────────┘
                    ▼
-               最终报告
+          Checkpoint: [A] 仅报告 / [B] 继续写论文
 ```
 
-### 从任意阶段切入
+### Stage 5-6: 论文写作流水线（可选）
 
-| 你有什么 | 怎么说 | 从哪开始 |
-|---------|--------|---------|
-| 原始数据 | `/msra 我有原始数据` | Stage 1 → Stage 1.5 → ... |
-| 已清洗数据 | `/msra 数据已清洗，帮我做分析计划` | Stage 2（需确认 Stage 1.5 门闸通过） |
-| 已有SAP | `/msra 按这个SAP执行分析` | Stage 3 |
-| 已有结果 | `/msra 帮我生成CONSORT报告` | Stage 4 |
-| 不确定 | `/msra` | 自动检测 |
+```
+                    │
+                    ▼ (选择 [B])
+┌─────────────────────────────────────────────────────┐
+│  Stage 5.0: Paper Intake  /msra-paper              │
+│  Handoff Bundle + 论文配置 + 期刊选择               │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Stage 5.1: Literature Search  /ars-lit-review     │
+│  文献检索 + 综述撰写 + 参考文献库                    │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Stage 5.2: Paper Writing  /ars-plan               │
+│  IMRaD 章节撰写（复用方法学和表格图表）             │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  🔴 Stage 5.5: Integrity Check                      │
+│  完整性检查（阻断式）→ ✅ / ❌                       │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Stage 5.6: Peer Review  /ars-reviewer             │
+│  5人评审团（EIC+方法学+领域+写作+DA）               │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Stage 5.7: Revision  /ars-revision                │
+│  修订 + Response to Reviewers                      │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  🔴 Stage 5.8: Final Integrity                     │
+│  最终完整性检查（阻断式）→ ✅ / ❌                    │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Stage 5.9: Finalize  /ars-export                  │
+│  定稿导出（MD → DOCX → PDF）                        │
+└──────────────────┬──────────────────────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Stage 6: Process Summary                          │
+│  完整过程记录 + AI 自我反思 + 协作质量评估          │
+└─────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## 命令一览
 
+### 📊 统计分析命令（7个）
+
 | 命令 | 功能 | 对应阶段 |
 |------|------|---------|
-| `/msra` | 启动流水线（自动检测入口） | 全流程 |
+| `/msra` | 启动统一流水线（自动检测入口） | 全流程 |
+| `/msra-paper` | 进入论文写作轨道（Stage 5.0） | Stage 5.0 |
 | `/msra-data` | 数据验证与清洗 | Stage 1 |
 | `/msra-plan` | 方法探讨、SAP制定与审查 | Stage 2 |
 | `/msra-exec` | 按SAP执行分析 + 质量检查 | Stage 3 |
-| `/msra-report` | 生成出版级报告 | Stage 4 |
+| `/msra-report` | 生成出版级统计报告 | Stage 4 |
 | `/msra-calibrate` | 指标校准（金标准对比） | 校准 |
+
+### 📝 论文写作命令（6个）
+
+| 命令 | 功能 | 对应阶段 |
+|------|------|---------|
+| `/ars-full` | 完整学术写作流水线：研究→写作→评审→修订→定稿 | Stage 5.1-5.9 |
+| `/ars-plan` | 苏格拉底式章节规划 | Stage 5.2 |
+| `/ars-outline` | 论文大纲生成 | Stage 5.2 |
+| `/ars-revision` | 论文修订 + 审稿回应 | Stage 5.7 |
+| `/ars-export` | 导出论文：MD → DOCX → PDF | Stage 5.9 |
+| `/ars-disclosure` | AI使用披露声明生成 | Stage 5.8 |
+
+### 📚 文献检索命令（6个）
+
+| 命令 | 功能 | 说明 |
+|------|------|------|
+| `/ars-lit-review` | 系统性文献检索与综述 | 内置 deep-research skill |
+| `/ars-citation-check` | 引用准确性验证 | 检查参考文献完整性 |
+| `/deepxiv-cli` | DeepXiv 论文访问 CLI | 搜索和阅读学术论文 |
+| `/deepxiv-trending` | 热点论文摘要 | 汇总近期热门论文 |
+| `/deepxiv-baseline` | 基线对比表 | 构建方法/数据集/评分对比表 |
+| `/deepxiv-read` | 标记论文为已读 | 文献库管理 |
+
+### 🔍 论文评审命令（1个）
+
+| 命令 | 功能 | 说明 |
+|------|------|------|
+| `/ars-reviewer` | 多视角论文评审 | 5人评审团：EIC+方法学+领域+写作+DA |
+
+---
+
+## 13 个内置 Skill
+
+| Skill | 名称 | 职责 | 核心能力 |
+|-------|------|------|---------|
+| **pipeline** | 统一编排器 | Stage 1-6 全流程调度 | 意图检测、阶段识别、任务分发 |
+| **data-prep** | 数据准备 | Stage 1 | 数据验证、清洗、EDA、盲态审核 |
+| **analysis-plan** | 分析计划 | Stage 2 | 估计目标定义、方法探讨、SAP制定 |
+| **analysis-exec** | 分析执行 | Stage 3 | R/Python代码生成、统计分析执行 |
+| **report** | 报告生成 | Stage 4 | 表格/图表生成、方法学描述、规范检查 |
+| **calibration** | 度量校准 | 校准 | 金标准对比、指标校准 |
+| **academic-paper** | 论文写作 | Stage 5.2 | IMRaD撰写、摘要生成、格式导出 |
+| **academic-paper-reviewer** | 论文评审 | Stage 5.6 | 5人评审团、质量评估、修订建议 |
+| **academic-pipeline** | 写作流水线 | Stage 5.0-5.9 | 写作流程编排、完整性检查 |
+| **deep-research** | 文献检索 | Stage 5.1 | 系统性文献检索、综述撰写 |
+| **deepxiv-cli** | DeepXiv CLI | 文献访问 | arXiv/PMC论文搜索和阅读 |
+| **deepxiv-trending-digest** | 热点摘要 | 文献追踪 | 热门论文汇总 |
+| **deepxiv-baseline-table** | 基线表 | 文献分析 | 方法对比表构建 |
 
 ---
 
@@ -100,24 +199,56 @@ medical-stats-research-assistant/
 ├── manifest.json                 # 插件清单
 ├── README.md                     # 本文件
 ├── LICENSE                       # MIT 许可证
-├── requirements.txt              # CI 依赖
+├── requirements.txt              # Python 依赖
+├── install.ps1                   # Windows 安装脚本
+├── install.sh                    # Mac/Linux 安装脚本
+├── uninstall.ps1                 # Windows 卸载脚本
+├── uninstall.sh                  # Mac/Linux 卸载脚本
 │
 ├── .github/workflows/            # CI/CD
-│   └── ci.yml                    # GitHub Actions（smoke + lint）
+│   └── ci.yml                    # GitHub Actions
 │
-├── skills/                       # 6 个 Skill
-│   ├── pipeline/                 # 🔀 流水线编排器（核心）
-│   │   └── SKILL.md
+├── .claude/                      # Claude Code 配置
+│   ├── CLAUDE.md                 # 统一路由规则
+│   ├── commands/                 # 命令入口（install创建junction）
+│   └── skills/                   # Skill入口（install创建junction）
+│
+├── commands/                     # 命令定义（20个）
+│   ├── msra.md                   # MSRA 主命令
+│   ├── msra-data.md              # 数据准备
+│   ├── msra-plan.md              # 分析计划
+│   ├── msra-exec.md              # 分析执行
+│   ├── msra-report.md            # 报告生成
+│   ├── msra-calibrate.md         # 指标校准
+│   ├── msra-paper.md             # 论文轨道
+│   ├── ars-full.md               # 完整写作流水线
+│   ├── ars-plan.md               # 章节规划
+│   ├── ars-outline.md            # 大纲生成
+│   ├── ars-revision.md           # 论文修订
+│   ├── ars-export.md             # 论文导出
+│   ├── ars-disclosure.md         # AI披露声明
+│   ├── ars-reviewer.md           # 论文评审
+│   ├── ars-lit-review.md         # 文献综述
+│   ├── ars-citation-check.md     # 引用检查
+│   ├── deepxiv-cli.md            # DeepXiv CLI
+│   ├── deepxiv-trending.md       # 热点摘要
+│   ├── deepxiv-baseline.md       # 基线表
+│   └── deepxiv-read.md           # 标记已读
+│
+├── skills/                       # 13 个 Skill
+│   ├── pipeline/                 # 🔀 统一编排器（核心）
 │   ├── data-prep/                # 📊 数据准备
-│   │   └── SKILL.md
 │   ├── analysis-plan/            # 📋 分析计划
-│   │   └── SKILL.md
 │   ├── analysis-exec/            # ⚙️ 分析执行
-│   │   └── SKILL.md
 │   ├── report/                   # 📝 报告生成
-│   │   └── SKILL.md
-│   └── calibration/              # 🎯 指标校准
-│       └── SKILL.md
+│   ├── calibration/              # 🎯 指标校准
+│   ├── academic-paper/           # 📄 论文写作
+│   ├── academic-paper-reviewer/  # 🔍 论文评审
+│   ├── academic-pipeline/        # 📑 写作流水线
+│   ├── deep-research/            # 📚 文献检索
+│   ├── deepxiv-cli/              # 🖥️ DeepXiv CLI
+│   ├── deepxiv-trending-digest/  # 📈 热点摘要
+│   └── deepxiv-baseline-table/   # 📊 基线表
 │
 ├── agents/                       # 多 Agent 定义
 │   ├── AGENTS.md                 # 团队架构 + 协作协议
@@ -128,39 +259,81 @@ medical-stats-research-assistant/
 │   └── qc_inspector_agent.md     # 质量审查员
 │
 ├── shared/                       # 共享资源
-│   ├── templates/                # 代码模板 (R + Python)
-│   │   ├── 00_config_template.R  # 配置脚本模板
-│   │   ├── 02_var_define_template.R  # 变量定义模板
-│   │   ├── 03_baseline_template.R    # 基线分析模板
-│   │   └── 04_iptw_template.R        # IPTW分析模板
-│   ├── sample-size/              # 样本量计算
-│   ├── causal-inference/         # 因果推断工作流
-│   ├── reproducibility/          # 可重复性验证
-│   ├── calibration/              # 校准框架
+│   ├── templates/                # 代码模板 + 文档模板
+│   │   ├── quality-gates/        # 质量门闸报告模板（3个）
+│   │   ├── data-prep/            # 数据准备模板（4个）
+│   │   ├── msra_handoff_bundle_template.md
+│   │   └── (R/Python 代码模板 40+)
+│   ├── sap/                      # SAP标准化
+│   │   └── templates/            # SAP模板（观察性/RCT/诊断）
+│   ├── statistics-methods/       # 统计与方法指南 (48章)
+│   ├── reporting-guidelines/     # 报告规范检查清单（16个）
+│   ├── risk-of-bias/             # 偏倚评估工具（5个）
+│   ├── journal-templates/        # 期刊模板（7个）
 │   ├── passport/                 # Material Passport 产物追踪
-│   ├── statistics-methods/       # 统计与方法指南 (48章) + 方法目录
-│   ├── value-normalization/      # 值规范化（TCM术语+数值变体）
-│   ├── chart-styles/             # 图表样式库（期刊配色、图表类型、字体规范）
-│   ├── error-diagnostics/        # 错误诊断知识库（错误模式、自动修复建议）
-│   ├── anti-patterns/            # 反模式黑名单
-│   ├── reporting-guidelines/     # 报告规范检查清单（CONSORT 2025/SPIRIT 2025/STROBE/PRISMA 2020/PRISMA-NMA/STARD 2015/TRIPOD+AI/TRIPOD-LLM/CARE/REMARK/ARRIVE/statcheck/CHEERS 2022）
-│   ├── risk-of-bias/             # 🆕 偏倚评估工具（RoB 2/ROBINS-I V2/PROBAST+AI/QUADAS-2/GRADE）
-│   ├── journal-templates/        # 期刊模板（NEJM/JAMA/Lancet/BMJ/CMJ/AIM/CJE）
-│   ├── report-assembler/         # 报告组装器（DOCX/HTML输出）
-│   ├── sap/                      # SAP标准化、一致性检查与方法转换
-│   └── data_sharing/             # 数据共享（去标识化）
+│   ├── contracts/                # Schema 定义（20个）
+│   ├── handoff_schemas.md        # 跨Skill数据契约（12个Schema）
+│   └── ...                       # 其他共享资源
 │
-├── examples/                     # 使用示例
-│   └── example_workflow.md
+├── scripts/                      # 辅助脚本
+│   └── generate_msra_handoff_bundle.py
 │
-└── MSRA/                         # 运行时输出目录（由 install.ps1 创建）
+└── MSRA/                         # 运行时输出目录
     ├── data/                     # 用户数据
     ├── reports/                  # 分析报告
-    │   ├── figures/              # 图表
-    │   └── tables/               # 表格
     ├── passport/                 # 产物护照
     └── calibration/              # 校准数据库
 ```
+
+---
+
+## 安装说明
+
+### Windows
+
+```powershell
+# 克隆项目
+git clone https://github.com/boangus/medical-stats-research-assistant.git
+cd medical-stats-research-assistant
+
+# 运行安装脚本
+.\install.ps1
+
+# 可选：跳过 R/Python 检查
+.\install.ps1 -SkipR -SkipPython
+
+# 卸载
+.\uninstall.ps1
+```
+
+### Mac / Linux
+
+```bash
+# 克隆项目
+git clone https://github.com/boangus/medical-stats-research-assistant.git
+cd medical-stats-research-assistant
+
+# 运行安装脚本
+chmod +x install.sh
+./install.sh
+
+# 可选：跳过 R/Python 检查
+./install.sh --skip-r --skip-python
+
+# 卸载
+chmod +x uninstall.sh
+./uninstall.sh
+```
+
+### 安装后验证
+
+安装完成后，在 Claude Code 中运行：
+
+```
+/msra --status
+```
+
+应显示所有13个skill已注册，命令可用。
 
 ---
 
@@ -168,7 +341,7 @@ medical-stats-research-assistant/
 
 ### Pipeline 驱动
 - **纯调度**: Pipeline 不做实质性工作，只负责检测、推荐、调度、追踪
-- **3 个阻断式质量门闸**: Stage 1.5（数据质量）、Stage 2.5（SAP 质量）、Stage 3.5（结果质量）
+- **5 个阻断式质量门闸**: Stage 1.5（数据质量）、Stage 2.5（SAP质量）、Stage 3.5（结果质量）、Stage 5.5（审前完整性）、Stage 5.8（最终完整性）
 - **任意切入**: 通过意图检测自动识别用户当前阶段
 - **Checkpoint 机制**: 每个阶段结束后暂停，等待用户确认
 - **前置检查**: 进入下一阶段前验证前置产物是否完整
@@ -183,71 +356,12 @@ medical-stats-research-assistant/
 - 所有步骤生成可重复代码
 - 清洗过程完全记录
 - 分析严格按 SAP 执行
+- 产物追踪（Material Passport）
 
----
-
-## 结构化分析工作流 (input/script/outcome)
-
-MSRA 支持基于目录分离的标准化分析项目结构，灵感来自成熟的医学统计项目实践：
-
-### 目录结构
-
-```
-project/
-├── input/                    # 输入数据（原始数据，只读）
-│   ├── raw_data.csv         # 原始数据文件
-│   ├── data_dictionary.xlsx # 数据字典
-│   └── inclusion_criteria.md # 纳入排除标准
-│
-├── script/                   # 分析脚本（按执行顺序编号）
-│   ├── 00_config.R          # 全局配置
-│   ├── 01_data_extract.R    # 数据提取
-│   ├── 02_var_define.R      # 变量定义
-│   ├── 03_baseline.R        # 基线分析
-│   ├── 04_iptw_matching.R   # 倾向性评分
-│   └── 05_survival_analysis.R # 生存分析
-│
-├── load/                     # 中间数据（各步骤缓存）
-│   ├── 01_extracted.rda     # 提取后的数据
-│   ├── 02_var_defined.rda   # 变量定义后的数据
-│   └── 04_iptw.rda          # IPTW数据
-│
-└── outcome/                  # 最终结果
-    ├── tables/              # 表格输出
-    ├── figures/             # 图表输出
-    └── reports/             # 报告文档
-```
-
-### 核心原则
-
-1. **输入只读**: `input/` 中的文件永不修改，保留原始数据可追溯性
-2. **脚本编号化**: `00-`, `01-`, `02-` 前缀表示执行顺序
-3. **中间数据缓存**: 每步保存 `.rda` 到 `load/`，支持断点续跑
-4. **变量集中定义**: 在 `02_var_define.R` 统一定义标签、协变量、亚组
-5. **输入输出声明**: 每个脚本顶部声明 `input_file` 和 `output_dir`
-
-### 快速开始
-
-```bash
-# 1. 创建项目结构
-mkdir -p my_project/{input,script,load,outcome/{tables,figures,reports}}
-
-# 2. 复制模板脚本
-cp shared/templates/00_config_template.R my_project/script/00_config.R
-cp shared/templates/02_var_define_template.R my_project/script/02_var_define.R
-
-# 3. 放入原始数据
-cp my_data.csv my_project/input/raw_data.csv
-
-# 4. 按顺序运行脚本
-cd my_project
-Rscript script/00_config.R
-Rscript script/01_data_extract.R
-Rscript script/02_var_define.R
-# ... 继续后续分析
-```
-
-详细指南请查看: `skills/pipeline/SKILL.md` 中的工作流程说明
+### 自包含性
+- 13 个 skill 全部内置，无需额外安装
+- 所有共享资源（模板、指南、schema）本地存储
+- 跨平台支持（Windows/Mac/Linux）
 
 ---
 
@@ -262,27 +376,20 @@ Rscript script/02_var_define.R
 
 ## 支持的报告规范
 
-CONSORT 2025 (RCT, 30项) · **SPIRIT 2025 (试验协议, 34项) 🆕** · STROBE (观察性) · **PRISMA 2020 (系统综述, 27项) 🆕** · PRISMA-NMA (网络Meta) · **STARD 2015 (诊断, 30项) 🆕** · TRIPOD+AI (预测模型, 27项) · **TRIPOD-LLM (LLM研究, 19+50项) 🆕** · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物) · **statcheck 统计一致性校验 🆕** · **CHEERS 2022 (卫生经济学, 28项) 🆕**
+CONSORT 2025 (RCT) · SPIRIT 2025 (试验协议) · STROBE (观察性) · PRISMA 2020 (系统综述) · PRISMA-NMA (网络Meta) · STARD 2015 (诊断) · TRIPOD+AI (预测模型) · TRIPOD-LLM (LLM研究) · CARE (病例报告) · ARRIVE (动物实验) · REMARK (肿瘤标志物) · statcheck · CHEERS 2022 (卫生经济学)
 
 ## 偏倚评估工具
 
-> 系统综述/Meta 分析中评估纳入研究偏倚风险和证据确定性的专用工具，与报告规范互补使用。
-
-| 工具 | 适用研究类型 | 域数 | 判断等级 | 文件 |
-|------|------------|------|---------|------|
-| **RoB 2** | 随机对照试验 (RCT) | 5 域 | Low/Some/High | `shared/risk-of-bias/RoB_2_checklist.md` |
-| **ROBINS-I V2** | 非随机干预研究 (NRSI) | 7 域 | Low/Mod/Serious/Critical | `shared/risk-of-bias/ROBINS_I_V2_checklist.md` |
-| **PROBAST+AI** | 临床预测模型 | 4 域 20 信号问题 | Low/High/Unclear | `shared/risk-of-bias/PROBAST_checklist.md` |
-| **QUADAS-2** | 诊断准确性研究 | 4 域 | Low/High/Unclear | `shared/risk-of-bias/QUADAS_2_checklist.md` |
-| **GRADE** | 证据确定性汇总 | 5 降级+3 升级 | ⊕⊕⊕⊕ ~ ⊕○○○ | `shared/risk-of-bias/GRADE_framework.md` |
-
----
+| 工具 | 适用研究类型 | 文件 |
+|------|------------|------|
+| **RoB 2** | 随机对照试验 (RCT) | `shared/risk-of-bias/RoB_2_checklist.md` |
+| **ROBINS-I V2** | 非随机干预研究 (NRSI) | `shared/risk-of-bias/ROBINS_I_V2_checklist.md` |
+| **PROBAST+AI** | 临床预测模型 | `shared/risk-of-bias/PROBAST_checklist.md` |
+| **QUADAS-2** | 诊断准确性研究 | `shared/risk-of-bias/QUADAS_2_checklist.md` |
+| **GRADE** | 证据确定性汇总 | `shared/risk-of-bias/GRADE_framework.md` |
 
 ---
 
 ## 许可证
 
 MIT License
-
-
-

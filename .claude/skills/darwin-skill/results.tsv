@@ -1,11 +1,15 @@
 timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
-2026-06-19T00:01	baseline	pipeline	-	74.3	baseline	-	dim1:6 dim2:10 dim3:9 dim4:5 dim5:14 dim6:4 dim7:10 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
-2026-06-19T00:02	baseline	data-prep	-	78.6	baseline	-	dim1:7 dim2:11 dim3:10 dim4:5 dim5:15 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
-2026-06-19T00:03	baseline	analysis-plan	-	75.2	baseline	-	dim1:7 dim2:10 dim3:9 dim4:5 dim5:14 dim6:4 dim7:10 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
-2026-06-19T00:04	baseline	analysis-exec	-	79.5	baseline	-	dim1:7 dim2:11 dim3:11 dim4:5 dim5:15 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
-2026-06-19T00:05	baseline	report	-	77.4	baseline	-	dim1:7 dim2:10 dim3:10 dim4:5 dim5:15 dim6:4 dim7:10 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
-2026-06-19T00:06	baseline	calibration	-	73.8	baseline	-	dim1:7 dim2:10 dim3:9 dim4:4 dim5:14 dim6:4 dim7:9 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
-2026-06-19T00:07	baseline	academic-pipeline	-	76.1	baseline	-	dim1:6 dim2:10 dim3:10 dim4:5 dim5:14 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
-2026-06-19T00:08	baseline	academic-paper	-	72.0	baseline	-	dim1:6 dim2:9 dim3:9 dim4:4 dim5:13 dim6:4 dim7:9 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
-2026-06-19T00:09	baseline	academic-paper-reviewer	-	77.9	baseline	-	dim1:6 dim2:11 dim3:10 dim4:5 dim5:15 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
-2026-06-19T00:10	baseline	deep-research	-	75.6	baseline	-	dim1:6 dim2:10 dim3:9 dim4:5 dim5:14 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
+2026-06-19T01:00	baseline	pipeline	-	77.0	baseline	-	dim1:6 dim2:11 dim3:11 dim4:5 dim5:7 dim6:4 dim7:9 dim8:7 dim9:6 Stage流转图与§1重复+Paper Track臃肿	dry_run
+2026-06-19T01:01	baseline	data-prep	-	75.0	baseline	-	dim1:6 dim2:11 dim3:11 dim4:5 dim5:6 dim6:4 dim7:9 dim8:7 dim9:6 架构图与工作流图重叠+软化措辞3+处	dry_run
+2026-06-19T01:02	baseline	analysis-plan	-	76.6	baseline	-	dim1:6 dim2:10 dim3:11 dim4:5 dim5:7 dim6:4 dim7:9 dim8:7 dim9:6 Phase2捆绑过紧+方法速查表重叠	dry_run
+2026-06-19T01:03	baseline	analysis-exec	-	77.4	baseline	-	dim1:6 dim2:12 dim3:12 dim4:5 dim5:7 dim6:4 dim7:8 dim8:7 dim9:6 自愈流程重复描述+Phase3子步骤重叠	dry_run
+2026-06-19T01:04	baseline	report	-	85.1	baseline	-	dim1:5 dim2:9 dim3:9 dim4:5 dim5:13 dim6:4 dim7:7 dim8:7 dim9:5 双模式合并致冗余	dry_run
+2026-06-19T01:05	baseline	calibration	-	86.0	baseline	-	dim1:5 dim2:8.5 dim3:9 dim4:4.8 dim5:13 dim6:4 dim7:8 dim8:7 dim9:5.4 门闸伪代码与表格重复	dry_run
+2026-06-19T01:06	baseline	deep-research	-	79.4	baseline	-	dim1:6 dim2:7 dim3:5 dim4:4.8 dim5:9 dim6:4 dim7:8 dim8:7 dim9:4.2 操作密度不足大量委托refs	dry_run
+2026-06-19T01:07	baseline	academic-paper-reviewer	-	79.7	baseline	-	dim1:6 dim2:8 dim3:4 dim4:5 dim5:10 dim6:4 dim7:8.5 dim8:7 dim9:3.6 无显式failure mode表	dry_run
+2026-06-19T02:00	3838ceb	data-prep	75.0	77.6	keep	dim5	replace 5 soft language instances with direct action items	dry_run
+2026-06-19T02:01	11b9093+2d9ae95	analysis-plan	76.6	78.4	keep	dim2+dim7	split Phase 2 into 3 sub-steps + add cross-reference to reduce table overlap	dry_run
+2026-06-19T02:02	76ba1f6+fce8c13	pipeline	77.0	78.2	keep	dim5+dim7	remove redundant Stage流转图 + replace 3 soft language instances	dry_run
+2026-06-19T03:00	455affa	analysis-exec	77.4	78.0	keep	dim7	consolidate redundant self-healing + unify audit log numbering (-18 lines)	dry_run
+2026-06-19T03:01	5884638	academic-paper-reviewer	79.7	84.1	keep	dim3+dim9	add 11-row failure mode table + 7-item anti-pattern blacklist	dry_run
+2026-06-19T03:02	5ad1eb7	deep-research	79.4	83.2	keep	dim3+dim5	inline Socratic 5-layer flow + 12-row failure mode table	dry_run

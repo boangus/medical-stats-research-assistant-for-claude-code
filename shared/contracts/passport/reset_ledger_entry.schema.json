@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Imbad0202/academic-research-skills/shared/contracts/passport/reset_ledger_entry.schema.json",
+  "$id": "./shared/contracts/passport/reset_ledger_entry.schema.json",
   "title": "Passport Reset Ledger Entry",
   "description": "One append-only ledger entry in reset_boundary[]. Two kinds: 'boundary' (recorded at a FULL checkpoint when ARS_PASSPORT_RESET=1) and 'resume' (recorded when resume_from_passport consumes a boundary entry). See academic-pipeline/references/passport_as_reset_boundary.md.",
   "oneOf": [
@@ -28,7 +28,7 @@
         "hash": {
           "type": "string",
           "pattern": "^[0-9a-f]{12}$",
-          "description": "First 12 lowercase hex characters of SHA-256 over the concatenated ledger (prior entries + this entry with hash set to the canonical placeholder '000000000000'). Placeholder rule is normative â€” see protocol doc Â§'The reset boundary protocol' step 2."
+          "description": "First 12 lowercase hex characters of SHA-256 over the concatenated ledger (prior entries + this entry with hash set to the canonical placeholder '000000000000'). Placeholder rule is normative â€?see protocol doc Â§'The reset boundary protocol' step 2."
         },
         "stage": {
           "type": "string",
@@ -90,7 +90,7 @@
                   "value": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "Branch identifier. Must be unique across the options array â€” chosen_branch on the resume entry matches this field."
+                    "description": "Branch identifier. Must be unique across the options array â€?chosen_branch on the resume entry matches this field."
                   },
                   "next_stage": {
                     "type": ["string", "null"],
@@ -127,7 +127,7 @@
         "consumes_hash": {
           "type": "string",
           "pattern": "^[0-9a-f]{12}$",
-          "description": "Hash of the boundary entry this resume consumes. Append-only pointer â€” lets readers compute awaiting_resume state from the ledger alone."
+          "description": "Hash of the boundary entry this resume consumes. Append-only pointer â€?lets readers compute awaiting_resume state from the ledger alone."
         },
         "generated_at": {
           "type": "string",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Imbad0202/academic-research-skills/shared/contracts/passport/timeline.schema.json",
+  "$id": "./shared/contracts/passport/timeline.schema.json",
   "title": "Material Passport Timeline (phase2_investigation/timeline.yaml)",
   "description": "Aggregate schema for the v3.9.4 timeline sidecar. Per spec §3.1 and §4. Owned by timeline_extraction_agent; literature_corpus_entry.schema.json is unmodified.",
   "type": "object",
@@ -27,7 +27,7 @@
       "properties": {
         "value": { "type": ["string", "null"] },
         "precision": { "enum": ["day", "month", "year", "interval", "unknown"] },
-        "open_ended": { "type": "boolean", "description": "True ONLY on effective_date_range.end when the source is still in force (verifier treats as +∞). MUST be absent or false on any other date. False or absent with value:null + precision:unknown means missing data (verifier emits TEMPORAL-METADATA-MISSING). Per spec §3.1 date shape table." },
+        "open_ended": { "type": "boolean", "description": "True ONLY on effective_date_range.end when the source is still in force (verifier treats as +�?. MUST be absent or false on any other date. False or absent with value:null + precision:unknown means missing data (verifier emits TEMPORAL-METADATA-MISSING). Per spec §3.1 date shape table." },
         "provenance": { "$ref": "#/$defs/provenance_object" }
       }
     },
