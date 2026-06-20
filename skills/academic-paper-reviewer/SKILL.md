@@ -307,6 +307,8 @@ deep-research --> report(论文模式) --> [integrity check] --> academic-paper-
 
 ## Agent File References
 
+> Agent 文件位于本 skill 目录下：`skills/academic-paper-reviewer/agents/`
+
 | Agent | Definition File |
 |-------|----------------|
 | field_analyst_agent | `agents/field_analyst_agent.md` |

@@ -462,6 +462,8 @@ See `pipeline/SKILL.md §11 Paper Track 扩展协议` for the complete workflow.
 
 ## Agent File References
 
+> Agent 文件位于本 skill 目录下：`skills/deep-research/agents/`
+
 | Agent | Definition File |
 |-------|----------------|
 | research_question_agent | `agents/research_question_agent.md` |

@@ -4,9 +4,9 @@
 
 [![CI](https://github.com/boangus/medical-stats-research-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/boangus/medical-stats-research-assistant/actions/workflows/ci.yml)
 
-一个以 **Pipeline 驱动** 的医学统计分析 + 学术写作工具集。从原始数据到最终报告，再到可投稿论文，6 个统计阶段 + 6 个写作阶段，覆盖完整的医学研究流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
+一个以 **Pipeline 驱动** 的医学统计分析 + 学术写作工具集。从原始数据到最终报告，再到可投稿论文，覆盖完整的医学研究流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
 
-**13 个内置 Skill，开箱即用，无需额外安装**。
+**8 个内置 Skill，开箱即用，无需额外安装**。
 
 ---
 
@@ -142,7 +142,7 @@
 | `/msra-report` | 生成出版级统计报告 | Stage 4 |
 | `/msra-calibrate` | 指标校准（金标准对比） | 校准 |
 
-### 📝 论文写作命令（6个）
+### 📝 论文写作命令（9个）
 
 | 命令 | 功能 | 对应阶段 |
 |------|------|---------|
@@ -150,19 +150,12 @@
 | `/ars-plan` | 苏格拉底式章节规划 | Stage 5.2 |
 | `/ars-outline` | 论文大纲生成 | Stage 5.2 |
 | `/ars-revision` | 论文修订 + 审稿回应 | Stage 5.7 |
-| `/ars-export` | 导出论文：MD → DOCX → PDF | Stage 5.9 |
+| `/ars-revision-coach` | 解析审稿意见 → Revision Roadmap | Stage 5.5 |
+| `/ars-abstract` | 双语摘要生成 | Stage 5.2 |
+| `/ars-lit-review` | 系统性文献检索与综述 | Stage 5.1 |
+| `/ars-citation-check` | 引用准确性验证 | Stage 5.2 |
+| `/ars-format-convert` | 格式转换：MD → DOCX/PDF + 引用格式转换 | Stage 5.9 |
 | `/ars-disclosure` | AI使用披露声明生成 | Stage 5.8 |
-
-### 📚 文献检索命令（6个）
-
-| 命令 | 功能 | 说明 |
-|------|------|------|
-| `/ars-lit-review` | 系统性文献检索与综述 | 内置 deep-research skill |
-| `/ars-citation-check` | 引用准确性验证 | 检查参考文献完整性 |
-| `/deepxiv-cli` | DeepXiv 论文访问 CLI | 搜索和阅读学术论文 |
-| `/deepxiv-trending` | 热点论文摘要 | 汇总近期热门论文 |
-| `/deepxiv-baseline` | 基线对比表 | 构建方法/数据集/评分对比表 |
-| `/deepxiv-read` | 标记论文为已读 | 文献库管理 |
 
 ### 🔍 论文评审命令（1个）
 
@@ -172,23 +165,18 @@
 
 ---
 
-## 13 个内置 Skill
+## 8 个内置 Skill
 
 | Skill | 名称 | 职责 | 核心能力 |
 |-------|------|------|---------|
-| **pipeline** | 统一编排器 | Stage 1-6 全流程调度 | 意图检测、阶段识别、任务分发 |
-| **data-prep** | 数据准备 | Stage 1 | 数据验证、清洗、EDA、盲态审核 |
-| **analysis-plan** | 分析计划 | Stage 2 | 估计目标定义、方法探讨、SAP制定 |
-| **analysis-exec** | 分析执行 | Stage 3 | R/Python代码生成、统计分析执行 |
-| **report** | 报告生成 | Stage 4 | 表格/图表生成、方法学描述、规范检查 |
-| **calibration** | 度量校准 | 校准 | 金标准对比、指标校准 |
-| **academic-paper** | 论文写作 | Stage 5.2 | IMRaD撰写、摘要生成、格式导出 |
-| **academic-paper-reviewer** | 论文评审 | Stage 5.6 | 5人评审团、质量评估、修订建议 |
-| **academic-pipeline** | 写作流水线 | Stage 5.0-5.9 | 写作流程编排、完整性检查 |
-| **deep-research** | 文献检索 | Stage 5.1 | 系统性文献检索、综述撰写 |
-| **deepxiv-cli** | DeepXiv CLI | 文献访问 | arXiv/PMC论文搜索和阅读 |
-| **deepxiv-trending-digest** | 热点摘要 | 文献追踪 | 热门论文汇总 |
-| **deepxiv-baseline-table** | 基线表 | 文献分析 | 方法对比表构建 |
+| **pipeline** | 统一编排器 | Stage 1-6 + Paper Track 全流程调度 | 意图检测、阶段识别、任务分发、6 个阻断门闸 |
+| **data-prep** | 数据准备 | Stage 1 | 数据验证、清洗、EDA、CDISC/PHI 合规、盲态审核 |
+| **analysis-plan** | 分析计划 | Stage 2 | Estimands 定义、方法探讨、SAP 制定、变量构造 |
+| **analysis-exec** | 分析执行 | Stage 3 | Hybrid Prompting 代码生成、自愈 5 轮、统计约束追踪 |
+| **report** | 双模式文档生成 | Stage 4-5 | 统计报告 + 12-agent 论文写作（11 种模式） |
+| **calibration** | 度量校准 | 校准 | 金标准对比、7 种模式、门闸联动 |
+| **deep-research** | 文献检索 | 共享工具 | 13-agent 流水线、8 种模式、系统综述+meta 分析 |
+| **academic-paper-reviewer** | 论文评审 | 独立 | 5 人评审团、6 种模式、Devil's Advocate |
 
 ---
 
@@ -213,44 +201,28 @@ medical-stats-research-assistant/
 │   ├── commands/                 # 命令入口（install创建junction）
 │   └── skills/                   # Skill入口（install创建junction）
 │
-├── commands/                     # 命令定义（20个）
+├── commands/                     # 命令定义
 │   ├── msra.md                   # MSRA 主命令
-│   ├── msra-data.md              # 数据准备
-│   ├── msra-plan.md              # 分析计划
-│   ├── msra-exec.md              # 分析执行
-│   ├── msra-report.md            # 报告生成
-│   ├── msra-calibrate.md         # 指标校准
-│   ├── msra-paper.md             # 论文轨道
-│   ├── ars-full.md               # 完整写作流水线
-│   ├── ars-plan.md               # 章节规划
-│   ├── ars-outline.md            # 大纲生成
-│   ├── ars-revision.md           # 论文修订
-│   ├── ars-export.md             # 论文导出
-│   ├── ars-disclosure.md         # AI披露声明
-│   ├── ars-reviewer.md           # 论文评审
-│   ├── ars-lit-review.md         # 文献综述
-│   ├── ars-citation-check.md     # 引用检查
-│   ├── deepxiv-cli.md            # DeepXiv CLI
-│   ├── deepxiv-trending.md       # 热点摘要
-│   ├── deepxiv-baseline.md       # 基线表
-│   └── deepxiv-read.md           # 标记已读
+│   ├── msra-data/plan/exec/report/calibrate.md
+│   ├── ars-full/plan/outline/revision/abstract/...
+│   ├── ars-lit-review/citation-check/format-convert/disclosure.md
+│   └── ars-reviewer.md           # 论文评审
 │
-├── skills/                       # 13 个 Skill
-│   ├── pipeline/                 # 🔀 统一编排器（核心）
-│   ├── data-prep/                # 📊 数据准备
-│   ├── analysis-plan/            # 📋 分析计划
-│   ├── analysis-exec/            # ⚙️ 分析执行
-│   ├── report/                   # 📝 报告生成
-│   ├── calibration/              # 🎯 指标校准
-│   ├── resources/academic-paper/           # 📄 论文写作
-│   ├── academic-paper-reviewer/  # 🔍 论文评审
-│   ├── resources/academic-pipeline/        # 📑 写作流水线
-│   ├── deep-research/            # 📚 文献检索
-│   ├── deepxiv-cli/              # 🖥️ DeepXiv CLI
-│   ├── deepxiv-trending-digest/  # 📈 热点摘要
-│   └── deepxiv-baseline-table/   # 📊 基线表
+├── skills/                       # 8 个 Skill（均有 SKILL.md）
+│   ├── pipeline/                 # 🔀 统一编排器（Stage 1-6 + Paper Track）
+│   ├── data-prep/                # 📊 数据准备（Stage 1）
+│   ├── analysis-plan/            # 📋 分析计划（Stage 2）
+│   ├── analysis-exec/            # ⚙️ 分析执行（Stage 3）
+│   ├── report/                   # 📝 双模式文档生成（Stage 4-5）
+│   ├── calibration/              # 🎯 度量校准
+│   ├── deep-research/            # 📚 文献检索（共享工具）
+│   └── academic-paper-reviewer/  # 🔍 论文评审
 │
-├── agents/                       # 多 Agent 定义
+├── resources/                    # 合并后的资源（被 skills 引用）
+│   ├── academic-paper/           # 论文写作资源（agents/refs/templates）
+│   └── academic-pipeline/        # 写作流水线资源（agents/refs/templates）
+│
+├── agents/                       # Pipeline Agent 定义（6个）
 │   ├── AGENTS.md                 # 团队架构 + 协作协议
 │   ├── data_validator_agent.md   # 数据质量专家
 │   ├── method_consultant_agent.md# 方法顾问
@@ -258,31 +230,22 @@ medical-stats-research-assistant/
 │   ├── exec_inference_agent.md   # 推断执行者
 │   └── qc_inspector_agent.md     # 质量审查员
 │
-├── shared/                       # 共享资源
-│   ├── templates/                # 代码模板 + 文档模板
-│   │   ├── quality-gates/        # 质量门闸报告模板（3个）
-│   │   ├── data-prep/            # 数据准备模板（4个）
-│   │   ├── msra_handoff_bundle_template.md
-│   │   └── (R/Python 代码模板 40+)
-│   ├── sap/                      # SAP标准化
-│   │   └── templates/            # SAP模板（观察性/RCT/诊断）
-│   ├── statistics-methods/       # 统计与方法指南 (48章)
+├── shared/                       # 共享资源（28个子目录）
+│   ├── templates/                # R/Python 代码模板（75+）
+│   ├── statistics-methods/       # 统计方法指南（47章）
 │   ├── reporting-guidelines/     # 报告规范检查清单（16个）
-│   ├── risk-of-bias/             # 偏倚评估工具（5个）
-│   ├── journal-templates/        # 期刊模板（7个）
+│   ├── sap/                      # SAP 标准化
 │   ├── passport/                 # Material Passport 产物追踪
-│   ├── contracts/                # Schema 定义（20个）
-│   ├── handoff_schemas.md        # 跨Skill数据契约（12个Schema）
+│   ├── calibration/              # 校准引擎
+│   ├── handoff_schemas.md        # 跨 Skill 数据契约
 │   └── ...                       # 其他共享资源
 │
 ├── scripts/                      # 辅助脚本
-│   └── generate_msra_handoff_bundle.py
+│   ├── generate_msra_handoff_bundle.py
+│   ├── check_pipeline_integrity.py
+│   └── check_sprint_contract.py
 │
 └── MSRA/                         # 运行时输出目录
-    ├── data/                     # 用户数据
-    ├── reports/                  # 分析报告
-    ├── passport/                 # 产物护照
-    └── calibration/              # 校准数据库
 ```
 
 ---

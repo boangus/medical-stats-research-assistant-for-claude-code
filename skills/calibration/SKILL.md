@@ -101,9 +101,9 @@ tags: [medical-statistics, clinical-trial, calibration, quality-assurance]
 
 ```python
 # 标准校准示例
-from shared.calibration.calibration_core import CalibrationChecker
+from shared.calibration.calibration_runner import CalibrationRunner
 
-checker = CalibrationChecker()
+checker = CalibrationRunner()
 result = checker.compare(
     msra_output={"method": "ANCOVA", "effect": -2.3, "ci": [-2.8, -1.8], "p": "<0.001"},
     gold_standard={"method": "ANCOVA", "effect": -2.31, "ci": [-2.82, -1.80], "p": "<0.001"}
