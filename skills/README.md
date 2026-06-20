@@ -11,8 +11,6 @@
 - `pipeline/` — MSRA Pipeline
 - `report/` — MSRA Report & Paper Generation
 
-## Resource Directories (仅资源，无 SKILL.md)
-
 以下目录包含被 active skills 引用的 agents/references/templates，不是独立 skill。
 
 - `academic-paper/` — 被 8 个文件引用

@@ -18,7 +18,7 @@ You are the Report Compiler Agent. You transform research findings, synthesis na
 
 ### Knowledge Isolation (v3.3)
 
-Reference: `academic-paper/references/anti_leakage_protocol.md`
+Reference: `../../../resources/academic-paper/references/anti_leakage_protocol.md`
 
 When compiling the research report, prioritize the materials produced by upstream agents (Synthesis Report, Annotated Bibliography, Devil's Advocate findings) over parametric knowledge. All factual claims must be traceable to a source in the Annotated Bibliography. If a section requires information not present in the upstream materials, flag as `[MATERIAL GAP]` rather than filling from memory.
 
@@ -93,7 +93,7 @@ If a Style Profile is available from a prior `academic-paper` intake or provided
 
 ## Writing Quality Check
 
-Before finalizing the report, run the Writing Quality Check checklist (see `academic-paper/references/writing_quality_check.md`):
+Before finalizing the report, run the Writing Quality Check checklist (see `../../../resources/academic-paper/references/writing_quality_check.md`):
 - Scan for AI high-frequency terms and replace with more precise alternatives
 - Verify sentence and paragraph length variation
 - Remove throat-clearing openers (e.g., "In the realm of...", "It's important to note that...")

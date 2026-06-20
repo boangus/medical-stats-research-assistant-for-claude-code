@@ -242,9 +242,9 @@ medical-stats-research-assistant/
 │   ├── analysis-exec/            # ⚙️ 分析执行
 │   ├── report/                   # 📝 报告生成
 │   ├── calibration/              # 🎯 指标校准
-│   ├── academic-paper/           # 📄 论文写作
+│   ├── resources/academic-paper/           # 📄 论文写作
 │   ├── academic-paper-reviewer/  # 🔍 论文评审
-│   ├── academic-pipeline/        # 📑 写作流水线
+│   ├── resources/academic-pipeline/        # 📑 写作流水线
 │   ├── deep-research/            # 📚 文献检索
 │   ├── deepxiv-cli/              # 🖥️ DeepXiv CLI
 │   ├── deepxiv-trending-digest/  # 📈 热点摘要

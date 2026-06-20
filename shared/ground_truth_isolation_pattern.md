@@ -164,8 +164,8 @@ not a duplication of their contents.
 | Mechanism | Where it lives |
 |---|---|
 | Source verification (S2 API) | `deep-research/references/semantic_scholar_api_protocol.md` |
-| Anti-leakage protocol | `academic-paper/references/anti_leakage_protocol.md` |
-| Integrity gates (Stage 2.5/4.5) + 7-mode failure checklist | `academic-pipeline/references/ai_research_failure_modes.md` |
+| Anti-leakage protocol | `../resources/academic-paper/references/anti_leakage_protocol.md` |
+| Integrity gates (Stage 2.5/4.5) + 7-mode failure checklist | `../resources/academic-pipeline/references/ai_research_failure_modes.md` |
 | Reviewer calibration mode (FNR/FPR with private gold set) | `academic-paper-reviewer/references/calibration_mode_protocol.md` |
 | Cross-model verification | `shared/cross_model_verification.md` |
 | Declarative posture | `shared/handoff_schemas.md` (`data_access_level` and `task_type` sections) |

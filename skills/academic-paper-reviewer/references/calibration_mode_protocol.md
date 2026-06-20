@@ -180,7 +180,7 @@ If the user's gold set is itself biased (e.g., all papers from one lab, all from
 
 There is a second reason a measured profile can be optimistic, independent of the gold set. It belongs to the broader **same-source evaluation risk**, which has two forms:
 
-- **Factual form** — *same-source hallucination*: when the model that wrote the work and the model verifying it share training data, a fabricated reference that "feels right" passes undetected. This is the citation-integrity risk documented in the Anti-Hallucination Mandate (`academic-pipeline/agents/integrity_verification_agent.md`), countered there by independent reference lookup.
+- **Factual form** — *same-source hallucination*: when the model that wrote the work and the model verifying it share training data, a fabricated reference that "feels right" passes undetected. This is the citation-integrity risk documented in the Anti-Hallucination Mandate (`../../../resources/academic-pipeline/agents/integrity_verification_agent.md`), countered there by independent reference lookup.
 - **Behavioral form** — *same-family rubric optimization* (rubric-aware judging): an evaluator may, to some degree, optimize toward *what the rubric appears to reward* rather than toward the correct judgment. When the produced-work model and the evaluator model are from the same family and may be rubric-aware, the calibration error you measure can be **optimistic — read it as a possible under-estimate of the true error, not a ceiling.**
 
 This is an interpretive caveat only. ARS does **not** detect, prevent, or correct rubric-aware judging — the behavior can be unverbalized and is not reliably visible in chain-of-thought. The note changes how you *read* the numbers; it does not change any threshold or gate.

@@ -114,7 +114,7 @@
 ARS 的 compliance 框架围绕 AI 研究透明度设计（PRISMA-trAIce + RAISE），
 **没有任何 CONSORT/STROBE/STARD/PRISMA 检查清单**。具体发现：
 
-- `academic-paper/references/` 下有 `academic_writing_style.md`、
+- `resources/academic-paper/references/` 下有 `academic_writing_style.md`、
   `writing_quality_check.md` 等写作规范，但无临床报告规范。
 - `academic-pipeline` Stage 2.5 的 integrity check 验证引用/数据/声明，
   不验证临床报告合规。
@@ -308,7 +308,7 @@ commands/                         ← ARS 斜杠命令（ars-*）
 > MSRA Handoff Bundle 格式保留（见下方），但作为 pipeline 内部数据结构，
 > 不再通过独立 skill 生成。
 
-#### 组件 C：修改 `skills/academic-paper/agents/intake_agent.md`（加 MSRA 分支）
+#### 组件 C：修改 `skills/resources/academic-paper/agents/intake_agent.md`（加 MSRA 分支）
 
 在现有"Deep Research Handoff Detection"之后，新增并列的
 "MSRA Handoff Detection"分支。**只改这 1 个 agent 文件，不动 academic-paper 的其他部分**。

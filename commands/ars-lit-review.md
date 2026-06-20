@@ -8,4 +8,4 @@ Trigger the `academic-paper` skill in `lit-review` mode. Produces an annotated b
 For the full research-side literature review (annotated bibliography + synthesis report), use the built-in `deep-research` skill `lit-review` mode via `/ars-lit-review`.
 
 Mode reference: `MODE_REGISTRY.md` § academic-paper.
-Skill entry: `academic-paper/SKILL.md`.
+Skill entry: `report/SKILL.md`.

@@ -19,7 +19,7 @@ MSRA provides clinical reporting expertise (CONSORT/STROBE/STARD/16 checklists) 
 - **`scripts/generate_msra_handoff_bundle.py`**: generates MSRA Handoff Bundle (spec §4.4) for academic-paper bridge
 - **`commands/msra-paper.md`**: new `/msra-paper` command for direct Paper Track entry
 - **`shared/passport/passport.py`**: `track` field (`report_only`|`full_paper`), `get_track()`/`set_track()`, Stage 5 stages in STAGE_ORDER
-- **`skills/academic-paper/agents/intake_agent.md`**: `# [MSRA-BRIDGE]` MSRA Handoff Detection block + `clinical` Domain Evidence Profile activation
+- **`resources/academic-paper/agents/intake_agent.md`**: `# [MSRA-BRIDGE]` MSRA Handoff Detection block + `clinical` Domain Evidence Profile activation
 - **`install.ps1`**: [6/6] ARS shared dependency verification step (non-blocking WARNING)
 - **`skills/pipeline/SKILL.md`**: Stage 4 checkpoint (M4'), Stage 5 Paper Track dispatch, intent detection update
 - **`skills/report/SKILL.md`**: Stage 4 checkpoint section (M4'), slimmed to 7-step statistical-only flow
