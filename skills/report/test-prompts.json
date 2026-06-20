@@ -1,20 +1,17 @@
 [
   {
-    "id": "report-01",
-    "prompt": "基于以下分析结果生成完整的统计报告：ANCOVA显示治疗组HbA1c下降2.3%（95%CI: -2.8, -1.8），P<0.001，Cohen's d=0.45。次要终点：体重变化P=0.032。请生成HTML格式报告。",
-    "expected_behavior": "Phase 3变量命名规范化+P值格式化（P<0.001不显示P=0.000），Phase 4发表级图表标准，Phase 6d统计约束合规检查，Phase 6e图表发表质量检查，Phase 7组装HTML报告含SVG图表",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+    "id": 1,
+    "prompt": "帮我生成统计报告，分析结果已经有了",
+    "expected": "启动Phase 0结果解读会话(确认优先级)→Phase 1结果解读→Phase 2表格生成→Phase 3图表→Phase 5一致性校验→Phase 6报告组装"
   },
   {
-    "id": "report-02",
-    "prompt": "检查以下报告片段的合规性：'P=0.000，治疗组效果显著。BMI分组按中位数分为两组。使用t检验（加权数据）。图表为PNG格式，分辨率150dpi。'",
-    "expected_behavior": "Phase 6d应检出4个违规：P-R01（P=0.000应为P<0.001）、V-R01（BMI按中位数分组无临床依据）、M-R01（加权数据用t检验不当）、发表标准（PNG 150dpi不达标，应为SVG+300dpi PNG）",
-    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "actionable_specificity"]
+    "id": 2,
+    "prompt": "生成Table 1基线特征表",
+    "expected": "Quick模式通过--type参数：仅生成Table 1，应用gtsummary模板，P值格式化(P-R01~R07)，变量命名规范化(V-R01~R07)"
   },
   {
-    "id": "report-03",
-    "prompt": "生成符合CONSORT规范的RCT报告，包含流程图、Table 1（基线特征）、主要结果表、安全性分析表和KM曲线。",
-    "expected_behavior": "Phase 3引用CONSORT checklist，Phase 4生成CONSORT流程图+Table 1+效应量表+安全性表，Phase 5 statcheck验证，Phase 6d/6e合规检查，Phase 7 HTML报告含所有CONSORT必需章节",
-    "test_dimensions": ["workflow_clarity", "resource_integration", "overall_architecture"]
+    "id": 3,
+    "prompt": "报告中出现P=0.000，帮我检查一下",
+    "expected": "触发Phase 5 statcheck校验：检测P=0.000违反P-R01规则，强制修正为P<0.001，记录不一致项"
   }
 ]

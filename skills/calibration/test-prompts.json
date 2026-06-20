@@ -1,20 +1,17 @@
 [
   {
-    "id": "calib-01",
-    "prompt": "对以下分析结果执行标准校准检查：Logistic回归模型AUC=0.82，校准曲线显示预测概率与观测概率在中段偏离。请评估模型校准状态。",
-    "expected_behavior": "standard模式执行：校准曲线分析+HL检验+Brier评分，status模式判断校准状态（中段偏离可能为PARTIALLY_CALIBRATED），输出校准报告含推荐措施",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+    "id": 1,
+    "prompt": "用这个金标准文件(gold.csv)校准一下MSRA的分析结果",
+    "expected": "标准校准模式：四维对比(方法选择/数值偏差/结论准确/代码输出)，生成混淆矩阵+TPR/FPR+方法匹配率+MAPE"
   },
   {
-    "id": "calib-02",
-    "prompt": "执行StatLLM风格的4任务分层评估：任务1（描述统计准确性）、任务2（推断统计准确性）、任务3（效应量计算准确性）、任务4（结果解释准确性）。分析结果为：均值差2.3，t=4.56，P<0.001，d=0.45。",
-    "expected_behavior": "external-bench模式：4任务分层评估，逐任务验证数值准确性（均值差、t值、P值、效应量），输出分层评估报告含每任务PASS/FAIL+总体评分",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "resource_integration"]
+    "id": 2,
+    "prompt": "查看当前校准状态",
+    "expected": "状态查看模式：展示校准数据库概览、累计关键指标(TPR/TNR/FPR/FNR/方法匹配率/MAPE)、分方法类型指标、趋势"
   },
   {
-    "id": "calib-03",
-    "prompt": "对模型进行公平性校准评估：数据包含不同性别（男/女）和种族（白人/黑人/亚裔）亚组，评估模型在不同亚组间的预测公平性。",
-    "expected_behavior": "fairness模式：计算MSF（模型分离度）、ESF（误差分离度）、CC（一致性）、SAC（亚组准确度）、PAT（预测准确度趋势），输出公平性报告含各亚组指标+不公平预警",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+    "id": 3,
+    "prompt": "帮我检查一下当前的校准指标是否满足门闸阈值",
+    "expected": "门闸校验模式：检查TPR≥0.90/TNR≥0.90/FPR≤0.10/FNR≤0.10/方法匹配率≥0.85/MAPE≤10%，输出PASS/FAIL状态"
   }
 ]

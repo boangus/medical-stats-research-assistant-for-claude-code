@@ -1,20 +1,17 @@
 [
   {
-    "id": "dr-01",
-    "prompt": "我需要全面检索关于「中医药治疗2型糖尿病」的文献，用于撰写系统综述。请执行完整的文献检索。",
-    "expected_behavior": "应进入Full Mode，确认RQ后制定检索策略，从多源（PubMed/Cochrane/Web of Science/中文数据库）检索≥15篇文献，输出RQ Brief+Bibliography+Synthesis Report",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "resource_integration"]
+    "id": 1,
+    "prompt": "Research the impact of AI on higher education quality assurance",
+    "expected": "Full模式：6阶段(Scoping→Investigation→Analysis→Composition→Review→Revision)→APA 7.0报告"
   },
   {
-    "id": "dr-02",
-    "prompt": "快速帮我了解「孟德尔随机化在中医药研究中的应用」这个方向，给5篇核心文献和简要综述。",
-    "expected_behavior": "应进入Quick Mode，关键词检索→5篇核心文献→快速综述，输出Bibliography(5篇)+简要综述，不要求PRISMA合规",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity"]
+    "id": 2,
+    "prompt": "帮我厘清研究方向，我对高教品保有兴趣但还不确定要研究什么",
+    "expected": "Socratic模式激活：引导式研究对话→帮助用户澄清研究方向→INSIGHT提取"
   },
   {
-    "id": "dr-03",
-    "prompt": "我有一个MSRA Phase 1的文献对比结果（3篇关键文献），需要在此基础上补充检索，用于论文写作的Introduction和Discussion。",
-    "expected_behavior": "应检测到MSRA文献seed，以这3篇为起点扩展检索，标注Bibliography source = MSRA seed + extension，输出扩展后的Bibliography",
-    "test_dimensions": ["resource_integration", "workflow_clarity", "actionable_specificity"]
+    "id": 3,
+    "prompt": "帮我做一个关于这个主题的系统性综述和meta分析",
+    "expected": "Systematic-review模式：PRISMA流程→文献筛选→偏倚评估→meta分析→综合报告"
   }
 ]

@@ -20,16 +20,16 @@
 
 | Skill | 路径 | 类型 | 描述 |
 |-------|------|------|------|
-| **pipeline** | `skills/pipeline/SKILL.md` | Orchestrator | 统一流水线编排器 (Stage 1-6) |
+| **pipeline** | `skills/pipeline/SKILL.md` | Orchestrator | 统一流水线编排器 (Stage 1-6 + Paper Track §11) |
 | **data-prep** | `skills/data-prep/SKILL.md` | Worker | 数据准备 (Stage 1) |
 | **analysis-plan** | `skills/analysis-plan/SKILL.md` | Worker | 分析计划 (Stage 2) |
 | **analysis-exec** | `skills/analysis-exec/SKILL.md` | Worker | 分析执行 (Stage 3) |
-| **report** | `skills/report/SKILL.md` | Worker | 统计报告 (Stage 4) |
+| **report** | `skills/report/SKILL.md` | Worker | 双模式文档生成：统计报告 (Stage 4) + 论文写作 (Stage 5) |
 | **calibration** | `skills/calibration/SKILL.md` | Utility | 度量校准 |
-| **academic-pipeline** | `skills/academic-pipeline/SKILL.md` | Worker | 学术写作流水线 (Stage 5.1-5.9) |
-| **academic-paper** | `skills/academic-paper/SKILL.md` | Worker | 论文写作 |
-| **academic-paper-reviewer** | `skills/academic-paper-reviewer/SKILL.md` | Worker | 论文评审 |
-| **deep-research** | `skills/deep-research/SKILL.md` | Worker | 文献检索 |
+| **academic-paper-reviewer** | `skills/academic-paper-reviewer/SKILL.md` | Worker | 论文评审 (5 审稿人) |
+| **deep-research** | `skills/deep-research/SKILL.md` | Worker | 文献检索 (共享工具) |
+
+> 注：academic-pipeline 和 academic-paper 已分别合并到 pipeline（§11）和 report（论文写作模式）。
 
 ---
 

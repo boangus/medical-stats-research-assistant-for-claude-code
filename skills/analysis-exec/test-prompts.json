@@ -1,20 +1,17 @@
 [
   {
-    "id": "exec-01",
-    "prompt": "按照SAP执行主要分析：ANCOVA比较治疗组与对照组HbA1c从基线到24周的变化，调整基线HbA1c。数据文件为cleaned_data.csv。请生成分析代码并执行。",
-    "expected_behavior": "Phase 0-3 Generator生成代码（Hybrid Prompting三层策略），Phase 3内置统计约束追踪（M-R01方法一致性），Phase 3标准步骤假设检验评估代码质量，如执行失败触发5轮自愈，Phase 4质量检查含P值格式（P-R01）和效应量报告",
-    "test_dimensions": ["workflow_clarity", "failure_mode_encoding", "actionable_specificity"]
+    "id": 1,
+    "prompt": "按SAP执行分析，SAP已批准",
+    "expected": "Phase 0 SAP验证→样本量验证→Phase 1变量构造→Phase 3推断分析(含自愈机制)，展示Hybrid Prompting三层代码生成"
   },
   {
-    "id": "exec-02",
-    "prompt": "执行Cox回归分析生存数据（time_to_event, event, treatment, age, sex），并检查比例风险假设。如果PH假设违反，请使用分层Cox。同时生成KM曲线（发表级）。",
-    "expected_behavior": "Phase 3执行Cox回归+Schoenfeld残差检验，Phase 3内置约束追踪S-R01（PH假设检查），Phase 3标准步骤检测PH违反时触发用户决策模板，Phase 5生成发表级KM曲线（SVG+PNG，nature-figure标准rcParams）",
-    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "actionable_specificity"]
+    "id": 2,
+    "prompt": "我的Cox回归PH假设检验Schoenfeld p=0.03，违反了比例风险假设，怎么办",
+    "expected": "触发Phase 3假设检验S-R03流程：展示用户抉择模板(分层Cox/时依系数/RMST)，等待用户决策"
   },
   {
-    "id": "exec-03",
-    "prompt": "执行IPTW加权后的Logistic回归分析，注意加权数据不能混用非加权方法。生成森林图展示OR及95%CI。",
-    "expected_behavior": "Phase 3内置约束追踪M-R01（加权后不能用非加权方法），Phase 4检查方法一致性，Phase 5生成发表级森林图（SVG+PNG），Phase 6审计日志记录所有分析决策",
-    "test_dimensions": ["failure_mode_encoding", "actionable_specificity", "overall_architecture"]
+    "id": 3,
+    "prompt": "分析代码执行报错ImportError: No module named 'statsmodels'",
+    "expected": "触发自愈机制Layer 1语法修复：添加缺失import和pip install提示，重试执行"
   }
 ]

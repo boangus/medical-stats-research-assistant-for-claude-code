@@ -87,7 +87,7 @@
       "id": "ars-full-pipeline",
       "name": "ARS Full Pipeline",
       "entry_point": "commands/ars-full.md",
-      "description": "Full academic research pipeline: research → write → review → revise → finalize (requires external academic-pipeline skill)",
+      "description": "Full academic research pipeline: research → write → review → revise → finalize. Uses built-in academic-pipeline skill.",
       "usage": "/ars-full",
       "examples": ["/ars-full"]
     },
@@ -95,7 +95,7 @@
       "id": "ars-paper-plan",
       "name": "ARS Paper Planning",
       "entry_point": "commands/ars-plan.md",
-      "description": "Socratic chapter-by-chapter paper planning (requires external academic-paper skill)",
+      "description": "Socratic chapter-by-chapter paper planning. Uses built-in academic-paper skill.",
       "usage": "/ars-plan",
       "examples": ["/ars-plan"]
     },
@@ -103,7 +103,7 @@
       "id": "ars-paper-outline",
       "name": "ARS Paper Outline",
       "entry_point": "commands/ars-outline.md",
-      "description": "Generate paper outline through Socratic dialogue (requires external academic-paper skill)",
+      "description": "Generate paper outline through Socratic dialogue. Uses built-in academic-paper skill.",
       "usage": "/ars-outline",
       "examples": ["/ars-outline"]
     },
@@ -111,7 +111,7 @@
       "id": "ars-abstract",
       "name": "ARS Abstract",
       "entry_point": "commands/ars-abstract.md",
-      "description": "Generate structured abstract from paper draft (requires external academic-paper skill)",
+      "description": "Generate structured abstract from paper draft. Uses built-in academic-paper skill.",
       "usage": "/ars-abstract",
       "examples": ["/ars-abstract"]
     },
@@ -119,7 +119,7 @@
       "id": "ars-revision",
       "name": "ARS Revision",
       "entry_point": "commands/ars-revision.md",
-      "description": "Paper revision + Response to Reviewers (requires external academic-paper skill)",
+      "description": "Paper revision + Response to Reviewers. Uses built-in academic-paper skill.",
       "usage": "/ars-revision",
       "examples": ["/ars-revision"]
     },
@@ -127,7 +127,7 @@
       "id": "ars-revision-coach",
       "name": "ARS Revision Coach",
       "entry_point": "commands/ars-revision-coach.md",
-      "description": "Guided revision coaching with commitment tracking (requires external academic-paper skill)",
+      "description": "Guided revision coaching with commitment tracking. Uses built-in academic-paper skill.",
       "usage": "/ars-revision-coach",
       "examples": ["/ars-revision-coach"]
     },
@@ -135,7 +135,7 @@
       "id": "ars-format-convert",
       "name": "ARS Format Convert",
       "entry_point": "commands/ars-format-convert.md",
-      "description": "Export paper: MD → DOCX → PDF (requires external academic-paper skill)",
+      "description": "Export paper: MD → DOCX → PDF. Uses built-in academic-paper skill.",
       "usage": "/ars-format-convert",
       "examples": ["/ars-format-convert"]
     },
@@ -143,7 +143,7 @@
       "id": "ars-reviewer",
       "name": "ARS Paper Reviewer",
       "entry_point": "commands/ars-reviewer.md",
-      "description": "Multi-perspective paper review (5 reviewers, requires external academic-paper-reviewer skill)",
+      "description": "Multi-perspective paper review (5 reviewers). Uses built-in academic-paper-reviewer skill.",
       "usage": "/ars-reviewer",
       "examples": ["/ars-reviewer"]
     },
@@ -151,7 +151,7 @@
       "id": "ars-lit-review",
       "name": "ARS Literature Review",
       "entry_point": "commands/ars-lit-review.md",
-      "description": "Systematic literature search and synthesis (requires external deep-research skill)",
+      "description": "Systematic literature search and synthesis. Uses built-in deep-research skill.",
       "usage": "/ars-lit-review",
       "examples": ["/ars-lit-review"]
     },
@@ -159,7 +159,7 @@
       "id": "ars-citation-check",
       "name": "ARS Citation Check",
       "entry_point": "commands/ars-citation-check.md",
-      "description": "Verify citation accuracy and completeness (requires external academic-paper skill)",
+      "description": "Verify citation accuracy and completeness. Uses built-in academic-paper skill.",
       "usage": "/ars-citation-check",
       "examples": ["/ars-citation-check"]
     },
@@ -167,7 +167,7 @@
       "id": "ars-disclosure",
       "name": "ARS AI Disclosure",
       "entry_point": "commands/ars-disclosure.md",
-      "description": "Generate AI usage disclosure statement (requires external academic-paper skill)",
+      "description": "Generate AI usage disclosure statement. Uses built-in academic-paper skill.",
       "usage": "/ars-disclosure",
       "examples": ["/ars-disclosure"]
     },
@@ -175,7 +175,7 @@
       "id": "ars-mark-read",
       "name": "ARS Mark Read",
       "entry_point": "commands/ars-mark-read.md",
-      "description": "Mark a paper as read in the literature corpus (requires external deep-research skill)",
+      "description": "Mark a paper as read in the literature corpus. Uses built-in deep-research skill.",
       "usage": "/ars-mark-read [paper_id]",
       "examples": ["/ars-mark-read S01"]
     },
@@ -183,7 +183,7 @@
       "id": "ars-unmark-read",
       "name": "ARS Unmark Read",
       "entry_point": "commands/ars-unmark-read.md",
-      "description": "Unmark a paper as read in the literature corpus (requires external deep-research skill)",
+      "description": "Unmark a paper as read in the literature corpus. Uses built-in deep-research skill.",
       "usage": "/ars-unmark-read [paper_id]",
       "examples": ["/ars-unmark-read S01"]
     }

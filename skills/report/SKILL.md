@@ -1,25 +1,31 @@
 ---
-version: "0.7.5"
-name: MSRA Report Generation
+version: "0.8.0"
+name: MSRA Report & Paper Generation
 description: |
-  生成符合医学报告规范（CONSORT/STROBE/PRISMA等）的出版级表格、
-  图表和方法学描述。同时提供研究设计咨询服务。
-  触发: 报告 / 生成报告 / 表格 / 图表 / CONSORT / STROBE / PRISMA / 方法学 / 统计报告 / 合规检查 / 三线表 / 最终报告 / report / table / figure / manuscript
+  双模式文档生成：[模式A] 统计报告（CONSORT/STROBE/PRISMA等出版级表格、图表、方法学描述）；
+  [模式B] 学术论文写作（12-agent团队、11种模式、IMRaD结构、双语摘要、5种引用格式）。
+  触发: 报告 / 生成报告 / 表格 / 图表 / 统计报告 / 写论文 / 学术论文 / paper / manuscript / write paper / academic paper / 论文大纲 / 修订论文 / 引导写论文 / 摘要 / 文献综述 / 审稿意见 / AI disclosure
 data_access_level: verified_only
 task_type: open-ended
-depends_on: [analysis-exec]
-works_with: [analysis-exec, analysis-plan, pipeline]
+depends_on: [analysis-exec, deep-research]
+works_with: [analysis-exec, analysis-plan, pipeline, academic-paper-reviewer]
 author: "MSRA Team"
 license: "MIT"
 min_claude_version: "3.5"
-tags: [medical-statistics, clinical-trial, report, CONSORT, STROBE, publication]
+tags: [medical-statistics, clinical-trial, report, CONSORT, STROBE, publication, academic-paper, writing, IMRaD]
 ---
 
-# 报告生成 (Report Generation)
+# 报告与论文生成 (Report & Paper Generation)
 
 ## 角色定义
 
 你是一位医学写作和生物统计学专家，负责将分析结果转化为符合国际报告规范的出版级材料。
+本 skill 为**双模式**：统计报告模式（Phase 0-6）生成表格/图表/方法学描述；论文写作模式（12-agent 团队）生成完整学术论文。
+
+**模式选择**：
+- 用户说"生成报告/Table 1/图表" → 统计报告模式
+- 用户说"写论文/paper/manuscript" → 论文写作模式
+- Stage 4 CHECKPOINT 选 [B] → 从统计报告模式自动转入论文写作模式
 
 > **IRON RULES**:
 > - 报告精确 P 值和效应量+95%CI，不写 P<0.05 / P>0.05 的二元结果
@@ -941,8 +947,165 @@ python shared/report-assembler/render_report_html.py \
 
 **决策逻辑**：
 - 选 **[A]** → `passport.set_track("report_only")`，pipeline 正常结束，输出统计报告
-- 选 **[B]** → 守卫检查通过后 `passport.set_track("full_paper")`，dispatch 到 pipeline Stage 5.0（Paper Intake → academic-pipeline）
+- 选 **[B]** → 守卫检查通过后 `passport.set_track("full_paper")`，进入下方 **§论文写作模式**（Stage 5 Paper Track）
 - 守卫检查失败 → 提示用户补全缺失产物，不进入 Paper Track
+
+---
+
+# 论文写作模式（原 academic-paper）
+
+> 以下内容合并自 academic-paper skill。本 skill 为双模式：统计报告（上方 §Phase 0-6）+ 论文写作（本节）。
+> 论文写作模式由 Pipeline Stage 4 CHECKPOINT [B] 触发，或用户直接调用。
+
+## 双模式架构
+
+```
+用户请求
+    │
+    ├─ "生成统计报告" / "Table 1" / "图表" → 统计报告模式 (§Phase 0-6)
+    │
+    └─ "写论文" / "paper" / "manuscript" → 论文写作模式 (本节)
+         │
+         ├─ 从零开始 → Phase 0-7 完整流程
+         ├─ 已有论文 → Revision / Revision-Coach 模式
+         └─ 仅需摘要/引用/格式 → Abstract / Citation-Check / Format-Convert 模式
+```
+
+## 论文写作 Agent Team（12 Agents）
+
+| # | Agent | Role | Phase |
+|---|-------|------|-------|
+| 1 | `intake_agent` | 配置访谈：论文类型、学科、引用格式、输出格式、语言 | Phase 0 |
+| 2 | `literature_strategist_agent` | 检索策略设计、来源筛选、注释书目 | Phase 1 |
+| 3 | `structure_architect_agent` | 论文结构选择、详细大纲、字数分配 | Phase 2 |
+| 4 | `argument_builder_agent` | 论证构建、claim-evidence 链、逻辑流 | Phase 3 |
+| 5 | `draft_writer_agent` | 逐节全文草稿、学科语域调整 | Phase 4 |
+| 6 | `citation_compliance_agent` | 引用格式验证、参考文献完整性、DOI 检查 | Phase 5a |
+| 7 | `abstract_bilingual_agent` | 双语摘要（中+英）、各 5-7 关键词 | Phase 5b |
+| 8 | `peer_reviewer_agent` | 模拟双盲审稿、五维评分、修改建议（最多 2 轮） | Phase 6 |
+| 9 | `formatter_agent` | 转换为 LaTeX/DOCX/PDF/Markdown、期刊格式化 | Phase 7 |
+| 10 | `socratic_mentor_agent` | Plan 模式苏格拉底导师：逐章引导 | Plan Step 0-3 |
+| 11 | `visualization_agent` | 生成出版级图表代码（matplotlib/ggplot2） | Phase 4/7 |
+| 12 | `revision_coach_agent` | 解析非结构化审稿意见 → 结构化 Revision Roadmap | Revision-Coach |
+
+## 论文写作 Operational Modes（11 Modes）
+
+| Mode | Trigger | Agents | Output |
+|------|---------|--------|--------|
+| `full` | "Write a paper" | All 12 | Complete paper draft |
+| `plan` | "guide my paper" | 1→10→3→4 | Chapter Plan + INSIGHT |
+| `outline-only` | "Paper outline" | 1→2→3 | Detailed outline + evidence map |
+| `revision` | "Revise paper" | 8→5→6 | Revised draft + Response to Reviewers |
+| `revision-coach` | "parse reviews" | 12 only | Revision Roadmap |
+| `abstract-only` | "Write abstract" | 1→7 | Bilingual abstract + keywords |
+| `lit-review` | "Literature review" | 1→2 | Annotated bibliography + synthesis |
+| `format-convert` | "Convert to LaTeX" | 9 only | Formatted document |
+| `citation-check` | "Check citations" | 6 only | Citation error report |
+| `disclosure` | "AI disclosure" | 9 only | AI-usage disclosure paragraph |
+| `rebuttal-audit` | "audit my response" | 12 only | Rebuttal QA report |
+
+### Quick Mode Selection Guide
+
+| 情况 | 推荐 Mode | 说明 |
+|------|----------|------|
+| 从零开始有明确 RQ | `full` | 完整 8 阶段流程 |
+| 需要先规划再写 | `plan` | 苏格拉底引导 |
+| 只要大纲 | `outline-only` | 仅 Phase 1-3 |
+| 有论文收到审稿意见 | `revision` | 解析 + 修改 |
+| 有非结构化审稿意见 | `revision-coach` | 结构化 Roadmap |
+| 只要摘要 | `abstract-only` | 双语摘要 |
+| 要检查引用 | `citation-check` | 引用合规 |
+| 要转换格式 | `format-convert` | LaTeX/DOCX/PDF |
+| 要文献综述 | `lit-review` | 注释书目 |
+| 要 AI 使用声明 | `disclosure` | 期刊特定声明 |
+| 有回复草稿要 QA | `rebuttal-audit` | 覆盖检查 |
+
+## 论文写作 8 Phase 工作流
+
+```
+Phase 0: CONFIG        → [intake_agent]              → Paper Configuration Record
+Phase 1: RESEARCH      → [literature_strategist]      → Search Strategy + Source Corpus
+Phase 2: ARCHITECTURE  → [structure_architect]        → Paper Outline + Evidence Map
+Phase 3: ARGUMENTATION → [argument_builder]           → Argument Blueprint
+Phase 4: DRAFTING      → [draft_writer]               → Complete Draft
+Phase 5a: CITATIONS    → [citation_compliance] ──┐    → Citation Audit Report
+Phase 5b: ABSTRACT     → [abstract_bilingual]   ─┘    → Bilingual Abstract (parallel)
+Phase 6: PEER REVIEW   → [peer_reviewer]              → Review Report (max 2 loops)
+Phase 7: FORMAT        → [formatter]                  → Final Output Package
+```
+
+### Checkpoint Rules
+
+1. **IRON RULE**: 用户必须确认 Paper Configuration Record 后才能进入 Phase 1
+2. **Phase 2 → 3**: 用户必须批准大纲（可要求重组）
+3. **IRON RULE**: 最多 2 轮修改；未解决项 → "Acknowledged Limitations"
+4. **Peer Review** Critical-severity 问题阻断进入 Phase 7
+5. 用户可跳过 Phase 1（如有自有来源）
+
+## 引用格式支持
+
+APA 7.0（默认）、Chicago（Author-Date 或 Notes-Bibliography）、MLA 9、IEEE、Vancouver。
+`formatter_agent` 支持后期引用格式转换："Convert citations to [format]"。
+
+## 输出格式
+
+- **文本**: LaTeX (.tex + .bib), DOCX (via Pandoc), PDF, Markdown
+- **图表**: Python matplotlib / R ggplot2，APA 7.0 格式，色盲安全调色板
+- **引用**: 5 种格式互转
+
+## Style Calibration（可选）
+
+用户提供 3+ 篇过往论文，pipeline 学习其写作风格（句式节奏、词汇偏好、引用整合风格）。
+作为草稿阶段的软指南应用；学科规范始终优先。参见 `shared/style_calibration_protocol.md`。
+
+## Writing Quality Check
+
+草稿自审步骤中应用的写作质量检查清单：
+- 检测过度使用的 AI 典型术语
+- 检查破折号过度使用
+- 移除 throat-clearing openers
+- 检查段落长度均匀性
+- 检查句式单调性
+
+## Generator-Evaluator Contract Protocol (v3.6.6)
+
+> 仅适用于 `full` 模式。将 Phase 4（写作）和 Phase 6（审稿）拆分为 paper-blind / paper-visible 调用对。
+
+**四调用结构**：
+1. **Phase 4a** — Writer paper-blind pre-commitment（仅看合同+元数据）
+2. **Phase 4b** — Writer paper-visible drafting + self-scoring（写全文+自评）
+3. **Phase 6a** — Evaluator paper-blind pre-commitment（仅看合同+元数据+4a 输出）
+4. **Phase 6b** — Evaluator paper-visible scoring + decision（评分+决策）
+
+**核心机制**：物理分离调用——4a 永远看不到运行时草稿，6a 永远看不到 4b 草稿。这消除了"先读论文再合理化标准"的漂移路径。
+
+### Unusable Handling
+
+Writer/evaluator phase 两次 lint 失败 → `[GENERATOR-PHASE-ABORTED]` → 用户介入决定重试/回退/降级。
+
+## 论文写作反例与黑名单
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 1 | 不做配置访谈直接写论文 | 论文类型/学科/引用格式不确定会导致返工 | Phase 0 配置访谈必须完成 |
+| 2 | 引用不验证直接使用 | 可能引用不存在的文献 | 每个引用必须通过 DOI 或 WebSearch 验证 |
+| 3 | 超过 2 轮修改仍继续 | 进入无限修改循环 | 最多 2 轮，剩余项归入 "Acknowledged Limitations" |
+| 4 | 模拟审稿人互相参考 | 破坏独立性 | 5 位审稿人独立审阅，不交叉引用 |
+| 5 | Peer Review 修改论文原稿 | 审稿人只评审不修改 | 所有审稿输出为独立文档 |
+| 6 | Phase 6a/6b 混淆 system prompt 和 user content | 动态 LLM 输出不应进入不变策略面 | system prompt 仅含不变策略，动态内容在 user content 中 |
+| 7 | 在非 full 模式调用 Generator-Evaluator 合同 | 仅 full 模式适用 | 9 个非 full 模式不触发此协议 |
+| 8 | 跳过 Style Calibration 直接使用默认风格 | 可能不符合用户写作习惯 | 可选但推荐，提供 3+ 篇过往论文 |
+
+---
+
+## 论文写作引用与集成
+
+| 集成方向 | 描述 |
+|---------|------|
+| **上游: deep-research → report** | Stage 5.1 文献检索提供研究基础 |
+| **上游: report 统计模式 → 论文模式** | Stage 4 CHECKPOINT [B] 提供 final_report + figures + tables |
+| **下游: report → academic-paper-reviewer** | Stage 5.4 审稿，Revision Roadmap 可直接用作修改输入 |
+| **下游: report → pipeline** | 通过 passport 状态追踪，pipeline 编排 Paper Track 全流程 |
 
 
 

@@ -1,20 +1,17 @@
 [
   {
-    "id": "pipe-01",
-    "prompt": "我有一个RCT临床试验数据集（CSV格式，包含500名患者，治疗组/对照组各250人，主要终点为HbA1c从基线到24周的变化），请启动完整的MSRA流程，从数据准备到最终报告。",
-    "expected_behavior": "应按 Stage 0→1→1.5→2→2.5→3→3.5→4 顺序执行，在每个质量门闸处检查前置产物，Stage 3.5 检查14项阻断条件，最终输出HTML报告+SVG图表",
-    "test_dimensions": ["workflow_clarity", "checkpoint_design", "actionable_specificity"]
+    "id": 1,
+    "prompt": "我有一份RCT的原始数据(data.csv)，治疗组vs安慰剂，主要终点是HbA1c变化，想完成整个分析流程",
+    "expected": "检测到RCT研究类型，推荐从Stage 1开始，询问交互模式和分析语言，展示Pipeline入口响应格式"
   },
   {
-    "id": "pipe-02",
-    "prompt": "我的观察性研究有3个中心的数据，需要使用IPTW进行混杂控制。数据准备阶段已完成，但跨中心一致性检查发现变量名不一致。Pipeline应该如何处理？",
-    "expected_behavior": "应识别multi-dataset模式，Stage 1.5门闸检查跨中心一致性产物，不一致时阻断退回Stage 1，修复后重新进入流程；Stage 2应激活Phase 3多中心分析计划（条件章节）",
-    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "resource_integration"]
+    "id": 2,
+    "prompt": "数据已经清洗好了，帮我做分析计划，这是一个队列研究，观察吸烟与肺癌的关系",
+    "expected": "检测到中途切入Stage 2，检查前置产物(cleaned_data)，识别观察性研究类型，进入analysis-plan调度"
   },
   {
-    "id": "pipe-03",
-    "prompt": "在Stage 3.5质量门闸检查中，P值格式检查（第10项）未通过——分析代码输出了P=0.000而不是P<0.001。Pipeline应该如何处理？",
-    "expected_behavior": "Stage 3.5门闸第10项标记❌，触发阻断条件，退回Stage 3要求analysis-exec修复P值格式（P-R01规则），修复后重新通过门闸",
-    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "actionable_specificity"]
+    "id": 3,
+    "prompt": "快速分析这个8变量85行的CSV文件",
+    "expected": "检测到Quick Mode触发条件(变量数<10且行数<100)，自动进入精简流水线，跳过非必要步骤"
   }
 ]

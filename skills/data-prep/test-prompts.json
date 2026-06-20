@@ -1,20 +1,17 @@
 [
   {
-    "id": "data-01",
-    "prompt": "我有一个临床数据文件clinical_trial.csv，包含患者ID、年龄、性别、治疗组、HbA1c基线、HbA1c_24周、不良事件等列。请帮我验证数据质量并制定清洗策略。数据中年龄列有一个值为250，HbA1c基线有15%缺失。",
-    "expected_behavior": "Phase 0生成数据画像，Phase 1验证报告标记age=250为Critical、HbA1c缺失率15%为Warning，Phase 2交互式讨论清洗策略（异常值修正+缺失处理），Phase 2.5检测值变体，不自动清洗",
-    "test_dimensions": ["workflow_clarity", "failure_mode_encoding", "actionable_specificity"]
+    "id": 1,
+    "prompt": "帮我清洗这个临床试验数据(data.csv)，里面有年龄、性别、血压等变量",
+    "expected": "启动Phase 1数据画像(Step 0)→7项深度验证，展示验证报告摘要，仅在Critical或≥3 Warning时暂停"
   },
   {
-    "id": "data-02",
-    "prompt": "我的研究数据包含患者姓名、身份证号、电话号码和精确出生日期。数据需要上传到云端AI进行分析。请检查数据隐私合规性。",
-    "expected_behavior": "Phase 1第7项PHI检测应检出直接标识字段（姓名、身份证、电话），合规分级为🔴需脱敏，推荐哈希替换/日期偏移策略，提示需脱敏后才可分析，GDPR决策流程判断需DPA",
-    "test_dimensions": ["failure_mode_encoding", "checkpoint_design", "resource_integration"]
+    "id": 2,
+    "prompt": "我的数据有一些中医诊断字段，比如'心脾两虚'和'心脾两虚证'这种变体，帮我规范化",
+    "expected": "触发Phase 2 Step 2.5值规范化，检测TCM术语变体，展示变体汇总表和GB/T 16751.2映射，请求用户确认策略"
   },
   {
-    "id": "data-03",
-    "prompt": "多中心研究有3个CSV文件（center_A.csv, center_B.csv, center_C.csv），各中心变量名不一致（如age vs Age vs 年龄）。请执行跨中心一致性检查。",
-    "expected_behavior": "Phase 0.5检测为multi-dataset模式，Phase 1b执行cross_site_consistency_check()，变量名一致性检查标记差异，生成cross_site_consistency_report.md，[SLIM]展示后继续",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+    "id": 3,
+    "prompt": "/msra-data data.csv --quick",
+    "expected": "进入Quick Mode，仅检查Critical问题(重复ID/数据损坏/关键变量全缺失)，自动修复格式问题，输出简化验证报告"
   }
 ]

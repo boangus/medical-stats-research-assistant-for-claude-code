@@ -1,0 +1,11 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-06-19T00:01	baseline	pipeline	-	74.3	baseline	-	dim1:6 dim2:10 dim3:9 dim4:5 dim5:14 dim6:4 dim7:10 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
+2026-06-19T00:02	baseline	data-prep	-	78.6	baseline	-	dim1:7 dim2:11 dim3:10 dim4:5 dim5:15 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
+2026-06-19T00:03	baseline	analysis-plan	-	75.2	baseline	-	dim1:7 dim2:10 dim3:9 dim4:5 dim5:14 dim6:4 dim7:10 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
+2026-06-19T00:04	baseline	analysis-exec	-	79.5	baseline	-	dim1:7 dim2:11 dim3:11 dim4:5 dim5:15 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
+2026-06-19T00:05	baseline	report	-	77.4	baseline	-	dim1:7 dim2:10 dim3:10 dim4:5 dim5:15 dim6:4 dim7:10 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
+2026-06-19T00:06	baseline	calibration	-	73.8	baseline	-	dim1:7 dim2:10 dim3:9 dim4:4 dim5:14 dim6:4 dim7:9 dim8:6(dim8=6/10 dry_run) dim9:5	dry_run
+2026-06-19T00:07	baseline	academic-pipeline	-	76.1	baseline	-	dim1:6 dim2:10 dim3:10 dim4:5 dim5:14 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
+2026-06-19T00:08	baseline	academic-paper	-	72.0	baseline	-	dim1:6 dim2:9 dim3:9 dim4:4 dim5:13 dim6:4 dim7:9 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
+2026-06-19T00:09	baseline	academic-paper-reviewer	-	77.9	baseline	-	dim1:6 dim2:11 dim3:10 dim4:5 dim5:15 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run
+2026-06-19T00:10	baseline	deep-research	-	75.6	baseline	-	dim1:6 dim2:10 dim3:9 dim4:5 dim5:14 dim6:4 dim7:10 dim8:7(dim8=7/10 dry_run) dim9:5	dry_run

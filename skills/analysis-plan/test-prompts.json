@@ -1,20 +1,17 @@
 [
   {
-    "id": "plan-01",
-    "prompt": "基于清洗后的RCT数据（治疗组vs安慰剂，主要终点为HbA1c从基线到24周的变化，连续变量），请制定统计分析计划。基线HbA1c、年龄、性别可能影响结局。",
-    "expected_behavior": "Phase 1深度EDA检查分布/缺失/异常值，Phase 2定义Estimands五要素（疗法策略/ITT/HbA1c变化/停药/均值差），Phase 3推荐ANCOVA调整基线，Phase 4生成SAP含Targeted-Context和[SKIP]预定义，Phase 5独立审查",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+    "id": 1,
+    "prompt": "这是一个RCT，治疗组vs安慰剂，主要终点HbA1c变化，n=200，帮我制定分析计划",
+    "expected": "生成RCT迷你SAP示例：Estimands五要素、ANCOVA主分析、敏感性分析、亚组分析，等待用户确认"
   },
   {
-    "id": "plan-02",
-    "prompt": "观察性队列研究：评估某药物对心血管事件的影响。数据有大量混杂因素（年龄、性别、BMI、合并症、用药史），需要控制未测量混杂。请选择方法并制定SAP。",
-    "expected_behavior": "Phase 3观察性分支：推荐IPTW/PSM+多变量调整+DAG，Phase 3高级方法表推荐E-value+阴性对照NCO，SAP §4.1必须预定义混杂控制策略，SAP §4.2必须包含E-value敏感性分析",
-    "test_dimensions": ["actionable_specificity", "failure_mode_encoding", "resource_integration"]
+    "id": 2,
+    "prompt": "观察性研究，探讨吸烟与肺癌的关系，数据有5000个样本，需要控制年龄、性别、BMI等混杂",
+    "expected": "进入观察性研究分支：DAG混杂结构、IPTW/PSM推荐、E-value敏感性分析、阴性对照NCO"
   },
   {
-    "id": "plan-03",
-    "prompt": "诊断试验研究：评估某生物标志物对早期肺癌的诊断价值，金标准为病理活检。数据包含标志物水平（连续）、病理结果（阳性/阴性）、年龄、吸烟史。请制定分析计划。",
-    "expected_behavior": "Phase 3诊断试验分支：推荐AUC+敏感度/特异度+不同切点分析，金标准偏倚评估，SAP中预定义ROC分析、Youden指数切点选择、阳性/阴性预测值计算",
-    "test_dimensions": ["workflow_clarity", "actionable_specificity", "overall_architecture"]
+    "id": 3,
+    "prompt": "帮我快速生成一个标准SAP模板，RCT设计",
+    "expected": "Quick模式：使用标准SAP模板，跳过文献种子检索，单次确认，输出标准框架"
   }
 ]

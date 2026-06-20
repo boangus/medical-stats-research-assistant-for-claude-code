@@ -120,32 +120,53 @@ if (-not (Test-Path $calibPath)) {
     Write-Host "  Exists:  calibration_db.json" -ForegroundColor DarkGray
 }
 
-# 6. Verify ARS shared dependencies (Paper Track readiness)
-Write-Host "`n[6/6] Verifying ARS shared dependencies..." -ForegroundColor Yellow
-$arsCheckFiles = @(
-    "shared\handoff_schemas.md",
-    "shared\contracts\passport\claim_audit_result.schema.json",
-    "shared\contracts\reviewer\full.json",
-    "shared\contracts\writer\full.json",
-    "shared\references\intent_clarification_protocol.md",
-    "shared\.claude\CLAUDE.md",
-    "shared\collaboration_depth_rubric.md",
-    "shared\style_calibration_protocol.md",
-    "shared\mode_spectrum.md",
-    "shared\compliance_checkpoint_protocol.md"
+# 6. Verify all skill directories and key files present
+Write-Host "`n[6/6] Verifying project integrity..." -ForegroundColor Yellow
+$skillDirs = @(
+    "skills\pipeline",
+    "skills\data-prep",
+    "skills\analysis-plan",
+    "skills\analysis-exec",
+    "skills\report",
+    "skills\calibration",
+    "skills\academic-paper",
+    "skills\academic-paper-reviewer",
+    "skills\academic-pipeline",
+    "skills\deep-research"
 )
-$missing = @()
-foreach ($f in $arsCheckFiles) {
-    $fullPath = Join-Path $ProjectRoot $f
-    if (-not (Test-Path $fullPath)) { $missing += $f }
+$keyFiles = @(
+    "shared\handoff_schemas.md",
+    "shared\passport\passport_schema.md",
+    "shared\sap\sap_standard.md",
+    ".claude\CLAUDE.md",
+    "commands\msra.md",
+    "commands\ars-full.md"
+)
+
+$missingDirs = @()
+foreach ($d in $skillDirs) {
+    $fullPath = Join-Path $ProjectRoot $d
+    if (-not (Test-Path $fullPath)) { $missingDirs += $d }
 }
-if ($missing.Count -gt 0) {
-    Write-Host "  WARNING: ARS shared files missing (Paper Track will not work):" -ForegroundColor DarkYellow
-    foreach ($m in $missing) { Write-Host "    - $m" -ForegroundColor DarkYellow }
-    Write-Host "  These files should be merged from upstream ARS (academic-research-skills)." -ForegroundColor DarkYellow
-    Write-Host "  See docs/superpowers/specs/2026-06-17-msra-ars-integration-design.md Task 1." -ForegroundColor DarkYellow
+$missingFiles = @()
+foreach ($f in $keyFiles) {
+    $fullPath = Join-Path $ProjectRoot $f
+    if (-not (Test-Path $fullPath)) { $missingFiles += $f }
+}
+
+if ($missingDirs.Count -gt 0 -or $missingFiles.Count -gt 0) {
+    Write-Host "  WARNING: Project files missing:" -ForegroundColor DarkYellow
+    if ($missingDirs.Count -gt 0) {
+        Write-Host "  Missing skill directories:" -ForegroundColor DarkYellow
+        foreach ($m in $missingDirs) { Write-Host "    - $m" -ForegroundColor DarkYellow }
+    }
+    if ($missingFiles.Count -gt 0) {
+        Write-Host "  Missing key files:" -ForegroundColor DarkYellow
+        foreach ($m in $missingFiles) { Write-Host "    - $m" -ForegroundColor DarkYellow }
+    }
+    Write-Host "  This is a self-contained plugin. If files are missing, reinstall from source." -ForegroundColor DarkYellow
 } else {
-    Write-Host "  All ARS shared dependencies present." -ForegroundColor Green
+    Write-Host "  All 10 skills and key files present. Project is self-contained." -ForegroundColor Green
 }
 
 # Dev mode: install dev dependencies
