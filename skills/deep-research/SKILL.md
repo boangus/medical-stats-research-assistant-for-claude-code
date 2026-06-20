@@ -287,6 +287,60 @@ Routing into Mode B requires explicit user signal — `/ars-<mode>` slash comman
 
 Setting `ARS_SOCRATIC_READING_PROBE=1` enables a one-time honesty probe during **goal-oriented** Socratic sessions. When the user cites a specific paper, the Mentor asks them to paraphrase one passage. Decline is logged without penalty. Default OFF. See `agents/socratic_mentor_agent.md` §"Optional Reading Probe Layer".
 
+### Socratic 5-Layer Dialogue Flow
+
+```
+Layer 1: PROBLEM FRAMING (Phase 1 前半)
+  ├── "你真正想回答的问题是什么？"
+  ├── "这个问题为什么重要？对谁重要？"
+  ├── 每轮提取 [INSIGHT: ...]，至少 2 轮后进入 Layer 2
+  └── Devil's Advocate 挑战 RQ 清晰度
+
+Layer 2: METHODOLOGY REFLECTION (Phase 1 后半)
+  ├── "你计划用什么方法回答？为什么选这个方法？"
+  ├── "有没有完全不同的方法也能回答你的问题？"
+  ├── 至少 2 轮后进入 Layer 3
+  └── Devil's Advocate 挑战方法假设
+
+Layer 3: EVIDENCE DESIGN (Phase 2-3)
+  ├── "什么样的证据能说服你得出结论？"
+  ├── "什么证据会让你改变结论？"
+  └── 至少 2 轮后进入 Layer 4
+
+Layer 4: CRITICAL ANALYSIS (Phase 3-4)
+  ├── "你的论证中最强的反驳是什么？"
+  ├── "如果审稿人只攻击一个点，会是哪个？"
+  └── 至少 2 轮后进入 Layer 5
+
+Layer 5: IMPLICATION (Phase 4-5)
+  ├── "如果你的结论成立，实践层面意味着什么？"
+  ├── "如果你的结论错误，最大的代价是什么？"
+  └── 自动结束条件：5 层完成 或 连续 2 轮无新 INSIGHT
+```
+
+> 详细对话规则和自动结束条件见 `references/socratic_mode_protocol.md`。
+
+---
+
+## 异常与失败模式
+
+| # | 失败场景 | 影响模式 | 严重度 | 处理策略 |
+|---|---------|---------|--------|---------|
+| F1 | RQ 无法收敛（>3轮无明确方向） | full, socratic | 中 | 缩小范围 + 提供 3 个候选 RQ → 用户选择；仍不行 → 建议先做 lit-review |
+| F2 | 文献不足（相关文献 <5 篇） | full, quick, lit-review | 高 | 扩展搜索策略（换关键词/数据库/语言）→ 仍不足 → 标注"文献基础薄弱"继续 |
+| F3 | 方法与数据不匹配 | full | 高 | 退回 Phase 1 重新评估数据特征 → 选择匹配方法 |
+| F4 | Devil's Advocate 发现 CRITICAL 问题 | full | 严重 | 🛑 STOP + 修正论证 → 修正后重跑 DA → 仍 CRITICAL → 标注"核心论点存疑" |
+| F5 | 伦理审查 BLOCKED | full, review | 严重 | 🛑 STOP + 展示伦理问题清单 → 用户提供补救路径 → 重新审查 |
+| F6 | Socratic 对话不收敛（>5层无共识） | socratic | 中 | 切换为 full 模式（Phase 1 交互式），保留已有 INSIGHT |
+| F7 | 用户中途放弃 | all | 低 | 保存当前进度到 passport → 允许 `/research --resume` 恢复 |
+| F8 | 仅中文文献可用 | full, lit-review | 中 | 切换搜索策略（中文数据库 + 翻译关键词）→ 标注"单语言限制" |
+| F9 | 所有来源质量低于阈值 | full, fact-check | 高 | 降级来源要求或扩展来源范围 → 标注"低质量来源，结论需谨慎" |
+| F10 | 结论与证据不一致 | full | 高 | 退回 Phase 3 重新综合 → 检查是否有 cherry-picking 或逻辑跳跃 |
+| F11 | 修改循环超过 2 轮 | full | 中 | 强制完成 + 将未解决项归入 "Acknowledged Limitations" |
+| F12 | 跨学科桥接失败 | full | 低 | 回退到单学科视角，在局限性中讨论跨学科不足 |
+
+> 详细恢复路径见 `references/failure_paths.md`。
+
 ---
 
 ## Systematic Review Mode
