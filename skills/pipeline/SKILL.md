@@ -999,49 +999,6 @@ Stage 1 → [MANDATORY] → Stage 1.5(9项) → [MANDATORY]
 
 ---
 
-## Stage 流转图
-
-```
-Stage 0: 入口诊断
-    │ 自动识别研究类型/数据规模/用户意图
-    ▼
-Stage 1: 数据准备 (data-prep)
-    │ 输出: cleaned_data + cleaning_log + validation_report
-    ▼
-┌─ Stage 1.5: 数据质量门闸 ─┐
-│  9项阻断检查 (□1-□9)      │
-│  全通过 → 继续             │
-│  ≤6项通过 → 阻断退回       │
-└──────────────────────────┘
-    │
-    ▼
-Stage 2: 分析计划 (analysis-plan)
-    │ 输出: SAP + variable_spec
-    ▼
-┌─ Stage 2.5: SAP质量门闸 ─┐
-│  审查通过/需修改/需重做    │
-│  收敛检测 (3次退回→BLOCK)  │
-└──────────────────────────┘
-    │
-    ▼
-Stage 3: 分析执行 (analysis-exec)
-    │ 输出: analysis_code + results + figures + audit_log
-    ▼
-┌─ Stage 3.5: 分析质量门闸 ─┐
-│  14项阻断检查 (含P值/方法  │
-│  一致性/图表质量)          │
-│  10-14项通过 → 继续        │
-│  <10项通过 → 阻断退回      │
-└──────────────────────────┘
-    │
-    ▼
-Stage 4: 报告生成 (report)
-    │ 输出: HTML报告 + SVG图表 + DOCX表格
-    ▼
-Stage 5: 论文写作 (Paper Track, 可选)
-    │ 输出: 论文初稿 + 审稿回复
-```
-
 ## 架构集成图
 
 ```
