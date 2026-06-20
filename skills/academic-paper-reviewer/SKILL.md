@@ -1,15 +1,17 @@
 ---
 name: academic-paper-reviewer
-description: "Multi-perspective academic paper review with dynamic reviewer personas. Simulates 5 independent reviewers (EIC + 3 peer reviewers + Devil's Advocate) with field-specific expertise. Supports full review, re-review (verification), quick assessment, methodology focus, Socratic guided, and calibration modes. Triggers on: review paper, peer review, manuscript review, referee report, review my paper, critique paper, simulate review, editorial review, calibrate reviewer, reviewer calibration, measure reviewer accuracy."
-metadata:
-  version: "1.10.0"
-  last_updated: "2026-06-01"
-  status: active
-  data_access_level: verified_only
-  task_type: open-ended
-  related_skills:
-    - report
-    - pipeline
+description: |
+  多视角学术论文评审，模拟 5 位独立审稿人（EIC + 3 位同行评审 + Devil's Advocate）。
+  6 种模式：完整评审、复审验证、快速评估、方法学聚焦、苏格拉底引导、校准。
+  触发: review paper / peer review / manuscript review / 审稿 / 评审 / simulate review / calibrate reviewer
+data_access_level: verified_only
+task_type: open-ended
+depends_on: []
+works_with: [report, pipeline, deep-research]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [peer-review, academic, editorial, devil-advocate, calibration]
 ---
 
 # Academic Paper Reviewer v1.10.0 — Multi-Perspective Academic Paper Review Agent Team

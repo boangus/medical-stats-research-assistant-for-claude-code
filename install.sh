@@ -142,13 +142,8 @@ SKILL_DIRS=(
     "skills/analysis-exec"
     "skills/report"
     "skills/calibration"
-    "skills/academic-paper"
-    "skills/academic-paper-reviewer"
-    "skills/academic-pipeline"
     "skills/deep-research"
-    "skills/deepxiv-cli"
-    "skills/deepxiv-trending-digest"
-    "skills/deepxiv-baseline-table"
+    "skills/academic-paper-reviewer"
 )
 KEY_FILES=(
     "shared/handoff_schemas.md"

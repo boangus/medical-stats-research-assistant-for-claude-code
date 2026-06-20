@@ -15,7 +15,7 @@ Write-Host "Project root: $ProjectRoot`n"
 
 # 1. Check Python
 if (-not $SkipPython) {
-    Write-Host "[1/6] Checking Python..." -ForegroundColor Yellow
+    Write-Host "[1/7] Checking Python..." -ForegroundColor Yellow
     try {
         $pyVersion = python --version 2>&1
         Write-Host "  Found: $pyVersion" -ForegroundColor Green
@@ -34,12 +34,12 @@ if (-not $SkipPython) {
         Write-Host "  No requirements.txt found, skipping pip install." -ForegroundColor DarkGray
     }
 } else {
-    Write-Host "[1/6] Skipping Python check (-SkipR)" -ForegroundColor DarkGray
+    Write-Host "[1/7] Skipping Python check (-SkipPython)" -ForegroundColor DarkGray
 }
 
 # 2. Check R
 if (-not $SkipR) {
-    Write-Host "`n[2/6] Checking R..." -ForegroundColor Yellow
+    Write-Host "`n[2/7] Checking R..." -ForegroundColor Yellow
     try {
         $rVersion = Rscript --version 2>&1
         Write-Host "  Found: $rVersion" -ForegroundColor Green
@@ -58,11 +58,11 @@ if (-not $SkipR) {
     Rscript $tempR
     Remove-Item $tempR -ErrorAction SilentlyContinue
 } else {
-    Write-Host "[2/6] Skipping R check (-SkipR)" -ForegroundColor DarkGray
+    Write-Host "[2/7] Skipping R check (-SkipR)" -ForegroundColor DarkGray
 }
 
 # 3. Create output directories
-Write-Host "`n[3/6] Creating output directories..." -ForegroundColor Yellow
+Write-Host "`n[3/7] Creating output directories..." -ForegroundColor Yellow
 $dirs = @(
     "MSRA\data",
     "MSRA\reports\figures",
@@ -81,13 +81,13 @@ foreach ($dir in $dirs) {
 }
 
 # 4. Initialize passport.json
-Write-Host "`n[4/6] Initializing passport..." -ForegroundColor Yellow
+Write-Host "`n[4/7] Initializing passport..." -ForegroundColor Yellow
 $passportPath = Join-Path $ProjectRoot "MSRA\passport\passport.json"
 if (-not (Test-Path $passportPath)) {
     $passport = @{
         passport_id = "msra-$(Get-Date -Format 'yyyyMMdd')-001"
         passport_schema_version = "1"
-        pipeline_version = "0.8.0"
+        pipeline_version = "0.8.1"
         created_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         status = "in_progress"
@@ -109,7 +109,7 @@ if (-not (Test-Path $passportPath)) {
 }
 
 # 5. Initialize calibration_db.json
-Write-Host "`n[5/6] Initializing calibration database..." -ForegroundColor Yellow
+Write-Host "`n[5/7] Initializing calibration database..." -ForegroundColor Yellow
 $calibPath = Join-Path $ProjectRoot "MSRA\calibration\calibration_db.json"
 if (-not (Test-Path $calibPath)) {
     $calibDb = @()  # CalibrationDatabase expects a JSON array of entries
@@ -121,7 +121,7 @@ if (-not (Test-Path $calibPath)) {
 }
 
 # 6. Verify all skill directories and key files present
-Write-Host "`n[6/6] Verifying project integrity..." -ForegroundColor Yellow
+Write-Host "`n[6/7] Verifying project integrity..." -ForegroundColor Yellow
 $skillDirs = @(
     "skills\pipeline",
     "skills\data-prep",
@@ -129,13 +129,8 @@ $skillDirs = @(
     "skills\analysis-exec",
     "skills\report",
     "skills\calibration",
-    "skills\academic-paper",
-    "skills\academic-paper-reviewer",
-    "skills\academic-pipeline",
     "skills\deep-research",
-    "skills\deepxiv-cli",
-    "skills\deepxiv-trending-digest",
-    "skills\deepxiv-baseline-table"
+    "skills\academic-paper-reviewer"
 )
 $keyFiles = @(
     "shared\handoff_schemas.md",

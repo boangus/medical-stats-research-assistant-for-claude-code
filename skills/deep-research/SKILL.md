@@ -1,15 +1,16 @@
 ---
 name: deep-research
-description: "Universal deep research agent team. 13-agent pipeline for rigorous academic research on any topic. 8 modes: full research, quick brief, paper review, lit-review, fact-check, three-way literature scan, Socratic guided research dialogue, and systematic review with optional meta-analysis. Covers research question formulation, Socratic mentoring, methodology design, systematic literature search, source verification, cross-source synthesis, risk of bias assessment, meta-analysis, APA 7.0 report compilation, editorial review, devil's advocate challenges, ethics review, and post-research literature monitoring. Triggers on: research, deep research, literature review, systematic review, meta-analysis, PRISMA, evidence synthesis, fact-check, WHY HOW WHAT papers, 3W literature scan, guide my research, help me think through, 研究, 深度研究, 文獻回顧, 文獻探討, 系統性回顧, 後設分析, 事實查核, 三段式文獻掃描, 引導我的研究, 幫我釐清, 幫我想想, 我不確定要研究什麼, 研究方向, 研究主題."
-metadata:
-  version: "2.10.0"
-  last_updated: "2026-06-15"
-  status: active
-  data_access_level: raw
-  task_type: open-ended
-  related_skills:
-    - report
-    - pipeline
+description: |
+  通用深度研究 agent 团队。13-agent 流水线，8 种模式：完整研究、快速摘要、论文评估、文献综述、事实核查、三段式文献扫描、苏格拉底引导对话、系统综述+meta分析。
+  触发: research / deep research / literature review / systematic review / meta-analysis / PRISMA / fact-check / 研究 / 深度研究 / 文献综述 / 系统综述 / 引导我的研究 / 帮我厘清
+data_access_level: raw
+task_type: open-ended
+depends_on: []
+works_with: [report, pipeline, academic-paper-reviewer]
+author: "MSRA Team"
+license: "MIT"
+min_claude_version: "3.5"
+tags: [research, literature-review, systematic-review, meta-analysis, socratic, academic]
 ---
 
 # Deep Research — Universal Academic Research Agent Team

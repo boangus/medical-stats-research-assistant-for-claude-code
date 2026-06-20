@@ -1,5 +1,5 @@
 ---
-version: "0.8.0"
+version: "0.8.1"
 name: MSRA Pipeline
 description: |
   医学统计分析 + 学术写作统一流水线编排器。从任意阶段切入，自动识别当前位置，
@@ -224,7 +224,7 @@ tags: [medical-statistics, clinical-trial, pipeline, orchestrator, quality-gate]
     适合：首次分析、对统计方法不熟、数据质量不确定、需要严格把控。
 
 [2] 高效模式（推荐）
-    全程自动推进，仅在质量门闸（4个阻断点）暂停。
+    全程自动推进，仅在质量门闸（6个阻断点）暂停。
     统计参数直接使用默认值，方法选择基于数据特征自动推荐。
     如需修改，可在 SAP 文档中调整后重新生成。
     适合：熟悉流程、标准分析、赶时间。
@@ -1192,7 +1192,7 @@ Stage 4: 报告生成（标准 HTML 报告，PNG 图表，无 SVG）
 
 ---
 
-## 11. Paper Track 扩展协议（原 academic-pipeline）
+## 11. Paper Track 扩展协议
 
 > 以下内容合并自 academic-pipeline skill，为 Stage 5 Paper Track 提供完整协议支持。
 
