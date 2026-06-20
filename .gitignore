@@ -75,3 +75,10 @@ MSRA/msra_handoff_bundle.md
 
 # 优化计划文档（本地工作文件，不进版本控制）
 OPTIMIZATION_PLAN.md
+FINAL_DELIVERY_REPORT.md
+
+# Darwin 优化报告（本地生成产物）
+darwin-optimization-report.html
+
+# 上传临时目录
+.uploads/
