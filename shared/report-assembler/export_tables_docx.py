@@ -47,6 +47,9 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn, nsdecls
 from docx.oxml import parse_xml
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -445,14 +448,15 @@ def main():
     elif args.input_md:
         md_table_to_docx(doc, args.input_md, args.title, args.note, args.header_rows)
     else:
-        print("错误: 必须提供 --input 或 --input-md", file=sys.stderr)
+        logger.error("错误: 必须提供 --input 或 --input-md")
         sys.exit(1)
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     doc.save(str(output_path))
-    print(f"✅ 三线表已导出: {output_path.resolve()}")
+    logger.info(f"✅ 三线表已导出: {output_path.resolve()}")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     main()

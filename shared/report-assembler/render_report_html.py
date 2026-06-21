@@ -48,6 +48,9 @@ import re
 import sys
 from pathlib import Path
 from html import escape
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -695,7 +698,7 @@ def main():
     # 读取 JSON 骨架
     sec_path = Path(args.sections)
     if not sec_path.exists():
-        print(f"错误: 骨架文件不存在: {sec_path}", file=sys.stderr)
+        logger.error(f"错误: 骨架文件不存在: {sec_path}")
         sys.exit(1)
     with open(sec_path, encoding="utf-8") as f:
         skeleton = json.load(f)
@@ -713,16 +716,17 @@ def main():
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html, encoding="utf-8")
-    print(f"✅ HTML 报告已生成: {output_path.resolve()}")
-    print(f"   文件大小: {output_path.stat().st_size / 1024:.1f} KB")
+    logger.info(f"✅ HTML 报告已生成: {output_path.resolve()}")
+    logger.info(f"   文件大小: {output_path.stat().st_size / 1024:.1f} KB")
     
     # 生成表格和图表核查报告
     verification_report = generate_table_chart_verification_report(skeleton)
     verification_path = output_path.with_suffix('.verification.json')
     with open(verification_path, "w", encoding="utf-8") as f:
         json.dump(verification_report, f, ensure_ascii=False, indent=2)
-    print(f"📊 表格图表核查报告已生成: {verification_path}")
+    logger.info(f"📊 表格图表核查报告已生成: {verification_path}")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     main()

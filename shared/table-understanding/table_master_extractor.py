@@ -16,6 +16,9 @@ import json
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ReasoningMode(Enum):
@@ -697,6 +700,7 @@ class TableMasterExtractor:
 
 # 示例用法
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 示例表格数据
     sample_table = {
         'headers': ['姓名', '年龄', '性别', '血压(mmHg)', '血糖(mmol/L)'],
@@ -710,13 +714,13 @@ if __name__ == "__main__":
     
     extractor = TableMasterExtractor(sample_table)
     
-    print("提取结果:")
-    print(json.dumps(extractor.extract(), ensure_ascii=False, indent=2))
+    logger.info("提取结果:")
+    logger.info("%s %s %s", json.dumps(extractor.extract(), ensure_ascii=False, indent=2))
     
-    print("\n语义描述:")
-    print(extractor.get_semantic_description())
+    logger.info("\n语义描述:")
+    logger.info("extractor.get_semantic_description()")
     
-    print("\n推理测试:")
+    logger.info("\n推理测试:")
     queries = [
         "年龄的平均值是多少？",
         "计算血压的总和",
@@ -726,7 +730,7 @@ if __name__ == "__main__":
     
     for query in queries:
         result = extractor.reason(query)
-        print(f"\n问题: {query}")
-        print(f"答案: {result['result']['answer']}")
-        print(f"置信度: {result['confidence']}")
-        print(f"推理模式: {result['reasoning_mode']}")
+        logger.info(f"\n问题: {query}")
+        logger.info(f"答案: {result['result']['answer']}")
+        logger.info(f"置信度: {result['confidence']}")
+        logger.info(f"推理模式: {result['reasoning_mode']}")

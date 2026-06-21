@@ -29,6 +29,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -153,7 +156,7 @@ def plot_summary(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        print(f"  Summary Plot saved to: {save_path}")
+        logger.info(f"  Summary Plot saved to: {save_path}")
 
     if show:
         plt.show()
@@ -221,7 +224,7 @@ def plot_bar(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        print(f"  Bar Plot saved to: {save_path}")
+        logger.info(f"  Bar Plot saved to: {save_path}")
 
     if show:
         plt.show()
@@ -292,7 +295,7 @@ def plot_dependence(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        print(f"  Dependence Plot saved to: {save_path}")
+        logger.info(f"  Dependence Plot saved to: {save_path}")
 
     if show:
         plt.show()
@@ -366,7 +369,7 @@ def plot_waterfall(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        print(f"  Waterfall Plot saved to: {save_path}")
+        logger.info(f"  Waterfall Plot saved to: {save_path}")
 
     if show:
         plt.show()
@@ -480,35 +483,35 @@ def full_shap_workflow(
     results = {}
 
     # Step 1: 计算 SHAP 值
-    print("=" * 60)
-    print("Step 1: 计算 SHAP 值")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("Step 1: 计算 SHAP 值")
+    logger.info("=" * 60)
     shap_values, explainer = compute_shap_values(model, X, model_type)
     results["shap_values"] = shap_values
     results["explainer"] = explainer
 
     # Step 2: Summary Plot
-    print("\n" + "=" * 60)
-    print("Step 2: SHAP Summary Plot")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 2: SHAP Summary Plot")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/shap_summary.png" if output_dir else None
     results["summary_plot"] = plot_summary(
         shap_values, X, feature_names, max_display,
         save_path=save_path, show=False)
 
     # Step 3: Bar Plot
-    print("\n" + "=" * 60)
-    print("Step 3: SHAP Bar Plot")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 3: SHAP Bar Plot")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/shap_bar.png" if output_dir else None
     results["bar_plot"] = plot_bar(
         shap_values, X, feature_names, max_display,
         save_path=save_path, show=False)
 
     # Step 4: Top 3 Dependence Plots
-    print("\n" + "=" * 60)
-    print("Step 4: SHAP Dependence Plots (Top 3)")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 4: SHAP Dependence Plots (Top 3)")
+    logger.info("=" * 60)
     imp_table = feature_importance_table(shap_values, X, feature_names)
     results["importance_table"] = imp_table
 
@@ -522,19 +525,19 @@ def full_shap_workflow(
             save_path=save_path, show=False)
 
     # Step 5: Waterfall Plot (first sample)
-    print("\n" + "=" * 60)
-    print("Step 5: SHAP Waterfall Plot (Sample #0)")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 5: SHAP Waterfall Plot (Sample #0)")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/shap_waterfall.png" if output_dir else None
     results["waterfall_plot"] = plot_waterfall(
         shap_values, X, index=0,
         save_path=save_path, show=False)
 
     # 打印汇总
-    print("\n=== SHAP 特征重要性汇总 ===")
-    print(imp_table.to_string(index=False))
+    logger.info("\n=== SHAP 特征重要性汇总 ===")
+    logger.info("imp_table.to_string(index=False)")
 
-    print("\n✅ SHAP 分析完成")
+    logger.info("\n✅ SHAP 分析完成")
     return results
 
 
@@ -543,6 +546,7 @@ def full_shap_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     from sklearn.datasets import make_classification
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import train_test_split
@@ -562,7 +566,7 @@ if __name__ == "__main__":
     # 训练模型
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
-    print(f"Model accuracy: {model.score(X_test, y_test):.3f}")
+    logger.info(f"Model accuracy: {model.score(X_test, y_test):.3f}")
 
     # 运行 SHAP 分析
     results = full_shap_workflow(

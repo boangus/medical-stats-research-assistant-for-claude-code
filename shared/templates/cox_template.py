@@ -19,6 +19,9 @@ import pandas as pd
 from lifelines import CoxPHFitter, KaplanMeierFitter
 from lifelines.statistics import logrank_test, multivariate_logrank_test
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -434,6 +437,7 @@ def survival_table_at_times(
 # 示例用法
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟生存数据
     np.random.seed(42)
     n = 200
@@ -468,16 +472,16 @@ if __name__ == "__main__":
         group_col="treatment",
     )
 
-    print("=== KM 分析 ===")
+    logger.info("=== KM 分析 ===")
     for g, data in res["km"].items():
         if g != "logrank_stat" and g != "logrank_pvalue":
-            print(f"  组 {g}: 中位生存期 {data['median_survival']:.2f}")
+            logger.info(f"  组 {g}: 中位生存期 {data['median_survival']:.2f}")
     if "logrank_pvalue" in res:
-        print(f"  Log-rank p-value: {res['logrank_pvalue']:.4f}")
+        logger.info(f"  Log-rank p-value: {res['logrank_pvalue']:.4f}")
 
-    print("\n=== Cox 回归结果 ===")
-    print(res["cox_summary"][["Variable", "exp(coef)_HR", "HR_Lower_95", "HR_Upper_95", "p_value", "Signif"]].to_string(index=False))
-    print(f"\n  C-index: {res['c_index']:.3f}")
-    print(f"  Partial AIC: {res['partial_aic']:.2f}")
+    logger.info("\n=== Cox 回归结果 ===")
+    logger.info("%s %s %s %s %s %s", res["cox_summary"][["Variable", "exp(coef)_HR", "HR_Lower_95", "HR_Upper_95", "p_value", "Signif"]].to_string(index=False))
+    logger.info(f"\n  C-index: {res['c_index']:.3f}")
+    logger.info(f"  Partial AIC: {res['partial_aic']:.2f}")
 
-    print("\n✅ 生存分析完成")
+    logger.info("\n✅ 生存分析完成")

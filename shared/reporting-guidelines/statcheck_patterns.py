@@ -28,6 +28,9 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     from scipy import stats as sp_stats
@@ -399,6 +402,7 @@ def format_report(report: StatcheckReport) -> str:
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 示例文本（包含故意的不一致）
     sample_text = """
     两组间年龄差异有统计学意义 (t(48) = 2.34, p = .023)。
@@ -408,6 +412,6 @@ if __name__ == "__main__":
     亚组分析未达显著水平 (z = 1.89, p = .058)。
     """
 
-    print("=== statcheck 一致性检查 ===\n")
+    logger.info("=== statcheck 一致性检查 ===\n")
     report = check_text(sample_text)
-    print(format_report(report))
+    logger.info("format_report(report)")

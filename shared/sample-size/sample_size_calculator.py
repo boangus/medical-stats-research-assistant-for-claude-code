@@ -14,6 +14,9 @@ from typing import Dict, Optional
 
 import numpy as np
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -351,25 +354,26 @@ def calc_sample_size_diagnostic(
 # 示例
 # ============================================================================
 if __name__ == "__main__":
-    print("=== 两样本 t 检验 ===")
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+    logger.info("=== 两样本 t 检验 ===")
     res = calc_sample_size_t(delta=5, sd=10)
-    print(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
+    logger.info(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
 
-    print("\n=== 率比较 ===")
+    logger.info("\n=== 率比较 ===")
     res = calc_sample_size_prop(p1=0.3, p2=0.5)
-    print(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
+    logger.info(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
 
-    print("\n=== 生存分析 ===")
+    logger.info("\n=== 生存分析 ===")
     res = calc_sample_size_survival(hr=0.7)
-    print(f"  n_events = {res['n_events']}, n_total = {res['n_total']}")
+    logger.info(f"  n_events = {res['n_events']}, n_total = {res['n_total']}")
 
-    print("\n=== Logistic 回归 (EPV=10) ===")
+    logger.info("\n=== Logistic 回归 (EPV=10) ===")
     res = calc_sample_size_logistic(n_predictors=5, prop_events=0.3)
-    print(f"  n_total = {res['n_total']}")
+    logger.info(f"  n_total = {res['n_total']}")
 
-    print("\n=== 效应量参考 ===")
-    print("Cohen's d: 小=0.2, 中=0.5, 大=0.8")
-    print("Cohen's f: 小=0.10, 中=0.25, 大=0.40")
-    print("OR/HR:     小=1.5, 中=2.0, 大=3.0")
+    logger.info("\n=== 效应量参考 ===")
+    logger.info("Cohen's d: 小=0.2, 中=0.5, 大=0.8")
+    logger.info("Cohen's f: 小=0.10, 中=0.25, 大=0.40")
+    logger.info("OR/HR:     小=1.5, 中=2.0, 大=3.0")
 
-    print("\n✅ 样本量计算示例完成")
+    logger.info("\n✅ 样本量计算示例完成")

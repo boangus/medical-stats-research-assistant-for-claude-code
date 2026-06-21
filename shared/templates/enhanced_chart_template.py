@@ -12,6 +12,9 @@ import numpy as np
 from typing import Dict, List, Tuple, Any, Optional
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class EnhancedChartGenerator:
@@ -73,7 +76,7 @@ class EnhancedChartGenerator:
                             else:
                                 default_config[key] = journal_data[key]
             except Exception as e:
-                print(f"加载配置文件失败: {e}")
+                logger.info(f"加载配置文件失败: {e}")
         
         return default_config
     
@@ -193,7 +196,7 @@ class EnhancedChartGenerator:
         fig.savefig(filepath, format=format, dpi=dpi, bbox_inches='tight', 
                    facecolor=fig.get_facecolor(), edgecolor='none')
         
-        print(f"图表已保存: {filepath} (DPI: {dpi})")
+        logger.info(f"图表已保存: {filepath} (DPI: {dpi})")
     
     def create_km_curve(self, survival_data: Dict[str, Any], title: str = "Kaplan-Meier Curve") -> Tuple[plt.Figure, plt.Axes]:
         """
@@ -283,6 +286,7 @@ class EnhancedChartGenerator:
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建图表生成器
     generator = EnhancedChartGenerator()
     
@@ -309,4 +313,4 @@ if __name__ == "__main__":
     # 保存图表
     generator.save_figure(fig, "example_km_curve.png")
     
-    print("示例图表已生成")
+    logger.info("示例图表已生成")

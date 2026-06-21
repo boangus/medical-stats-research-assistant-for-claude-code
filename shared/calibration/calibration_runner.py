@@ -18,6 +18,9 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -289,7 +292,7 @@ def save_calibration_report(result: CalibrationResult, output_path: str):
     data = json.loads(json.dumps(data, default=float))
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-    print(f"  校准报告已保存: {output_path}")
+    logger.info(f"  校准报告已保存: {output_path}")
 
 
 # ============================================================================
@@ -394,6 +397,7 @@ class CalibrationDatabase:
 # 示例用法
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     np.random.seed(42)
 
     # 生成模拟金标准数据
@@ -423,21 +427,21 @@ if __name__ == "__main__":
     # 翻转 1 个方法选择
     msra_data.loc[0, "msra_method"] = "Chi-square"
 
-    print("=" * 60)
-    print("  度量校准示例")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("  度量校准示例")
+    logger.info("=" * 60)
 
     engine = CalibrationEngine(gold_data, msra_data)
     result = engine.run()
 
     report = format_calibration_report(result)
-    print(report)
+    logger.info("report")
 
     # 保存报告
     save_calibration_report(result, "calibration_report.json")
 
     # 演示增量校准数据库
-    print("\n测试增量校准数据库...")
+    logger.info("\n测试增量校准数据库...")
     db = CalibrationDatabase("calibration_db_test.json")
     db.record(
         msra_result={"method": "t-test", "estimate": 2.1, "lower": 0.5,
@@ -446,7 +450,7 @@ if __name__ == "__main__":
                      "estimate": 2.0, "lower": 0.4, "upper": 3.6,
                      "p": 0.018, "significant": True},
     )
-    print("  ✅ 增量记录已保存")
+    logger.info("  ✅ 增量记录已保存")
     os.remove("calibration_db_test.json")
 
-    print("\n✅ 度量校准示例完成")
+    logger.info("\n✅ 度量校准示例完成")

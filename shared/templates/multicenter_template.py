@@ -14,6 +14,9 @@ import os
 import json
 from typing import Optional, Dict, List, Any
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MultiCenterAnalyzer:
@@ -343,11 +346,12 @@ class MultiCenterAnalyzer:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python multicenter_template.py <data_dir> [output_path]")
-        print("  data_dir: 包含多个 CSV 文件的目录")
+        logger.info("Usage: python multicenter_template.py <data_dir> [output_path]")
+        logger.info("  data_dir: 包含多个 CSV 文件的目录")
         sys.exit(1)
 
     data_dir = sys.argv[1]
@@ -355,4 +359,4 @@ if __name__ == "__main__":
 
     mca = MultiCenterAnalyzer(data_dir=data_dir)
     report_md = mca.generate_summary_report(output_path)
-    print(report_md)
+    logger.info("report_md")

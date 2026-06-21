@@ -17,6 +17,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 延迟导入 PyMC / ArviZ（在函数内部导入），以便模块在缺少依赖时仍可加载
 
@@ -936,9 +939,9 @@ def full_bayesian_workflow(
     results = {}
 
     # Step 1: 模型拟合
-    print("=" * 50)
-    print("Step 1: 贝叶斯模型拟合")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Step 1: 贝叶斯模型拟合")
+    logger.info("=" * 50)
     if model_type == "linear":
         bayes_result = bayesian_linear_regression(
             df, outcome, predictors, draws=draws, tune=tune, chains=chains
@@ -951,51 +954,51 @@ def full_bayesian_workflow(
         raise ValueError("model_type 必须是 'linear' 或 'logistic'")
 
     results["bayes_result"] = bayes_result
-    print(f"  模型类型: {model_type}")
-    print(f"  采样: {draws} draws x {chains} chains")
+    logger.info(f"  模型类型: {model_type}")
+    logger.info(f"  采样: {draws} draws x {chains} chains")
 
     # Step 2: 收敛诊断
-    print("\n" + "=" * 50)
-    print("Step 2: 收敛诊断")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 2: 收敛诊断")
+    logger.info("=" * 50)
     diag = bayes_result["diagnostics"]
-    print(f"  Max R-hat: {diag['max_r_hat']:.4f} {'✓' if diag['max_r_hat'] < 1.01 else '✗'}")
-    print(f"  Min ESS: {diag['min_ess']:.0f} {'✓' if diag['min_ess'] > 400 else '✗'}")
-    print(f"  Divergences: {diag['divergences']} {'✓' if diag['divergences'] == 0 else '✗'}")
-    print(f"  Converged: {diag['converged']}")
+    logger.info(f"  Max R-hat: {diag['max_r_hat']:.4f} {'✓' if diag['max_r_hat'] < 1.01 else '✗'}")
+    logger.info(f"  Min ESS: {diag['min_ess']:.0f} {'✓' if diag['min_ess'] > 400 else '✗'}")
+    logger.info(f"  Divergences: {diag['divergences']} {'✓' if diag['divergences'] == 0 else '✗'}")
+    logger.info(f"  Converged: {diag['converged']}")
 
     # Step 3: 后验摘要
-    print("\n" + "=" * 50)
-    print("Step 3: 后验摘要")
-    print("=" * 50)
-    print(bayes_result["summary"][
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 3: 后验摘要")
+    logger.info("=" * 50)
+    logger.info(bayes_result["summary"][
         ["Parameter", "mean", "sd", "hdi_2.5%", "hdi_97.5%", "r_hat", "ess_bulk"]
     ].to_string(index=False))
 
     # Step 4: 可视化
     if do_plots:
-        print("\n" + "=" * 50)
-        print("Step 4: 后验可视化")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 4: 后验可视化")
+        logger.info("=" * 50)
         results["posterior_plot"] = plot_posterior_distribution(bayes_result["idata"])
         results["trace_plot"] = plot_trace(bayes_result["idata"])
         results["forest_plot"] = plot_forest(bayes_result["idata"])
-        print("  后验分布图、轨迹图、森林图已生成")
+        logger.info("  后验分布图、轨迹图、森林图已生成")
 
     # Step 5: 频率学派对比
     if do_comparison:
-        print("\n" + "=" * 50)
-        print("Step 5: 与频率学派对比")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 5: 与频率学派对比")
+        logger.info("=" * 50)
         comp = compare_bayesian_frequentist(
             df, outcome, predictors, bayes_result, model_type
         )
         results["comparison"] = comp
-        print(comp[["Parameter", "Bayes_Mean", "Freq_Estimate",
+        logger.info(comp[["Parameter", "Bayes_Mean", "Freq_Estimate",
                      "Bayes_HDI_low", "Bayes_HDI_high",
                      "Freq_CI_low", "Freq_CI_high", "CI_Overlap"]].to_string(index=False))
 
-    print("\n 贝叶斯分析完成")
+    logger.info("\n 贝叶斯分析完成")
     return results
 
 
@@ -1004,6 +1007,7 @@ def full_bayesian_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟数据
     np.random.seed(42)
     n = 200
@@ -1018,38 +1022,38 @@ if __name__ == "__main__":
     df_demo["y"] = df_demo["y"] + 2 * df_demo["treatment"] + 0.05 * df_demo["age"]
 
     # 贝叶斯线性回归
-    print("=" * 60)
-    print("贝叶斯线性回归示例")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("贝叶斯线性回归示例")
+    logger.info("=" * 60)
 
     result = bayesian_linear_regression(
         df_demo, "y", ["age", "treatment", "bmi"],
         draws=1000, tune=500, chains=2,
     )
 
-    print("\n=== 后验摘要 ===")
-    print(result["summary"][
+    logger.info("\n=== 后验摘要 ===")
+    logger.info(result["summary"][
         ["Parameter", "mean", "sd", "hdi_2.5%", "hdi_97.5%", "r_hat"]
     ].to_string(index=False))
 
-    print("\n=== 收敛诊断 ===")
+    logger.info("\n=== 收敛诊断 ===")
     diag = result["diagnostics"]
-    print(f"  Max R-hat: {diag['max_r_hat']:.4f}")
-    print(f"  Min ESS: {diag['min_ess']:.0f}")
-    print(f"  Divergences: {diag['divergences']}")
-    print(f"  Converged: {diag['converged']}")
+    logger.info(f"  Max R-hat: {diag['max_r_hat']:.4f}")
+    logger.info(f"  Min ESS: {diag['min_ess']:.0f}")
+    logger.info(f"  Divergences: {diag['divergences']}")
+    logger.info(f"  Converged: {diag['converged']}")
 
     # Savage-Dickey 贝叶斯因子
-    print("\n=== Savage-Dickey 贝叶斯因子 ===")
+    logger.info("\n=== Savage-Dickey 贝叶斯因子 ===")
     bf = savage_dickey_density_ratio(result["idata"], var_name="beta", var_idx=1)
-    print(f"  BF01 (treatment=0): {bf['bf_01']:.3f}")
-    print(f"  Interpretation: {bf['interpretation']}")
+    logger.info(f"  BF01 (treatment=0): {bf['bf_01']:.3f}")
+    logger.info(f"  Interpretation: {bf['interpretation']}")
 
     # 频率学派对比
-    print("\n=== 贝叶斯 vs 频率学派 ===")
+    logger.info("\n=== 贝叶斯 vs 频率学派 ===")
     comp = compare_bayesian_frequentist(
         df_demo, "y", ["age", "treatment", "bmi"], result, "linear"
     )
-    print(comp[["Parameter", "Bayes_Mean", "Freq_Estimate", "CI_Overlap"]].to_string(index=False))
+    logger.info("%s %s %s %s", comp[["Parameter", "Bayes_Mean", "Freq_Estimate", "CI_Overlap"]].to_string(index=False))
 
-    print("\n 贝叶斯分析模板示例完成")
+    logger.info("\n 贝叶斯分析模板示例完成")

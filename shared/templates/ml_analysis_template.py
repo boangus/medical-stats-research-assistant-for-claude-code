@@ -42,6 +42,9 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -111,11 +114,11 @@ def train_models(
 
     trained = {}
     for name, model in models.items():
-        print(f"  Training {name}...")
+        logger.info(f"  Training {name}...")
         model.fit(X_train, y_train)
         trained[name] = model
 
-    print(f"  ✅ 训练完成: {list(trained.keys())}")
+    logger.info(f"  ✅ 训练完成: {list(trained.keys())}")
     return trained
 
 
@@ -352,7 +355,7 @@ def plot_roc_comparison(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        print(f"  ROC Curve saved to: {save_path}")
+        logger.info(f"  ROC Curve saved to: {save_path}")
 
     if show:
         plt.show()
@@ -424,7 +427,7 @@ def plot_calibration(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        print(f"  Calibration Curve saved to: {save_path}")
+        logger.info(f"  Calibration Curve saved to: {save_path}")
 
     if show:
         plt.show()
@@ -481,66 +484,66 @@ def full_ml_workflow(
         feature_names = X_train.columns.tolist()
 
     # Step 1: 训练模型
-    print("=" * 60)
-    print("Step 1: 训练模型")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("Step 1: 训练模型")
+    logger.info("=" * 60)
     trained_models = train_models(X_train, y_train, models)
     results["models"] = trained_models
 
     # Step 2: 评估
-    print("\n" + "=" * 60)
-    print("Step 2: 模型评估")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 2: 模型评估")
+    logger.info("=" * 60)
     eval_table = evaluate_models(trained_models, X_test, y_test)
     results["evaluation"] = eval_table
-    print(eval_table.to_string(index=False))
+    logger.info("eval_table.to_string(index=False)")
 
     # Step 3: 交叉验证
-    print("\n" + "=" * 60)
-    print(f"Step 3: {cv}-Fold 交叉验证")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info(f"Step 3: {cv}-Fold 交叉验证")
+    logger.info("=" * 60)
     X_all = pd.concat([X_train, X_test], axis=0)
     y_all = pd.concat([y_train, y_test], axis=0)
     cv_table = cross_validate_models(X_all, y_all, trained_models, cv=cv)
     results["cross_validation"] = cv_table
-    print(cv_table.to_string(index=False))
+    logger.info("cv_table.to_string(index=False)")
 
     # Step 4: 特征重要性 (基于最佳模型)
-    print("\n" + "=" * 60)
-    print("Step 4: 特征重要性")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 4: 特征重要性")
+    logger.info("=" * 60)
     best_model_name = eval_table.iloc[0]["Model"]
     best_model = trained_models[best_model_name]
 
     try:
         imp_table = feature_importance(best_model, feature_names, method="mdi")
         results["feature_importance"] = imp_table
-        print(f"  最佳模型: {best_model_name}")
-        print(imp_table.to_string(index=False))
+        logger.info(f"  最佳模型: {best_model_name}")
+        logger.info("imp_table.to_string(index=False)")
     except (ValueError, AttributeError):
-        print(f"  ⚠️ {best_model_name} 不支持 MDI 特征重要性")
+        logger.info(f"  ⚠️ {best_model_name} 不支持 MDI 特征重要性")
 
     # Step 5: ROC 曲线
-    print("\n" + "=" * 60)
-    print("Step 5: ROC 曲线对比")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 5: ROC 曲线对比")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/ml_roc_comparison.png" if output_dir else None
     results["roc_plot"] = plot_roc_comparison(
         trained_models, X_test, y_test, save_path=save_path, show=False)
 
     # Step 6: 校准曲线
-    print("\n" + "=" * 60)
-    print("Step 6: 校准曲线")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 6: 校准曲线")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/ml_calibration.png" if output_dir else None
     results["calibration_plot"] = plot_calibration(
         trained_models, X_test, y_test, save_path=save_path, show=False)
 
     # Step 7: SHAP (如果可用)
     try:
-        print("\n" + "=" * 60)
-        print("Step 7: SHAP 可解释性分析")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("Step 7: SHAP 可解释性分析")
+        logger.info("=" * 60)
         from shap_plot_template import full_shap_workflow
         save_path = output_dir if output_dir else None
         shap_results = full_shap_workflow(
@@ -549,9 +552,9 @@ def full_ml_workflow(
             output_dir=save_path)
         results["shap"] = shap_results
     except ImportError:
-        print("  ⚠️ shap 未安装，跳过 SHAP 分析")
+        logger.info("  ⚠️ shap 未安装，跳过 SHAP 分析")
 
-    print("\n✅ 机器学习分析完成")
+    logger.info("\n✅ 机器学习分析完成")
     return results
 
 
@@ -560,6 +563,7 @@ def full_ml_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     from sklearn.datasets import make_classification
     from sklearn.model_selection import train_test_split
 
@@ -575,9 +579,9 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(
         X_df, y_series, test_size=0.3, random_state=42)
 
-    print(f"训练集: {X_train.shape[0]} 样本, 测试集: {X_test.shape[0]} 样本")
-    print(f"阳性率: {y_train.mean():.1%} (训练), {y_test.mean():.1%} (测试)")
-    print()
+    logger.info(f"训练集: {X_train.shape[0]} 样本, 测试集: {X_test.shape[0]} 样本")
+    logger.info(f"阳性率: {y_train.mean():.1%} (训练), {y_test.mean():.1%} (测试)")
+    logger.info("")
 
     # 运行完整 ML 分析
     results = full_ml_workflow(X_train, y_train, X_test, y_test, cv=5)

@@ -26,6 +26,9 @@ from sklearn.metrics import (
 )
 from statsmodels.formula.api import logit
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -432,6 +435,7 @@ def full_logistic_workflow(
 # 示例用法
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟数据
     np.random.seed(42)
     n = 200
@@ -453,15 +457,15 @@ if __name__ == "__main__":
         cat_vars=["sex"],
     )
 
-    print("=== Logistic 回归结果 ===")
-    print(f"Pseudo R² (McFadden): {res['pseudo_r2']:.4f}")
-    print(f"AIC: {res['aic']:.2f}, BIC: {res['bic']:.2f}")
-    print(f"LRT p-value: {res['lrt_pvalue']:.4f}")
-    print("\n=== OR 表 ===")
-    print(res["summary"][["Variable", "OR", "OR_Lower_95", "OR_Upper_95", "p_value", "Signif"]].to_string(index=False))
-    print(f"\n=== 模型评估 ===")
-    print(f"AUC: {res['evaluation']['auc']:.3f}")
-    print(f"Sensitivity: {res['evaluation']['sensitivity']:.3f}")
-    print(f"Specificity: {res['evaluation']['specificity']:.3f}")
+    logger.info("=== Logistic 回归结果 ===")
+    logger.info(f"Pseudo R² (McFadden): {res['pseudo_r2']:.4f}")
+    logger.info(f"AIC: {res['aic']:.2f}, BIC: {res['bic']:.2f}")
+    logger.info(f"LRT p-value: {res['lrt_pvalue']:.4f}")
+    logger.info("\n=== OR 表 ===")
+    logger.info("%s %s %s %s %s %s", res["summary"][["Variable", "OR", "OR_Lower_95", "OR_Upper_95", "p_value", "Signif"]].to_string(index=False))
+    logger.info(f"\n=== 模型评估 ===")
+    logger.info(f"AUC: {res['evaluation']['auc']:.3f}")
+    logger.info(f"Sensitivity: {res['evaluation']['sensitivity']:.3f}")
+    logger.info(f"Specificity: {res['evaluation']['specificity']:.3f}")
 
-    print("\n✅ Logistic 回归分析完成")
+    logger.info("\n✅ Logistic 回归分析完成")

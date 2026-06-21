@@ -42,6 +42,9 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -771,9 +774,9 @@ def full_prediction_model_workflow(
     results = {}
 
     # Phase 1: 样本量评估
-    print("=" * 60)
-    print("Phase 1: 样本量评估")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("Phase 1: 样本量评估")
+    logger.info("=" * 60)
     n_events = int(y_train.sum())
     n_pred = n_predictors or X_train.shape[1]
     prevalence = y_train.mean()
@@ -781,34 +784,34 @@ def full_prediction_model_workflow(
     sample_assess = assess_sample_size(
         n_events, n_pred, outcome_prevalence=prevalence, n_total=len(y_train))
     results["sample_size"] = sample_assess
-    print(f"  EPV = {sample_assess['epv']:.1f} ({sample_assess['assessment']})")
-    print(f"  {sample_assess['suggestion']}")
+    logger.info(f"  EPV = {sample_assess['epv']:.1f} ({sample_assess['assessment']})")
+    logger.info(f"  {sample_assess['suggestion']}")
 
     # Phase 2: 模型开发
-    print("\n" + "=" * 60)
-    print("Phase 2: 模型开发与比较")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Phase 2: 模型开发与比较")
+    logger.info("=" * 60)
     dev_results = develop_models(X_train, y_train, X_test, y_test)
     results["development"] = dev_results
-    print(dev_results["evaluation"].to_string(index=False))
+    logger.info(dev_results["evaluation"].to_string(index=False))
 
     best_name = dev_results["evaluation"].iloc[0]["Model"]
     best_model = dev_results["models"][best_name]
     y_prob_best = best_model.predict_proba(X_test)[:, 1]
 
     # Phase 3: Bootstrap 内部验证
-    print("\n" + "=" * 60)
-    print("Phase 3: Bootstrap 内部验证")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Phase 3: Bootstrap 内部验证")
+    logger.info("=" * 60)
     boot_results = bootstrap_validation(best_model, X_train, y_train)
     results["bootstrap"] = boot_results
-    print(f"  表观 AUC = {boot_results['apparent_auc']:.3f}")
-    print(f"  校正后 AUC = {boot_results['corrected_auc']:.3f}")
+    logger.info(f"  表观 AUC = {boot_results['apparent_auc']:.3f}")
+    logger.info(f"  校正后 AUC = {boot_results['corrected_auc']:.3f}")
 
     # Phase 4: 校准曲线
-    print("\n" + "=" * 60)
-    print("Phase 4: 校准曲线")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Phase 4: 校准曲线")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/calibration_curve.png" if output_dir else None
     fig_cal, ax_cal = plt.subplots(figsize=(8, 6))
 
@@ -831,30 +834,30 @@ def full_prediction_model_workflow(
     results["calibration_plot"] = fig_cal
 
     # Phase 5: DCA
-    print("\n" + "=" * 60)
-    print("Phase 5: 决策曲线分析 (DCA)")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Phase 5: 决策曲线分析 (DCA)")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/dca.png" if output_dir else None
     results["dca_plot"] = decision_curve_analysis(
         y_test, y_prob_best, best_name, save_path=save_path, show=False)
 
     # Phase 6: 临床影响曲线
-    print("\n" + "=" * 60)
-    print("Phase 6: 临床影响曲线")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Phase 6: 临床影响曲线")
+    logger.info("=" * 60)
     save_path = f"{output_dir}/clinical_impact.png" if output_dir else None
     results["clinical_impact_plot"] = clinical_impact_curve(
         y_test, y_prob_best, best_name, save_path=save_path, show=False)
 
     # Phase 7: 报告
-    print("\n" + "=" * 60)
-    print("Phase 7: 生成 TRIPOD 合规报告")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Phase 7: 生成 TRIPOD 合规报告")
+    logger.info("=" * 60)
     report = generate_prediction_model_report(dev_results, boot_results)
     results["report"] = report
-    print(report)
+    logger.info("report")
 
-    print("\n✅ 临床预测模型分析完成")
+    logger.info("\n✅ 临床预测模型分析完成")
     return results
 
 
@@ -863,6 +866,7 @@ def full_prediction_model_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     from sklearn.datasets import make_classification
     from sklearn.model_selection import train_test_split
 
@@ -877,7 +881,7 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(
         X_df, y_series, test_size=0.3, random_state=42)
 
-    print(f"训练集: {len(X_train)} 例 (阳性 {y_train.sum()})")
-    print(f"测试集: {len(X_test)} 例 (阳性 {y_test.sum()})")
+    logger.info(f"训练集: {len(X_train)} 例 (阳性 {y_train.sum()})")
+    logger.info(f"测试集: {len(X_test)} 例 (阳性 {y_test.sum()})")
 
     results = full_prediction_model_workflow(X_train, y_train, X_test, y_test)

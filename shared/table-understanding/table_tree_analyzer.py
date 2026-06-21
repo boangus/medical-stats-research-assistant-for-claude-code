@@ -16,6 +16,9 @@ import json
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NodeType(Enum):
@@ -792,6 +795,7 @@ class TableTreeAnalyzer:
 
 # 示例用法
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 示例表格数据
     sample_table = {
         'headers': ['姓名', '年龄', '性别', '血压(mmHg)', '血糖(mmol/L)'],
@@ -807,8 +811,8 @@ if __name__ == "__main__":
     tree = analyzer.build_tree()
     analysis = analyzer.analyze()
     
-    print("树结构:")
-    print(json.dumps(tree, ensure_ascii=False, indent=2))
+    logger.info("树结构:")
+    logger.info("%s %s %s", json.dumps(tree, ensure_ascii=False, indent=2))
     
-    print("\n分析结果:")
-    print(json.dumps(analysis, ensure_ascii=False, indent=2))
+    logger.info("\n分析结果:")
+    logger.info("%s %s %s", json.dumps(analysis, ensure_ascii=False, indent=2))

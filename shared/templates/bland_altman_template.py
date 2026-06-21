@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def plot_bland_altman(
@@ -189,6 +192,7 @@ def plot_bland_altman_pct(
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     np.random.seed(42)
     n = 100
     true_val = np.random.uniform(10, 100, n)
@@ -198,5 +202,5 @@ if __name__ == "__main__":
     res = plot_bland_altman(m1, m2, title="Device A vs Device B")
     res["fig"].savefig("bland_altman_demo.png", dpi=150, bbox_inches="tight")
     plt.close()
-    print("✅ bland_altman_demo.png 已保存")
-    print(f"Stats: mean_diff={res['stats']['mean_diff']:.2f}")
+    logger.info("✅ bland_altman_demo.png 已保存")
+    logger.info(f"Stats: mean_diff={res['stats']['mean_diff']:.2f}")

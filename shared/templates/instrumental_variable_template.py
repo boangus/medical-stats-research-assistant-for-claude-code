@@ -17,6 +17,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 延迟导入 linearmodels（在函数内部导入），以便模块在缺少依赖时仍可加载
 
@@ -271,10 +274,10 @@ def weak_instrument_test(
     }
 
     # 输出
-    print(f"  第一阶段 F 统计量: {first_stage_f:.2f}")
-    print(f"  Stock-Yogo 临界值 (10%): {critical_value:.2f}")
-    print(f"  经验法则 (F < 10): {'弱工具变量' if is_weak else '非弱工具变量'}")
-    print(f"  Stock-Yogo 检验: {'弱工具变量' if is_weak_stock_yogo else '非弱工具变量'}")
+    logger.info(f"  第一阶段 F 统计量: {first_stage_f:.2f}")
+    logger.info(f"  Stock-Yogo 临界值 (10%): {critical_value:.2f}")
+    logger.info(f"  经验法则 (F < 10): {'弱工具变量' if is_weak else '非弱工具变量'}")
+    logger.info(f"  Stock-Yogo 检验: {'弱工具变量' if is_weak_stock_yogo else '非弱工具变量'}")
 
     if is_weak:
         warnings.warn(
@@ -396,11 +399,11 @@ def anderson_rubin_test(
         "method": "Anderson-Rubin test",
     }
 
-    print(f"  AR 统计量: {ar_stat:.4f}")
-    print(f"  p 值: {p_value:.4f}")
-    print(f"  拒绝零假设 (effect = {null_value}): {'是' if reject_null else '否'}")
+    logger.info(f"  AR 统计量: {ar_stat:.4f}")
+    logger.info(f"  p 值: {p_value:.4f}")
+    logger.info(f"  拒绝零假设 (effect = {null_value}): {'是' if reject_null else '否'}")
     if ar_ci is not None:
-        print(f"  AR 95% 置信集: [{ar_ci[0]:.4f}, {ar_ci[1]:.4f}]")
+        logger.info(f"  AR 95% 置信集: [{ar_ci[0]:.4f}, {ar_ci[1]:.4f}]")
 
     return result
 
@@ -560,10 +563,10 @@ def _overidentification_test(iv_result, instruments, endogenous):
             "reject_validity": j_pvalue < 0.05,
         }
 
-        print(f"  Hansen J 统计量: {j_stat:.4f}")
-        print(f"  p 值: {j_pvalue:.4f}")
+        logger.info(f"  Hansen J 统计量: {j_stat:.4f}")
+        logger.info(f"  p 值: {j_pvalue:.4f}")
         if j_pvalue < 0.05:
-            print("  警告: 过度识别检验拒绝工具变量有效性（p < 0.05）")
+            logger.info("  警告: 过度识别检验拒绝工具变量有效性（p < 0.05）")
             warnings.warn(
                 "Hansen J 检验拒绝工具变量有效性，工具变量可能不满足外生性假设。",
                 RuntimeWarning,
@@ -734,62 +737,62 @@ def full_iv_workflow(
     results = {}
 
     # Step 1: 完整 IV 估计
-    print("=" * 50)
-    print("Step 1: IV 估计（OLS + 2SLS）")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Step 1: IV 估计（OLS + 2SLS）")
+    logger.info("=" * 50)
     iv_results = linear_iv_estimation(
         df, outcome, endogenous, instruments, exogenous
     )
     results.update(iv_results)
 
-    print(f"\n  OLS 系数: {iv_results.get('ols_coefficient', 'N/A'):.4f}")
-    print(f"  IV 系数:  {iv_results.get('iv_coefficient', 'N/A'):.4f}")
+    logger.info(f"\n  OLS 系数: {iv_results.get('ols_coefficient', 'N/A'):.4f}")
+    logger.info(f"  IV 系数:  {iv_results.get('iv_coefficient', 'N/A'):.4f}")
 
     # Step 2: 弱工具变量检验
-    print("\n" + "=" * 50)
-    print("Step 2: 弱工具变量检验")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 2: 弱工具变量检验")
+    logger.info("=" * 50)
     weak_test = iv_results["weak_iv_test"]
-    print(f"  第一阶段 F: {weak_test['first_stage_f']:.2f}")
-    print(f"  弱工具变量: {'是' if weak_test['is_weak_rule_of_thumb'] else '否'}")
+    logger.info(f"  第一阶段 F: {weak_test['first_stage_f']:.2f}")
+    logger.info(f"  弱工具变量: {'是' if weak_test['is_weak_rule_of_thumb'] else '否'}")
 
     # Step 3: AR 检验
-    print("\n" + "=" * 50)
-    print("Step 3: Anderson-Rubin 检验")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 3: Anderson-Rubin 检验")
+    logger.info("=" * 50)
     ar = iv_results["ar_test"]
-    print(f"  AR 统计量: {ar['ar_statistic']:.4f}")
-    print(f"  p 值: {ar['p_value']:.4f}")
+    logger.info(f"  AR 统计量: {ar['ar_statistic']:.4f}")
+    logger.info(f"  p 值: {ar['p_value']:.4f}")
 
     # Step 4: 过度识别检验
     if "overid_test" in iv_results:
-        print("\n" + "=" * 50)
-        print("Step 4: 过度识别检验")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 4: 过度识别检验")
+        logger.info("=" * 50)
         overid = iv_results["overid_test"]
         if "test_statistic" in overid:
-            print(f"  Hansen J: {overid['test_statistic']:.4f}")
-            print(f"  p 值: {overid['p_value']:.4f}")
+            logger.info(f"  Hansen J: {overid['test_statistic']:.4f}")
+            logger.info(f"  p 值: {overid['p_value']:.4f}")
 
     # Step 5: Hausman 检验
-    print("\n" + "=" * 50)
-    print("Step 5: Hausman 检验（OLS vs IV）")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 5: Hausman 检验（OLS vs IV）")
+    logger.info("=" * 50)
     hausman = iv_results["hausman_test"]
     if "hausman_stat" in hausman:
-        print(f"  Hausman 统计量: {hausman['hausman_stat']:.4f}")
-        print(f"  p 值: {hausman['p_value']:.4f}")
-        print(f"  结论: {hausman['interpretation']}")
+        logger.info(f"  Hausman 统计量: {hausman['hausman_stat']:.4f}")
+        logger.info(f"  p 值: {hausman['p_value']:.4f}")
+        logger.info(f"  结论: {hausman['interpretation']}")
 
     # Step 6: 可视化
     if do_plot:
-        print("\n" + "=" * 50)
-        print("Step 6: 可视化")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 6: 可视化")
+        logger.info("=" * 50)
         results["comparison_plot"] = plot_iv_comparison(iv_results, endogenous)
-        print("  OLS vs IV 对比图已生成")
+        logger.info("  OLS vs IV 对比图已生成")
 
-    print("\n 工具变量分析完成")
+    logger.info("\n 工具变量分析完成")
     return results
 
 
@@ -798,6 +801,7 @@ def full_iv_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟数据（存在内生性）
     np.random.seed(42)
     n = 1000
@@ -830,40 +834,40 @@ if __name__ == "__main__":
     import statsmodels.api as sm
     X_ols = sm.add_constant(df[["treated", "age"]])
     ols = sm.OLS(df["y"], X_ols).fit(cov_type="HC1")
-    print("=" * 60)
-    print("OLS 估计（有偏，受混杂影响）")
-    print("=" * 60)
-    print(f"  treated 系数: {ols.params['treated']:.4f} (真实值: 2.0)")
+    logger.info("=" * 60)
+    logger.info("OLS 估计（有偏，受混杂影响）")
+    logger.info("=" * 60)
+    logger.info(f"  treated 系数: {ols.params['treated']:.4f} (真实值: 2.0)")
 
     # IV 估计
-    print("\n" + "=" * 60)
-    print("IV 估计（2SLS）")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("IV 估计（2SLS）")
+    logger.info("=" * 60)
     iv_result = run_2sls(df, "y", "treated", ["z"], exogenous=["age"])
-    print(iv_result["summary"].to_string(index=False))
+    logger.info(iv_result["summary"].to_string(index=False))
 
     # 弱工具变量检验
-    print("\n" + "=" * 60)
-    print("弱工具变量检验")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("弱工具变量检验")
+    logger.info("=" * 60)
     weak_test = weak_instrument_test(df, "treated", ["z"], exogenous=["age"])
 
     # AR 检验
-    print("\n" + "=" * 60)
-    print("Anderson-Rubin 检验")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Anderson-Rubin 检验")
+    logger.info("=" * 60)
     ar = anderson_rubin_test(df, "y", "treated", ["z"], exogenous=["age"])
 
     # 完整工作流
-    print("\n" + "=" * 60)
-    print("完整 IV 工作流")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("完整 IV 工作流")
+    logger.info("=" * 60)
     full_results = full_iv_workflow(
         df, "y", "treated", ["z"], exogenous=["age"], do_plot=False
     )
 
-    print(f"\n  OLS 系数: {full_results['ols_coefficient']:.4f}")
-    print(f"  IV 系数:  {full_results['iv_coefficient']:.4f}")
-    print(f"  真实值:   2.0000")
+    logger.info(f"\n  OLS 系数: {full_results['ols_coefficient']:.4f}")
+    logger.info(f"  IV 系数:  {full_results['iv_coefficient']:.4f}")
+    logger.info(f"  真实值:   2.0000")
 
-    print("\n 工具变量分析模板示例完成")
+    logger.info("\n 工具变量分析模板示例完成")

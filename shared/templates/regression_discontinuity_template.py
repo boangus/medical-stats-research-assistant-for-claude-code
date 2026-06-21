@@ -17,6 +17,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 延迟导入 rdrobust（在函数内部导入），以便模块在缺少依赖时仍可加载
 
@@ -116,10 +119,10 @@ def density_test(
         "method": "McCrary density test (simplified)",
     }
 
-    print(f"  对数密度差: {log_diff:.4f}" if not np.isnan(log_diff) else "  对数密度差: N/A")
-    print(f"  z 统计量: {z_stat:.4f}" if not np.isnan(z_stat) else "  z 统计量: N/A")
-    print(f"  p 值: {p_value:.4f}" if not np.isnan(p_value) else "  p 值: N/A")
-    print(f"  操纵检测: {'是' if result['manipulation_detected'] else '否'}")
+    logger.info(f"  对数密度差: {log_diff:.4f}" if not np.isnan(log_diff) else "  对数密度差: N/A")
+    logger.info(f"  z 统计量: {z_stat:.4f}" if not np.isnan(z_stat) else "  z 统计量: N/A")
+    logger.info(f"  p 值: {p_value:.4f}" if not np.isnan(p_value) else "  p 值: N/A")
+    logger.info(f"  操纵检测: {'是' if result['manipulation_detected'] else '否'}")
 
     if result["manipulation_detected"]:
         warnings.warn(
@@ -337,13 +340,13 @@ def rd_estimate(
         "rd_result": rd_result,
     }
 
-    print(f"  RD 估计值: {estimate:.4f}")
-    print(f"  标准误: {se:.4f}")
-    print(f"  95% CI: [{ci_lower:.4f}, {ci_upper:.4f}]")
-    print(f"  z 统计量: {z_stat:.4f}")
-    print(f"  p 值: {p_value:.4f}")
-    print(f"  带宽: {h:.4f}")
-    print(f"  有效样本: 左 {result['n_left']}, 右 {result['n_right']}")
+    logger.info(f"  RD 估计值: {estimate:.4f}")
+    logger.info(f"  标准误: {se:.4f}")
+    logger.info(f"  95% CI: [{ci_lower:.4f}, {ci_upper:.4f}]")
+    logger.info(f"  z 统计量: {z_stat:.4f}")
+    logger.info(f"  p 值: {p_value:.4f}")
+    logger.info(f"  带宽: {h:.4f}")
+    logger.info(f"  有效样本: 左 {result['n_left']}, 右 {result['n_right']}")
 
     return result
 
@@ -427,11 +430,11 @@ def _rd_estimate_manual(
         "method": f"Manual local linear (kernel={kernel}, p={p})",
     }
 
-    print(f"  RD 估计值: {estimate:.4f}")
-    print(f"  标准误: {se:.4f}")
-    print(f"  95% CI: [{result['ci_lower']:.4f}, {result['ci_upper']:.4f}]")
-    print(f"  p 值: {p_value:.4f}")
-    print(f"  带宽: {bandwidth:.4f}")
+    logger.info(f"  RD 估计值: {estimate:.4f}")
+    logger.info(f"  标准误: {se:.4f}")
+    logger.info(f"  95% CI: [{result['ci_lower']:.4f}, {result['ci_upper']:.4f}]")
+    logger.info(f"  p 值: {p_value:.4f}")
+    logger.info(f"  带宽: {bandwidth:.4f}")
 
     return result
 
@@ -538,7 +541,7 @@ def optimal_bandwidth(
             "cutoff": cutoff,
         }
 
-    print(f"  最优带宽 (IK): {result['bandwidth']:.4f}")
+    logger.info(f"  最优带宽 (IK): {result['bandwidth']:.4f}")
     return result
 
 
@@ -672,10 +675,10 @@ def fuzzy_rd_estimate(
         "method": "Fuzzy RD (Wald estimator)",
     }
 
-    print(f"  模糊 RD LATE: {late:.4f}" if not np.isnan(late) else "  模糊 RD LATE: N/A")
-    print(f"  Reduced form: {reduced_form:.4f}")
-    print(f"  First stage: {first_stage:.4f}")
-    print(f"  带宽: {bandwidth:.4f}")
+    logger.info(f"  模糊 RD LATE: {late:.4f}" if not np.isnan(late) else "  模糊 RD LATE: N/A")
+    logger.info(f"  Reduced form: {reduced_form:.4f}")
+    logger.info(f"  First stage: {first_stage:.4f}")
+    logger.info(f"  带宽: {bandwidth:.4f}")
 
     return result
 
@@ -780,9 +783,9 @@ def smoothness_test(
         "real_cutoff": cutoff,
     }
 
-    print(f"  安慰剂断点数: {len(placebo_cutoffs)}")
-    print(f"  显著的安慰剂断点: {n_significant}")
-    print(f"  平滑性确认: {'是' if result['smoothness_confirmed'] else '否'}")
+    logger.info(f"  安慰剂断点数: {len(placebo_cutoffs)}")
+    logger.info(f"  显著的安慰剂断点: {n_significant}")
+    logger.info(f"  平滑性确认: {'是' if result['smoothness_confirmed'] else '否'}")
 
     if not result["smoothness_confirmed"]:
         warnings.warn(
@@ -1037,74 +1040,74 @@ def full_rd_workflow(
     results = {}
 
     # Step 1: 密度检验
-    print("=" * 50)
-    print("Step 1: McCrary 密度检验（操纵检验）")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Step 1: McCrary 密度检验（操纵检验）")
+    logger.info("=" * 50)
     results["density_test"] = density_test(df, running_var, cutoff)
 
     # Step 2: 协变量平衡检验
     if covariates:
-        print("\n" + "=" * 50)
-        print("Step 2: 协变量平衡检验")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 2: 协变量平衡检验")
+        logger.info("=" * 50)
         results["covariate_balance"] = covariate_balance_test(
             df, running_var, cutoff, covariates
         )
-        print(results["covariate_balance"].to_string(index=False))
+        logger.info(results["covariate_balance"].to_string(index=False))
 
     # Step 3: 最优带宽
-    print("\n" + "=" * 50)
-    print("Step 3: 最优带宽选择")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 3: 最优带宽选择")
+    logger.info("=" * 50)
     bw = optimal_bandwidth(df, outcome, running_var, cutoff)
     results["optimal_bandwidth"] = bw
 
     # Step 4: RD 估计
-    print("\n" + "=" * 50)
-    print("Step 4: RD 估计（局部线性回归）")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 4: RD 估计（局部线性回归）")
+    logger.info("=" * 50)
     rd_est = rd_estimate(df, outcome, running_var, cutoff,
                          bandwidth=bw["bandwidth"], covariates=covariates)
     results["rd_estimate"] = rd_est
 
     # Step 5: 模糊 RD（如果提供了处理变量）
     if treatment:
-        print("\n" + "=" * 50)
-        print("Step 5: 模糊 RD 估计")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 5: 模糊 RD 估计")
+        logger.info("=" * 50)
         fuzzy = fuzzy_rd_estimate(df, outcome, treatment, running_var, cutoff,
                                   bandwidth=bw["bandwidth"])
         results["fuzzy_rd"] = fuzzy
 
     # Step 6: 平滑性检验
-    print("\n" + "=" * 50)
-    print("Step 6: 平滑性检验（安慰剂断点）")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 6: 平滑性检验（安慰剂断点）")
+    logger.info("=" * 50)
     smooth = smoothness_test(df, outcome, running_var, cutoff,
                              bandwidth=bw["bandwidth"])
     results["smoothness_test"] = smooth
 
     # Step 7: 带宽敏感性
     if do_sensitivity:
-        print("\n" + "=" * 50)
-        print("Step 7: 带宽敏感性分析")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 7: 带宽敏感性分析")
+        logger.info("=" * 50)
         sensitivity = bandwidth_sensitivity(df, outcome, running_var, cutoff,
                                             kernel="triangular")
         results["bandwidth_sensitivity"] = sensitivity
-        print(sensitivity[["bandwidth_multiplier", "bandwidth", "estimate",
+        logger.info(sensitivity[["bandwidth_multiplier", "bandwidth", "estimate",
                            "se", "p_value", "significant"]].to_string(index=False))
 
     # Step 8: 可视化
     if do_plots:
-        print("\n" + "=" * 50)
-        print("Step 8: 可视化")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 8: 可视化")
+        logger.info("=" * 50)
         results["rd_plot"] = plot_rd(df, outcome, running_var, cutoff,
                                      bandwidth=bw["bandwidth"])
-        print("  RD 图已生成")
+        logger.info("  RD 图已生成")
 
-    print("\n 断点回归分析完成")
+    logger.info("\n 断点回归分析完成")
     return results
 
 
@@ -1113,6 +1116,7 @@ def full_rd_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟 RD 数据
     np.random.seed(42)
     n = 1000
@@ -1140,40 +1144,40 @@ if __name__ == "__main__":
     })
 
     # RD 估计
-    print("=" * 60)
-    print("RD 估计（局部线性回归）")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("RD 估计（局部线性回归）")
+    logger.info("=" * 60)
     rd_est = rd_estimate(df, "outcome", "score", cutoff=cutoff)
-    print(f"\n  RD 效应: {rd_est['estimate']:.4f} (真实值: 5.0)")
+    logger.info(f"\n  RD 效应: {rd_est['estimate']:.4f} (真实值: 5.0)")
 
     # 密度检验
-    print("\n" + "=" * 60)
-    print("McCrary 密度检验")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("McCrary 密度检验")
+    logger.info("=" * 60)
     density = density_test(df, "score", cutoff=cutoff)
 
     # 协变量平衡
-    print("\n" + "=" * 60)
-    print("协变量平衡检验")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("协变量平衡检验")
+    logger.info("=" * 60)
     balance = covariate_balance_test(df, "score", cutoff, ["age", "bmi"])
-    print(balance.to_string(index=False))
+    logger.info("balance.to_string(index=False)")
 
     # 带宽敏感性
-    print("\n" + "=" * 60)
-    print("带宽敏感性分析")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("带宽敏感性分析")
+    logger.info("=" * 60)
     sensitivity = bandwidth_sensitivity(df, "outcome", "score", cutoff=cutoff)
-    print(sensitivity[["bandwidth_multiplier", "estimate", "se", "p_value"]].to_string(index=False))
+    logger.info("%s %s %s %s", sensitivity[["bandwidth_multiplier", "estimate", "se", "p_value"]].to_string(index=False))
 
     # 模糊 RD
-    print("\n" + "=" * 60)
-    print("模糊 RD 估计")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("模糊 RD 估计")
+    logger.info("=" * 60)
     # 创建不完全遵从的处理变量
     compliance = np.random.binomial(1, 0.8, n)  # 80% 遵从
     df["treated_fuzzy"] = treated * compliance
     fuzzy = fuzzy_rd_estimate(df, "outcome", "treated_fuzzy", "score", cutoff=cutoff)
-    print(f"\n  模糊 RD LATE: {fuzzy['late']:.4f}" if fuzzy['late'] else "  N/A")
+    logger.info(f"\n  模糊 RD LATE: {fuzzy['late']:.4f}" if fuzzy['late'] else "  N/A")
 
-    print("\n 断点回归分析模板示例完成")
+    logger.info("\n 断点回归分析模板示例完成")

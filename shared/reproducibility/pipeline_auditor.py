@@ -28,6 +28,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -113,7 +116,7 @@ class PipelineAuditor:
                         data=df)
 
         # 生成审计报告
-        print(auditor.generate_report())
+        logger.info("auditor.generate_report()")
         auditor.save_report("audit_report.md")
 
     Parameters
@@ -507,7 +510,7 @@ class PipelineAuditor:
             report = self.generate_report()
             path.write_text(report, encoding="utf-8")
 
-        print(f"审计报告已保存: {path}")
+        logger.info(f"审计报告已保存: {path}")
 
 
 # ============================================================================
@@ -515,6 +518,7 @@ class PipelineAuditor:
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     import numpy as np
 
     # --- 模拟临床数据 ---
@@ -537,7 +541,7 @@ if __name__ == "__main__":
     raw_data.loc[31:35, "age"] = 0  # 异常值
     raw_data.loc[36:40, "bmi"] = 65  # 极端异常值
 
-    print(f"原始数据: {raw_data.shape}")
+    logger.info(f"原始数据: {raw_data.shape}")
 
     # --- 使用 PipelineAuditor ---
     auditor = PipelineAuditor(
@@ -589,7 +593,7 @@ if __name__ == "__main__":
 
     # --- 生成报告 ---
     report = auditor.generate_report()
-    print(report)
+    logger.info("report")
 
     # --- 保存报告 ---
     # auditor.save_report("audit_report.md")

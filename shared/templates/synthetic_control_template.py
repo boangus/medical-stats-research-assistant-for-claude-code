@@ -24,6 +24,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy.optimize import minimize
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 延迟导入 cvxpy（在函数内部导入），以便模块在缺少依赖时仍可加载
 
@@ -177,14 +180,14 @@ def build_synthetic_control(
         "post_period": pivot_outcome.index[post_mask].tolist(),
     }
 
-    print(f"  处理单元: {treated_unit}")
-    print(f"  干预时间: {treatment_time}")
-    print(f"  控制单元数: {len(control_units)}")
-    print(f"  非零权重数: {len(weights_df)}")
-    print(f"  干预前 MSPE: {mspe_pre:.6f}")
-    print(f"  干预后 MSPE: {mspe_post:.6f}")
-    print(f"\n  权重分布:")
-    print(weights_df.to_string(index=False))
+    logger.info(f"  处理单元: {treated_unit}")
+    logger.info(f"  干预时间: {treatment_time}")
+    logger.info(f"  控制单元数: {len(control_units)}")
+    logger.info(f"  非零权重数: {len(weights_df)}")
+    logger.info(f"  干预前 MSPE: {mspe_pre:.6f}")
+    logger.info(f"  干预后 MSPE: {mspe_post:.6f}")
+    logger.info(f"\n  权重分布:")
+    logger.info("weights_df.to_string(index=False)")
 
     return result
 
@@ -316,12 +319,12 @@ def estimate_treatment_effect(
                        if sc_result["mspe_pre"] > 0 else np.nan,
     }
 
-    print(f"  平均处理效应: {avg_effect:.4f} ({direction})")
-    print(f"  累积效应: {total_effect:.4f}")
-    print(f"  最大效应: {max_effect:.4f}")
+    logger.info(f"  平均处理效应: {avg_effect:.4f} ({direction})")
+    logger.info(f"  累积效应: {total_effect:.4f}")
+    logger.info(f"  最大效应: {max_effect:.4f}")
     if relative_effect is not None and not np.isnan(relative_effect):
-        print(f"  相对效应: {relative_effect:.2%}")
-    print(f"  MSPE 比 (后/前): {result['mspe_ratio']:.2f}")
+        logger.info(f"  相对效应: {relative_effect:.2%}")
+    logger.info(f"  MSPE 比 (后/前): {result['mspe_ratio']:.2f}")
 
     return result
 
@@ -398,7 +401,7 @@ def spatial_placebo_test(
             placebo_effects[placebo_unit] = placebo_eff["average_effect"]
             placebo_mspe_ratios[placebo_unit] = placebo_eff["mspe_ratio"]
         except Exception as e:
-            print(f"  安慰剂检验 {placebo_unit} 失败: {e}")
+            logger.info(f"  安慰剂检验 {placebo_unit} 失败: {e}")
             placebo_effects[placebo_unit] = np.nan
             placebo_mspe_ratios[placebo_unit] = np.nan
 
@@ -433,10 +436,10 @@ def spatial_placebo_test(
         }),
     }
 
-    print(f"\n  真实效应: {real_avg_effect:.4f}")
-    print(f"  效应 p 值 (排序检验): {p_value:.4f}")
-    print(f"  MSPE 比 p 值: {p_value_mspe:.4f}")
-    print(f"  有效安慰剂数: {result['n_valid_placebos']}")
+    logger.info(f"\n  真实效应: {real_avg_effect:.4f}")
+    logger.info(f"  效应 p 值 (排序检验): {p_value:.4f}")
+    logger.info(f"  MSPE 比 p 值: {p_value_mspe:.4f}")
+    logger.info(f"  有效安慰剂数: {result['n_valid_placebos']}")
 
     return result
 
@@ -536,9 +539,9 @@ def temporal_placebo_test(
         "real_treatment_time": real_treatment_time,
     }
 
-    print(f"  时间安慰剂数: {len(placebo_times)}")
-    print(f"  显著的安慰剂: {n_significant}")
-    print(f"  时间有效性: {'是' if result['temporal_validity'] else '否'}")
+    logger.info(f"  时间安慰剂数: {len(placebo_times)}")
+    logger.info(f"  显著的安慰剂: {n_significant}")
+    logger.info(f"  时间有效性: {'是' if result['temporal_validity'] else '否'}")
 
     if not result["temporal_validity"]:
         warnings.warn(
@@ -651,12 +654,12 @@ def permutation_test(
         "significant_mspe": p_value_mspe < 0.05 if not np.isnan(p_value_mspe) else False,
     }
 
-    print(f"\n  真实效应: {real_avg:.4f}")
-    print(f"  置换次数: {len(null_effects_clean)}")
-    print(f"  效应 p 值: {p_value_effect:.4f}")
-    print(f"  MSPE 比 p 值: {p_value_mspe:.4f}")
-    print(f"  显著 (效应): {'是' if result['significant_effect'] else '否'}")
-    print(f"  显著 (MSPE): {'是' if result['significant_mspe'] else '否'}")
+    logger.info(f"\n  真实效应: {real_avg:.4f}")
+    logger.info(f"  置换次数: {len(null_effects_clean)}")
+    logger.info(f"  效应 p 值: {p_value_effect:.4f}")
+    logger.info(f"  MSPE 比 p 值: {p_value_mspe:.4f}")
+    logger.info(f"  显著 (效应): {'是' if result['significant_effect'] else '否'}")
+    logger.info(f"  显著 (MSPE): {'是' if result['significant_mspe'] else '否'}")
 
     return result
 
@@ -766,10 +769,10 @@ def leave_one_out_sensitivity(
         "robust": consistent and (effect_std < abs(base_effect) if not np.isnan(effect_std) else False),
     }
 
-    print(f"  基准效应: {base_effect:.4f}")
-    print(f"  留一效应标准差: {effect_std:.4f}" if not np.isnan(effect_std) else "  留一效应标准差: N/A")
-    print(f"  方向一致: {'是' if consistent else '否'}")
-    print(f"  稳健: {'是' if result['robust'] else '否'}")
+    logger.info(f"  基准效应: {base_effect:.4f}")
+    logger.info(f"  留一效应标准差: {effect_std:.4f}" if not np.isnan(effect_std) else "  留一效应标准差: N/A")
+    logger.info(f"  方向一致: {'是' if consistent else '否'}")
+    logger.info(f"  稳健: {'是' if result['robust'] else '否'}")
 
     return result
 
@@ -951,9 +954,9 @@ def full_synthetic_control_workflow(
     results = {}
 
     # Step 1: 构建合成控制
-    print("=" * 50)
-    print("Step 1: 构建合成控制")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Step 1: 构建合成控制")
+    logger.info("=" * 50)
     sc = build_synthetic_control(
         data, treated_unit, control_units, time_col, outcome_col,
         predictor_cols, treatment_time,
@@ -961,17 +964,17 @@ def full_synthetic_control_workflow(
     results["synthetic_control"] = sc
 
     # Step 2: 效应估计
-    print("\n" + "=" * 50)
-    print("Step 2: 效应估计")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 2: 效应估计")
+    logger.info("=" * 50)
     effect = estimate_treatment_effect(sc)
     results["effect"] = effect
 
     # Step 3: 空间安慰剂检验
     if do_placebo:
-        print("\n" + "=" * 50)
-        print("Step 3: 空间安慰剂检验")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 3: 空间安慰剂检验")
+        logger.info("=" * 50)
         spatial = spatial_placebo_test(
             data, treated_unit, control_units, time_col, outcome_col,
             treatment_time, predictor_cols,
@@ -980,9 +983,9 @@ def full_synthetic_control_workflow(
 
     # Step 4: 时间安慰剂检验
     if do_placebo:
-        print("\n" + "=" * 50)
-        print("Step 4: 时间安慰剂检验")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 4: 时间安慰剂检验")
+        logger.info("=" * 50)
         temporal = temporal_placebo_test(
             data, treated_unit, control_units, time_col, outcome_col,
             treatment_time, predictor_cols,
@@ -991,9 +994,9 @@ def full_synthetic_control_workflow(
 
     # Step 5: 留一敏感性分析
     if do_loo:
-        print("\n" + "=" * 50)
-        print("Step 5: 留一敏感性分析")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 5: 留一敏感性分析")
+        logger.info("=" * 50)
         loo = leave_one_out_sensitivity(
             data, treated_unit, control_units, time_col, outcome_col,
             treatment_time, predictor_cols,
@@ -1002,17 +1005,17 @@ def full_synthetic_control_workflow(
 
     # Step 6: 可视化
     if do_plots:
-        print("\n" + "=" * 50)
-        print("Step 6: 可视化")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 6: 可视化")
+        logger.info("=" * 50)
         results["sc_plot"] = plot_synthetic_control(sc)
         if do_placebo:
             results["placebo_plot"] = plot_placebo_distribution(
                 results["spatial_placebo"]
             )
-        print("  合成控制图和安慰剂分布图已生成")
+        logger.info("  合成控制图和安慰剂分布图已生成")
 
-    print("\n 合成控制分析完成")
+    logger.info("\n 合成控制分析完成")
     return results
 
 
@@ -1021,6 +1024,7 @@ def full_synthetic_control_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟面板数据
     np.random.seed(42)
     n_years = 20
@@ -1052,9 +1056,9 @@ if __name__ == "__main__":
     df = pd.DataFrame(rows)
 
     # 构建合成控制
-    print("=" * 60)
-    print("合成控制构建")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("合成控制构建")
+    logger.info("=" * 60)
     sc_result = build_synthetic_control(
         df, "treated", [f"control_{i}" for i in range(1, n_controls + 1)],
         "year", "outcome", predictor_cols=["gdp", "population"],
@@ -1062,21 +1066,21 @@ if __name__ == "__main__":
     )
 
     # 效应估计
-    print("\n" + "=" * 60)
-    print("效应估计")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("效应估计")
+    logger.info("=" * 60)
     effect = estimate_treatment_effect(sc_result)
 
     # 留一敏感性分析
-    print("\n" + "=" * 60)
-    print("留一敏感性分析")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("留一敏感性分析")
+    logger.info("=" * 60)
     loo = leave_one_out_sensitivity(
         df, "treated", [f"control_{i}" for i in range(1, n_controls + 1)],
         "year", "outcome", treatment_year, predictor_cols=["gdp", "population"],
     )
-    print(loo["loo_df"].to_string(index=False))
+    logger.info(loo["loo_df"].to_string(index=False))
 
-    print("\n 合成控制法模板示例完成")
-    print(f"  真实效应: 8.0")
-    print(f"  估计效应: {effect['average_effect']:.4f}")
+    logger.info("\n 合成控制法模板示例完成")
+    logger.info(f"  真实效应: 8.0")
+    logger.info(f"  估计效应: {effect['average_effect']:.4f}")

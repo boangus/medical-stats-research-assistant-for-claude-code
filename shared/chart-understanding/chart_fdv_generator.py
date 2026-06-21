@@ -17,6 +17,9 @@ import json
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ChartType(Enum):
@@ -900,6 +903,7 @@ class ChartFDVGenerator:
 
 # 示例用法
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 示例图表数据
     sample_chart = {
         'type': 'scatter_plot',
@@ -940,11 +944,11 @@ if __name__ == "__main__":
     
     generator = ChartFDVGenerator(sample_chart)
     
-    print("FDV描述:")
-    print(json.dumps(generator.generate_description(), ensure_ascii=False, indent=2))
+    logger.info("FDV描述:")
+    logger.info("%s %s %s", json.dumps(generator.generate_description(), ensure_ascii=False, indent=2))
     
-    print("\n质量评估:")
-    print(json.dumps(generator.assess_quality(), ensure_ascii=False, indent=2))
+    logger.info("\n质量评估:")
+    logger.info("%s %s %s", json.dumps(generator.assess_quality(), ensure_ascii=False, indent=2))
     
-    print("\n一致性检查:")
-    print(json.dumps(generator.check_consistency(), ensure_ascii=False, indent=2))
+    logger.info("\n一致性检查:")
+    logger.info("%s %s %s", json.dumps(generator.check_consistency(), ensure_ascii=False, indent=2))

@@ -13,6 +13,9 @@ Usage:
 import os
 import re
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def parse_variable_constructions(sap_path: str) -> list[dict]:
@@ -285,14 +288,15 @@ def _render_png(dot_text: str, output_dir: str):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python variable_dag_template.py <sap_path> [output_dir]")
+        logger.info("Usage: python variable_dag_template.py <sap_path> [output_dir]")
         sys.exit(1)
 
     sap = sys.argv[1]
     out = sys.argv[2] if len(sys.argv) > 2 else None
 
     result = generate_variable_dag(sap, output_dir=out)
-    print(result)
+    logger.info("result")

@@ -19,6 +19,9 @@ import pandas as pd
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import NearestNeighbors
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -88,7 +91,7 @@ def estimate_propensity(
     # c-statistic (AUC)
     from sklearn.metrics import roc_auc_score
     c_stat = roc_auc_score(y, data["ps_score"])
-    print(f"  C-statistic: {c_stat:.3f}")
+    logger.info(f"  C-statistic: {c_stat:.3f}")
 
     return data
 
@@ -192,8 +195,8 @@ def nearest_neighbor_match(
         raise ValueError("No matches found. Try relaxing caliper.")
 
     matched_df = pd.DataFrame(matched_rows)
-    print(f"  匹配前: 处理组 {len(treated)}, 对照组 {len(control)}")
-    print(f"  匹配后: {len(matched_df) // 2} 对匹配")
+    logger.info(f"  匹配前: 处理组 {len(treated)}, 对照组 {len(control)}")
+    logger.info(f"  匹配后: {len(matched_df) // 2} 对匹配")
 
     return matched_df
 
@@ -397,9 +400,9 @@ def full_psm_workflow(
     results = {}
 
     # Step 1: PS 估计
-    print("=" * 50)
-    print("Step 1: 估计倾向性评分")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Step 1: 估计倾向性评分")
+    logger.info("=" * 50)
     data_ps = estimate_propensity(df, treatment_col, covariate_cols, cat_vars)
     results["ps_data"] = data_ps
 
@@ -408,9 +411,9 @@ def full_psm_workflow(
     results["balance_before"] = balance_before
 
     # Step 3: 匹配
-    print("\n" + "=" * 50)
-    print("Step 2: 最近邻匹配")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 2: 最近邻匹配")
+    logger.info("=" * 50)
     matched = nearest_neighbor_match(data_ps, treatment_col,
                                       caliper=caliper, ratio=ratio)
     results["matched_data"] = matched
@@ -424,18 +427,19 @@ def full_psm_workflow(
         results["love_plot"] = love_plot(balance_before, balance_after)
 
     # Step 6: 效应估计
-    print("\n" + "=" * 50)
-    print("Step 3: 处理效应估计")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 3: 处理效应估计")
+    logger.info("=" * 50)
     ate = estimate_ate(matched, outcome_col, treatment_col)
     results["ate"] = ate
 
-    print(f"  ATE = {ate['ate']:.4f} (p = {ate['p_value']:.4f})")
+    logger.info(f"  ATE = {ate['ate']:.4f} (p = {ate['p_value']:.4f})")
 
     return results
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     from sklearn.datasets import make_classification
 
     # 模拟观察性数据
@@ -472,10 +476,10 @@ if __name__ == "__main__":
         caliper=0.2,
     )
 
-    print("\n=== 匹配前平衡诊断 ===")
-    print(results["balance_before"].to_string(index=False))
+    logger.info("\n=== 匹配前平衡诊断 ===")
+    logger.info(results["balance_before"].to_string(index=False))
 
-    print("\n=== 匹配后平衡诊断 ===")
-    print(results["balance_after"].to_string(index=False))
+    logger.info("\n=== 匹配后平衡诊断 ===")
+    logger.info(results["balance_after"].to_string(index=False))
 
-    print("\n✅ PSM 分析完成")
+    logger.info("\n✅ PSM 分析完成")

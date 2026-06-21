@@ -15,6 +15,9 @@ from typing import Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -324,6 +327,7 @@ def forest_plot_with_table(
 # 示例
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     demo_data = pd.DataFrame(
         {
             "variable": ["Age (per 10yr)", "BMI (per 5)", "Smoking",
@@ -342,4 +346,4 @@ if __name__ == "__main__":
     )
     fig.savefig("forest_plot_demo.png", dpi=150, bbox_inches="tight")
     plt.close()
-    print("✅ forest_plot_demo.png 已保存")
+    logger.info("✅ forest_plot_demo.png 已保存")

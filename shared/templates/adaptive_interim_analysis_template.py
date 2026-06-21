@@ -28,6 +28,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy.optimize import brentq
+import logging
+
+logger = logging.getLogger(__name__)
 
 # matplotlib 延迟导入（在绘图函数内部导入），以便模块在缺少 matplotlib 时
 # 仍可加载统计计算功能。
@@ -1647,36 +1650,37 @@ def plot_conditional_power(
 # ============================================================================
 
 if __name__ == "__main__":
-    print("=" * 72)
-    print("适应性设计与期中分析模板 — 示例演示")
-    print("=" * 72)
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+    logger.info("=" * 72)
+    logger.info("适应性设计与期中分析模板 — 示例演示")
+    logger.info("=" * 72)
 
     # ----------------------------------------------------------------------
     # 示例 1: 成组序贯设计
     # ----------------------------------------------------------------------
-    print("\n[1] 成组序贯设计\n")
+    logger.info("\n[1] 成组序贯设计\n")
 
     # O'Brien-Fleming 设计
     design_of = obrien_fleming_design(
         k_max=3, alpha=0.025, beta=0.2, futility="non-binding"
     )
-    print("O'Brien-Fleming 设计:")
-    print(f"  分析次数: {design_of['k_max']}")
-    print(f"  信息比例: {design_of['info_rates']}")
-    print(f"  优效性边界: {design_of['efficacy_boundaries']}")
-    print(f"  无效性边界: {design_of['futility_boundaries']}")
-    print(f"  累积α消耗: {design_of['alpha_spent']}")
-    print(f"  实际把握度: {design_of['power']:.2%}")
-    print(f"  漂移参数: {design_of['drift']:.4f}")
+    logger.info("O'Brien-Fleming 设计:")
+    logger.info(f"  分析次数: {design_of['k_max']}")
+    logger.info(f"  信息比例: {design_of['info_rates']}")
+    logger.info(f"  优效性边界: {design_of['efficacy_boundaries']}")
+    logger.info(f"  无效性边界: {design_of['futility_boundaries']}")
+    logger.info(f"  累积α消耗: {design_of['alpha_spent']}")
+    logger.info(f"  实际把握度: {design_of['power']:.2%}")
+    logger.info(f"  漂移参数: {design_of['drift']:.4f}")
 
     # Pocock 设计
     design_pk = pocock_design(
         k_max=3, alpha=0.025, beta=0.2, futility="non-binding"
     )
-    print("\nPocock 设计:")
-    print(f"  优效性边界: {design_pk['efficacy_boundaries']}")
-    print(f"  无效性边界: {design_pk['futility_boundaries']}")
-    print(f"  实际把握度: {design_pk['power']:.2%}")
+    logger.info("\nPocock 设计:")
+    logger.info(f"  优效性边界: {design_pk['efficacy_boundaries']}")
+    logger.info(f"  无效性边界: {design_pk['futility_boundaries']}")
+    logger.info(f"  实际把握度: {design_pk['power']:.2%}")
 
     # Lan-DeMets 设计（非等距信息比例）
     design_ld = lan_demets_design(
@@ -1684,44 +1688,44 @@ if __name__ == "__main__":
         info_rates=np.array([0.3, 0.7, 1.0]),
         spending_type="of",
     )
-    print("\nLan-DeMets 设计（非等距信息比例 [0.3, 0.7, 1.0]）:")
-    print(f"  优效性边界: {design_ld['efficacy_boundaries']}")
-    print(f"  累积α消耗: {design_ld['alpha_spent']}")
+    logger.info("\nLan-DeMets 设计（非等距信息比例 [0.3, 0.7, 1.0]）:")
+    logger.info(f"  优效性边界: {design_ld['efficacy_boundaries']}")
+    logger.info(f"  累积α消耗: {design_ld['alpha_spent']}")
 
     # ----------------------------------------------------------------------
     # 示例 2: 期中分析决策
     # ----------------------------------------------------------------------
-    print("\n[2] 期中分析决策\n")
+    logger.info("\n[2] 期中分析决策\n")
 
     # 模拟第 1 次期中分析，Z = 1.5
     decision1 = interim_decision(
         z_stat=1.5, look=1, design=design_of, n_obs=120, n_planned=300
     )
-    print(f"第 1 次期中分析 (Z=1.5):")
-    print(f"  决策: {decision1['decision']}")
-    print(f"  条件把握度: {decision1['conditional_power']:.2%}")
-    print(f"  建议: {decision1['recommendation']}")
+    logger.info(f"第 1 次期中分析 (Z=1.5):")
+    logger.info(f"  决策: {decision1['decision']}")
+    logger.info(f"  条件把握度: {decision1['conditional_power']:.2%}")
+    logger.info(f"  建议: {decision1['recommendation']}")
 
     # 模拟第 1 次期中分析，Z = 3.0（超过优效性边界）
     decision2 = interim_decision(
         z_stat=3.0, look=1, design=design_of
     )
-    print(f"\n第 1 次期中分析 (Z=3.0):")
-    print(f"  决策: {decision2['decision']}")
-    print(f"  建议: {decision2['recommendation']}")
+    logger.info(f"\n第 1 次期中分析 (Z=3.0):")
+    logger.info(f"  决策: {decision2['decision']}")
+    logger.info(f"  建议: {decision2['recommendation']}")
 
     # 模拟第 1 次期中分析，Z = -0.5（低于无效性边界）
     decision3 = interim_decision(
         z_stat=-0.5, look=1, design=design_of
     )
-    print(f"\n第 1 次期中分析 (Z=-0.5):")
-    print(f"  决策: {decision3['decision']}")
-    print(f"  建议: {decision3['recommendation']}")
+    logger.info(f"\n第 1 次期中分析 (Z=-0.5):")
+    logger.info(f"  决策: {decision3['decision']}")
+    logger.info(f"  建议: {decision3['recommendation']}")
 
     # ----------------------------------------------------------------------
     # 示例 3: 条件把握度与样本量重新估计
     # ----------------------------------------------------------------------
-    print("\n[3] 条件把握度与样本量重新估计\n")
+    logger.info("\n[3] 条件把握度与样本量重新估计\n")
 
     # 条件把握度（不同漂移假设）
     t_interim = design_of["info_rates"][0]
@@ -1734,45 +1738,45 @@ if __name__ == "__main__":
         ("观察效应", 1.5 / np.sqrt(t_interim)),
     ]:
         cp = conditional_power(1.5, t_interim, t_final, b_final, drift_val)
-        print(f"  Z=1.5, {drift_label} (μ={drift_val:.3f}): CP = {cp:.2%}")
+        logger.info(f"  Z=1.5, {drift_label} (μ={drift_val:.3f}): CP = {cp:.2%}")
 
     # 盲态样本量重新估计
     ssr = blinded_sample_size_reestimation(
         n_obs=100, pooled_sd=12.5, effect_size=5.0,
         alpha=0.025, power=0.8,
     )
-    print(f"\n  盲态样本量重新估计:")
-    print(f"    合并SD={ssr['pooled_sd']}, 效应量={ssr['effect_size']}")
-    print(f"    标准化效应量(d)={ssr['standardized_effect']:.4f}")
-    print(f"    重新估计每组样本量: {ssr['n_per_group_reestimated']}")
-    print(f"    重新估计总样本量: {ssr['n_total_reestimated']}")
+    logger.info(f"\n  盲态样本量重新估计:")
+    logger.info(f"    合并SD={ssr['pooled_sd']}, 效应量={ssr['effect_size']}")
+    logger.info(f"    标准化效应量(d)={ssr['standardized_effect']:.4f}")
+    logger.info(f"    重新估计每组样本量: {ssr['n_per_group_reestimated']}")
+    logger.info(f"    重新估计总样本量: {ssr['n_total_reestimated']}")
 
     # 基于条件把握度的样本量重新估计
     cpr = conditional_power_reestimation(
         z_interim=1.2, t_interim=0.5, design=design_of, target_cp=0.8
     )
-    print(f"\n  条件把握度样本量重新估计 (Z=1.2, t=0.5):")
-    print(f"    当前CP(观察效应): {cpr['cp_current']:.2%}")
-    print(f"    当前CP(设计效应): {cpr['cp_design']:.2%}")
-    print(f"    当前CP(H0): {cpr['cp_null']:.2%}")
-    print(f"    样本量膨胀因子: {cpr['n_inflation_factor']:.2f}")
-    print(f"    建议: {cpr['recommendation']}")
+    logger.info(f"\n  条件把握度样本量重新估计 (Z=1.2, t=0.5):")
+    logger.info(f"    当前CP(观察效应): {cpr['cp_current']:.2%}")
+    logger.info(f"    当前CP(设计效应): {cpr['cp_design']:.2%}")
+    logger.info(f"    当前CP(H0): {cpr['cp_null']:.2%}")
+    logger.info(f"    样本量膨胀因子: {cpr['n_inflation_factor']:.2f}")
+    logger.info(f"    建议: {cpr['recommendation']}")
 
     # ----------------------------------------------------------------------
     # 示例 4: 适应性随机化
     # ----------------------------------------------------------------------
-    print("\n[4] 适应性随机化\n")
+    logger.info("\n[4] 适应性随机化\n")
 
     # 随机化胜者分配
     rpw = randomized_play_the_winner(
         n=100, p_success_a=0.3, p_success_b=0.6, random_seed=42
     )
-    print(f"  随机化胜者分配 (RPW):")
-    print(f"    A组: n={rpw['n_a']}, 成功={rpw['success_a']} "
+    logger.info(f"  随机化胜者分配 (RPW):")
+    logger.info(f"    A组: n={rpw['n_a']}, 成功={rpw['success_a']} "
           f"({rpw['success_a']/max(rpw['n_a'],1):.1%})")
-    print(f"    B组: n={rpw['n_b']}, 成功={rpw['success_b']} "
+    logger.info(f"    B组: n={rpw['n_b']}, 成功={rpw['success_b']} "
           f"({rpw['success_b']/max(rpw['n_b'],1):.1%})")
-    print(f"    分配比(B/A): {rpw['allocation_ratio']:.2f}")
+    logger.info(f"    分配比(B/A): {rpw['allocation_ratio']:.2f}")
 
     # 最小化随机化
     factors = np.array([
@@ -1781,34 +1785,34 @@ if __name__ == "__main__":
         [0, 2, 0], [1, 0, 1],
     ])
     minim = minimization_randomization(factors, n_treatments=2, random_seed=42)
-    print(f"\n  最小化随机化:")
-    print(f"    分配序列: {minim['assignments']}")
-    print(f"    最终不平衡量: {minim['final_imbalance']:.1f}")
+    logger.info(f"\n  最小化随机化:")
+    logger.info(f"    分配序列: {minim['assignments']}")
+    logger.info(f"    最终不平衡量: {minim['final_imbalance']:.1f}")
 
     # ----------------------------------------------------------------------
     # 示例 5: 多重性校正
     # ----------------------------------------------------------------------
-    print("\n[5] 多重性校正\n")
+    logger.info("\n[5] 多重性校正\n")
 
     # α 消耗函数
     as_corr = alpha_spending_correction(looks=3, alpha=0.025, spending_type="of")
-    print(f"  α消耗函数校正 (3次分析, OF型):")
-    print(f"    累积α: {as_corr['alpha_cumulative']}")
-    print(f"    增量α: {as_corr['alpha_incremental']}")
+    logger.info(f"  α消耗函数校正 (3次分析, OF型):")
+    logger.info(f"    累积α: {as_corr['alpha_cumulative']}")
+    logger.info(f"    增量α: {as_corr['alpha_incremental']}")
 
     # 封闭检验程序
     pvals = np.array([0.01, 0.04, 0.03])
     for method in ["bonferroni", "simes"]:
         ct = closed_testing_procedure(pvals, alpha=0.05, local_test=method)
-        print(f"\n  封闭检验 ({method}):")
-        print(f"    p值: {pvals}")
-        print(f"    调整p值: {ct['adjusted_p_values'].round(4)}")
-        print(f"    拒绝: {ct['rejected']}")
+        logger.info(f"\n  封闭检验 ({method}):")
+        logger.info(f"    p值: {pvals}")
+        logger.info(f"    调整p值: {ct['adjusted_p_values'].round(4)}")
+        logger.info(f"    拒绝: {ct['rejected']}")
 
     # ----------------------------------------------------------------------
     # 示例 6: 报告生成
     # ----------------------------------------------------------------------
-    print("\n[6] 报告生成\n")
+    logger.info("\n[6] 报告生成\n")
 
     report = generate_interim_report(
         design=design_of,
@@ -1820,28 +1824,28 @@ if __name__ == "__main__":
             "report_date": "2026-06-19",
         },
     )
-    print(report[:500])
-    print("  ...（报告已生成，完整内容见返回字符串）")
+    logger.info("report[:500]")
+    logger.info("  ...（报告已生成，完整内容见返回字符串）")
 
     # ----------------------------------------------------------------------
     # 示例 7: 可视化
     # ----------------------------------------------------------------------
-    print("\n[7] 可视化\n")
+    logger.info("\n[7] 可视化\n")
 
     # 停止边界图
     fig1 = plot_stopping_boundaries(
         design_of, z_stats=[1.5, 2.2, 2.1],
         save_path="stopping_boundaries_demo.png",
     )
-    print("  停止边界图已生成: stopping_boundaries_demo.png")
+    logger.info("  停止边界图已生成: stopping_boundaries_demo.png")
 
     # 条件把握度曲线
     fig2 = plot_conditional_power(
         design_of, look=1,
         save_path="conditional_power_demo.png",
     )
-    print("  条件把握度曲线已生成: conditional_power_demo.png")
+    logger.info("  条件把握度曲线已生成: conditional_power_demo.png")
 
-    print("\n" + "=" * 72)
-    print("示例演示完成")
-    print("=" * 72)
+    logger.info("\n" + "=" * 72)
+    logger.info("示例演示完成")
+    logger.info("=" * 72)

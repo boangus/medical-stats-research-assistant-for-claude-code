@@ -14,6 +14,9 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Any, Optional
 from pathlib import Path
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ReproducibilityIntegrator:
@@ -399,14 +402,15 @@ check_reproducibility(
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建集成器
     integrator = ReproducibilityIntegrator()
     
     # 生成环境报告
     env_report = integrator.generate_environment_report()
-    print("环境报告:")
+    logger.info("环境报告:")
     for key, value in env_report.items():
-        print(f"  {key}: {value}")
+        logger.info(f"  {key}: {value}")
     
     # 创建存档包
     analysis_results = {
@@ -415,4 +419,4 @@ if __name__ == "__main__":
     }
     
     archive_path = integrator.create_archive_package(analysis_results)
-    print(f"\n存档包已创建: {archive_path}")
+    logger.info(f"\n存档包已创建: {archive_path}")

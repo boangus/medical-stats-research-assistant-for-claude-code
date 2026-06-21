@@ -31,6 +31,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -157,7 +160,7 @@ def estimate_propensity(
     # C-statistic
     from sklearn.metrics import roc_auc_score
     c_stat = roc_auc_score(y, data["ps_score"])
-    print(f"  C-statistic (AUC): {c_stat:.3f}")
+    logger.info(f"  C-statistic (AUC): {c_stat:.3f}")
 
     return data
 
@@ -397,26 +400,26 @@ def compare_ow_iptw(
     ate_iptw = weighted_ate(data_ps, treatment_col, outcome_col, "iptw_weight", outcome_type)
 
     # --- 对比 ---
-    print("\n" + "=" * 60)
-    print("OW vs IPTW 对比")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("OW vs IPTW 对比")
+    logger.info("=" * 60)
 
     if outcome_type == "continuous":
-        print(f"  OW  ATE = {ate_ow['ATE']:.4f} (95% CI: {ate_ow['CI_lower']:.4f}, "
-              f"{ate_ow['CI_upper']:.4f}, p = {ate_ow['p_value']:.4f})")
-        print(f"  IPTW ATE = {ate_iptw['ATE']:.4f} (95% CI: {ate_iptw['CI_lower']:.4f}, "
-              f"{ate_iptw['CI_upper']:.4f}, p = {ate_iptw['p_value']:.4f})")
+        logger.info(f"  OW  ATE = {ate_ow['ATE']:.4f} (95% CI: {ate_ow['CI_lower']:.4f}, "
+                    f"{ate_ow['CI_upper']:.4f}, p = {ate_ow['p_value']:.4f})")
+        logger.info(f"  IPTW ATE = {ate_iptw['ATE']:.4f} (95% CI: {ate_iptw['CI_lower']:.4f}, "
+                    f"{ate_iptw['CI_upper']:.4f}, p = {ate_iptw['p_value']:.4f})")
     else:
-        print(f"  OW  OR = {ate_ow['OR']:.3f} (95% CI: {ate_ow['OR_CI_lower']:.3f}, "
-              f"{ate_ow['OR_CI_upper']:.3f}, p = {ate_ow['p_value']:.4f})")
-        print(f"  IPTW OR = {ate_iptw['OR']:.3f} (95% CI: {ate_iptw['OR_CI_lower']:.3f}, "
-              f"{ate_iptw['OR_CI_upper']:.3f}, p = {ate_iptw['p_value']:.4f})")
+        logger.info(f"  OW  OR = {ate_ow['OR']:.3f} (95% CI: {ate_ow['OR_CI_lower']:.3f}, "
+                    f"{ate_ow['OR_CI_upper']:.3f}, p = {ate_ow['p_value']:.4f})")
+        logger.info(f"  IPTW OR = {ate_iptw['OR']:.3f} (95% CI: {ate_iptw['OR_CI_lower']:.3f}, "
+                    f"{ate_iptw['OR_CI_upper']:.3f}, p = {ate_iptw['p_value']:.4f})")
 
     # 权重分布
-    print(f"\n  OW 权重分布: min={ow_weights.min():.4f}, "
-          f"median={np.median(ow_weights):.4f}, max={ow_weights.max():.4f}")
-    print(f"  IPTW 权重分布 (clipped): min={iptw_weights_clipped.min():.4f}, "
-          f"median={np.median(iptw_weights_clipped):.4f}, max={iptw_weights_clipped.max():.4f}")
+    logger.info(f"\n  OW 权重分布: min={ow_weights.min():.4f}, "
+                f"median={np.median(ow_weights):.4f}, max={ow_weights.max():.4f}")
+    logger.info(f"  IPTW 权重分布 (clipped): min={iptw_weights_clipped.min():.4f}, "
+                f"median={np.median(iptw_weights_clipped):.4f}, max={iptw_weights_clipped.max():.4f}")
 
     return {
         "ow": {
@@ -540,29 +543,29 @@ def full_ow_workflow(
     results = {}
 
     # Step 1: PS 估计
-    print("=" * 60)
-    print("Step 1: 估计倾向性评分")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("Step 1: 估计倾向性评分")
+    logger.info("=" * 60)
     data_ps = estimate_propensity(df, treatment_col, covariate_cols, cat_vars)
     results["ps_data"] = data_ps
 
     # Step 2: 计算 OW 权重
-    print("\n" + "=" * 60)
-    print("Step 2: 计算 Overlapping Weight")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 2: 计算 Overlapping Weight")
+    logger.info("=" * 60)
     ps = data_ps["ps_score"].values
     treatment = data_ps[treatment_col].values
     ow_weights = compute_overlap_weights_simple(ps, treatment)
     data_ps["ow_weight"] = ow_weights
     results["ow_weights"] = ow_weights
 
-    print(f"  OW 权重分布: min={ow_weights.min():.4f}, "
-          f"median={np.median(ow_weights):.4f}, max={ow_weights.max():.4f}")
+    logger.info(f"  OW 权重分布: min={ow_weights.min():.4f}, "
+                f"median={np.median(ow_weights):.4f}, max={ow_weights.max():.4f}")
 
     # Step 3: 平衡诊断
-    print("\n" + "=" * 60)
-    print("Step 3: 平衡诊断")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 3: 平衡诊断")
+    logger.info("=" * 60)
     balance_before = balance_check(data_ps, treatment_col, covariate_cols)
     balance_after = balance_check(data_ps, treatment_col, covariate_cols, "ow_weight")
     results["balance_before"] = balance_before
@@ -572,26 +575,26 @@ def full_ow_workflow(
         results["love_plot"] = love_plot(balance_before, balance_after)
 
     # Step 4: 效应估计
-    print("\n" + "=" * 60)
-    print("Step 4: 加权效应估计 (OW)")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("Step 4: 加权效应估计 (OW)")
+    logger.info("=" * 60)
     ate_ow = weighted_ate(data_ps, treatment_col, outcome_col, "ow_weight", outcome_type)
     results["ate_ow"] = ate_ow
 
     if outcome_type == "continuous":
-        print(f"  ATE (OW) = {ate_ow['ATE']:.4f} "
-              f"(95% CI: {ate_ow['CI_lower']:.4f}, {ate_ow['CI_upper']:.4f}, "
-              f"p = {ate_ow['p_value']:.4f})")
+        logger.info(f"  ATE (OW) = {ate_ow['ATE']:.4f} "
+                    f"(95% CI: {ate_ow['CI_lower']:.4f}, {ate_ow['CI_upper']:.4f}, "
+                    f"p = {ate_ow['p_value']:.4f})")
     else:
-        print(f"  OR (OW) = {ate_ow['OR']:.3f} "
-              f"(95% CI: {ate_ow['OR_CI_lower']:.3f}, {ate_ow['OR_CI_upper']:.3f}, "
-              f"p = {ate_ow['p_value']:.4f})")
+        logger.info(f"  OR (OW) = {ate_ow['OR']:.3f} "
+                    f"(95% CI: {ate_ow['OR_CI_lower']:.3f}, {ate_ow['OR_CI_upper']:.3f}, "
+                    f"p = {ate_ow['p_value']:.4f})")
 
     # Step 5: (可选) IPTW 对比
     if compare_iptw:
-        print("\n" + "=" * 60)
-        print("Step 5: IPTW 对比分析")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("Step 5: IPTW 对比分析")
+        logger.info("=" * 60)
         iptw_weights = np.where(treatment == 1, 1 / ps, 1 / (1 - ps))
         p1, p99 = np.percentile(iptw_weights, [1, 99])
         iptw_weights_clipped = np.clip(iptw_weights, p1, p99)
@@ -609,17 +612,17 @@ def full_ow_workflow(
             ow_weights, iptw_weights_clipped, treatment)
 
         if outcome_type == "continuous":
-            print(f"  ATE (IPTW) = {ate_iptw['ATE']:.4f} "
-                  f"(95% CI: {ate_iptw['CI_lower']:.4f}, {ate_iptw['CI_upper']:.4f}, "
-                  f"p = {ate_iptw['p_value']:.4f})")
+            logger.info(f"  ATE (IPTW) = {ate_iptw['ATE']:.4f} "
+                        f"(95% CI: {ate_iptw['CI_lower']:.4f}, {ate_iptw['CI_upper']:.4f}, "
+                        f"p = {ate_iptw['p_value']:.4f})")
         else:
-            print(f"  OR (IPTW) = {ate_iptw['OR']:.3f} "
-                  f"(95% CI: {ate_iptw['OR_CI_lower']:.3f}, {ate_iptw['OR_CI_upper']:.3f}, "
-                  f"p = {ate_iptw['p_value']:.4f})")
+            logger.info(f"  OR (IPTW) = {ate_iptw['OR']:.3f} "
+                        f"(95% CI: {ate_iptw['OR_CI_lower']:.3f}, {ate_iptw['OR_CI_upper']:.3f}, "
+                        f"p = {ate_iptw['p_value']:.4f})")
 
     results["data"] = data_ps
 
-    print("\n✅ Overlapping Weighting 分析完成")
+    logger.info("\n✅ Overlapping Weighting 分析完成")
     return results
 
 
@@ -686,6 +689,7 @@ def generate_ow_report(results: Dict) -> str:
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     np.random.seed(42)
     n = 500
 
@@ -710,8 +714,8 @@ if __name__ == "__main__":
         "smoking": smoking,
     })
 
-    print(f"模拟数据: N={n}, 处理组={treatment.sum()}, 对照组={n - treatment.sum()}")
-    print()
+    logger.info(f"模拟数据: N={n}, 处理组={treatment.sum()}, 对照组={n - treatment.sum()}")
+    logger.info("")
 
     # 运行完整 OW 工作流
     results = full_ow_workflow(
@@ -722,18 +726,18 @@ if __name__ == "__main__":
     )
 
     # 打印平衡诊断
-    print("\n=== 加权前平衡诊断 ===")
-    print(results["balance_before"].to_string(index=False))
-    print("\n=== 加权后平衡诊断 (OW) ===")
-    print(results["balance_after"].to_string(index=False))
+    logger.info("\n=== 加权前平衡诊断 ===")
+    logger.info(results["balance_before"].to_string(index=False))
+    logger.info("\n=== 加权后平衡诊断 (OW) ===")
+    logger.info(results["balance_after"].to_string(index=False))
 
     if "balance_iptw" in results:
-        print("\n=== 加权后平衡诊断 (IPTW) ===")
-        print(results["balance_iptw"].to_string(index=False))
+        logger.info("\n=== 加权后平衡诊断 (IPTW) ===")
+        logger.info(results["balance_iptw"].to_string(index=False))
 
     # 生成方法学描述
     report = generate_ow_report(results)
-    print("\n=== 统计方法学描述 ===")
-    print(report)
+    logger.info("\n=== 统计方法学描述 ===")
+    logger.info("report")
 
-    print("\n✅ Overlapping Weighting 完整分析完成")
+    logger.info("\n✅ Overlapping Weighting 完整分析完成")

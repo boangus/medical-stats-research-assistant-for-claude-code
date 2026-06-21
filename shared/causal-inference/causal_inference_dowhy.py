@@ -27,6 +27,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -112,14 +115,14 @@ def plot_causal_graph(graph_dot: str, title: str = "Causal DAG") -> None:
         import graphviz
         graphviz.Source(graph_dot).view()
     """
-    print("=" * 50)
-    print(f"  {title}")
-    print("=" * 50)
-    print(graph_dot)
-    print("=" * 50)
-    print("如需图形化渲染, 请安装 graphviz: pip install graphviz")
-    print("  >>> import graphviz")
-    print("  >>> graphviz.Source(graph_dot).view()")
+    logger.info("=" * 50)
+    logger.info(f"  {title}")
+    logger.info("=" * 50)
+    logger.info("graph_dot")
+    logger.info("=" * 50)
+    logger.info("如需图形化渲染, 请安装 graphviz: pip install graphviz")
+    logger.info("  >>> import graphviz")
+    logger.info("  >>> graphviz.Source(graph_dot).view()")
 
 
 # ============================================================================
@@ -195,18 +198,18 @@ def estimate_causal_effect_dowhy(
 
     # 打印因果图
     if plot_graph:
-        print("因果图 DOT 格式:")
-        print(model.view_model())
+        logger.info("因果图 DOT 格式:")
+        logger.info("model.view_model()")
 
     # Step 2: 识别
     identified_estimand = model.identify_effect(
         proceed_when_unidentifiable=True
     )
-    print(f"\n[Step 2] 识别目标: {estimand_type.upper()}")
-    print(f"  调整集: {identified_estimand.backdoor_variables}")
+    logger.info(f"\n[Step 2] 识别目标: {estimand_type.upper()}")
+    logger.info(f"  调整集: {identified_estimand.backdoor_variables}")
 
     # Step 3: 估计
-    print(f"\n[Step 3] 因果效应估计 (方法: {method})")
+    logger.info(f"\n[Step 3] 因果效应估计 (方法: {method})")
     estimate = model.estimate_effect(
         identified_estimand,
         method_name=method,
@@ -214,17 +217,17 @@ def estimate_causal_effect_dowhy(
         confidence_level=0.95,
     )
 
-    print(f"  效应估计值: {estimate.value:.4f}")
+    logger.info(f"  效应估计值: {estimate.value:.4f}")
     if hasattr(estimate, 'confidence_intervals'):
         ci = estimate.confidence_intervals
-        print(f"  95% CI: ({ci[0]:.4f}, {ci[1]:.4f})")
+        logger.info(f"  95% CI: ({ci[0]:.4f}, {ci[1]:.4f})")
 
     # Step 4: 反驳检验 (Refutation)
-    print(f"\n[Step 4] 反驳检验")
+    logger.info(f"\n[Step 4] 反驳检验")
     refutation_results = {}
 
     # 4a: 随机共同原因检验
-    print("  4a: 随机共同原因 (Random Common Cause)...")
+    logger.info("  4a: 随机共同原因 (Random Common Cause)...")
     ref_random = model.refute_estimate(
         identified_estimand, estimate,
         method_name="random_common_cause",
@@ -234,10 +237,10 @@ def estimate_causal_effect_dowhy(
         "new_effect": ref_random.new_effect,
         "p_value": ref_random.new_effect
     }
-    print(f"      新效应: {ref_random.new_effect:.4f}")
+    logger.info(f"      新效应: {ref_random.new_effect:.4f}")
 
     # 4b: 数据替换检验 (Placebo)
-    print("  4b: 安慰子检验 (Placebo Treatment)...")
+    logger.info("  4b: 安慰子检验 (Placebo Treatment)...")
     ref_placebo = model.refute_estimate(
         identified_estimand, estimate,
         method_name="placebo_treatment_refuter",
@@ -247,10 +250,10 @@ def estimate_causal_effect_dowhy(
     refutation_results["placebo"] = {
         "p_value": ref_placebo.p_value
     }
-    print(f"      p-value: {ref_placebo.p_value:.4f}")
+    logger.info(f"      p-value: {ref_placebo.p_value:.4f}")
 
     # 4c: 数据子集检验 (subset)
-    print("  4c: 数据子集检验 (Data Subset)...")
+    logger.info("  4c: 数据子集检验 (Data Subset)...")
     ref_subset = model.refute_estimate(
         identified_estimand, estimate,
         method_name="data_subset_refuter",
@@ -261,7 +264,7 @@ def estimate_causal_effect_dowhy(
         "new_effect": ref_subset.new_effect,
         "p_value": ref_subset.p_value
     }
-    print(f"      新效应: {ref_subset.new_effect:.4f} (p={ref_subset.p_value:.4f})")
+    logger.info(f"      新效应: {ref_subset.new_effect:.4f} (p={ref_subset.p_value:.4f})")
 
     return {
         "estimate": estimate.value,
@@ -332,9 +335,9 @@ def estimate_cate_econml(
     # 效应修饰变量的索引
     mod_idx = [features.index(m) for m in effect_modifiers]
 
-    print(f"\n[EconML] 异质性处理效应 (CATE) 估计")
-    print(f"  方法: {method}")
-    print(f"  效应修饰: {effect_modifiers}")
+    logger.info(f"\n[EconML] 异质性处理效应 (CATE) 估计")
+    logger.info(f"  方法: {method}")
+    logger.info(f"  效应修饰: {effect_modifiers}")
 
     if method == "causal_forest":
         est = CausalForestDML(
@@ -380,9 +383,9 @@ def estimate_cate_econml(
     else:
         cate_by_mod = None
 
-    print(f"  平均 CATE: {cate_mean:.4f} ({cate_lower:.4f}, {cate_upper:.4f})")
+    logger.info(f"  平均 CATE: {cate_mean:.4f} ({cate_lower:.4f}, {cate_upper:.4f})")
     if cate_by_mod is not None:
-        print(f"\n  按修饰变量分层 CATE:\n{cate_by_mod}")
+        logger.info(f"\n  按修饰变量分层 CATE:\n{cate_by_mod}")
 
     return {
         "model": est,
@@ -449,13 +452,13 @@ def e_value(estimate: float,
             extreme_ci = upper_ci
         result["e_value_ci_extreme"] = round(_e_val(_or_to_rr(extreme_ci)), 3)
 
-    print(f"\n=== E-value 分析 ===")
-    print(f"  效应估计: {estimate:.4f}")
-    print(f"  E-value (点估计): {result['e_value_estimate']}")
+    logger.info(f"\n=== E-value 分析 ===")
+    logger.info(f"  效应估计: {estimate:.4f}")
+    logger.info(f"  E-value (点估计): {result['e_value_estimate']}")
     if 'e_value_ci_extreme' in result:
-        print(f"  E-value (CI 极端): {result['e_value_ci_extreme']}")
-    print(f"  解释: 需要 E-value ≥ {result['e_value_estimate']} 倍")
-    print(f"        的未测量混杂才能推翻因果结论")
+        logger.info(f"  E-value (CI 极端): {result['e_value_ci_extreme']}")
+    logger.info(f"  解释: 需要 E-value ≥ {result['e_value_estimate']} 倍")
+    logger.info(f"        的未测量混杂才能推翻因果结论")
 
     return result
 
@@ -507,30 +510,30 @@ def full_causal_workflow(
 
     results = {}
 
-    print("=" * 60)
-    print("  完整因果推断工作流")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("  完整因果推断工作流")
+    logger.info("=" * 60)
 
     # --- Step 0: 描述统计 ---
-    print("\n[Step 0] 描述性统计")
+    logger.info("\n[Step 0] 描述性统计")
     n_treat = (df[treatment] == 1).sum()
     n_control = (df[treatment] == 0).sum()
-    print(f"  处理组: n={n_treat}")
-    print(f"  对照组: n={n_control}")
-    print(f"  总样本: n={len(df)}")
+    logger.info(f"  处理组: n={n_treat}")
+    logger.info(f"  对照组: n={n_control}")
+    logger.info(f"  总样本: n={len(df)}")
 
     # --- Step 1: DAG ---
-    print(f"\n[Step 1] 因果图 (DAG)")
-    print(f"  暴露: {treatment}  →  结局: {outcome}")
-    print(f"  混杂调整集 ({len(confounders)}): {confounders}")
+    logger.info(f"\n[Step 1] 因果图 (DAG)")
+    logger.info(f"  暴露: {treatment}  →  结局: {outcome}")
+    logger.info(f"  混杂调整集 ({len(confounders)}): {confounders}")
     if effect_modifiers:
-        print(f"  效应修饰: {effect_modifiers}")
+        logger.info(f"  效应修饰: {effect_modifiers}")
 
     graph = build_causal_graph(treatment, outcome, confounders)
     results["causal_graph"] = graph
 
     # --- Step 2: DoWhy ---
-    print(f"\n[Step 2] DoWhy 因果效应估计")
+    logger.info(f"\n[Step 2] DoWhy 因果效应估计")
 
     # 根据 outcome_type 选择估计方法
     if outcome_type == "binary":
@@ -561,7 +564,7 @@ def full_causal_workflow(
             "estimate": naive_or,
             "note": "DoWhy 不可用，使用 Logistic 回归近似估计",
         }
-        print(f"  (回退) Logistic OR ≈ {naive_or:.4f}")
+        logger.info(f"  (回退) Logistic OR ≈ {naive_or:.4f}")
 
     # --- Step 3: E-value ---
     est = results["dowhy"]["estimate"]
@@ -580,11 +583,11 @@ def full_causal_workflow(
             )
             results["cate"] = cate_results
         except ImportError:
-            print("  跳过 CATE: 请安装 EconML: pip install econml")
+            logger.info("  跳过 CATE: 请安装 EconML: pip install econml")
 
-    print("\n" + "=" * 60)
-    print("  因果推断工作流完成")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("  因果推断工作流完成")
+    logger.info("=" * 60)
 
     return results
 
@@ -594,6 +597,7 @@ def full_causal_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     from sklearn.linear_model import LogisticRegression
 
     # 模拟观察性数据（有混杂）
@@ -634,4 +638,4 @@ if __name__ == "__main__":
         show_cate=False,
     )
 
-    print("\n✅ 因果推断分析完成")
+    logger.info("\n✅ 因果推断分析完成")

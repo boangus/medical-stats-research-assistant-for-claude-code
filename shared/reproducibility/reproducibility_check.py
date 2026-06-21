@@ -135,16 +135,16 @@ with open(__RUN_OUTPUT_FILE__, "w") as _f:
         Dict
             包含所有运行结果和分析
         """
-        print("=" * 60)
-        print("  结果复现验证")
-        print("=" * 60)
-        print(f"\n脚本: {self.script_path}")
-        print(f"运行次数: {self.n_runs}")
+        logger.info("=" * 60)
+        logger.info("  结果复现验证")
+        logger.info("=" * 60)
+        logger.info(f"\n脚本: {self.script_path}")
+        logger.info(f"运行次数: {self.n_runs}")
 
         all_metrics = []
 
         for i in range(1, self.n_runs + 1):
-            print(f"\n  Run {i}/{self.n_runs} (seed={self.seed_start + i - 1})...", end=" ")
+            logger.info(f"\n  Run {i}/{self.n_runs} (seed={self.seed_start + i - 1})...", end=" ")
 
             run_script = self._create_run_script(i)
             output_json = os.path.join(self.output_dir, "runs", f"output_{i}.json")
@@ -160,26 +160,26 @@ with open(__RUN_OUTPUT_FILE__, "w") as _f:
                 elapsed = time.time() - start_time
 
                 if result.returncode != 0:
-                    print(f"ERROR (rc={result.returncode})")
+                    logger.info(f"ERROR (rc={result.returncode})")
                     all_metrics.append({"__error__": result.stderr[-500:] if result.stderr else "Unknown error"})
                 elif os.path.exists(output_json):
                     with open(output_json, "r", encoding="utf-8") as f:
                         metrics = json.load(f)
                     all_metrics.append(metrics)
-                    print(f"OK ({elapsed:.1f}s)")
+                    logger.info(f"OK ({elapsed:.1f}s)")
                 else:
-                    print("WARNING: No output")
+                    logger.info("WARNING: No output")
                     all_metrics.append({"__error__": "No output file generated"})
 
             except subprocess.TimeoutExpired:
-                print(f"TIMEOUT (>{self.timeout_sec}s)")
+                logger.info(f"TIMEOUT (>{self.timeout_sec}s)")
                 all_metrics.append({"__error__": f"Timeout after {self.timeout_sec}s"})
             except Exception as e:
-                print(f"ERROR: {e}")
+                logger.info(f"ERROR: {e}")
                 all_metrics.append({"__error__": str(e)})
 
         # 分析一致性
-        print("\n\n--- 关键参数一致性 ---")
+        logger.info("\n\n--- 关键参数一致性 ---")
 
         # 找出所有共同指标
         metric_names = set()
@@ -214,7 +214,7 @@ with open(__RUN_OUTPUT_FILE__, "w") as _f:
                     "SD": f"{std_val:.4f}",
                     "Verdict": verdict,
                 })
-                print(f"  {name}: range={val_range:.4f}, mean={mean_val:.4f} → {verdict}")
+                logger.info(f"  {name}: range={val_range:.4f}, mean={mean_val:.4f} → {verdict}")
 
         consistency_df = pd.DataFrame(rows) if rows else pd.DataFrame()
 
@@ -228,9 +228,9 @@ with open(__RUN_OUTPUT_FILE__, "w") as _f:
         else:
             verdict = "❌ FAIL — Key results not reproducible"
 
-        print(f"\n--- 结论 ---")
-        print(f"  {verdict}")
-        print("\n" + "=" * 60)
+        logger.info(f"\n--- 结论 ---")
+        logger.info(f"  {verdict}")
+        logger.info("\n" + "=" * 60)
 
         return {
             "script": self.script_path,
@@ -266,10 +266,11 @@ def extract_from_dict(d: Dict, key: str) -> float:
 # 示例
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟测试
-    print("=" * 60)
-    print("  示例: 生成模拟分析结果并验证复现性")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("  示例: 生成模拟分析结果并验证复现性")
+    logger.info("=" * 60)
 
     # 创建一个临时测试脚本
     test_script = os.path.join(
@@ -281,6 +282,9 @@ if __name__ == "__main__":
         f.write("""
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 模拟数据
 np.random.seed(42)
@@ -316,8 +320,8 @@ score = model.score(X, y)
     report = checker.run()
 
     if not report["consistency"].empty:
-        print("\n一致性表:")
-        print(report["consistency"].to_string(index=False))
+        logger.info("\n一致性表:")
+        logger.info(report["consistency"].to_string(index=False))
 
-    print(f"\n结论: {report['verdict']}")
-    print("\n✅ 复现验证测试完成")
+    logger.info(f"\n结论: {report['verdict']}")
+    logger.info("\n✅ 复现验证测试完成")

@@ -13,6 +13,9 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Any, Optional
 from pathlib import Path
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ResultsPackageGenerator:
@@ -422,6 +425,7 @@ python verify_results.py {package_path}
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建结果包生成器
     generator = ResultsPackageGenerator()
     
@@ -443,17 +447,17 @@ if __name__ == "__main__":
         include_summary=True
     )
     
-    print(f"结果包已创建: {package_path}")
+    logger.info(f"结果包已创建: {package_path}")
     
     # 验证结果包
     verification_results = generator.verify_results_package(package_path)
-    print(f"结果包验证: {'通过' if verification_results['valid'] else '失败'}")
+    logger.info(f"结果包验证: {'通过' if verification_results['valid'] else '失败'}")
     
     if verification_results['issues']:
-        print("问题:")
+        logger.info("问题:")
         for issue in verification_results['issues']:
-            print(f"  - {issue}")
+            logger.info(f"  - {issue}")
     
     # 生成分享说明
     share_text = generator.create_shareable_link(package_path)
-    print(f"\n分享说明已生成")
+    logger.info(f"\n分享说明已生成")

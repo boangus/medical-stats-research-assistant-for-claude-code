@@ -11,6 +11,9 @@ Usage:
 
 import os
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def generate_data_profile(
@@ -259,11 +262,12 @@ def get_checkpoint_level(df) -> str:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     import sys
     import pandas as pd
 
     if len(sys.argv) < 2:
-        print("Usage: python data_profile_template.py <csv_path> [output_dir]")
+        logger.info("Usage: python data_profile_template.py <csv_path> [output_dir]")
         sys.exit(1)
 
     csv_path = sys.argv[1]
@@ -276,5 +280,5 @@ if __name__ == "__main__":
     out_path = os.path.join(out_dir, "data_profile.md")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(md)
-    print(f"Data profile written to: {out_path}")
-    print(f"Checkpoint level: {get_checkpoint_level(df)}")
+    logger.info(f"Data profile written to: {out_path}")
+    logger.info(f"Checkpoint level: {get_checkpoint_level(df)}")

@@ -29,6 +29,9 @@ from statsmodels.genmod.cov_struct import (
     AR1,
     Independence,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -222,10 +225,10 @@ def gee_summary(model: GEEResults, alpha: float = 0.05) -> pd.DataFrame:
     cov_struct = getattr(model, "_gee_cov_struct", "unknown")
     groups_col = getattr(model, "_gee_groups", "unknown")
     n_groups = model.group.ngroups if hasattr(model, "group") else "N/A"
-    print(f"=== GEE 模型摘要 ===")
-    print(f"分布族: {family} | 协方差结构: {cov_struct}")
-    print(f"效应量: {effect_name} | 聚类数: {n_groups}")
-    print()
+    logger.info(f"=== GEE 模型摘要 ===")
+    logger.info(f"分布族: {family} | 协方差结构: {cov_struct}")
+    logger.info(f"效应量: {effect_name} | 聚类数: {n_groups}")
+    logger.info("")
 
     return summary_df
 
@@ -256,7 +259,7 @@ def gee_diagnostics(model: GEEResults) -> Dict:
         - cluster_sizes: 各聚类大小描述
         - naive_se vs robust_se: 模型标准误与稳健标准误比较
     """
-    print("=== GEE 模型诊断 ===\n")
+    logger.info("=== GEE 模型诊断 ===\n")
 
     result = {}
 
@@ -266,13 +269,13 @@ def gee_diagnostics(model: GEEResults) -> Dict:
         qicu = model.qicu()
         result["qic"] = qic
         result["qicu"] = qicu
-        print(f"QIC (准信息准则): {qic:.4f}")
-        print(f"QICu: {qicu:.4f}")
-        print("注: QIC 越小越好，可用于不同协方差结构间的模型比较\n")
+        logger.info(f"QIC (准信息准则): {qic:.4f}")
+        logger.info(f"QICu: {qicu:.4f}")
+        logger.info("注: QIC 越小越好，可用于不同协方差结构间的模型比较\n")
     except Exception as e:
         result["qic"] = None
         result["qicu"] = None
-        print(f"QIC 计算失败: {e}\n")
+        logger.info(f"QIC 计算失败: {e}\n")
 
     # --- 尺度参数和 Pearson 卡方 ---
     try:
@@ -281,9 +284,9 @@ def gee_diagnostics(model: GEEResults) -> Dict:
         result["pearson_chi2"] = pearson_chi2
         result["scale"] = scale
         if pearson_chi2 is not None:
-            print(f"Pearson 卡方: {pearson_chi2:.4f}")
+            logger.info(f"Pearson 卡方: {pearson_chi2:.4f}")
         if scale is not None:
-            print(f"尺度参数: {scale:.4f}")
+            logger.info(f"尺度参数: {scale:.4f}")
     except Exception:
         pass
 
@@ -297,7 +300,7 @@ def gee_diagnostics(model: GEEResults) -> Dict:
             "min_size": np.min(sizes),
             "max_size": np.max(sizes),
         }
-        print(
+        logger.info(
             f"\n聚类数: {group_info.ngroups} | "
             f"平均每组: {np.mean(sizes):.1f} | "
             f"范围: [{np.min(sizes)}, {np.max(sizes)}]"
@@ -322,9 +325,9 @@ def gee_diagnostics(model: GEEResults) -> Dict:
                 "Ratio": np.round(se_ratio, 2),
             }
         )
-        print("\n--- 标准误比较 (稳健/朴素) ---")
-        print(se_table.to_string(index=False))
-        print("注: Ratio > 1.5 提示聚类效应较强，稳健标准误更为可靠")
+        logger.info("\n--- 标准误比较 (稳健/朴素) ---")
+        logger.info("se_table.to_string(index=False)")
+        logger.info("注: Ratio > 1.5 提示聚类效应较强，稳健标准误更为可靠")
 
         result["naive_se"] = naive_se_vals
         result["robust_se"] = robust_se
@@ -378,13 +381,13 @@ def compare_cov_structures(
     pd.DataFrame
         包含各结构的 QIC 值和排名
     """
-    print("=== 协方差结构比较 ===\n")
+    logger.info("=== 协方差结构比较 ===\n")
 
     struct_list = ["independence", "exchangeable", "ar1"]
     rows = []
 
     for cs in struct_list:
-        print(f"拟合 {cs} ... ", end="")
+        logger.info(f"拟合 {cs} ... ", end="")
         try:
             fit = fit_gee(
                 data, formula, groups, family, cov_struct=cs, time=time
@@ -397,7 +400,7 @@ def compare_cov_structures(
                     "Converged": True,
                 }
             )
-            print(f"QIC = {qic_val:.4f}")
+            logger.info(f"QIC = {qic_val:.4f}")
         except Exception as e:
             rows.append(
                 {
@@ -406,7 +409,7 @@ def compare_cov_structures(
                     "Converged": False,
                 }
             )
-            print(f"失败: {e}")
+            logger.info(f"失败: {e}")
 
     results = pd.DataFrame(rows)
     results["Rank"] = results["QIC"].rank().astype("Int64")
@@ -414,12 +417,12 @@ def compare_cov_structures(
         drop=True
     )
 
-    print("\n--- 比较结果 ---")
-    print(results.to_string(index=False))
+    logger.info("\n--- 比较结果 ---")
+    logger.info("results.to_string(index=False)")
 
     best = results.loc[results["QIC"].idxmin(), "Cov_Struct"]
-    print(f"\n推荐: QIC 最小的结构为 '{best}'")
-    print(
+    logger.info(f"\n推荐: QIC 最小的结构为 '{best}'")
+    logger.info(
         "注: exchangeable 适用于组内相关均匀的场景; "
         "ar1 适用于时间衰减相关;\n"
         "     independence 适用于无组内相关"
@@ -444,10 +447,10 @@ def full_gee_workflow() -> Dict:
     Dict
         包含所有分析结果
     """
-    print("=" * 50)
-    print("    GEE 广义估计方程分析 — 完整工作流")
-    print("=" * 50)
-    print()
+    logger.info("=" * 50)
+    logger.info("    GEE 广义估计方程分析 — 完整工作流")
+    logger.info("=" * 50)
+    logger.info("")
 
     # --- 模拟纵向数据 ---
     np.random.seed(2024)
@@ -481,17 +484,17 @@ def full_gee_workflow() -> Dict:
         }
     )
 
-    print(
+    logger.info(
         f"模拟数据: {n_subjects} 名受试者, 每人 {n_times} 个时间点, "
         f"共 {n} 条记录"
     )
-    print(f"结局阳性率: {100 * sim_data['outcome'].mean():.1f}%")
-    print()
+    logger.info(f"结局阳性率: {100 * sim_data['outcome'].mean():.1f}%")
+    logger.info("")
 
     results = {}
 
     # --- 1. GEE 模型拟合 ---
-    print(">>> 步骤 1: 拟合 GEE 模型 (binomial, exchangeable)")
+    logger.info(">>> 步骤 1: 拟合 GEE 模型 (binomial, exchangeable)")
     model = fit_gee(
         data=sim_data,
         formula="outcome ~ trt + time + age",
@@ -503,18 +506,18 @@ def full_gee_workflow() -> Dict:
     results["model"] = model
 
     # --- 2. 结果摘要 ---
-    print("\n>>> 步骤 2: 模型结果摘要")
+    logger.info("\n>>> 步骤 2: 模型结果摘要")
     summary_tbl = gee_summary(model)
     results["summary"] = summary_tbl
-    print(summary_tbl.to_string(index=False))
+    logger.info("summary_tbl.to_string(index=False)")
 
     # --- 3. 模型诊断 ---
-    print("\n>>> 步骤 3: 模型诊断")
+    logger.info("\n>>> 步骤 3: 模型诊断")
     diag_info = gee_diagnostics(model)
     results["diagnostics"] = diag_info
 
     # --- 4. 协方差结构比较 ---
-    print("\n>>> 步骤 4: 比较不同协方差结构")
+    logger.info("\n>>> 步骤 4: 比较不同协方差结构")
     cov_comp = compare_cov_structures(
         data=sim_data,
         formula="outcome ~ trt + time + age",
@@ -525,9 +528,9 @@ def full_gee_workflow() -> Dict:
     results["cov_comparison"] = cov_comp
 
     # --- 汇总 ---
-    print("\n" + "=" * 50)
-    print("    分析完成")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("    分析完成")
+    logger.info("=" * 50)
 
     return results
 
@@ -536,6 +539,7 @@ def full_gee_workflow() -> Dict:
 # 示例用法
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # ---- 完整工作流 ----
     res = full_gee_workflow()
 
@@ -556,4 +560,4 @@ if __name__ == "__main__":
     #                 groups='center', family='poisson')
     # gee_summary(model)
 
-    print("\n完成 GEE 分析模板演示")
+    logger.info("\n完成 GEE 分析模板演示")

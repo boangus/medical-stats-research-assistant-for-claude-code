@@ -11,6 +11,9 @@ import yaml
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SAPValidator:
@@ -256,6 +259,7 @@ class SAPValidator:
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建验证器
     validator = SAPValidator()
     
@@ -321,7 +325,7 @@ study_type: "RCT"
     # 生成报告
     report = validator.generate_validation_report(result)
     
-    print(report)
+    logger.info("report")
     
     # 清理临时文件
     temp_sap.unlink()

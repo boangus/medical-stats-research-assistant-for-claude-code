@@ -26,6 +26,9 @@ from sklearn.metrics import (
     roc_curve,
 )
 from sklearn.utils import resample
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -425,6 +428,7 @@ def calibration_curve(
 # 5. 完整工作流示例
 # ============================================================================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 模拟两组诊断数据
     np.random.seed(42)
     n = 300
@@ -440,35 +444,35 @@ if __name__ == "__main__":
 
     # 1. ROC 分析
     roc_result = compute_roc(y_true, y_score)
-    print(f"=== ROC 分析 ===")
-    print(f"AUC: {roc_result['auc']:.4f}")
+    logger.info(f"=== ROC 分析 ===")
+    logger.info(f"AUC: {roc_result['auc']:.4f}")
 
     # 2. 最佳截断值
     best_th, metrics = get_best_threshold(y_true, y_score, method="youden")
-    print(f"\n=== 最佳截断值 (Youden Index) ===")
-    print(f"Threshold: {best_th:.4f}")
-    print(f"Sensitivity: {metrics['sensitivity']:.3f}")
-    print(f"Specificity: {metrics['specificity']:.3f}")
-    print(f"PPV: {metrics['ppv']:.3f}")
-    print(f"NPV: {metrics['npv']:.3f}")
-    print(f"Accuracy: {metrics['accuracy']:.3f}")
+    logger.info(f"\n=== 最佳截断值 (Youden Index) ===")
+    logger.info(f"Threshold: {best_th:.4f}")
+    logger.info(f"Sensitivity: {metrics['sensitivity']:.3f}")
+    logger.info(f"Specificity: {metrics['specificity']:.3f}")
+    logger.info(f"PPV: {metrics['ppv']:.3f}")
+    logger.info(f"NPV: {metrics['npv']:.3f}")
+    logger.info(f"Accuracy: {metrics['accuracy']:.3f}")
 
     # 3. AUC 置信区间
     auc_result = auc_ci(y_true, y_score)
-    print(f"\n=== AUC 置信区间 ===")
-    print(f"AUC = {auc_result['auc']:.3f} (95% CI: {auc_result['ci_lower']:.3f}, {auc_result['ci_upper']:.3f})")
+    logger.info(f"\n=== AUC 置信区间 ===")
+    logger.info(f"AUC = {auc_result['auc']:.3f} (95% CI: {auc_result['ci_lower']:.3f}, {auc_result['ci_upper']:.3f})")
 
     # 4. 模型比较（模拟两个模型）
     score2 = y_score + np.random.normal(0, 0.05, len(y_score))
     score2 = np.clip(score2, 0, 1)
     comp = compare_two_aucs(y_true, y_score, score2, method="delong")
-    print(f"\n=== AUC 比较 ===")
-    print(f"Model 1 AUC: {comp['auc1']:.3f}, Model 2 AUC: {comp['auc2']:.3f}")
-    print(f"Difference: {comp['auc_diff']:.3f}, p = {comp['p_value']:.4f}")
+    logger.info(f"\n=== AUC 比较 ===")
+    logger.info(f"Model 1 AUC: {comp['auc1']:.3f}, Model 2 AUC: {comp['auc2']:.3f}")
+    logger.info(f"Difference: {comp['auc_diff']:.3f}, p = {comp['p_value']:.4f}")
 
     # 5. 校准曲线
     cal_df = calibration_curve(y_true, y_score)
-    print(f"\n=== 校准曲线 ===")
-    print(cal_df.round(3).to_string(index=False))
+    logger.info(f"\n=== 校准曲线 ===")
+    logger.info("cal_df.round(3).to_string(index=False)")
 
-    print("\n✅ ROC 诊断分析完成")
+    logger.info("\n✅ ROC 诊断分析完成")

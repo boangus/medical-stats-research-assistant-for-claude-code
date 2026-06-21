@@ -9,6 +9,9 @@ MSRA 自动修复建议生成器
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AutoFixSuggestions:
@@ -220,6 +223,7 @@ df$integer_var <- as.integer(df$double_var)  # 优化数据类型
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建修复建议生成器
     fix_generator = AutoFixSuggestions()
     
@@ -229,10 +233,10 @@ if __name__ == "__main__":
         {"vif_value": 12.5}
     )
     
-    print("诊断结果:")
-    print(f"  错误类型: {diagnosis['diagnosis']}")
-    print(f"  修复建议: {diagnosis['suggestions']}")
-    print(f"  风险提示: {diagnosis['risk']}")
+    logger.info("诊断结果:")
+    logger.info(f"  错误类型: {diagnosis['diagnosis']}")
+    logger.info(f"  修复建议: {diagnosis['suggestions']}")
+    logger.info(f"  风险提示: {diagnosis['risk']}")
     
     # 生成修复代码
     fix_code = fix_generator.generate_fix_code(
@@ -240,5 +244,5 @@ if __name__ == "__main__":
         {"dataframe_name": "cleaned_data"}
     )
     
-    print("\n修复代码:")
-    print(fix_code)
+    logger.info("\n修复代码:")
+    logger.info("fix_code")

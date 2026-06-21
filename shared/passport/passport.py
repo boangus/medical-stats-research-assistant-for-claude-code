@@ -17,6 +17,9 @@ import hashlib
 import os
 from datetime import datetime, timezone
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_ARTIFACT_TEMPLATE = {
@@ -465,18 +468,19 @@ class PassportManager:
 # ── CLI ──
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     import sys
 
     def usage():
-        print("用法:")
-        print("  passport.py <passport.json> <命令> [参数]")
-        print("命令:")
-        print("  status              — 显示当前护照状态")
-        print("  add <id> <stage> <name>  — 添加产物")
-        print("  update <id> <status>     — 更新产物状态")
-        print("  check <stage>            — 检查前置条件")
-        print("  resume                   — 显示恢复点")
-        print("  rollback <stage>         — 回退到指定阶段")
+        logger.info("用法:")
+        logger.info("  passport.py <passport.json> <命令> [参数]")
+        logger.info("命令:")
+        logger.info("  status              — 显示当前护照状态")
+        logger.info("  add <id> <stage> <name>  — 添加产物")
+        logger.info("  update <id> <status>     — 更新产物状态")
+        logger.info("  check <stage>            — 检查前置条件")
+        logger.info("  resume                   — 显示恢复点")
+        logger.info("  rollback <stage>         — 回退到指定阶段")
 
     if len(sys.argv) < 3:
         usage()
@@ -487,40 +491,40 @@ if __name__ == "__main__":
 
     if cmd == "status":
         d = pm.data
-        print(f"护照: {d['passport_id']}")
-        print(f"版本: {d['pipeline_version']}")
-        print(f"当前阶段: {d.get('current_stage', 'unknown')}")
-        print(f"状态: {d['status']}")
-        print(f"\n产物 ({len(d.get('artifacts', []))} 个):")
+        logger.info(f"护照: {d['passport_id']}")
+        logger.info(f"版本: {d['pipeline_version']}")
+        logger.info(f"当前阶段: {d.get('current_stage', 'unknown')}")
+        logger.info(f"状态: {d['status']}")
+        logger.info(f"\n产物 ({len(d.get('artifacts', []))} 个):")
         for a in d.get("artifacts", []):
-            print(f"  [{a['status']:>10}] {a['id']} ({a['stage']})")
-        print(f"\n门闸:")
+            logger.info(f"  [{a['status']:>10}] {a['id']} ({a['stage']})")
+        logger.info(f"\n门闸:")
         for g, r in d.get("gates", {}).items():
-            print(f"  {g}: {r['status']} ({r['passed_items']}/{r['total_items']})")
-        print(f"\n检查点: {d.get('checkpoints', {})}")
+            logger.info(f"  {g}: {r['status']} ({r['passed_items']}/{r['total_items']})")
+        logger.info(f"\n检查点: {d.get('checkpoints', {})}")
 
     elif cmd == "add" and len(sys.argv) >= 5:
         art = {"id": sys.argv[3], "stage": sys.argv[4], "name": sys.argv[5] if len(sys.argv) > 5 else sys.argv[3]}
         pm.add_artifact(art)
-        print(f"已添加: {art['id']}")
+        logger.info(f"已添加: {art['id']}")
 
     elif cmd == "update" and len(sys.argv) >= 5:
         pm.update_status(sys.argv[3], sys.argv[4])
-        print(f"已更新: {sys.argv[3]} -> {sys.argv[4]}")
+        logger.info(f"已更新: {sys.argv[3]} -> {sys.argv[4]}")
 
     elif cmd == "check" and len(sys.argv) >= 4:
         ok, missing = pm.verify_prerequisites(sys.argv[3])
         if ok:
-            print(f"✅ 前置条件全部满足")
+            logger.info(f"✅ 前置条件全部满足")
         else:
-            print(f"❌ 缺失: {', '.join(missing)}")
+            logger.info(f"❌ 缺失: {', '.join(missing)}")
 
     elif cmd == "resume":
         rp = pm.get_resume_point()
-        print(f"恢复点: {rp}")
+        logger.info(f"恢复点: {rp}")
 
     elif cmd == "rollback" and len(sys.argv) >= 4:
         rolled = pm.rollback_to(sys.argv[3])
-        print(f"已回退至 {sys.argv[3]}，{len(rolled)} 个产物标记为 rollback")
+        logger.info(f"已回退至 {sys.argv[3]}，{len(rolled)} 个产物标记为 rollback")
         for r in rolled:
-            print(f"  ↻ {r}")
+            logger.info(f"  ↻ {r}")

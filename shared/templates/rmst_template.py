@@ -32,6 +32,9 @@ RMST 是生存曲线下面积，代表在指定时间点内患者期望存活的
 from typing import Dict, Optional, Tuple
 import numpy as np
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     import matplotlib.pyplot as plt
@@ -353,6 +356,7 @@ def format_rmst_report(results: Dict) -> str:
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     np.random.seed(42)
 
     # 模拟生存数据
@@ -362,9 +366,9 @@ if __name__ == "__main__":
     event1 = np.random.binomial(1, 0.7, n)
     event2 = np.random.binomial(1, 0.8, n)
 
-    print("=== RMST 分析 ===\n")
+    logger.info("=== RMST 分析 ===\n")
     results = rmst_difference(time1, event1, time2, event2, tau=24)
     report = format_rmst_report(results)
-    print(report)
+    logger.info("report")
 
-    print("✅ RMST 分析示例完成")
+    logger.info("✅ RMST 分析示例完成")

@@ -16,6 +16,9 @@ import json
 import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # 报告规范检查清单定义
@@ -169,24 +172,24 @@ def run_compliance_check(
         results["status"] = "❌ 不通过"
 
     if verbose:
-        print(f"\n{'='*50}")
-        print(f"  {checklist['name']} 合规检查报告")
-        print(f"{'='*50}")
-        print(f"  总条目: {results['total_items']}")
-        print(f"  通过: {results['passed']} | 未通过: {results['failed']}")
-        print(f"  覆盖率: {results['coverage']:.1%}")
-        print(f"  状态: {results['status']}")
-        print(f"{'='*50}")
+        logger.info(f"\n{'='*50}")
+        logger.info(f"  {checklist['name']} 合规检查报告")
+        logger.info(f"{'='*50}")
+        logger.info(f"  总条目: {results['total_items']}")
+        logger.info(f"  通过: {results['passed']} | 未通过: {results['failed']}")
+        logger.info(f"  覆盖率: {results['coverage']:.1%}")
+        logger.info(f"  状态: {results['status']}")
+        logger.info(f"{'='*50}")
 
         if results["missing_items"]:
-            print(f"\n  缺失条目:")
+            logger.info(f"\n  缺失条目:")
             for item in results["missing_items"]:
-                print(f"    ❌ {item}")
+                logger.info(f"    ❌ {item}")
 
         if results["suggestions"]:
-            print(f"\n  改进建议:")
+            logger.info(f"\n  改进建议:")
             for s in results["suggestions"]:
-                print(f"    💡 {s}")
+                logger.info(f"    💡 {s}")
 
     return results
 
@@ -750,8 +753,9 @@ def main():
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
-        print(f"\n结果已保存到: {args.output}")
+        logger.info(f"\n结果已保存到: {args.output}")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     main()

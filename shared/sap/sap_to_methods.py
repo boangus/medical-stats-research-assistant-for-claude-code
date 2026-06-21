@@ -10,6 +10,9 @@ import json
 import re
 from typing import Dict, List, Tuple, Any, Optional
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SAPToMethods:
@@ -50,7 +53,7 @@ class SAPToMethods:
             
             return self.sap_data
         except Exception as e:
-            print(f"加载SAP文件失败: {e}")
+            logger.info(f"加载SAP文件失败: {e}")
             return {}
     
     def _parse_markdown_sap(self, content: str) -> Dict[str, Any]:
@@ -117,7 +120,7 @@ class SAPToMethods:
                     templates = json.load(f)
                     default_templates.update(templates)
             except Exception as e:
-                print(f"加载模板文件失败: {e}")
+                logger.info(f"加载模板文件失败: {e}")
         
         return default_templates
     
@@ -358,6 +361,7 @@ class SAPToMethods:
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建转换器
     converter = SAPToMethods()
     
@@ -376,13 +380,13 @@ if __name__ == "__main__":
     # 生成方法学描述
     methods_description = converter.generate_methods_description()
     
-    print("生成的方法学描述：")
-    print(methods_description)
+    logger.info("生成的方法学描述：")
+    logger.info("methods_description")
     
     # 为CONSORT报告生成方法学描述
     consort_methods = converter.generate_methods_for_report("CONSORT")
     
-    print("\nCONSORT报告方法学描述：")
+    logger.info("\nCONSORT报告方法学描述：")
     for section, content in consort_methods.items():
-        print(f"\n{section}:")
-        print(content)
+        logger.info(f"\n{section}:")
+        logger.info("content")

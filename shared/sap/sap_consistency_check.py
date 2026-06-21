@@ -11,6 +11,9 @@ import numpy as np
 from scipy import stats
 from typing import Dict, List, Tuple, Any, Optional
 import warnings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SAPConsistencyCheck:
@@ -437,6 +440,7 @@ cv_fit <- cv.glmnet(x, y, alpha = 0)  # alpha = 0 为岭回归
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # SAP配置示例
     sap_config = {
         "normality_test": "shapiro-wilk",
@@ -463,21 +467,21 @@ if __name__ == "__main__":
     sample_size_result = checker.check_sample_size(100, 100)
     
     # 打印结果
-    print("正态性检查:")
-    print(f"  一致性: {normality_result['consistency']}")
-    print(f"  详情: {normality_result['mismatch_details']}")
+    logger.info("正态性检查:")
+    logger.info(f"  一致性: {normality_result['consistency']}")
+    logger.info(f"  详情: {normality_result['mismatch_details']}")
     
-    print("\n方差齐性检查:")
-    print(f"  一致性: {homogeneity_result['consistency']}")
-    print(f"  详情: {homogeneity_result['mismatch_details']}")
+    logger.info("\n方差齐性检查:")
+    logger.info(f"  一致性: {homogeneity_result['consistency']}")
+    logger.info(f"  详情: {homogeneity_result['mismatch_details']}")
     
-    print("\n样本量检查:")
-    print(f"  一致性: {sample_size_result['consistency']}")
-    print(f"  详情: {sample_size_result['mismatch_details']}")
+    logger.info("\n样本量检查:")
+    logger.info(f"  一致性: {sample_size_result['consistency']}")
+    logger.info(f"  详情: {sample_size_result['mismatch_details']}")
     
     # 生成报告
     checker.consistency_results = [normality_result, homogeneity_result, sample_size_result]
     report = checker.generate_consistency_report()
     
-    print(f"\n总体一致性: {report['summary']['overall_consistent']}")
-    print(f"不一致检查项: {report['summary']['inconsistent']}")
+    logger.info(f"\n总体一致性: {report['summary']['overall_consistent']}")
+    logger.info(f"不一致检查项: {report['summary']['inconsistent']}")

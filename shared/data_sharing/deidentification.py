@@ -15,6 +15,9 @@ from typing import Dict, List, Tuple, Any, Optional
 from pathlib import Path
 import json
 from datetime import datetime, timedelta
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class DataDeidentifier:
@@ -412,6 +415,7 @@ class DataDeidentifier:
 
 # 使用示例
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建去标识化工具
     deidentifier = DataDeidentifier()
     
@@ -430,10 +434,10 @@ if __name__ == "__main__":
     
     # 识别标识符
     identifiers = deidentifier.identify_identifiers(df)
-    print("识别到的标识符:")
-    print(f"  直接标识符: {len(identifiers['direct_identifiers'])} 个")
-    print(f"  间接标识符: {len(identifiers['indirect_identifiers'])} 个")
-    print(f"  潜在标识符: {len(identifiers['potential_identifiers'])} 个")
+    logger.info("识别到的标识符:")
+    logger.info(f"  直接标识符: {len(identifiers['direct_identifiers'])} 个")
+    logger.info(f"  间接标识符: {len(identifiers['indirect_identifiers'])} 个")
+    logger.info(f"  潜在标识符: {len(identifiers['potential_identifiers'])} 个")
     
     # 去标识化（哈希策略）
     df_deidentified, report = deidentifier.deidentify_data(
@@ -442,16 +446,16 @@ if __name__ == "__main__":
         columns_to_process=["姓名", "身份证号"]
     )
     
-    print(f"\n去标识化完成:")
-    print(f"  处理列数: {len(report['columns_processed'])}")
-    print(f"  处理列: {report['columns_processed']}")
+    logger.info(f"\n去标识化完成:")
+    logger.info(f"  处理列数: {len(report['columns_processed'])}")
+    logger.info(f"  处理列: {report['columns_processed']}")
     
     # 保存去标识化后的数据
     output_path = deidentifier.save_deidentified_data(
         df_deidentified, 
         "deidentified_data.csv"
     )
-    print(f"\n去标识化数据已保存: {output_path}")
+    logger.info(f"\n去标识化数据已保存: {output_path}")
     
     # 生成报告
     report_content = deidentifier.generate_deidentification_report(
@@ -462,4 +466,4 @@ if __name__ == "__main__":
     with open(report_path, 'w', encoding='utf-8') as f:
         f.write(report_content)
     
-    print(f"去标识化报告已保存: {report_path}")
+    logger.info(f"去标识化报告已保存: {report_path}")

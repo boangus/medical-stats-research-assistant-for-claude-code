@@ -38,6 +38,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from pathlib import Path
 from typing import List, Optional, Tuple, Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -985,6 +988,7 @@ def check_figure_quality(fig, variable_names=None, p_values=None):
 # ═══════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 1. 应用发表级样式
     apply_publication_style(font_size=10, support_chinese=True)
 
@@ -1005,13 +1009,13 @@ if __name__ == '__main__':
 
     # 3. 导出（SVG + PNG）
     saved = export_figure(fig, 'reports/figures/figure1_forest')
-    print(f"已保存: {saved}")
+    logger.info(f"已保存: {saved}")
 
     # 4. 质量检查
     violations = check_figure_quality(fig, p_values=p_values)
     if violations:
-        print(f"质量检查发现 {len(violations)} 个问题:")
+        logger.info(f"质量检查发现 {len(violations)} 个问题:")
         for v in violations:
-            print(f"  - {v['rule']}: {v['issue']}")
+            logger.info(f"  - {v['rule']}: {v['issue']}")
     else:
-        print("质量检查通过 ✅")
+        logger.info("质量检查通过 ✅")

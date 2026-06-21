@@ -32,6 +32,9 @@ effect_size_template.py — 效应量计算模板（Python）
 from typing import Dict, Optional, Tuple, Union
 import numpy as np
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -427,6 +430,7 @@ def nnt_from_or(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     np.random.seed(42)
 
     # 两样本 t 检验效应量
@@ -437,10 +441,10 @@ if __name__ == "__main__":
     g = hedges_g(g1, g2)
     r = rank_biserial_r(g1, g2)
 
-    print("=== 连续变量效应量 ===")
-    print(f"  Cohen's d = {d:.3f} ({interpret_effect_size(d, 'd')})")
-    print(f"  Hedges' g = {g:.3f} ({interpret_effect_size(g, 'g')})")
-    print(f"  Rank-biserial r = {r:.3f} ({interpret_effect_size(r, 'r')})")
+    logger.info("=== 连续变量效应量 ===")
+    logger.info(f"  Cohen's d = {d:.3f} ({interpret_effect_size(d, 'd')})")
+    logger.info(f"  Hedges' g = {g:.3f} ({interpret_effect_size(g, 'g')})")
+    logger.info(f"  Rank-biserial r = {r:.3f} ({interpret_effect_size(r, 'r')})")
 
     # ANOVA 效应量
     g3 = np.random.normal(60, 10, 50)
@@ -448,21 +452,21 @@ if __name__ == "__main__":
     omega2 = omega_squared([g1, g2, g3])
     f = cohens_f_from_eta2(eta2)
 
-    print("\n=== ANOVA 效应量 ===")
-    print(f"  η² = {eta2:.3f} ({interpret_effect_size(eta2, 'eta2')})")
-    print(f"  ω² = {omega2:.3f}")
-    print(f"  Cohen's f = {f:.3f} ({interpret_effect_size(f, 'f')})")
+    logger.info("\n=== ANOVA 效应量 ===")
+    logger.info(f"  η² = {eta2:.3f} ({interpret_effect_size(eta2, 'eta2')})")
+    logger.info(f"  ω² = {omega2:.3f}")
+    logger.info(f"  Cohen's f = {f:.3f} ({interpret_effect_size(f, 'f')})")
 
     # OR/RR
     or_result = odds_ratio(30, 70, 20, 80)
     rr_result = risk_ratio(30, 70, 20, 80)
 
-    print("\n=== OR/RR ===")
-    print(f"  OR = {or_result['odds_ratio']:.3f} (95% CI: {or_result['ci_lower']:.3f}-{or_result['ci_upper']:.3f})")
-    print(f"  RR = {rr_result['risk_ratio']:.3f} (95% CI: {rr_result['ci_lower']:.3f}-{rr_result['ci_upper']:.3f})")
+    logger.info("\n=== OR/RR ===")
+    logger.info(f"  OR = {or_result['odds_ratio']:.3f} (95% CI: {or_result['ci_lower']:.3f}-{or_result['ci_upper']:.3f})")
+    logger.info(f"  RR = {rr_result['risk_ratio']:.3f} (95% CI: {rr_result['ci_lower']:.3f}-{rr_result['ci_upper']:.3f})")
 
     # NNT
     nnt = nnt_from_or(or_result['odds_ratio'], 20 / 100)
-    print(f"\n  NNT = {nnt:.1f}")
+    logger.info(f"\n  NNT = {nnt:.1f}")
 
-    print("\n✅ 效应量计算示例完成")
+    logger.info("\n✅ 效应量计算示例完成")

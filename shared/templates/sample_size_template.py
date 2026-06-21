@@ -21,6 +21,9 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 尝试导入已有的样本量计算器
 try:
@@ -652,7 +655,7 @@ def save_report(report: str, filepath: str) -> None:
     """
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(report)
-    print(f"报告已保存至: {filepath}")
+    logger.info(f"报告已保存至: {filepath}")
 
 
 # ============================================================================
@@ -695,30 +698,30 @@ def full_sample_size_workflow(
     results = {}
 
     # 1. 样本量计算
-    print("=" * 50)
-    print("Step 1: 样本量计算")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Step 1: 样本量计算")
+    logger.info("=" * 50)
     calc_result = calculate_sample_size(design, params)
     results["calculation"] = calc_result
-    print(f"  方法: {calc_result.get('method', design)}")
+    logger.info(f"  方法: {calc_result.get('method', design)}")
     for key in ("n_total", "n_per_group", "n_events"):
         if key in calc_result:
-            print(f"  {key}: {calc_result[key]}")
+            logger.info(f"  {key}: {calc_result[key]}")
 
     # 2. 报告生成
-    print("\n" + "=" * 50)
-    print("Step 2: 报告生成")
-    print("=" * 50)
+    logger.info("\n" + "=" * 50)
+    logger.info("Step 2: 报告生成")
+    logger.info("=" * 50)
     report = generate_sample_size_report(design, params, calc_result,
                                          study_name=study_name)
     results["report"] = report
-    print("  Markdown 报告已生成")
+    logger.info("  Markdown 报告已生成")
 
     # 3. 把握度曲线（可选）
     if do_power_curve:
-        print("\n" + "=" * 50)
-        print("Step 3: 把握度曲线")
-        print("=" * 50)
+        logger.info("\n" + "=" * 50)
+        logger.info("Step 3: 把握度曲线")
+        logger.info("=" * 50)
         if power_curve_range is None:
             n_base = calc_result.get("n_per_group", calc_result.get("n_total", 100))
             power_curve_range = np.arange(
@@ -730,9 +733,9 @@ def full_sample_size_workflow(
         fixed = {k: v for k, v in params.items() if k != power_curve_param}
         curve = power_curve(design, power_curve_param, power_curve_range, fixed)
         results["power_curve"] = curve
-        print(f"  把握度曲线已生成（{len(curve)} 个点）")
+        logger.info(f"  把握度曲线已生成（{len(curve)} 个点）")
 
-    print("\n 样本量计算工作流完成")
+    logger.info("\n 样本量计算工作流完成")
     return results
 
 
@@ -741,56 +744,57 @@ def full_sample_size_workflow(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 示例 1: 两样本 t 检验
-    print("=" * 60)
-    print("示例 1: 两样本 t 检验")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("示例 1: 两样本 t 检验")
+    logger.info("=" * 60)
     res = calculate_sample_size("t_test", {"delta": 5, "sd": 10, "power": 0.80})
-    print(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
-    print(f"  Cohen's d = {res['d']:.3f}")
+    logger.info(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
+    logger.info(f"  Cohen's d = {res['d']:.3f}")
 
     # 示例 2: 率比较
-    print("\n" + "=" * 60)
-    print("示例 2: 两样本率比较")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 2: 两样本率比较")
+    logger.info("=" * 60)
     res = calculate_sample_size("proportion", {"p1": 0.3, "p2": 0.5})
-    print(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
+    logger.info(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
 
     # 示例 3: 生存分析
-    print("\n" + "=" * 60)
-    print("示例 3: 生存分析")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 3: 生存分析")
+    logger.info("=" * 60)
     res = calculate_sample_size("survival", {"hr": 0.7, "prop_event": 0.6})
-    print(f"  n_events = {res['n_events']}, n_total = {res['n_total']}")
+    logger.info(f"  n_events = {res['n_events']}, n_total = {res['n_total']}")
 
     # 示例 4: 非劣效性试验
-    print("\n" + "=" * 60)
-    print("示例 4: 非劣效性试验")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 4: 非劣效性试验")
+    logger.info("=" * 60)
     res = calculate_sample_size("noninferiority", {"delta": 3, "sd": 10})
-    print(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
+    logger.info(f"  n_per_group = {res['n_per_group']}, n_total = {res['n_total']}")
 
     # 示例 5: 诊断试验
-    print("\n" + "=" * 60)
-    print("示例 5: 诊断试验")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 5: 诊断试验")
+    logger.info("=" * 60)
     res = calculate_sample_size("diagnostic", {
         "sensitivity": 0.9, "specificity": 0.85, "prevalence": 0.3
     })
-    print(f"  n_positive = {res['n_positive']}, n_negative = {res['n_negative']}")
-    print(f"  n_total = {res['n_total']}")
+    logger.info(f"  n_positive = {res['n_positive']}, n_negative = {res['n_negative']}")
+    logger.info(f"  n_total = {res['n_total']}")
 
     # 示例 6: 反向把握度计算
-    print("\n" + "=" * 60)
-    print("示例 6: 反向把握度计算")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 6: 反向把握度计算")
+    logger.info("=" * 60)
     pw = calculate_power("t_test", {"n": 64, "delta": 5, "sd": 10})
-    print(f"  Power = {pw['power']:.3f}")
+    logger.info(f"  Power = {pw['power']:.3f}")
 
     # 示例 7: 批量场景比较
-    print("\n" + "=" * 60)
-    print("示例 7: 批量场景比较")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 7: 批量场景比较")
+    logger.info("=" * 60)
     scenarios = [
         {"delta": 3, "sd": 10},
         {"delta": 5, "sd": 10},
@@ -798,24 +802,24 @@ if __name__ == "__main__":
     ]
     df_compare = compare_scenarios("t_test", scenarios,
                                    labels=["Small effect", "Medium effect", "Large effect"])
-    print(df_compare.to_string(index=False))
+    logger.info("df_compare.to_string(index=False)")
 
     # 示例 8: 生成 Markdown 报告
-    print("\n" + "=" * 60)
-    print("示例 8: Markdown 报告")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 8: Markdown 报告")
+    logger.info("=" * 60)
     report = generate_sample_size_report(
         "t_test",
         {"delta": 5, "sd": 10, "power": 0.80, "alpha": 0.05},
         study_name="降压药疗效比较试验",
     )
-    print(report[:500])
-    print("  ... (报告已截断显示)")
+    logger.info("report[:500]")
+    logger.info("  ... (报告已截断显示)")
 
     # 示例 9: 完整工作流
-    print("\n" + "=" * 60)
-    print("示例 9: 完整工作流")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("示例 9: 完整工作流")
+    logger.info("=" * 60)
     workflow_result = full_sample_size_workflow(
         "survival",
         {"hr": 0.75, "prop_event": 0.5, "power": 0.80},
@@ -823,9 +827,9 @@ if __name__ == "__main__":
         do_power_curve=True,
     )
 
-    print("\n 效应量参考:")
-    print("  Cohen's d: 小=0.2, 中=0.5, 大=0.8")
-    print("  Cohen's f: 小=0.10, 中=0.25, 大=0.40")
-    print("  OR/HR:     小=1.5, 中=2.0, 大=3.0")
+    logger.info("\n 效应量参考:")
+    logger.info("  Cohen's d: 小=0.2, 中=0.5, 大=0.8")
+    logger.info("  Cohen's f: 小=0.10, 中=0.25, 大=0.40")
+    logger.info("  OR/HR:     小=1.5, 中=2.0, 大=3.0")
 
-    print("\n 样本量计算模板示例完成")
+    logger.info("\n 样本量计算模板示例完成")

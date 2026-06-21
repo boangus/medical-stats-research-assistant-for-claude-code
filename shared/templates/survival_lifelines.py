@@ -29,6 +29,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 抑制 pandas/numpy 的 FutureWarning 和 SettingWithCopyWarning，
 # 但保留 ConvergenceWarning / RuntimeWarning / DeprecationWarning
@@ -283,14 +286,14 @@ def cox_regression(
     # C-index
     c_index = cph.concordance_index_
 
-    print("=" * 60)
-    print("  Cox 比例风险模型结果")
-    print("=" * 60)
-    print(f"  C-index (Harrell's C): {c_index:.3f}")
-    print(f"  事件数: {model_data[event_col].sum()}")
-    print(f"  样本数: {len(model_data)}")
-    print(f"\n  系数表 (HR, 95% CI, p-value):")
-    print(result_summary.to_string())
+    logger.info("=" * 60)
+    logger.info("  Cox 比例风险模型结果")
+    logger.info("=" * 60)
+    logger.info(f"  C-index (Harrell's C): {c_index:.3f}")
+    logger.info(f"  事件数: {model_data[event_col].sum()}")
+    logger.info(f"  样本数: {len(model_data)}")
+    logger.info(f"\n  系数表 (HR, 95% CI, p-value):")
+    logger.info("result_summary.to_string()")
 
     return {
         "model": cph,
@@ -345,9 +348,9 @@ def proportional_hazard_test(
 
     # 手动计算每个变量的 PH 检验
     # 使用 lifelines 的统计检验
-    print("\n=== 比例风险假设 (PH) 检验 ===")
-    print("  H0: 比例风险假设成立")
-    print("  若 p < 0.05 → 违反 PH 假设\n")
+    logger.info("\n=== 比例风险假设 (PH) 检验 ===")
+    logger.info("  H0: 比例风险假设成立")
+    logger.info("  若 p < 0.05 → 违反 PH 假设\n")
 
     ph_results = {}
     for var, result in test_results.items():
@@ -357,7 +360,7 @@ def proportional_hazard_test(
                 "pass": result.p_value > 0.05,
             }
             status = "✅" if result.p_value > 0.05 else "❌"
-            print(f"  {var}: p = {result.p_value:.4f} {status}")
+            logger.info(f"  {var}: p = {result.p_value:.4f} {status}")
 
     return ph_results
 
@@ -440,8 +443,8 @@ def aalen_additive_model(
     aaf = AalenAdditiveFitter(coef_penalizer=0.5)
     aaf.fit(model_data, duration_col=duration_col, event_col=event_col)
 
-    print("Aalen 加性模型拟合完成")
-    print(f"  样本量: {len(model_data)}")
+    logger.info("Aalen 加性模型拟合完成")
+    logger.info(f"  样本量: {len(model_data)}")
 
     return {"model": aaf}
 
@@ -472,7 +475,7 @@ def fine_gray_competing_risks(
         from lifelines import FineGrayModel
     except ImportError:
         # Fallback: 使用 cmprsk 的 Python 实现或说明
-        print("注意: lifelines 的 FineGrayModel 在较新版本中可用。")
+        logger.info("注意: lifelines 的 FineGrayModel 在较新版本中可用。")
         raise ImportError("需要 lifelines >= 0.28.0: pip install --upgrade lifelines")
 
     model_data = df[[duration_col, event_col] + predictor_cols].dropna()
@@ -527,12 +530,12 @@ def survival_report(
     n_events = events.sum()
     n_censored = n_total - n_events
 
-    print("=" * 60)
-    print("  生存分析报告")
-    print("=" * 60)
-    print(f"  总样本: {n_total}")
-    print(f"  事件数: {n_events} ({n_events/n_total*100:.1f}%)")
-    print(f"  删失数: {n_censored}")
+    logger.info("=" * 60)
+    logger.info("  生存分析报告")
+    logger.info("=" * 60)
+    logger.info(f"  总样本: {n_total}")
+    logger.info(f"  事件数: {n_events} ({n_events/n_total*100:.1f}%)")
+    logger.info(f"  删失数: {n_censored}")
 
     # --- Step 1: KM ---
     if group_col is not None:
@@ -544,14 +547,14 @@ def survival_report(
     results["km"] = km
 
     if group_col is not None:
-        print(f"\n[KM] 中位生存时间:")
-        print(km["summary"].to_string(index=False))
+        logger.info(f"\n[KM] 中位生存时间:")
+        logger.info(km["summary"].to_string(index=False))
 
     # --- Step 2: Log-rank (如有分组) ---
     if group_col is not None:
         lr = logrank_test(durations, events, df[group_col].values)
         results["logrank"] = lr
-        print(f"\n[Log-rank] 统计量: {lr['test_statistic']:.3f}, "
+        logger.info(f"\n[Log-rank] 统计量: {lr['test_statistic']:.3f}, "
               f"p = {lr['p_value']:.4f}")
 
     # --- Step 3: Cox ---
@@ -563,9 +566,9 @@ def survival_report(
         ph = proportional_hazard_test(cox, df, duration_col, event_col)
         results["ph_test"] = ph
 
-    print("\n" + "=" * 60)
-    print("  生存分析报告完成")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("  生存分析报告完成")
+    logger.info("=" * 60)
 
     return results
 
@@ -575,11 +578,12 @@ def survival_report(
 # ============================================================================
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     from lifelines.datasets import load_rossi
 
     # 使用 lifelines 内置的 Rossi 再犯数据
     rossi = load_rossi()
-    print(f"Rossi 数据集: {rossi.shape}")
+    logger.info(f"Rossi 数据集: {rossi.shape}")
 
     # 运行完整生存分析报告
     results = survival_report(
@@ -601,4 +605,4 @@ if __name__ == "__main__":
     # 保存图片
     # fig.savefig("KM_lifelines.png", dpi=300, bbox_inches="tight")
 
-    print("\n✅ 生存分析完成")
+    logger.info("\n✅ 生存分析完成")

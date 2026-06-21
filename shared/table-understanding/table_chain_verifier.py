@@ -17,6 +17,9 @@ import json
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class VerificationStep(Enum):
@@ -601,6 +604,7 @@ class TableChainVerifier:
 
 # 示例用法
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 示例表格数据
     sample_table = {
         'headers': ['姓名', '年龄', '性别', '血压(mmHg)', '血糖(mmol/L)'],
@@ -615,5 +619,5 @@ if __name__ == "__main__":
     verifier = TableChainVerifier(sample_table)
     results = verifier.verify()
     
-    print("验证结果:")
-    print(json.dumps(results, ensure_ascii=False, indent=2))
+    logger.info("验证结果:")
+    logger.info("%s %s %s", json.dumps(results, ensure_ascii=False, indent=2))
