@@ -46,9 +46,9 @@ $msraCommands = @(
     "msra-report.md",
     "msra-calibrate.md",
     "msra-paper.md",
-    "ars-paper.md",
-    "ars-full.md",
-    "ars-reviewer.md"
+    "msra-write.md",
+    "msra-full.md",
+    "msra-reviewer.md"
 )
 
 foreach ($cmd in $msraCommands) {

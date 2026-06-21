@@ -23,7 +23,7 @@
 /msra 我有一份RCT的原始数据，想完成整个分析
 
 # 直接进入论文写作
-/ars-full 帮我写一篇关于肺癌靶向治疗的综述
+/msra-full 帮我写一篇关于肺癌靶向治疗的综述
 ```
 
 ---
@@ -86,12 +86,12 @@
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
-│  Stage 5.1: Literature Search  /ars-lit-review     │
+│  Stage 5.1: Literature Search  /msra-write --mode lit-review     │
 │  文献检索 + 综述撰写 + 参考文献库                    │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
-│  Stage 5.2: Paper Writing  /ars-plan               │
+│  Stage 5.2: Paper Writing  /msra-write --mode plan               │
 │  IMRaD 章节撰写（复用方法学和表格图表）             │
 └──────────────────┬──────────────────────────────────┘
                    ▼
@@ -101,12 +101,12 @@
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
-│  Stage 5.6: Peer Review  /ars-reviewer             │
+│  Stage 5.6: Peer Review  /msra-reviewer             │
 │  5人评审团（EIC+方法学+领域+写作+DA）               │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
-│  Stage 5.7: Revision  /ars-revision                │
+│  Stage 5.7: Revision  /msra-write --mode revision                │
 │  修订 + Response to Reviewers                      │
 └──────────────────┬──────────────────────────────────┘
                    ▼
@@ -116,7 +116,7 @@
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐
-│  Stage 5.9: Finalize  /ars-format-convert          │
+│  Stage 5.9: Finalize  /msra-write --mode format-convert          │
 │  定稿导出（MD → DOCX → PDF）                        │
 └──────────────────┬──────────────────────────────────┘
                    ▼
@@ -146,9 +146,9 @@
 
 | 命令 | 功能 | 说明 |
 |------|------|------|
-| `/ars-paper --mode <mode>` | 论文写作（9种模式：plan/abstract/revision/...） | `report/SKILL.md` |
-| `/ars-full` | 完整写作流水线：研究→写作→评审→修订→定稿 | `pipeline/SKILL.md` |
-| `/ars-reviewer` | 多视角论文评审（5人评审团） | `academic-paper-reviewer` |
+| `/msra-write --mode <mode>` | 论文写作（9种模式：plan/abstract/revision/...） | `report/SKILL.md` |
+| `/msra-full` | 完整写作流水线：研究→写作→评审→修订→定稿 | `pipeline/SKILL.md` |
+| `/msra-reviewer` | 多视角论文评审（5人评审团） | `academic-paper-reviewer` |
 
 ---
 
@@ -198,9 +198,9 @@ medical-stats-research-assistant/
 │   ├── msra-report.md            # 报告生成
 │   ├── msra-calibrate.md         # 指标校准
 │   ├── msra-paper.md             # 论文轨道
-│   ├── ars-paper.md              # 论文写作（9种模式）
-│   ├── ars-full.md               # 完整写作流水线
-│   └── ars-reviewer.md           # 论文评审
+│   ├── msra-write.md              # 论文写作（9种模式）
+│   ├── msra-full.md               # 完整写作流水线
+│   └── msra-reviewer.md           # 论文评审
 │
 ├── skills/                       # 8 个 Skill
 │   ├── pipeline/                 # 🔀 统一编排器（核心）

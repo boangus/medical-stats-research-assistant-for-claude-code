@@ -1,5 +1,5 @@
 ---
-description: ARS academic-paper-reviewer `full` mode — simulated peer-review panel
+description: MSRA paper reviewer — simulated 5-person peer-review panel
 model: opus
 ---
 

@@ -51,7 +51,7 @@ When clarification fires, the main session emits a message in this shape (markdo
 ```markdown
 I see you've provided <summary of materials>. To route correctly, could you confirm which workflow you want?
 
-(a) **Full pipeline** — go from materials through to a complete deliverable (research + write + review + revise). Use `academic-pipeline` orchestrator (`/ars-full`).
+(a) **Full pipeline** — go from materials through to a complete deliverable (research + write + review + revise). Use `academic-pipeline` orchestrator (`/msra-full`).
 (b) **<phase-specific workflow 1>** — <one-line description>. Use `<skill>` (`/ars-<mode>`).
 (c) **<phase-specific workflow 2>** — <one-line description>. Use `<skill>` (`/ars-<mode>`).
 (d) **Something else** — let me know what you're trying to do.
@@ -101,7 +101,7 @@ Pick a-d, or describe the target deliverable. If you want me to dispatch a speci
 **Main session response:**
 > I see you've provided an abstract and a literature collection. To route correctly, could you confirm which workflow you want?
 >
-> (a) **Full paper from existing scaffolding** — use your abstract as paper seed, expand literature into bibliography, draft full paper, then review/revise. Use `academic-pipeline` (`/ars-full`).
+> (a) **Full paper from existing scaffolding** — use your abstract as paper seed, expand literature into bibliography, draft full paper, then review/revise. Use `academic-pipeline` (`/msra-full`).
 > (b) **Lit-review only** — produce an annotated bibliography matrix from the literature; don't touch your abstract. Use `academic-paper` (`/ars-lit-review`).
 > (c) **Quality-check the abstract against the literature** — verify abstract claims are supported by the cited sources. Use `academic-paper-reviewer` (`/ars-citation-check`).
 > (d) **Something else** — let me know what you're trying to do.
@@ -128,7 +128,7 @@ Pick a-d, or describe the target deliverable. If you want me to dispatch a speci
 > Of course. To route correctly, could you tell me what stage you're at?
 >
 > (a) **I have an idea but no clear research question** — Socratic mode to clarify direction. Use `deep-research` (`/ars-plan`).
-> (b) **I have a question and need to do the research** — full research pipeline. Use `academic-pipeline` (`/ars-full`).
+> (b) **I have a question and need to do the research** — full research pipeline. Use `academic-pipeline` (`/msra-full`).
 > (c) **I have research notes and need to write the paper** — drafting pipeline. Use `academic-paper`.
 > (d) **I have a draft and want feedback** — peer-review simulation. Use `academic-paper-reviewer` (`/ars-review` equivalent).
 >

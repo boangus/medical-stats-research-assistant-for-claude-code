@@ -1,5 +1,5 @@
 ---
-description: ARS academic-paper — 9 modes for paper writing, revision, and export
+description: MSRA paper writing — 9 modes for writing, revision, and export
 argument-hint: "--mode <abstract-only|citation-check|disclosure|format-convert|outline-only|plan|revision|revision-coach|lit-review>"
 ---
 
@@ -22,9 +22,9 @@ Trigger the `academic-paper` skill (via `report/SKILL.md`) in the specified mode
 ## Usage
 
 ```
-/ars-paper --mode abstract-only
-/ars-paper --mode plan
-/ars-paper --mode revision-coach
+/msra-write --mode abstract-only
+/msra-write --mode plan
+/msra-write --mode revision-coach
 ```
 
 ## Dispatch

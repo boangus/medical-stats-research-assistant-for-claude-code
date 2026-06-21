@@ -1,5 +1,5 @@
 ---
-description: ARS full pipeline — research → write → review → revise → finalize
+description: MSRA full academic pipeline — research → write → review → revise → finalize
 model: opus
 ---
 

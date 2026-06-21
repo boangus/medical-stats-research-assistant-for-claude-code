@@ -1,7 +1,7 @@
 {
   "name": "medical-stats-research-assistant",
   "version": "0.8.1",
-  "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper via ARS academic-pipeline integration",
+  "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
   "author": "boangus",
   "license": "MIT",
   "min_claude_code_version": "3.7.0",
@@ -83,33 +83,33 @@
         "/msra-calibrate --update new_results.csv"
       ]
     },
-    "/ars-paper": {
-      "id": "ars-paper",
-      "name": "ARS Paper Writing",
-      "entry_point": "commands/ars-paper.md",
+    "/msra-write": {
+      "id": "msra-write",
+      "name": "MSRA Paper Writing",
+      "entry_point": "commands/msra-write.md",
       "description": "Academic paper writing in 9 modes: abstract, citation-check, disclosure, format-convert, outline, plan, revision, revision-coach, lit-review",
-      "usage": "/ars-paper --mode <mode>",
+      "usage": "/msra-write --mode <mode>",
       "examples": [
-        "/ars-paper --mode plan",
-        "/ars-paper --mode abstract-only",
-        "/ars-paper --mode revision-coach"
+        "/msra-write --mode plan",
+        "/msra-write --mode abstract-only",
+        "/msra-write --mode revision-coach"
       ]
     },
-    "/ars-full": {
-      "id": "ars-full-pipeline",
-      "name": "ARS Full Pipeline",
-      "entry_point": "commands/ars-full.md",
+    "/msra-full": {
+      "id": "msra-full-pipeline",
+      "name": "MSRA Full Pipeline",
+      "entry_point": "commands/msra-full.md",
       "description": "Full academic research pipeline: research → write → review → revise → finalize. Uses built-in academic-pipeline skill.",
-      "usage": "/ars-full",
-      "examples": ["/ars-full"]
+      "usage": "/msra-full",
+      "examples": ["/msra-full"]
     },
-    "/ars-reviewer": {
-      "id": "ars-reviewer",
-      "name": "ARS Paper Reviewer",
-      "entry_point": "commands/ars-reviewer.md",
+    "/msra-reviewer": {
+      "id": "msra-reviewer",
+      "name": "MSRA Paper Reviewer",
+      "entry_point": "commands/msra-reviewer.md",
       "description": "Multi-perspective paper review (5 reviewers). Uses built-in academic-paper-reviewer skill.",
-      "usage": "/ars-reviewer",
-      "examples": ["/ars-reviewer"]
+      "usage": "/msra-reviewer",
+      "examples": ["/msra-reviewer"]
     }
   },
   "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research", "academic-writing", "paper-review"],

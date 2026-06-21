@@ -60,7 +60,7 @@ Step 3: 判断 Paper Track 分叉 (Stage 4 Checkpoint)
 | # | 规则 | 说明 |
 |---|------|------|
 | R1 | 有数据 → `/msra` | 任何涉及数据分析的需求走 MSRA Pipeline |
-| R2 | 无数据纯写作 → 直接用写作 skill | `/ars-full`, `/ars-plan`, `/ars-reviewer` 等 |
+| R2 | 无数据纯写作 → 直接用写作 skill | `/msra-full`, `/msra-write --mode plan`, `/msra-reviewer` 等 |
 | R3 | Paper Track 需 Stage 4 完成 | `passport.track == "full_paper"` + Stage 1-4 completed |
 | R4 | Pipeline 保持编排器定位 | 不做实质性工作，只调度 |
 | R5 | 写作 skill 保持独立可运行 | 既可被 Pipeline 调度，也可独立使用 |
@@ -71,9 +71,9 @@ Step 3: 判断 Paper Track 分叉 (Stage 4 Checkpoint)
 |------|--------|---------|
 | 数据分析 | 数据、清洗、统计、分析、RCT、队列 | `/msra` |
 | 报告生成 | 报告、表格、图表、CONSORT、STROBE | `/msra-report` |
-| 写论文 | 论文、manuscript、投稿、paper | Stage 5 或 `/ars-full` |
-| 文献检索 | 文献、检索、综述、literature | `/ars-lit-review` 或 `deep-research` |
-| 论文评审 | 审稿、评审、review | `/ars-reviewer` |
+| 写论文 | 论文、manuscript、投稿、paper | Stage 5 或 `/msra-full` |
+| 文献检索 | 文献、检索、综述、literature | `/msra-write --mode lit-review` 或 `deep-research` |
+| 论文评审 | 审稿、评审、review | `/msra-reviewer` |
 | 系统综述 | 系统综述、PRISMA、systematic | `deep-research` (systematic-review mode) |
 
 ---

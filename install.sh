@@ -151,7 +151,7 @@ KEY_FILES=(
     "shared/sap/sap_standard.md"
     ".claude/CLAUDE.md"
     "commands/msra.md"
-    "commands/ars-full.md"
+    "commands/msra-full.md"
     "manifest.json"
 )
 

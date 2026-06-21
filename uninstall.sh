@@ -51,9 +51,9 @@ MSRA_COMMANDS=(
     "msra-report.md"
     "msra-calibrate.md"
     "msra-paper.md"
-    "ars-paper.md"
-    "ars-full.md"
-    "ars-reviewer.md"
+    "msra-write.md"
+    "msra-full.md"
+    "msra-reviewer.md"
 )
 
 for cmd in "${MSRA_COMMANDS[@]}"; do
