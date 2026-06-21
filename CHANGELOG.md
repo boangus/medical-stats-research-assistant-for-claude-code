@@ -2,6 +2,56 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.9.0] - 2026-06-21
+
+Large-scale data processing: handle datasets >1M rows (GB-TB scale) without memory overflow.
+
+### Summary
+Adds three processing engines (Polars/DuckDB/Dask) with automatic engine selection based on data size.
+Solves the core pain point of pandas memory overflow for large medical datasets.
+
+### Added
+- **`shared/large_scale_processing/`** (7 files) — unified data processing module:
+  - `engine_selector.py`: `ProcessingEngine` enum + `EngineSelector` class for auto-selection
+  - `base_engine.py`: `BaseEngine` abstract class defining unified API
+  - `polars_engine.py`: Fast in-memory processing (<10GB), 31 tests
+  - `duckdb_engine.py`: SQL-friendly OLAP (10-100GB), 20 tests
+  - `dask_engine.py`: Distributed processing (>100GB), 15 tests
+  - `engine_factory.py`: `EngineFactory` for unified instantiation
+
+- **`tests/`** (6 new files):
+  - `test_engine_selector.py`: 27 tests
+  - `test_polars_engine.py`: 31 tests
+  - `test_duckdb_engine.py`: 20 tests
+  - `test_dask_engine.py`: 15 tests
+  - `test_engine_factory.py`: 21 tests
+  - `test_large_scale_integration.py`: 22 integration tests
+
+- **`scripts/benchmark_large_scale.py`**: Performance benchmark script (100K-10M rows)
+
+- **`docs/large-scale-processing-guide.md`**: Complete usage guide with examples and tips
+
+- **`requirements.txt`**: New dependencies (polars, duckdb, dask, pyarrow)
+
+### Engine Selection Logic
+| Data Size | Engine | Use Case |
+|-----------|--------|----------|
+| <1GB | pandas | Compatibility |
+| 1-10GB | Polars | Fast in-memory |
+| 10-100GB | DuckDB | SQL OLAP |
+| >100GB | Dask | Distributed |
+
+### Performance (100K rows)
+| Engine | CSV Read | GroupBy |
+|--------|----------|---------|
+| Polars | 0.01s | 0.009s |
+| DuckDB | 0.071s | 0.002s |
+| Dask | 0.146s | 0.146s |
+
+### Test Results
+- Total: 88 passed tests
+- Coverage: 95+ unit tests + 22 integration tests
+
 ## [0.8.0] - 2026-06-18
 
 MSRA × ARS integration — unified pipeline: raw data → statistical report → (optional) submittable paper.
