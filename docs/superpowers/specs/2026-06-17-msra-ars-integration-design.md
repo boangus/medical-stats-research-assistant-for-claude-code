@@ -308,7 +308,7 @@ commands/                         ← ARS 斜杠命令（ars-*）
 > MSRA Handoff Bundle 格式保留（见下方），但作为 pipeline 内部数据结构，
 > 不再通过独立 skill 生成。
 
-#### 组件 C：修改 `skills/resources/academic-paper/agents/intake_agent.md`（加 MSRA 分支）
+#### 组件 C：修改 `resources/academic-paper/agents/intake_agent.md`（加 MSRA 分支）
 
 在现有"Deep Research Handoff Detection"之后，新增并列的
 "MSRA Handoff Detection"分支。**只改这 1 个 agent 文件，不动 academic-paper 的其他部分**。

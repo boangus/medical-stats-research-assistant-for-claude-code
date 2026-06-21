@@ -165,7 +165,7 @@ if ($missingDirs.Count -gt 0 -or $missingFiles.Count -gt 0) {
     }
     Write-Host "  This is a self-contained plugin. If files are missing, reinstall from source." -ForegroundColor DarkYellow
 } else {
-    Write-Host "  All 13 skills and key files present. Project is self-contained." -ForegroundColor Green
+    Write-Host "  All 8 skills and key files present. Project is self-contained." -ForegroundColor Green
 }
 
 # 7. Verify all SKILL.md files exist
@@ -179,7 +179,7 @@ if ($missingSkillMd.Count -gt 0) {
     Write-Host "  WARNING: Missing SKILL.md files:" -ForegroundColor DarkYellow
     foreach ($m in $missingSkillMd) { Write-Host "    - $m" -ForegroundColor DarkYellow }
 } else {
-    Write-Host "  All 13 SKILL.md files present." -ForegroundColor Green
+    Write-Host "  All 8 SKILL.md files present." -ForegroundColor Green
 }
 
 # Dev mode: install dev dependencies

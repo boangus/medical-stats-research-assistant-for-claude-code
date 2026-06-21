@@ -59,6 +59,7 @@ shared/reproducibility/_test_output/
 
 # Skill优化评估
 .darwin-results/
+.claude/skills/darwin-skill/results.tsv
 
 # 运行时缓存
 .msra/

@@ -24,13 +24,8 @@ $msraSkills = @(
     "msra-analysis-exec",
     "msra-report",
     "msra-calibration",
-    "msra-academic-paper",
     "msra-academic-paper-reviewer",
-    "msra-academic-pipeline",
-    "msra-deep-research",
-    "msra-deepxiv-cli",
-    "msra-deepxiv-trending-digest",
-    "msra-deepxiv-baseline-table"
+    "msra-deep-research"
 )
 
 foreach ($skill in $msraSkills) {
@@ -54,16 +49,16 @@ $msraCommands = @(
     "ars-full.md",
     "ars-plan.md",
     "ars-outline.md",
+    "ars-abstract.md",
     "ars-revision.md",
-    "ars-export.md",
+    "ars-revision-coach.md",
+    "ars-format-convert.md",
     "ars-disclosure.md",
     "ars-reviewer.md",
     "ars-lit-review.md",
     "ars-citation-check.md",
-    "deepxiv-cli.md",
-    "deepxiv-trending.md",
-    "deepxiv-baseline.md",
-    "deepxiv-read.md"
+    "ars-mark-read.md",
+    "ars-unmark-read.md"
 )
 
 foreach ($cmd in $msraCommands) {

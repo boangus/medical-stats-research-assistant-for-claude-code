@@ -186,7 +186,7 @@ if [ ${#MISSING_DIRS[@]} -gt 0 ] || [ ${#MISSING_FILES[@]} -gt 0 ]; then
     fi
     echo -e "\033[1;33m  This is a self-contained plugin. If files are missing, reinstall from source.\033[0m"
 else
-    echo -e "\033[0;32m  All 13 skills and key files present. Project is self-contained.\033[0m"
+    echo -e "\033[0;32m  All 8 skills and key files present. Project is self-contained.\033[0m"
 fi
 
 # 7. Verify all SKILL.md files exist
@@ -204,7 +204,7 @@ if [ ${#MISSING_SKILL_MD[@]} -gt 0 ]; then
         echo -e "\033[1;33m    - $m\033[0m"
     done
 else
-    echo -e "\033[0;32m  All 13 SKILL.md files present.\033[0m"
+    echo -e "\033[0;32m  All 8 SKILL.md files present.\033[0m"
 fi
 
 # Dev mode: install dev dependencies

@@ -22,7 +22,7 @@ Consuming agents should validate input and request re-generation if schema viola
 ## Schema 1: RQ Brief (deep-research -> academic-paper)
 
 **Producer**: `deep-research/research_question_agent` | `deep-research/socratic_mentor_agent`
-**Consumer**: `deep-research/research_architect_agent` | `../resourc../resources/academic-paper/intake_agent`
+**Consumer**: `deep-research/research_architect_agent` | `../resources/academic-paper/intake_agent`
 
 ### Required Fields
 
@@ -80,7 +80,7 @@ Consuming agents should validate input and request re-generation if schema viola
 ## Schema 2: Bibliography (deep-research -> academic-paper)
 
 **Producer**: `deep-research/bibliography_agent`
-**Consumer**: `deep-research/synthesis_agent` | `deep-research/source_verification_agent` | `../resourc../resources/academic-paper/literature_strategist_agent`
+**Consumer**: `deep-research/synthesis_agent` | `deep-research/source_verification_agent` | `../resources/academic-paper/literature_strategist_agent`
 
 ### Required Fields
 
@@ -145,7 +145,7 @@ Consuming agents should validate input and request re-generation if schema viola
 ## Schema 3: Synthesis Report (deep-research -> academic-paper)
 
 **Producer**: `deep-research/synthesis_agent`
-**Consumer**: `deep-research/report_compiler_agent` | `../resourc../resources/academic-paper/argument_builder_agent`
+**Consumer**: `deep-research/report_compiler_agent` | `../resources/academic-paper/argument_builder_agent`
 
 ### Required Fields
 
@@ -204,8 +204,8 @@ AI-assisted assessment's primary advantage lies in the immediacy of feedback, re
 
 ## Schema 4: Paper Draft (academic-paper -> integrity/reviewer)
 
-**Producer**: `../resourc../resources/academic-paper/draft_writer_agent`
-**Consumer**: `../resourc../resources/academic-pipeline/integrity_verification_agent` | `academic-paper-reviewer/*`
+**Producer**: `../resources/academic-paper/draft_writer_agent`
+**Consumer**: `../resources/academic-pipeline/integrity_verification_agent` | `academic-paper-reviewer/*`
 
 ### Required Fields
 
@@ -255,8 +255,8 @@ AI-assisted assessment's primary advantage lies in the immediacy of feedback, re
 
 ## Schema 5: Integrity Report (integrity_verification_agent -> pipeline)
 
-**Producer**: `../resourc../resources/academic-pipeline/integrity_verification_agent`
-**Consumer**: `../resourc../resources/academic-pipeline/pipeline_orchestrator_agent` | `../resourc../resources/academic-paper/draft_writer_agent` (for revision)
+**Producer**: `../resources/academic-pipeline/integrity_verification_agent`
+**Consumer**: `../resources/academic-pipeline/pipeline_orchestrator_agent` | `../resources/academic-paper/draft_writer_agent` (for revision)
 
 ### Required Fields
 
@@ -363,7 +363,7 @@ score_trajectory: {
 ## Schema 6: Review Report (academic-paper-reviewer -> pipeline)
 
 **Producer**: `academic-paper-reviewer/editorial_synthesizer_agent`
-**Consumer**: `../resourc../resources/academic-pipeline/pipeline_orchestrator_agent` | `../resourc../resources/academic-paper/draft_writer_agent`
+**Consumer**: `../resources/academic-pipeline/pipeline_orchestrator_agent` | `../resources/academic-paper/draft_writer_agent`
 
 ### Required Fields
 
@@ -399,7 +399,7 @@ score_trajectory: {
 ## Schema 7: Revision Roadmap (reviewer -> academic-paper revision)
 
 **Producer**: `academic-paper-reviewer/editorial_synthesizer_agent`
-**Consumer**: `../resourc../resources/academic-paper/draft_writer_agent` | `../resourc../resources/academic-pipeline/pipeline_orchestrator_agent`
+**Consumer**: `../resources/academic-paper/draft_writer_agent` | `../resources/academic-pipeline/pipeline_orchestrator_agent`
 
 ### Required Fields
 
@@ -436,7 +436,7 @@ score_trajectory: {
 
 ## Schema 8: Response to Reviewers (academic-paper revision -> reviewer re-review)
 
-**Producer**: `../resourc../resources/academic-paper/draft_writer_agent` (revision mode)
+**Producer**: `../resources/academic-paper/draft_writer_agent` (revision mode)
 **Consumer**: `academic-paper-reviewer/editorial_synthesizer_agent` (re-review)
 
 ### Required Fields
@@ -510,8 +510,8 @@ score_trajectory: {
 | `upstream_dependencies` | list[string] | Version labels of artifacts this one depends on |
 | `repro_lock` | object \| null | configuration lockfile for artifact reproducibility. See [`artifact_reproducibility_pattern.md`](artifact_reproducibility_pattern.md). `null` = honest opt-out. Required from v3.3.5+ — omitted key fails lint. |
 | `compliance_history` | list[object] | Append-only audit trail of `compliance_report` entries (Schema 12). Added v3.4.0+. See [Schema 12](#schema-12--compliance-report-v340) and [`shared/compliance_report.schema.json`](compliance_report.schema.json). |
-| `reset_boundary` | list[object] | Append-only ledger. Two entry kinds: `boundary` (recorded at FULL checkpoints when `ARS_PASSPORT_RESET=1`) and `resume` (recorded when `resume_from_passport` consumes a boundary). Added v3.6.3+. Entry shape: [`shared/contracts/passport/reset_ledger_entry.schema.json`](contracts/passport/reset_ledger_entry.schema.json). See [`../resourc../resources/academic-pipeline/references/passport_as_reset_boundary.md`](../resources/academic-pipeline/references/passport_as_reset_boundary.md). |
-| `literature_corpus` | list[object] | Optional append-friendly literature corpus. Each entry conforms to [`shared/contracts/passport/literature_corpus_entry.schema.json`](contracts/passport/literature_corpus_entry.schema.json). Produced by user-written adapters (see [`../resourc../resources/academic-pipeline/references/adapters/overview.md`](../resources/academic-pipeline/references/adapters/overview.md)); ARS does not produce these entries itself. Added v3.6.4+. |
+| `reset_boundary` | list[object] | Append-only ledger. Two entry kinds: `boundary` (recorded at FULL checkpoints when `ARS_PASSPORT_RESET=1`) and `resume` (recorded when `resume_from_passport` consumes a boundary). Added v3.6.3+. Entry shape: [`shared/contracts/passport/reset_ledger_entry.schema.json`](contracts/passport/reset_ledger_entry.schema.json). See [`../resources/academic-pipeline/references/passport_as_reset_boundary.md`](../resources/academic-pipeline/references/passport_as_reset_boundary.md). |
+| `literature_corpus` | list[object] | Optional append-friendly literature corpus. Each entry conforms to [`shared/contracts/passport/literature_corpus_entry.schema.json`](contracts/passport/literature_corpus_entry.schema.json). Produced by user-written adapters (see [`../resources/academic-pipeline/references/adapters/overview.md`](../resources/academic-pipeline/references/adapters/overview.md)); ARS does not produce these entries itself. Added v3.6.4+. |
 | `audit_artifact` | list[object] | Optional append-only ledger of cross-model audit runs for v3.6.7 downstream-agent deliverables. Each entry conforms to [`shared/contracts/passport/audit_artifact_entry.schema.json`](contracts/passport/audit_artifact_entry.schema.json). Produced by the pipeline orchestrator after Layer 2 + Layer 3 verification of wrapper-emitted proposal entries; only `persisted` entries are stored here. Added v3.6.7+. |
 | `slr_lineage` | boolean | Run-level provenance flag set by `pipeline_orchestrator_agent` at the Stage 1 → Stage 2 handoff. `true` iff any stage in this run history was produced by `deep-research` in systematic-review mode. Consumed by `disclosure` mode renderer (`--policy-anchor=prisma-trAIce` track gate per `policy_anchor_disclosure_protocol.md` §3.1). Absence = `false` = cold-start path (renderer requires explicit `mode=` per §4.3 G2 invariant fallback rule). Added v3.7.4+. See [Run-level lineage signal (v3.7.4)](#run-level-lineage-signal-v374) below. |
 
@@ -578,7 +578,7 @@ reset_boundary:
 
 Consumers match `resume_from_passport=<hash>` against `boundary` entries. A `boundary` is **awaiting resume** iff no later `resume` entry carries `consumes_hash == <boundary hash>`. Hash mismatch on resume is a hard error.
 
-See [`../resourc../resources/academic-pipeline/references/passport_as_reset_boundary.md`](../resources/academic-pipeline/references/passport_as_reset_boundary.md) for the full protocol.
+See [`../resources/academic-pipeline/references/passport_as_reset_boundary.md`](../resources/academic-pipeline/references/passport_as_reset_boundary.md) for the full protocol.
 
 ### Literature Corpus Input Port (v3.6.4)
 
@@ -586,9 +586,9 @@ The optional `literature_corpus[]` field is Schema 9's input port for user-owned
 
 ARS does not produce these entries. User-written adapters read their own corpus source (Zotero, Obsidian, folder, Notion, etc.) and emit a passport with `literature_corpus[]` populated. Three reference adapters ship with v3.6.4 under [`scripts/adapters/`](../scripts/adapters/).
 
-Consumer integration ships in v3.6.5: `bibliography_agent` (deep-research, Phase 1) and `literature_strategist_agent` (academic-paper, Phase 1) read `literature_corpus[]` via the corpus-first, search-fills-gap flow. See [`../resourc../resources/academic-pipeline/references/literature_corpus_consumers.md`](../resources/academic-pipeline/references/literature_corpus_consumers.md) for the full consumer protocol, the four Iron Rules, and per-consumer reading instructions.
+Consumer integration ships in v3.6.5: `bibliography_agent` (deep-research, Phase 1) and `literature_strategist_agent` (academic-paper, Phase 1) read `literature_corpus[]` via the corpus-first, search-fills-gap flow. See [`../resources/academic-pipeline/references/literature_corpus_consumers.md`](../resources/academic-pipeline/references/literature_corpus_consumers.md) for the full consumer protocol, the four Iron Rules, and per-consumer reading instructions.
 
-See [`../resourc../resources/academic-pipeline/references/adapters/overview.md`](../resources/academic-pipeline/references/adapters/overview.md) for the adapter contract.
+See [`../resources/academic-pipeline/references/adapters/overview.md`](../resources/academic-pipeline/references/adapters/overview.md) for the adapter contract.
 
 ### Audit Artifact Ledger (v3.6.7)
 
@@ -632,7 +632,7 @@ audit_artifact:
 
 **This mirrors the v3.6.3 `reset_boundary[]` append-only pattern**: history preserved, freshness computed by ledger scan. Deletion or reordering is forbidden; lint at `scripts/check_audit_artifact_consistency.py` enforces the invariant family at [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](../docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §3.7.
 
-For the orchestrator-side gate procedure (Path A latest-by-`verified_at` selection, Path B proposal merge after Layer 2 + Layer 3 verification), the canonical contract is [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](../docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §5.6 (Path A/B fall-through with the §5.6 A1.5 superseding-proposal preflight) plus §5.2 (eleven Layer 2 + Layer 3 gating checks). Implementation lands as a subsection of `../resourc../resources/academic-pipeline/agents/pipeline_orchestrator_agent.md` (Phase 6.6 deliverable). For the resume-time re-verification semantics, see [`../resourc../resources/academic-pipeline/references/passport_as_reset_boundary.md`](../resources/academic-pipeline/references/passport_as_reset_boundary.md).
+For the orchestrator-side gate procedure (Path A latest-by-`verified_at` selection, Path B proposal merge after Layer 2 + Layer 3 verification), the canonical contract is [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](../docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §5.6 (Path A/B fall-through with the §5.6 A1.5 superseding-proposal preflight) plus §5.2 (eleven Layer 2 + Layer 3 gating checks). Implementation lands as a subsection of `../resources/academic-pipeline/agents/pipeline_orchestrator_agent.md` (Phase 6.6 deliverable). For the resume-time re-verification semantics, see [`../resources/academic-pipeline/references/passport_as_reset_boundary.md`](../resources/academic-pipeline/references/passport_as_reset_boundary.md).
 
 ### Run-level lineage signal (v3.7.4)
 
@@ -646,7 +646,7 @@ slr_lineage: true   # any pipeline stage was deep-research in systematic-review 
 
 - `true` iff `bool(incoming_passport.slr_lineage) or any(stage.skill == "deep-research" and stage.mode in {"systematic-review", "slr"} for stage in state_tracker.stages.values())` at the time the passport is written. The OR is monotonic — a true value persists across resume / mid-entry passports whose `state_tracker.stages` was reconstructed from the ledger and may be empty. Run-level, not artifact-level — distinct from `origin_mode` which records the directly-producing skill's mode.
 - Producer: `pipeline_orchestrator_agent` writes the field at every handoff transition; in practice only the Stage 1 → Stage 2 transition can flip `false` → `true`, and the OR keeps the value monotonic thereafter. Reference helper: `scripts/slr_lineage.py` `emit(stages, incoming_slr_lineage)` (or the underlying `resolve_from_stages(stages)` when callers need the pre-OR fragment alone).
-- Consumer: `disclosure` mode renderer reads it as `RendererInput.slr_lineage` to dispatch `--policy-anchor=prisma-trAIce` per the §4.3 G2 invariant track gate documented in [`../resourc../resources/academic-paper/references/policy_anchor_disclosure_protocol.md`](../resources/academic-paper/references/policy_anchor_disclosure_protocol.md) §3.1.
+- Consumer: `disclosure` mode renderer reads it as `RendererInput.slr_lineage` to dispatch `--policy-anchor=prisma-trAIce` per the §4.3 G2 invariant track gate documented in [`../resources/academic-paper/references/policy_anchor_disclosure_protocol.md`](../resources/academic-paper/references/policy_anchor_disclosure_protocol.md) §3.1.
 - Backward compat: passports written before v3.7.4 lack the field; renderer treats absence as `false` (cold-start path requiring explicit `mode_param='systematic-review'`). Identical to pre-v3.7.4 behavior.
 - G1 boundary: this is a passport-level (run-level provenance) field, distinct from corpus-entry-level fields. The §4.4 #11 G1 invariant scope is `literature_corpus_entry.schema.json` (corpus entry data schema, frozen by Decision Doc §2.1); passport-schema extensions follow the v3.6.3 / v3.6.4 / v3.6.7 precedent and are permitted per Decision Doc §4.4 #11.
 
@@ -671,7 +671,7 @@ v3.8 introduces six passport aggregates around the L3 (claim-faithfulness) audit
 
 - `audit_sampling_summaries[]` — one entry per audit pass when `len(citations) > max_claims_per_paper` triggers stratified sampling. S-INV-1..S-INV-4 invariants (audited_count == |audited_indices|, count ≤ cap, count ≤ total, indices strictly ascending without duplicates). Schema is inline in `scripts/check_claim_audit_consistency.py` (no separate shipped schema file at v3.8.0); drives the paper-level `[CLAIM-AUDIT-SAMPLED — k/N audited]` formatter annotation. Adapters preserving audit runs MUST keep these entries for the transparency record.
 
-Cross-field invariants (INV-1..INV-18 / M-INV-1..M-INV-4 / U-INV-1..U-INV-4 / D-INV-1..D-INV-4 / CV-INV-1..CV-INV-4 / S-INV-1..S-INV-4) are lint-enforced by `scripts/check_claim_audit_consistency.py` because the conditional matrix relating judgment / audit_status / defect_stage / ref_retrieval_method exceeds what JSON Schema can express. Audit-side producer: `claim_ref_alignment_audit_agent` (`../resourc../resources/academic-pipeline/agents/`). Consumer: `formatter_agent` REFUSE rules 6-10 (see v3.8 spec §5 mode flag rationale). Default OFF for v3.8.0 — ramp-on plan deferred to post-calibration evidence.
+Cross-field invariants (INV-1..INV-18 / M-INV-1..M-INV-4 / U-INV-1..U-INV-4 / D-INV-1..D-INV-4 / CV-INV-1..CV-INV-4 / S-INV-1..S-INV-4) are lint-enforced by `scripts/check_claim_audit_consistency.py` because the conditional matrix relating judgment / audit_status / defect_stage / ref_retrieval_method exceeds what JSON Schema can express. Audit-side producer: `claim_ref_alignment_audit_agent` (`../resources/academic-pipeline/agents/`). Consumer: `formatter_agent` REFUSE rules 6-10 (see v3.8 spec §5 mode flag rationale). Default OFF for v3.8.0 — ramp-on plan deferred to post-calibration evidence.
 
 Spec: [`docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md`](../docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md) + decision doc [`2026-05-15-issue-103-claim-alignment-audit-decision.md`](../docs/design/2026-05-15-issue-103-claim-alignment-audit-decision.md) (D1-D6 settled).
 
@@ -679,8 +679,8 @@ Spec: [`docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md`](../docs
 
 ## Schema 10: Style Profile (intake -> draft_writer / report_compiler)
 
-**Producer**: `../resourc../resources/academic-paper/agents/intake_agent` (Step 10)
-**Consumer**: `../resourc../resources/academic-paper/agents/draft_writer_agent`, `deep-research/agents/report_compiler_agent`
+**Producer**: `../resources/academic-paper/agents/intake_agent` (Step 10)
+**Consumer**: `../resources/academic-paper/agents/draft_writer_agent`, `deep-research/agents/report_compiler_agent`
 **Carried by**: `academic-pipeline` Material Passport (optional field)
 
 ### Required Fields

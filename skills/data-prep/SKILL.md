@@ -688,6 +688,43 @@ EDA 数据质量报告
 
 ---
 
+### Phase 4.5: 数据挖掘特征检测 (Data Mining Feature Detection)
+
+> **目的**：在 EDA 阶段自动检测数据特征，为后续分析思路推荐提供依据。
+> **触发条件**：Phase 4 EDA 完成后自动执行
+> **输出**：数据特征报告，传递给 analysis-plan Phase 1.5
+
+检测以下 8 类数据特征：
+
+| # | 特征 | 检测方法 | 阈值 | 输出 |
+|---|------|---------|------|------|
+| 1 | 高维数据 | 变量数/样本量比 | >1/10 | `high_dimensional: true/false` |
+| 2 | 非线性关系 | 残差图/GAM拟合 | 非线性p<0.05 | `nonlinear: [变量对列表]` |
+| 3 | 复杂交互 | 领域知识+统计检验 | 交互p<0.1 | `interactions: [变量组合]` |
+| 4 | 聚类结构 | 设计信息 | 多中心/重复测量 | `clustered: [聚类变量]` |
+| 5 | 时间依赖 | 变量类型检测 | 有时间变量 | `longitudinal: [时间变量]` |
+| 6 | 缺失模式 | Little's MCAR+模式分析 | 缺失率>20%或MNAR | `missing_pattern: {type, rate}` |
+| 7 | 零膨胀/过度离散 | 均值-方差关系 | 方差>2*均值 | `overdispersion: true/false` |
+| 8 | 竞争风险 | 结局类型检测 | 多种互斥结局 | `competing_risks: [结局列表]` |
+
+输出格式（传递给 analysis-plan）：
+```json
+{
+  "data_mining_features": {
+    "high_dimensional": false,
+    "nonlinear": [["age", "outcome"]],
+    "interactions": [["treatment", "age"]],
+    "clustered": ["center_id"],
+    "longitudinal": ["visit_time"],
+    "missing_pattern": {"type": "MAR", "rate": 0.15},
+    "overdispersion": false,
+    "competing_risks": ["death", "progression"]
+  }
+}
+```
+
+---
+
 #### 盲态审核
 
 > 依据：《药物临床试验数据管理与统计分析计划指导原则》数据审核章节
