@@ -1,5 +1,5 @@
 ---
-version: "0.8.1"
+version: "0.9.0"
 name: MSRA Pipeline
 description: |
   医学统计分析 + 学术写作统一流水线编排器。从任意阶段切入，自动识别当前位置，

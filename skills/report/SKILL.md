@@ -1,5 +1,5 @@
 ---
-version: "0.8.0"
+version: "0.9.0"
 name: MSRA Report & Paper Generation
 description: |
   双模式文档生成：[模式A] 统计报告（CONSORT/STROBE/PRISMA等出版级表格、图表、方法学描述）；

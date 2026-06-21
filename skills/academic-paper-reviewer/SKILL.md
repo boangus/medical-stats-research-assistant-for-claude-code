@@ -456,7 +456,7 @@ Follows the paper's language. Academic terms remain in English. User can overrid
 | Skill Version | 1.10.0 |
 | Last Updated | 2026-06-01 |
 | Maintainer | Cheng-I Wu |
-| Dependent Skills | report v0.8.0+ 论文写作模式 (upstream/downstream integration) |
+| Dependent Skills | report v0.9.0+ 论文写作模式 (upstream/downstream integration) |
 | Role | Multi-perspective academic paper review simulator |
 
 ---

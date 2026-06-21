@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "medical-stats-research-assistant",
   "displayName": "MSRA — Medical Statistics Research Assistant",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Unified medical statistics + academic writing pipeline: raw data → statistical report → (optional) submittable paper. 8 skills, 10 commands.",
   "author": {
     "name": "boangus",

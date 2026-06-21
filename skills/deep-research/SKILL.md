@@ -596,7 +596,7 @@ deep-research (systematic-review) + report(论文模式) -> PRISMA systematic re
 | Skill Version | 2.10.0 |
 | Last Updated | 2026-06-15 |
 | Maintainer | Cheng-I Wu |
-| Dependent Skills | report v0.8.0+ 论文写作模式 (downstream) |
+| Dependent Skills | report v0.9.0+ 论文写作模式 (downstream) |
 
 ---
 

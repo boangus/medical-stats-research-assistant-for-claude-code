@@ -224,7 +224,7 @@ passport 新增 `track` 字段，记录用户在 Stage 4 checkpoint 的选择：
 {
   "passport_id": "msra-20260618-001",
   "passport_schema_version": "1",
-  "pipeline_version": "0.8.0",
+  "pipeline_version": "0.9.0",
   "created_at": "2026-06-18T10:00:00+00:00",
   "updated_at": "2026-06-18T15:30:00+00:00",
   "status": "in_progress",

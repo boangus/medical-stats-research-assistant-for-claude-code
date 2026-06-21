@@ -62,7 +62,7 @@ if (-not $SkipR) {
 }
 
 # 3. Create output directories
-Write-Host "`n[3/7] Creating output directories..." -ForegroundColor Yellow
+Write-Host "`n[3/9] Creating output directories..." -ForegroundColor Yellow
 $dirs = @(
     "MSRA\data",
     "MSRA\reports\figures",
@@ -80,14 +80,67 @@ foreach ($dir in $dirs) {
     }
 }
 
-# 4. Initialize passport.json
-Write-Host "`n[4/7] Initializing passport..." -ForegroundColor Yellow
+# 4. Create .claude/commands/ and .claude/skills/ symlinks for Claude Code discovery
+Write-Host "`n[4/9] Setting up Claude Code discovery paths..." -ForegroundColor Yellow
+
+$claudeDir = Join-Path $ProjectRoot ".claude"
+$commandsLink = Join-Path $claudeDir "commands"
+$skillsLink = Join-Path $claudeDir "skills"
+$commandsSource = Join-Path $ProjectRoot "commands"
+$skillsSource = Join-Path $ProjectRoot "skills"
+
+# Ensure .claude directory exists
+if (-not (Test-Path $claudeDir)) {
+    New-Item -ItemType Directory -Path $claudeDir -Force | Out-Null
+}
+
+# Create commands junction/symlink
+if (-not (Test-Path $commandsLink)) {
+    try {
+        New-Item -ItemType Junction -Path $commandsLink -Target $commandsSource | Out-Null
+        Write-Host "  Created junction: .claude/commands/ -> commands/" -ForegroundColor Green
+    } catch {
+        # Fallback: copy files if junction fails (e.g. non-admin)
+        New-Item -ItemType Directory -Path $commandsLink -Force | Out-Null
+        Copy-Item "$commandsSource\*.md" $commandsLink -Force
+        Write-Host "  Copied commands to .claude/commands/ (junction failed)" -ForegroundColor DarkYellow
+    }
+} else {
+    Write-Host "  Exists:  .claude/commands/" -ForegroundColor DarkGray
+}
+
+# Create skills directory and symlink each skill subdirectory
+if (-not (Test-Path $skillsLink)) {
+    New-Item -ItemType Directory -Path $skillsLink -Force | Out-Null
+}
+$skillDirs = @(
+    "pipeline", "data-prep", "analysis-plan", "analysis-exec",
+    "report", "calibration", "deep-research", "academic-paper-reviewer"
+)
+foreach ($skill in $skillDirs) {
+    $skillLinkPath = Join-Path $skillsLink $skill
+    $skillSourcePath = Join-Path $skillsSource $skill
+    if (-not (Test-Path $skillLinkPath) -and (Test-Path $skillSourcePath)) {
+        try {
+            New-Item -ItemType Junction -Path $skillLinkPath -Target $skillSourcePath | Out-Null
+            Write-Host "  Created junction: .claude/skills/$skill -> skills/$skill" -ForegroundColor Green
+        } catch {
+            # Fallback: copy if junction fails
+            Copy-Item $skillSourcePath $skillLinkPath -Recurse -Force
+            Write-Host "  Copied skill: .claude/skills/$skill (junction failed)" -ForegroundColor DarkYellow
+        }
+    }
+}
+Write-Host "  Claude Code discovery paths configured." -ForegroundColor Green
+
+# 5. Initialize passport.json
+Write-Host "`n[5/9] Initializing passport..." -ForegroundColor Yellow
 $passportPath = Join-Path $ProjectRoot "MSRA\passport\passport.json"
 if (-not (Test-Path $passportPath)) {
     $passport = @{
         passport_id = "msra-$(Get-Date -Format 'yyyyMMdd')-001"
         passport_schema_version = "1"
-        pipeline_version = "0.8.1"
+        pipeline_version = "0.9.0"
         created_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         status = "in_progress"
@@ -108,8 +161,8 @@ if (-not (Test-Path $passportPath)) {
     Write-Host "  Exists:  passport.json" -ForegroundColor DarkGray
 }
 
-# 5. Initialize calibration_db.json
-Write-Host "`n[5/7] Initializing calibration database..." -ForegroundColor Yellow
+# 6. Initialize calibration_db.json
+Write-Host "`n[6/9] Initializing calibration database..." -ForegroundColor Yellow
 $calibPath = Join-Path $ProjectRoot "MSRA\calibration\calibration_db.json"
 if (-not (Test-Path $calibPath)) {
     $calibDb = @()  # CalibrationDatabase expects a JSON array of entries
@@ -120,8 +173,8 @@ if (-not (Test-Path $calibPath)) {
     Write-Host "  Exists:  calibration_db.json" -ForegroundColor DarkGray
 }
 
-# 6. Verify all skill directories and key files present
-Write-Host "`n[6/7] Verifying project integrity..." -ForegroundColor Yellow
+# 7. Verify all skill directories and key files present
+Write-Host "`n[7/9] Verifying project integrity..." -ForegroundColor Yellow
 $skillDirs = @(
     "skills\pipeline",
     "skills\data-prep",
@@ -168,8 +221,8 @@ if ($missingDirs.Count -gt 0 -or $missingFiles.Count -gt 0) {
     Write-Host "  All 8 skills and key files present. Project is self-contained." -ForegroundColor Green
 }
 
-# 7. Verify all SKILL.md files exist
-Write-Host "`n[7/7] Verifying SKILL.md files..." -ForegroundColor Yellow
+# 8. Verify all SKILL.md files exist
+Write-Host "`n[8/9] Verifying SKILL.md files..." -ForegroundColor Yellow
 $missingSkillMd = @()
 foreach ($d in $skillDirs) {
     $skillMdPath = Join-Path $ProjectRoot "$d\SKILL.md"
@@ -182,14 +235,16 @@ if ($missingSkillMd.Count -gt 0) {
     Write-Host "  All 8 SKILL.md files present." -ForegroundColor Green
 }
 
-# Dev mode: install dev dependencies
+# 9. Dev mode: install dev dependencies
 if ($Dev) {
-    Write-Host "`n[DEV] Installing development dependencies..." -ForegroundColor Magenta
+    Write-Host "`n[9/9] [DEV] Installing development dependencies..." -ForegroundColor Magenta
     $devReqFile = Join-Path $ProjectRoot "requirements-dev.txt"
     if (Test-Path $devReqFile) {
         pip install -r $devReqFile --quiet
         Write-Host "  Dev dependencies installed." -ForegroundColor Green
     }
+} else {
+    Write-Host "`n[9/9] Skipping dev dependencies." -ForegroundColor DarkGray
 }
 
 Write-Host "`n=== MSRA Installation Complete ===" -ForegroundColor Cyan

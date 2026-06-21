@@ -24,7 +24,7 @@ echo ""
 
 # 1. Check Python
 if [ "$SKIP_PYTHON" = false ]; then
-    echo -e "\033[1;33m[1/7] Checking Python...\033[0m"
+    echo -e "\033[1;33m[1/9] Checking Python...\033[0m"
     if command -v python3 &> /dev/null; then
         PY_VERSION=$(python3 --version)
         echo -e "\033[0;32m  Found: $PY_VERSION\033[0m"
@@ -47,12 +47,12 @@ if [ "$SKIP_PYTHON" = false ]; then
         echo -e "\033[0;90m  No requirements.txt found, skipping pip install.\033[0m"
     fi
 else
-    echo -e "\033[0;90m[1/7] Skipping Python check (--skip-python)\033[0m"
+    echo -e "\033[0;90m[1/9] Skipping Python check (--skip-python)\033[0m"
 fi
 
 # 2. Check R
 if [ "$SKIP_R" = false ]; then
-    echo -e "\n\033[1;33m[2/7] Checking R...\033[0m"
+    echo -e "\n\033[1;33m[2/9] Checking R...\033[0m"
     if command -v Rscript &> /dev/null; then
         R_VERSION=$(Rscript --version | head -n 1)
         echo -e "\033[0;32m  Found: $R_VERSION\033[0m"
@@ -73,11 +73,11 @@ if [ "$SKIP_R" = false ]; then
         echo -e "\033[1;33m  Install R 4.0+ from https://cran.r-project.org/\033[0m"
     fi
 else
-    echo -e "\n\033[0;90m[2/7] Skipping R check (--skip-r)\033[0m"
+    echo -e "\n\033[0;90m[2/9] Skipping R check (--skip-r)\033[0m"
 fi
 
 # 3. Create output directories
-echo -e "\n\033[1;33m[3/7] Creating output directories...\033[0m"
+echo -e "\n\033[1;33m[3/9] Creating output directories...\033[0m"
 DIRS=(
     "MSRA/data"
     "MSRA/reports/figures"
@@ -95,14 +95,50 @@ for dir in "${DIRS[@]}"; do
     fi
 done
 
-# 4. Initialize passport.json
-echo -e "\n\033[1;33m[4/7] Initializing passport...\033[0m"
+# 4. Create .claude/commands/ and .claude/skills/ symlinks for Claude Code discovery
+echo -e "\n\033[1;33m[4/9] Setting up Claude Code discovery paths...\033[0m"
+
+CLAUDE_DIR="$PROJECT_ROOT/.claude"
+COMMANDS_LINK="$CLAUDE_DIR/commands"
+SKILLS_LINK="$CLAUDE_DIR/skills"
+COMMANDS_SOURCE="$PROJECT_ROOT/commands"
+SKILLS_SOURCE="$PROJECT_ROOT/skills"
+
+# Ensure .claude directory exists
+mkdir -p "$CLAUDE_DIR"
+
+# Create commands symlink
+if [ ! -e "$COMMANDS_LINK" ]; then
+    ln -s "$COMMANDS_SOURCE" "$COMMANDS_LINK"
+    echo -e "\033[0;32m  Created symlink: .claude/commands/ -> commands/\033[0m"
+else
+    echo -e "\033[0;90m  Exists:  .claude/commands/\033[0m"
+fi
+
+# Create skills directory and symlink each skill subdirectory
+mkdir -p "$SKILLS_LINK"
+SKILL_NAMES=(
+    "pipeline" "data-prep" "analysis-plan" "analysis-exec"
+    "report" "calibration" "deep-research" "academic-paper-reviewer"
+)
+for skill in "${SKILL_NAMES[@]}"; do
+    SKILL_LINK_PATH="$SKILLS_LINK/$skill"
+    SKILL_SOURCE_PATH="$SKILLS_SOURCE/$skill"
+    if [ ! -e "$SKILL_LINK_PATH" ] && [ -d "$SKILL_SOURCE_PATH" ]; then
+        ln -s "$SKILL_SOURCE_PATH" "$SKILL_LINK_PATH"
+        echo -e "\033[0;32m  Created symlink: .claude/skills/$skill -> skills/$skill\033[0m"
+    fi
+done
+echo -e "\033[0;32m  Claude Code discovery paths configured.\033[0m"
+
+# 5. Initialize passport.json
+echo -e "\n\033[1;33m[5/9] Initializing passport...\033[0m"
 PASSPORT_PATH="$PROJECT_ROOT/MSRA/passport/passport.json"
 if [ ! -f "$PASSPORT_PATH" ]; then
     PASSPORT="{
         \"passport_id\": \"msra-$(date +%Y%m%d)-001\",
         \"passport_schema_version\": \"1\",
-        \"pipeline_version\": \"0.8.0\",
+        \"pipeline_version\": \"0.9.0\",
         \"created_at\": \"$(date +%Y-%m-%dT%H:%M:%S)\",
         \"updated_at\": \"$(date +%Y-%m-%dT%H:%M:%S)\",
         \"status\": \"in_progress\",
@@ -123,8 +159,8 @@ else
     echo -e "\033[0;90m  Exists:  passport.json\033[0m"
 fi
 
-# 5. Initialize calibration_db.json
-echo -e "\n\033[1;33m[5/7] Initializing calibration database...\033[0m"
+# 6. Initialize calibration_db.json
+echo -e "\n\033[1;33m[6/9] Initializing calibration database...\033[0m"
 CALIB_PATH="$PROJECT_ROOT/MSRA/calibration/calibration_db.json"
 if [ ! -f "$CALIB_PATH" ]; then
     echo "[]" > "$CALIB_PATH"
@@ -133,8 +169,8 @@ else
     echo -e "\033[0;90m  Exists:  calibration_db.json\033[0m"
 fi
 
-# 6. Verify all skill directories and key files present
-echo -e "\n\033[1;33m[6/7] Verifying project integrity...\033[0m"
+# 7. Verify all skill directories and key files present
+echo -e "\n\033[1;33m[7/9] Verifying project integrity...\033[0m"
 SKILL_DIRS=(
     "skills/pipeline"
     "skills/data-prep"
@@ -189,8 +225,8 @@ else
     echo -e "\033[0;32m  All 8 skills and key files present. Project is self-contained.\033[0m"
 fi
 
-# 7. Verify all SKILL.md files exist
-echo -e "\n\033[1;33m[7/7] Verifying SKILL.md files...\033[0m"
+# 8. Verify all SKILL.md files exist
+echo -e "\n\033[1;33m[8/9] Verifying SKILL.md files...\033[0m"
 MISSING_SKILL_MD=()
 for d in "${SKILL_DIRS[@]}"; do
     SKILL_MD_PATH="$PROJECT_ROOT/$d/SKILL.md"
@@ -207,9 +243,9 @@ else
     echo -e "\033[0;32m  All 8 SKILL.md files present.\033[0m"
 fi
 
-# Dev mode: install dev dependencies
+# 9. Dev mode: install dev dependencies
 if [ "$DEV" = true ]; then
-    echo -e "\n\033[1;35m[DEV] Installing development dependencies...\033[0m"
+    echo -e "\n\033[1;35m[9/9] [DEV] Installing development dependencies...\033[0m"
     DEV_REQ_FILE="$PROJECT_ROOT/requirements-dev.txt"
     if [ -f "$DEV_REQ_FILE" ]; then
         "$PY_CMD" -m pip install -r "$DEV_REQ_FILE" --quiet
