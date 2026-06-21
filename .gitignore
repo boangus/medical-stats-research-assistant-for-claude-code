@@ -83,3 +83,8 @@ darwin-optimization-report.html
 
 # 上传临时目录
 .uploads/
+
+# 大型数据处理（测试数据和基准输出）
+shared/large-scale-processing/test_data/
+scripts/benchmark_output/
+*.parquet  # 大型二进制文件不进版本控制

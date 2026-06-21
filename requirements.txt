@@ -57,6 +57,12 @@ cvxpy>=1.4                # 凸优化 (权重求解)
 # ── 适应性设计 (shared/templates/adaptive_interim_analysis_template.py) ──
 # 无额外依赖（scipy + numpy + matplotlib 已在 Core 中）
 
+# ── 大规模数据处理 (shared/large_scale_processing/) ─────────────────
+polars>=1.21.0            # 快速内存处理 (<10GB)
+duckdb>=1.1.0             # SQL 友好 OLAP (10-100GB)
+dask[dataframe]>=2024.5.0 # 分布式处理 (>100GB)
+pyarrow>=15.0.0           # 高效数据交换
+
 # ============================================================
 # R 依赖 (通过 install.packages 安装，不在此文件管理)
 # ============================================================

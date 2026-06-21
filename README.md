@@ -361,6 +361,38 @@ chmod +x uninstall.sh
 
 ---
 
+## 核心功能
+
+### 大规模数据处理引擎
+
+内置统一的大规模数据处理引擎，支持自动引擎选择：
+
+| 数据规模 | 引擎 | 适用场景 |
+|---------|------|---------|
+| <1GB | pandas | 小数据集，兼容性处理 |
+| 1-10GB | Polars | 中型数据，高性能内存处理 |
+| 10-100GB | DuckDB | 大型数据，SQL风格OLAP |
+| >100GB | Dask | 超大型数据，分布式处理 |
+
+**使用示例**:
+```python
+from shared.large_scale_processing import EngineFactory, EngineSelector
+
+# 自动选择引擎
+engine = EngineFactory.create_for_size(file_size_bytes=5 * 1024**3)
+
+# 或手动指定
+engine = EngineFactory.create_engine("polars")
+
+# 统一API操作
+df = engine.read_csv("data.csv")
+result = engine.groupby_aggregate(df, ["group"], {"value": "mean"})
+```
+
+详细使用指南请参考: [`docs/large-scale-processing-guide.md`](docs/large-scale-processing-guide.md)
+
+---
+
 ## 支持的统计方法
 
 - **组间比较**: t检验、ANOVA、卡方、Mann-Whitney U、Kruskal-Wallis、Fisher精确检验、McNemar检验
