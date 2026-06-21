@@ -233,7 +233,7 @@ class PolarsEngine(BaseEngine):
             "inner": "inner",
             "left": "left",
             "right": "right",
-            "outer": "outer",
+            "outer": "full",
         }
         join_how = how_map.get(how, "inner")
         return left.join(right, on=on, how=join_how)
