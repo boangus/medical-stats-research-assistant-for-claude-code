@@ -9,5 +9,6 @@ Provides scalable data processing engines for datasets >1M rows:
 
 from .engine_selector import EngineSelector, ProcessingEngine
 from .base_engine import BaseEngine
+from .engine_factory import EngineFactory
 
-__all__ = ["EngineSelector", "ProcessingEngine", "BaseEngine"]
+__all__ = ["EngineSelector", "ProcessingEngine", "BaseEngine", "EngineFactory"]
