@@ -6,7 +6,7 @@
 
 一个以 **Pipeline 驱动** 的医学统计分析 + 学术写作工具集。从原始数据到最终报告，再到可投稿论文，6 个统计阶段 + 6 个写作阶段，覆盖完整的医学研究流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
 
-**8 个内置 Skill，20 个命令，开箱即用，无需额外安装**。
+**8 个内置 Skill，10 个命令，开箱即用，无需额外安装**。
 
 ---
 
@@ -128,47 +128,27 @@
 
 ---
 
-## 命令一览
+## 命令一览（10个）
 
-### 📊 统计分析命令（7个）
+### 📊 统计分析（7个）
 
 | 命令 | 功能 | 对应阶段 |
 |------|------|---------|
 | `/msra` | 启动统一流水线（自动检测入口） | 全流程 |
-| `/msra-paper` | 进入论文写作轨道（Stage 5.0） | Stage 5.0 |
 | `/msra-data` | 数据验证与清洗 | Stage 1 |
 | `/msra-plan` | 方法探讨、SAP制定与审查 | Stage 2 |
 | `/msra-exec` | 按SAP执行分析 + 质量检查 | Stage 3 |
 | `/msra-report` | 生成出版级统计报告 | Stage 4 |
 | `/msra-calibrate` | 指标校准（金标准对比） | 校准 |
+| `/msra-paper` | 进入论文写作轨道（Stage 5.0） | Stage 5.0 |
 
-### 📝 论文写作命令（9个）
-
-| 命令 | 功能 | 对应阶段 |
-|------|------|---------|
-| `/ars-full` | 完整学术写作流水线：研究→写作→评审→修订→定稿 | Stage 5.1-5.9 |
-| `/ars-plan` | 苏格拉底式章节规划 | Stage 5.2 |
-| `/ars-outline` | 论文大纲生成 | Stage 5.2 |
-| `/ars-abstract` | 结构化摘要生成 | Stage 5.2 |
-| `/ars-revision` | 论文修订 + 审稿回应 | Stage 5.7 |
-| `/ars-revision-coach` | 引导式修订辅导 + 承诺追踪 | Stage 5.7 |
-| `/ars-format-convert` | 导出论文：MD → DOCX → PDF | Stage 5.9 |
-| `/ars-disclosure` | AI使用披露声明生成 | Stage 5.8 |
-
-### 📚 文献检索命令（4个）
+### ✍️ 学术写作（3个）
 
 | 命令 | 功能 | 说明 |
 |------|------|------|
-| `/ars-lit-review` | 系统性文献检索与综述 | 内置 deep-research skill |
-| `/ars-citation-check` | 引用准确性验证 | 检查参考文献完整性 |
-| `/ars-mark-read` | 标记论文为已读 | 文献库管理 |
-| `/ars-unmark-read` | 取消标记已读 | 文献库管理 |
-
-### 🔍 论文评审命令（1个）
-
-| 命令 | 功能 | 说明 |
-|------|------|------|
-| `/ars-reviewer` | 多视角论文评审 | 5人评审团：EIC+方法学+领域+写作+DA |
+| `/ars-paper --mode <mode>` | 论文写作（9种模式：plan/abstract/revision/...） | `report/SKILL.md` |
+| `/ars-full` | 完整写作流水线：研究→写作→评审→修订→定稿 | `pipeline/SKILL.md` |
+| `/ars-reviewer` | 多视角论文评审（5人评审团） | `academic-paper-reviewer` |
 
 ---
 
@@ -210,7 +190,7 @@ medical-stats-research-assistant/
 │   ├── commands/                 # 命令入口（install创建junction）
 │   └── skills/                   # Skill入口（install创建junction）
 │
-├── commands/                     # 命令定义（20个）
+├── commands/                     # 命令定义（10个）
 │   ├── msra.md                   # MSRA 主命令
 │   ├── msra-data.md              # 数据准备
 │   ├── msra-plan.md              # 分析计划
@@ -218,19 +198,9 @@ medical-stats-research-assistant/
 │   ├── msra-report.md            # 报告生成
 │   ├── msra-calibrate.md         # 指标校准
 │   ├── msra-paper.md             # 论文轨道
+│   ├── ars-paper.md              # 论文写作（9种模式）
 │   ├── ars-full.md               # 完整写作流水线
-│   ├── ars-plan.md               # 章节规划
-│   ├── ars-outline.md            # 大纲生成
-│   ├── ars-abstract.md           # 摘要生成
-│   ├── ars-revision.md           # 论文修订
-│   ├── ars-revision-coach.md     # 修订辅导
-│   ├── ars-format-convert.md     # 格式导出
-│   ├── ars-disclosure.md         # AI披露声明
-│   ├── ars-reviewer.md           # 论文评审
-│   ├── ars-lit-review.md         # 文献综述
-│   ├── ars-citation-check.md     # 引用检查
-│   ├── ars-mark-read.md          # 标记已读
-│   └── ars-unmark-read.md        # 取消已读
+│   └── ars-reviewer.md           # 论文评审
 │
 ├── skills/                       # 8 个 Skill
 │   ├── pipeline/                 # 🔀 统一编排器（核心）
@@ -329,7 +299,7 @@ chmod +x uninstall.sh
 /msra --status
 ```
 
-应显示所有8个skill已注册，20个命令可用。
+应显示所有8个skill已注册，10个命令可用。
 
 ---
 

@@ -3,7 +3,7 @@
   "name": "medical-stats-research-assistant",
   "displayName": "MSRA — Medical Statistics Research Assistant",
   "version": "0.8.1",
-  "description": "Unified medical statistics + academic writing pipeline: raw data → statistical report → (optional) submittable paper. 8 skills, 20 commands.",
+  "description": "Unified medical statistics + academic writing pipeline: raw data → statistical report → (optional) submittable paper. 8 skills, 10 commands.",
   "author": {
     "name": "boangus",
     "url": "https://github.com/boangus"
