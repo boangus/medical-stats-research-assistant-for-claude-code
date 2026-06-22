@@ -1,0 +1,21 @@
+{
+  "tuple_id": "017-blocking-gate-trigger",
+  "kind": "pipeline_edge",
+  "test_name": "门闸阻断条件触发",
+  "source_pit": "-",
+  "description": "Multiple critical issues coexisting (5+ gate items fail), Stage 1.5 must block",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "pipeline",
+    "trigger_columns": []
+  },
+  "expected": {
+    "detection": true,
+    "severity": "blocking",
+    "phase": "Stage 1.5 (blocking gate: 3+ items fail)",
+    "action": "Block and return to Stage 1, cannot skip"
+  },
+  "failure_pattern": "LLM may attempt to pass with conditions instead of strictly blocking"
+}
+
+

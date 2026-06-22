@@ -1,0 +1,130 @@
+{
+  "name": "medical-stats-research-assistant",
+  "version": "0.9.0",
+  "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
+  "author": "boangus",
+  "license": "MIT",
+  "min_claude_code_version": "3.7.0",
+  "commands": {
+    "/msra": {
+      "id": "msra-pipeline",
+      "name": "MSRA Pipeline",
+      "entry_point": "skills/pipeline/SKILL.md",
+      "description": "Launch unified pipeline: data → stats report → (optional) paper track. Auto-detect entry point.",
+      "usage": "/msra [context]",
+      "examples": [
+        "/msra 我有原始数据要分析",
+        "/msra --from plan",
+        "/msra --status"
+      ]
+    },
+    "/msra-paper": {
+      "id": "msra-paper-track",
+      "name": "MSRA Paper Track",
+      "entry_point": "skills/pipeline/SKILL.md",
+      "description": "Enter Paper Track (Stage 5.0): convert stats report into a submittable paper via medical-pipeline. Requires completed Stage 4 with track=full_paper.",
+      "usage": "/msra-paper",
+      "examples": ["/msra-paper"]
+    },
+    "/msra-data": {
+      "id": "msra-data-prep",
+      "name": "Data Preparation",
+      "entry_point": "skills/data-prep/SKILL.md",
+      "description": "Data validation, cleaning, and quality gate",
+      "usage": "/msra-data [file]",
+      "examples": [
+        "/msra-data raw_data.csv",
+        "/msra-data --dict dictionary.xlsx --quick",
+        "/msra-data --quality-gate"
+      ]
+    },
+    "/msra-explore": {
+      "id": "msra-exploratory-causal",
+      "name": "Exploratory Causal Analysis",
+      "entry_point": "skills/exploratory-causal/SKILL.md",
+      "description": "Data-driven exploratory causal analysis: discover potential causal structures, identify confounders, generate hypotheses",
+      "usage": "/msra-explore [file] [--mode causal-discovery|confounding|eda|hypothesis|sensitivity|direction]",
+      "examples": [
+        "/msra-explore cleaned_data.csv",
+        "/msra-explore --mode causal-discovery",
+        "/msra-explore --mode confounding --exposure treatment --outcome survival"
+      ]
+    },
+    "/msra-plan": {
+      "id": "msra-analysis-plan",
+      "name": "Analysis Planning",
+      "entry_point": "skills/analysis-plan/SKILL.md",
+      "description": "Create and review statistical analysis plan",
+      "usage": "/msra-plan [data]",
+      "examples": [
+        "/msra-plan cleaned_data.csv --study RCT",
+        "/msra-plan --quick"
+      ]
+    },
+    "/msra-exec": {
+      "id": "msra-analysis-exec",
+      "name": "Analysis Execution",
+      "entry_point": "skills/analysis-exec/SKILL.md",
+      "description": "Execute analysis per approved SAP",
+      "usage": "/msra-exec --sap [plan] --data [data]",
+      "examples": [
+        "/msra-exec --sap sap.md --data cleaned.csv",
+        "/msra-exec --check-only"
+      ]
+    },
+    "/msra-report": {
+      "id": "msra-report",
+      "name": "Report Generation",
+      "entry_point": "skills/report/SKILL.md",
+      "description": "Generate publication-ready report",
+      "usage": "/msra-report [guideline]",
+      "examples": [
+        "/msra-report CONSORT",
+        "/msra-report --type table1"
+      ]
+    },
+    "/msra-calibrate": {
+      "id": "msra-calibration",
+      "name": "Calibration",
+      "entry_point": "skills/calibration/SKILL.md",
+      "description": "Run metric calibration against gold standard, or view calibration status",
+      "usage": "/msra-calibrate [gold_standard.csv] [--status] [--update results.csv]",
+      "examples": [
+        "/msra-calibrate gold_standard.csv",
+        "/msra-calibrate --status",
+        "/msra-calibrate --update new_results.csv"
+      ]
+    },
+    "/msra-write": {
+      "id": "msra-write",
+      "name": "MSRA Paper Writing",
+      "entry_point": "commands/msra-write.md",
+      "description": "Academic paper writing in 9 modes: abstract, citation-check, disclosure, format-convert, outline, plan, revision, revision-coach, lit-review",
+      "usage": "/msra-write --mode <mode>",
+      "examples": [
+        "/msra-write --mode plan",
+        "/msra-write --mode abstract-only",
+        "/msra-write --mode revision-coach"
+      ]
+    },
+    "/msra-full": {
+      "id": "msra-full-pipeline",
+      "name": "MSRA Full Pipeline",
+      "entry_point": "commands/msra-full.md",
+      "description": "Full academic research pipeline: research → write → review → revise → finalize. Uses built-in medical-pipeline skill.",
+      "usage": "/msra-full",
+      "examples": ["/msra-full"]
+    },
+    "/msra-reviewer": {
+      "id": "msra-reviewer",
+      "name": "MSRA Paper Reviewer",
+      "entry_point": "commands/msra-reviewer.md",
+      "description": "Multi-perspective paper review (5 reviewers). Uses built-in peer-review skill.",
+      "usage": "/msra-reviewer",
+      "examples": ["/msra-reviewer"]
+    }
+  },
+  "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research", "academic-writing", "paper-review"],
+  "languages": ["zh-CN", "en"],
+  "repository": "https://github.com/boangus/medical-stats-research-assistant-for-claude-code"
+}

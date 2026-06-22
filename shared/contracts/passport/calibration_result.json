@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/calibration_result/v1",
+  "stage": "calibration",
+  "description": "Material Passport for Calibration —度量校准. Tracks calibration metrics, cross-validation results, model performance evaluations, and style calibration outputs used across the pipeline.",
+
+  "passport_type": "calibration_result",
+  "stage_number": null,
+
+  "required_artifacts": [
+    {
+      "artifact_id": "calibration_config",
+      "name": "校准配置",
+      "description": "Configuration parameters for the calibration run: metrics selected, datasets used, evaluation criteria.",
+      "required": true
+    },
+    {
+      "artifact_id": "metric_results",
+      "name": "度量结果",
+      "description": "Quantitative results of all calibrated metrics (accuracy, precision, recall, F1, AUC, Brier score, etc.).",
+      "required": true
+    },
+    {
+      "artifact_id": "calibration_report",
+      "name": "校准报告",
+      "description": "Summary report of calibration findings, deviations, and recommendations.",
+      "required": true
+    },
+    {
+      "artifact_id": "reference_standards",
+      "name": "参考标准",
+      "description": "Reference standards or benchmarks used for calibration (e.g., expected score ranges, threshold values).",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "cross_validation_results",
+      "name": "交叉验证结果",
+      "description": "K-fold or leave-one-out cross-validation results for predictive models."
+    },
+    {
+      "artifact_id": "calibration_curves",
+      "name": "校准曲线",
+      "description": "Visual calibration plots (predicted vs observed)."
+    },
+    {
+      "artifact_id": "style_calibration",
+      "name": "写作风格校准",
+      "description": "Writing style calibration against target journal or regulatory template."
+    },
+    {
+      "artifact_id": "drift_analysis",
+      "name": "漂移分析",
+      "description": "Analysis of metric drift over time or across data snapshots."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "CAL-01",
+      "name": "指标阈值达标",
+      "description": "All required metrics meet or exceed the predefined thresholds.",
+      "required": true
+    },
+    {
+      "gate_id": "CAL-02",
+      "name": "校准可复现性",
+      "description": "Calibration results are reproducible across repeated runs with the same data.",
+      "required": true
+    },
+    {
+      "gate_id": "CAL-03",
+      "name": "参考标准一致性",
+      "description": "Results are consistent with established reference standards or benchmarks.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": null,
+    "description": "Calibration results are consumed by other stages on demand; no fixed downstream stage.",
+    "required_for_handoff": ["metric_results", "calibration_report"],
+    "handoff_bundle_file": null
+  }
+}

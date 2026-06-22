@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "medical_review/reviewer_methodology_focus/v1",
+  "mode": "reviewer_methodology_focus",
+  "stage": "methodology_peer_review",
+  "baseline_version": "v1.0.0",
+  "description": "Methodology-focused peer review schema for clinical studies. Deep-dive assessment of study design, bias risks, internal/external validity, and statistical methodology. Used alongside reviewer_full for dual-pass review.",
+
+  "panel_size": 2,
+
+  "acceptance_dimensions": [
+    {
+      "id": "D1",
+      "name": "study_design_assessment",
+      "description": "Appropriateness of the study design for the research question; adequacy of controls; blinding; randomization; sample size justification.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D2",
+      "name": "bias_risk_assessment",
+      "description": "Systematic evaluation of selection, performance, detection, attrition, and reporting biases using established frameworks (e.g., Cochrane Risk of Bias 2, ROBINS-I).",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D3",
+      "name": "internal_validity",
+      "description": "Confounding control, measurement validity, temporal relationships, and analytical rigor that support causal inference within the study population.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D4",
+      "name": "external_validity",
+      "description": "Generalizability of findings to real-world clinical populations; population representativeness; setting applicability.",
+      "priority": "high"
+    },
+    {
+      "id": "D5",
+      "name": "statistical_method_review",
+      "description": "Appropriateness of statistical methods; assumption verification; handling of multiplicity; missing data approach; sensitivity analyses.",
+      "priority": "mandatory"
+    }
+  ],
+
+  "bias_risk_categories": [
+    {
+      "id": "selection_bias",
+      "description": "Risk that the study sample is not representative of the target population, or that allocation was influenced by participant characteristics.",
+      "assessment_items": [
+        "Randomization method is adequate and described",
+        "Allocation concealment is maintained",
+        "Baseline characteristics are balanced across groups",
+        "Inclusion/exclusion criteria are appropriate",
+        "Screening and enrollment procedures minimize selection"
+      ]
+    },
+    {
+      "id": "performance_bias",
+      "description": "Risk that knowledge of intervention assignment influenced participant behavior or care provider delivery.",
+      "assessment_items": [
+        "Blinding of participants is adequate",
+        "Blinding of care providers is adequate",
+        "Co-interventions are balanced across groups",
+        "Protocol deviations are documented and balanced"
+      ]
+    },
+    {
+      "id": "detection_bias",
+      "description": "Risk that knowledge of intervention assignment influenced outcome assessment.",
+      "assessment_items": [
+        "Outcome assessors are blinded",
+        "Outcome definitions are objective and pre-specified",
+        "Measurement methods are standardized across groups",
+        "Timing of outcome assessment is consistent"
+      ]
+    },
+    {
+      "id": "attrition_bias",
+      "description": "Risk that incomplete outcome data (dropout, loss to follow-up) introduces systematic error.",
+      "assessment_items": [
+        "Dropout rate is reported and acceptable (<20%)",
+        "Reasons for dropout are provided and similar across groups",
+        "Appropriate missing data method is applied (ITT, multiple imputation)",
+        "Sensitivity analyses address potential attrition bias"
+      ]
+    },
+    {
+      "id": "reporting_bias",
+      "description": "Risk that selective outcome reporting or analysis reporting distorts the evidence.",
+      "assessment_items": [
+        "All pre-specified primary and secondary outcomes are reported",
+        "Analysis matches the SAP",
+        "Non-significant results are reported, not suppressed",
+        "Protocol and SAP are available for comparison",
+        "Trial is registered (ClinicalTrials.gov, EudraCT)"
+      ]
+    }
+  ],
+
+  "internal_validity_score": {
+    "scale": "1-5",
+    "description": "Overall internal validity rating based on bias risk assessment.",
+    "score_labels": {
+      "1": "Very low: Critical bias concerns that invalidate causal inference",
+      "2": "Low: Major bias concerns that substantially weaken causal inference",
+      "3": "Moderate: Some bias concerns; causal inference is limited",
+      "4": "High: Minor bias concerns; causal inference is well-supported",
+      "5": "Very high: Minimal bias; causal inference is strong"
+    }
+  },
+
+  "external_validity_score": {
+    "scale": "1-5",
+    "description": "Overall external validity / generalizability rating.",
+    "score_labels": {
+      "1": "Very low: Findings cannot be generalized beyond the study sample",
+      "2": "Low: Limited generalizability due to narrow population or settings",
+      "3": "Moderate: Some generalizability with important caveats",
+      "4": "High: Findings are likely applicable to typical clinical populations",
+      "5": "Very high: Findings are broadly applicable across clinical settings"
+    }
+  },
+
+  "scoring_plan": {
+    "per_dimension_criteria": [
+      {
+        "dimension_id": "D1",
+        "what_to_look_for": "Design matches research question; sample size is justified by power calculation; randomization and blinding are appropriate; control group is adequate.",
+        "what_triggers_block": "Fundamentally inappropriate design (e.g., using RCT design for a rare disease with no feasible control); no sample size justification; no randomization in an RCT.",
+        "what_triggers_warn": "Design is appropriate but sample size justification is weak; blinding could be improved; control group has minor issues."
+      },
+      {
+        "dimension_id": "D2",
+        "what_to_look_for": "Each bias domain is assessed with specific criteria; overall risk of bias is clearly stated; high-risk domains have mitigating analyses.",
+        "what_triggers_block": "No formal bias assessment performed; multiple high-risk domains with no mitigating analysis; unblinded study with subjective outcomes.",
+        "what_triggers_warn": "Bias assessment present but incomplete; some domains not addressed; overall risk judgment lacks justification."
+      },
+      {
+        "dimension_id": "D3",
+        "what_to_look_for": "Confounders are identified and controlled; measurement instruments are validated; temporal sequence is clear; dose-response or biological plausibility supports causation.",
+        "what_triggers_block": "Major confounders uncontrolled; measurement methods not validated; temporal ambiguity undermines causal claims.",
+        "what_triggers_warn": "Most confounders addressed but some potential confounders remain uncontrolled; measurement methods adequate but not optimal."
+      },
+      {
+        "dimension_id": "D4",
+        "what_to_look_for": "Study population represents the intended clinical population; exclusion criteria do not systematically exclude relevant groups; setting is typical of clinical practice.",
+        "what_triggers_block": "Highly selected population with no discussion of generalizability; exclusion of major demographic groups without justification.",
+        "what_triggers_warn": "Population is somewhat narrower than typical clinical practice; some exclusion criteria could limit applicability."
+      },
+      {
+        "dimension_id": "D5",
+        "what_to_look_for": "Methods match data type and research question; assumptions are tested; multiplicity is controlled; missing data is handled appropriately; sensitivity analyses are conducted.",
+        "what_triggers_block": "Wrong statistical method applied; key assumptions not tested; no multiplicity adjustment when required; no missing data handling; no sensitivity analyses.",
+        "what_triggers_warn": "Methods generally appropriate but some assumptions not tested; multiplicity control could be more rigorous; sensitivity analyses are limited."
+      }
+    ]
+  },
+
+  "failure_conditions": [
+    {
+      "condition_id": "F1",
+      "severity": 95,
+      "cross_reviewer_quantifier": "any",
+      "expression": "any mandatory dimension scores 'block' from either reviewer",
+      "action": "editorial_decision=reject_or_major_revision"
+    },
+    {
+      "condition_id": "F2",
+      "severity": 80,
+      "cross_reviewer_quantifier": "both",
+      "expression": "both reviewers score D2 (bias_risk) as 'block'",
+      "action": "editorial_decision=reject"
+    },
+    {
+      "condition_id": "F3",
+      "severity": 70,
+      "cross_reviewer_quantifier": "any",
+      "expression": "internal_validity_score <= 2 from either reviewer",
+      "action": "editorial_decision=major_revision"
+    },
+    {
+      "condition_id": "F4",
+      "severity": 60,
+      "cross_reviewer_quantifier": "any",
+      "expression": "D5 (statistical_method_review) scores 'block' from either reviewer",
+      "action": "editorial_decision=major_revision"
+    },
+    {
+      "condition_id": "F0",
+      "severity": 10,
+      "cross_reviewer_quantifier": "all",
+      "expression": "all mandatory dimensions score 'pass' from both reviewers and internal_validity_score >= 4 from both",
+      "action": "editorial_decision=accept"
+    }
+  ]
+}

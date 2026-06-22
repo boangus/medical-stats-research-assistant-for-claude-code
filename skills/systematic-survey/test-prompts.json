@@ -1,0 +1,5 @@
+[
+  {"id": 1, "prompt": "帮我做一项系统综述+meta分析：二甲双胍对2型糖尿病患者心血管结局的影响。", "expected": "执行完整系统综述：PICO定义→PubMed/Embase/Cochrane检索策略→PRISMA流程→偏倚风险评估→效应量合并→GRADE评级→领域检索报告。"},
+  {"id": 2, "prompt": "帮我制定一个关于免疫检查点抑制剂不良反应的PubMed检索策略。", "expected": "执行检索策略制定模式：构建MeSH+自由词组合检索式，覆盖Embase/Cochrane，输出PRISMA-S声明格式的检索策略报告。"},
+  {"id": 3, "prompt": "用苏格拉底模式引导我明确一个关于AI辅助诊断的研究问题。", "expected": "执行苏格拉底引导：通过PICO框架提问，逐步明确人群、干预、对照、结局，评估FINER可行性。"}
+]

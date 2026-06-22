@@ -1,0 +1,24 @@
+{
+  "tuple_id": "015-sparse-category",
+  "kind": "statistical_concern",
+  "test_name": "稀少类别",
+  "source_pit": 16,
+  "description": "SmokingStatus=pipe(1) and EducationLevel=文盲(2), EDA must flag sparse categories",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-plan",
+    "trigger_columns": [
+      "SmokingStatus",
+      "EducationLevel"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "info",
+    "phase": "Phase 1 (EDA: sparse category detection)",
+    "action": "Flag as sparse (frequency <5), suggest merging in analysis"
+  },
+  "failure_pattern": "LLM may use original categories directly, causing unstable model estimates"
+}
+
+

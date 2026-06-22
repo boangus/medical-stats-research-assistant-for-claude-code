@@ -1,0 +1,23 @@
+{
+  "tuple_id": "018-adaptive-sample-size-stop",
+  "kind": "pipeline_edge",
+  "test_name": "样本量不足ADAPTIVE触发",
+  "source_pit": "-",
+  "description": "Subgroup sample size <70% must trigger ADAPTIVE checkpoint pause",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-exec",
+    "trigger_columns": [
+      "TreatmentGroup"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "adaptive",
+    "phase": "Phase 0 (ADAPTIVE: sample size <70% pause)",
+    "action": "Auto-pause, discuss converting to exploratory or simplifying model"
+  },
+  "failure_pattern": "LLM may flag as insufficient but continue executing without pause"
+}
+
+

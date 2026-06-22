@@ -1,0 +1,77 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    groups:
+      scientific-core:
+        patterns:
+          - "pandas"
+          - "numpy"
+          - "scipy"
+          - "statsmodels"
+        update-types: ["minor", "patch"]
+      survival-analysis:
+        patterns:
+          - "lifelines"
+        update-types: ["minor", "patch"]
+      causal-inference:
+        patterns:
+          - "dowhy"
+          - "econml"
+          - "causalinference"
+        update-types: ["minor", "patch"]
+      ml-frameworks:
+        patterns:
+          - "scikit-learn"
+          - "xgboost"
+          - "lightgbm"
+          - "shap"
+        update-types: ["minor", "patch"]
+      visualization:
+        patterns:
+          - "matplotlib"
+          - "seaborn"
+          - "plotnine"
+        update-types: ["minor", "patch"]
+      large-scale-processing:
+        patterns:
+          - "polars"
+          - "duckdb"
+          - "dask"
+          - "pyarrow"
+        update-types: ["minor", "patch"]
+      bayesian:
+        patterns:
+          - "pymc"
+          - "arviz"
+        update-types: ["minor", "patch"]
+      testing:
+        patterns:
+          - "pytest"
+          - "pytest-cov"
+          - "ruff"
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "dcurves"
+        versions: ["*"]
+      - dependency-name: "simpleNomo"
+        versions: ["*"]
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "first"
+    groups:
+      actions-core:
+        patterns:
+          - "actions/*"
+          - "r-lib/actions/*"
+        update-types: ["minor", "patch"]
+    open-pull-requests-limit: 5

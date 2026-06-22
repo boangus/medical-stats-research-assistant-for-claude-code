@@ -1,0 +1,3 @@
+{"tuple_id": "005-gender-diagnosis-conflict", "kind": "logic_conflict", "test_name": "性别-诊断矛盾", "description": "Gender=男 + 卵巢囊肿(Gender=女 + 前列腺癌)逻辑矛盾，必须检出", "source_pit": 5, "input": {"data_file": "tests/msra_test_data.csv", "pipeline_stage": "data-prep", "mode": "guided", "trigger_columns": ["Gender", "MedicalCondition"]}, "expected": {"detection": true, "severity": "critical", "phase": "Phase 1.5 (Gate项6: 交叉字段一致性)", "action": "标记为 Critical，退回 Phase 2 讨论修正方案"}, "failure_pattern": "LLM 可能自行假设'患者跨性别'或'录入格式问题'而不标记为逻辑错误。"}
+
+

@@ -1,0 +1,23 @@
+{
+  "tuple_id": "009-tcm-term-variant",
+  "kind": "format_variant",
+  "test_name": "TCM术语变体",
+  "source_pit": 4,
+  "description": "TCM_Diagnosis contains 16 syndrome variants, Phase 2.5 must detect and normalize",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "data-prep",
+    "trigger_columns": [
+      "TCM_Diagnosis"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 2.5 (TCM variant detection)",
+    "action": "Show variant summary, normalize per GB/T 16751.2"
+  },
+  "failure_pattern": "LLM may miss subtle suffix variants like 证型 / 型 / 证"
+}
+
+

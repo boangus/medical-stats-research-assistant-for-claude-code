@@ -1,0 +1,97 @@
+# 忽略文件
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+
+# 输出文件 (示例)
+examples/output/
+*.docx
+*.pdf
+*.html
+
+# 测试输出
+tests/output/
+.pytest_cache/
+
+# 测试数据（原始Kaggle数据太大，不上传）
+tests/healthcare_dataset.csv
+tests/healthcare_dataset_dictionary.md
+# 测试输出（运行生成，不进版本控制）
+tests/output/
+tests/*.md
+!tests/msra_test_data_dictionary.md
+
+# 本地配置
+config.local.yaml
+.env
+
+# 复现验证
+shared/reproducibility/runs/
+shared/reproducibility/_test_output/
+
+# Skill优化评估
+.darwin-results/
+.claude/skills/darwin-skill/results.tsv
+
+# 运行时缓存
+.msra/
+
+# WorkBuddy 项目级数据（对话记录、检查点、状态）
+.workbuddy/
+
+# 流水线评估生成产物（由 eval_pipeline_gold.py 运行生成）
+evals/gold/pipeline/results/eval_results.json
+academic-research-skills/
+
+# MSRA Handoff Bundle (runtime-generated, not committed)
+MSRA/msra_handoff_bundle.md
+
+# 优化计划文档（本地工作文件，不进版本控制）
+OPTIMIZATION_PLAN.md
+FINAL_DELIVERY_REPORT.md
+
+# Darwin 优化报告（本地生成产物）
+darwin-optimization-report.html
+
+# SDD 任务跟踪（本地工作文件）
+.sdd/
+
+# Superpowers 计划文档（本地工作文件）
+docs/superpowers/
+
+# 上传临时目录
+.uploads/
+
+# 大型数据处理（测试数据和基准输出）
+shared/large-scale-processing/test_data/
+scripts/benchmark_output/
+*.parquet  # 大型二进制文件不进版本控制
+*.xlsx

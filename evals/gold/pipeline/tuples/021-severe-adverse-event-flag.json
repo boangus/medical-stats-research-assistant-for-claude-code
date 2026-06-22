@@ -1,0 +1,23 @@
+{
+  "tuple_id": "021-severe-adverse-event-flag",
+  "kind": "pipeline_edge",
+  "test_name": "严重不良事件标记",
+  "source_pit": 21,
+  "description": "AdverseEvent=Severe (SUBJ-0581,0582), safety analysis must flag separately",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-exec",
+    "trigger_columns": [
+      "AdverseEvent"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "info",
+    "phase": "Phase 5 (safety analysis: SAE flag)",
+    "action": "SAE must be listed separately in safety report"
+  },
+  "failure_pattern": "LLM may mix SAE into routine AE table without special marking"
+}
+
+

@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/analysis_execution/v1",
+  "stage": "analysis_execution",
+  "description": "Material Passport for Stage 3 — Analysis Execution. Tracks all artifacts produced during statistical analysis, assumption verification, and result generation.",
+
+  "passport_type": "analysis_execution",
+  "stage_number": 3,
+
+  "required_artifacts": [
+    {
+      "artifact_id": "analysis_programs",
+      "name": "分析程序",
+      "description": "Complete, annotated R/Python/SAS programs that produce all analysis results from the analysis dataset.",
+      "file_patterns": ["*.R", "*.py", "*.sas"],
+      "required": true,
+      "executable": true
+    },
+    {
+      "artifact_id": "assumption_check_results",
+      "name": "假设检验结果",
+      "description": "Results of all statistical assumption checks (normality, homoscedasticity, proportional hazards, etc.) with test statistics and p-values.",
+      "required": true
+    },
+    {
+      "artifact_id": "primary_analysis_results",
+      "name": "主要分析结果",
+      "description": "Results of the primary endpoint analysis including test statistics, p-values, confidence intervals, and effect estimates.",
+      "required": true
+    },
+    {
+      "artifact_id": "secondary_analysis_results",
+      "name": "次要分析结果",
+      "description": "Results of all secondary and exploratory endpoint analyses.",
+      "required": true
+    },
+    {
+      "artifact_id": "subgroup_analysis_results",
+      "name": "亚组分析结果",
+      "description": "Results of pre-specified subgroup analyses with interaction tests.",
+      "required": true
+    },
+    {
+      "artifact_id": "sensitivity_analysis_results",
+      "name": "敏感性分析结果",
+      "description": "Results of all pre-specified sensitivity analyses.",
+      "required": true
+    },
+    {
+      "artifact_id": "missing_data_analysis",
+      "name": "缺失数据分析",
+      "description": "Missing data handling results: multiple imputation parameters, tipping point analyses, pattern mixture models.",
+      "required": true
+    },
+    {
+      "artifact_id": "deviation_log",
+      "name": "偏差日志",
+      "description": "Record of all deviations from the SAP with justification and impact assessment.",
+      "required": true
+    },
+    {
+      "artifact_id": "quality_gate_report",
+      "name": "质量门闸报告",
+      "description": "Automated quality gate checks on analysis output: numeric validation, range checks, consistency verification.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "model_diagnostics",
+      "name": "模型诊断",
+      "description": "Residual plots, influence diagnostics, and model fit statistics for regression models."
+    },
+    {
+      "artifact_id": "forest_plot_data",
+      "name": "森林图数据",
+      "description": "Data underlying forest plots for subgroup and meta-analyses."
+    },
+    {
+      "artifact_id": "KM_curve_data",
+      "name": "Kaplan-Meier曲线数据",
+      "description": "Survival curve data and log-rank test results."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "AE-01",
+      "name": "SAP合规性检查",
+      "description": "All analyses specified in the SAP have been executed; any deviations are documented.",
+      "required": true
+    },
+    {
+      "gate_id": "AE-02",
+      "name": "结果数值合理性",
+      "description": "All numeric results are within plausible ranges; no impossible values (e.g., p < 0, probabilities > 1).",
+      "required": true
+    },
+    {
+      "gate_id": "AE-03",
+      "name": "可复现性验证",
+      "description": "Analysis programs run without errors from a clean state and produce identical results.",
+      "required": true
+    },
+    {
+      "gate_id": "AE-04",
+      "name": "假设验证完整性",
+      "description": "All required assumption checks have been performed and results are documented.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "report_generation",
+    "required_for_handoff": ["primary_analysis_results", "secondary_analysis_results", "subgroup_analysis_results", "sensitivity_analysis_results", "missing_data_analysis", "deviation_log", "quality_gate_report"],
+    "handoff_bundle_file": "analysis_execution_handoff.json"
+  }
+}

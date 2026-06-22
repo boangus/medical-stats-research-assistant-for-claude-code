@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/report_generation/v1",
+  "stage": "report_generation",
+  "description": "Material Passport for Stage 4 — Report Generation. Tracks all artifacts produced during statistical report compilation, TFL generation, and CONSORT/STROBE compliance.",
+
+  "passport_type": "report_generation",
+  "stage_number": 4,
+
+  "required_artifacts": [
+    {
+      "artifact_id": "statistical_report",
+      "name": "统计报告",
+      "description": "Complete statistical report including methods, results, and interpretation sections.",
+      "required": true
+    },
+    {
+      "artifact_id": "tables",
+      "name": "统计表格",
+      "description": "All completed tables: baseline characteristics, efficacy results, safety results, subgroup analyses.",
+      "file_patterns": ["*.docx", "*.html", "*.latex"],
+      "required": true
+    },
+    {
+      "artifact_id": "figures",
+      "name": "统计图表",
+      "description": "All completed figures: CONSORT/STROBE flow diagrams, forest plots, KM curves, bar charts.",
+      "file_patterns": ["*.png", "*.pdf", "*.svg"],
+      "required": true
+    },
+    {
+      "artifact_id": "listings",
+      "name": "数据列表",
+      "description": "Detailed data listings: individual patient data summaries, adverse event listings.",
+      "required": true
+    },
+    {
+      "artifact_id": "consort_strobe_checklist",
+      "name": "CONSORT/STROBE清单",
+      "description": "Completed reporting guideline checklist with page references for each item.",
+      "required": true
+    },
+    {
+      "artifact_id": "safety_summary",
+      "name": "安全性摘要",
+      "description": "Summary of safety findings: treatment-emergent AEs, SAEs, deaths, discontinuations.",
+      "required": true
+    },
+    {
+      "artifact_id": "key_findings_summary",
+      "name": "关键发现摘要",
+      "description": "Concise summary of primary and key secondary findings with clinical interpretation.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "executive_summary",
+      "name": "执行摘要",
+      "description": "1-2 page summary for non-statistical audiences."
+    },
+    {
+      "artifact_id": "appendix_materials",
+      "name": "附录材料",
+      "description": "Supplementary tables, additional analyses, and technical appendices."
+    },
+    {
+      "artifact_id": "reviewer_response",
+      "name": "审稿意见回复",
+      "description": "Point-by-point responses to prior review comments."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "RG-01",
+      "name": "报告指南合规性",
+      "description": "All applicable CONSORT/STROBE/PRISMA/STARD checklist items are addressed.",
+      "required": true
+    },
+    {
+      "gate_id": "RG-02",
+      "name": "表格图表一致性",
+      "description": "Numbers in tables match numbers in text; no discrepancies between sources.",
+      "required": true
+    },
+    {
+      "gate_id": "RG-03",
+      "name": "统计结果准确性",
+      "description": "Reported p-values, CIs, and effect sizes match the analysis execution outputs.",
+      "required": true
+    },
+    {
+      "gate_id": "RG-04",
+      "name": "安全性数据完整性",
+      "description": "All safety data are presented; no missing safety tables.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "manuscript_draft",
+    "required_for_handoff": ["statistical_report", "tables", "figures", "consort_strobe_checklist", "safety_summary", "key_findings_summary"],
+    "handoff_bundle_file": "report_generation_handoff.json"
+  }
+}

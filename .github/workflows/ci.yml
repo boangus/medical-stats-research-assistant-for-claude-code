@@ -1,0 +1,251 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyyaml pytest
+
+      - name: Python imports check
+        run: |
+          python -c "
+          import pandas, numpy, scipy, statsmodels
+          print(f'pandas: {pandas.__version__}')
+          print(f'numpy: {numpy.__version__}')
+          print(f'scipy: {scipy.__version__}')
+          print(f'statsmodels: {statsmodels.__version__}')
+          print('All imports OK')
+          "
+
+      - name: SKILL frontmatter validation
+        run: |
+          python -c "
+          import os, yaml, sys
+
+          skill_dirs = [
+            'skills/pipeline',
+            'skills/data-prep',
+            'skills/analysis-plan',
+            'skills/analysis-exec',
+            'skills/report',
+            'skills/calibration',
+          ]
+
+          errors = []
+          for sd in skill_dirs:
+              path = os.path.join(sd, 'SKILL.md')
+              if not os.path.exists(path):
+                  errors.append(f'MISSING: {path}')
+                  continue
+
+              with open(path, 'r', encoding='utf-8') as f:
+                  content = f.read()
+
+              # Extract YAML frontmatter
+              if not content.startswith('---'):
+                  errors.append(f'NO FRONTMATTER: {path}')
+                  continue
+
+              _, fm_str, _ = content.split('---', 2)
+
+              try:
+                  fm = yaml.safe_load(fm_str)
+              except Exception as e:
+                  errors.append(f'YAML ERROR in {path}: {e}')
+                  continue
+
+              # Check required fields
+              required = ['name', 'description']
+              for field in required:
+                  if field not in fm:
+                      errors.append(f'MISSING {field} in {path}')
+
+              if errors:
+                  continue
+
+              print(f'  ✅ {os.path.basename(os.path.dirname(path))}: name={fm.get(\"name\",\"?\")[:30]}...')
+
+          if errors:
+              print(f'\n❌ {len(errors)} error(s):')
+              for e in errors:
+                  print(f'  {e}')
+              sys.exit(1)
+          else:
+              print(f'\n✅ All {len(skill_dirs)} SKILLs validated')
+          "
+
+      - name: Cross-reference check (manifest vs skills)
+        run: |
+          python -c "
+          import json
+          with open('manifest.json') as f:
+              manifest = json.load(f)
+          commands = manifest.get('commands', {})
+          for cmd, info in commands.items():
+              entry = info.get('entry_point', '')
+              print(f'  {cmd:15} -> {entry}')
+          print(f'✅ {len(commands)} commands registered in manifest.json')
+          "
+
+      - name: Python template import check
+        run: |
+          python -c "
+          import sys, os
+          templates = [
+              'shared/templates/logistic_template',
+              'shared/templates/cox_template',
+              'shared/templates/roc_template',
+              'shared/templates/forest_plot_template',
+              'shared/templates/prediction_model_template',
+              'shared/templates/ml_analysis_template',
+              'shared/templates/shap_plot_template',
+              'shared/templates/gee_template',
+              'shared/templates/effect_size_template',
+              'shared/reporting-guidelines/statcheck_patterns',
+          ]
+          errors = []
+          for t in templates:
+              if not os.path.exists(t + '.py'):
+                  errors.append(f'MISSING: {t}.py'); continue
+              try:
+                  with open(t + '.py', 'r', encoding='utf-8') as f:
+                      compile(f.read(), t + '.py', 'exec')
+                  print(f'  ✅ {os.path.basename(t)}.py')
+              except SyntaxError as e:
+                  errors.append(f'SYNTAX ERROR in {t}.py: {e}'); print(f'  ❌ {os.path.basename(t)}.py: {e}')
+          if errors:
+              print(f'\n❌ {len(errors)} error(s)'); [print(f'  {e}') for e in errors]; sys.exit(1)
+          else:
+              print(f'\n✅ All {len(templates)} Python templates syntax-checked')
+          "
+
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/ -v --tb=short -x
+
+      - name: Python end-to-end test
+        run: |
+          python -c "
+          import pandas as pd
+          import numpy as np
+
+          # Load test data
+          df = pd.read_csv('tests/msra_test_data.csv')
+          print(f'Rows: {len(df)}, Columns: {len(df.columns)}')
+          print(f'Columns: {list(df.columns)}')
+          # Dtypes skipped for pitfall test data
+          print(f'Missing: {df.isnull().sum().sum()} cells')
+
+          # Basic validation checks
+          assert len(df) > 0, 'Empty dataset'
+          assert 'Age' in df.columns, 'Missing Age column'
+          assert 'Gender' in df.columns, 'Missing Gender column'
+          print('✅ Test data loaded and validated')
+
+          # Run basic analysis
+          print(f'Age range: {df[\"Age\"].min():.0f}-{df[\"Age\"].max():.0f}')
+          print(f'Gender distribution:\n{df[\"Gender\"].value_counts().to_dict()}')
+          print(f'MedicalCondition distribution:\n{df[\"MedicalCondition\"].value_counts().to_dict()}')
+          print(f'Known pitfalls: missing={int(df.isnull().sum().sum())}, neg_billing={int((pd.to_numeric(df[\"BillingAmount\"], errors=\"coerce\") < 0).sum())}, dup_ids={int(df.duplicated(subset=[\"PatientID\"]).sum())}')
+          print('✅ End-to-end smoke test passed')
+          "
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Python files syntax
+        run: |
+          python -m py_compile tests/run_validation.py
+          python -m py_compile tests/run_cleaning.py
+          python -m py_compile tests/run_eda.py
+          python -m py_compile tests/run_analysis.py
+          python -m py_compile tests/run_quality_gate.py
+          echo '✅ All Python files compile'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Ruff lint
+        run: |
+          ruff check shared/ tests/ --select E,F,W --ignore E501,E741,W503 --exit-zero 2>&1 || echo "Ruff completed with warnings"
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.3"
+
+      - name: Check R template syntax
+        run: |
+          Rscript -e '
+          errors <- c()
+          r_files <- list.files("shared/templates", pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+          r_files <- c(r_files, list.files("shared/calibration", pattern = "\\.R$", full.names = TRUE))
+          for (f in r_files) {
+            result <- tryCatch({
+              parse(file = f)
+              "OK"
+            }, error = function(e) {
+              paste0("PARSE ERROR: ", e$message)
+            })
+            if (result == "OK") {
+              cat(sprintf("  ✅ %s\n", basename(f)))
+            } else {
+              cat(sprintf("  ❌ %s: %s\n", basename(f), result))
+              errors <<- c(errors, f)
+            }
+          }
+          if (length(errors) > 0) {
+            cat(sprintf("\n❌ %d R file(s) with syntax errors\n", length(errors)))
+            quit(status = 1)
+          } else {
+            cat(sprintf("\n✅ All %d R files parsed successfully\n", length(r_files)))
+          }
+          '
+
+      - name: Validate gold standard CSV
+        run: |
+          python -c "
+          import pandas as pd
+          df = pd.read_csv('shared/calibration/gold_standard_example.csv')
+          required_cols = ['analysis_id', 'gold_method', 'gold_estimate', 'gold_significant']
+          for col in required_cols:
+            assert col in df.columns, f'Missing column: {col}'
+          methods = df['gold_method'].nunique()
+          print(f'  Records: {len(df)}, Methods: {methods}')
+          assert len(df) >= 50, f'Gold standard too small: {len(df)} < 50'
+          assert methods >= 10, f'Too few methods: {methods} < 10'
+          print(f'✅ Gold standard validated ({len(df)} records, {methods} methods)')
+          "
+
+      - name: Quality-gate item-count consistency check
+        run: |
+          python scripts/lint_gate_counts.py

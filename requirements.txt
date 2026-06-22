@@ -1,0 +1,73 @@
+# ============================================================
+# MSRA 依赖清单
+# 按功能分组，CI 仅安装 Core 组
+# 完整安装: pip install -r requirements.txt
+# 核心安装: pip install -r requirements.txt --no-deps
+# ============================================================
+
+# ── Core (CI 必装) ──────────────────────────────────────────
+pandas>=1.5
+numpy>=1.24
+scipy>=1.10
+statsmodels>=0.14
+
+# ── 生存分析 (analysis-exec Phase 6) ───────────────────────
+lifelines>=0.27           # Python KM/Cox/竞争风险
+
+# ── 因果推断 (analysis-exec Phase 3) ──────────────────────
+dowhy>=0.11               # DAG + 因果推断框架
+econml>=0.15              # 因果 ML (DML/CATE)
+causalinference>=0.1      # 轻量因果推断
+
+# ── 机器学习 (shared/templates/ml_*) ────────────────────────
+scikit-learn>=1.3         # LR/RF/SVM/通用ML
+xgboost>=2.0              # XGBoost
+lightgbm>=4.0             # LightGBM
+shap>=0.43                # SHAP 可解释性
+
+# ── 可视化 (shared/templates/*_template) ────────────────────
+matplotlib>=3.7           # 基础绑图
+seaborn>=0.13             # 统计可视化
+plotnine>=0.12            # ggplot2 for Python
+
+# ── 表格导出 (shared/report-assembler/) ─────────────────────
+python-docx>=1.0          # DOCX 三线表导出
+openpyxl>=3.1             # Excel 导出
+
+# ── 文档解析 ────────────────────────────────────────────────
+tabula-py>=2.7            # PDF 表格提取
+
+# ── 贝叶斯分析 (shared/templates/bayesian_analysis_template.py) ──
+pymc>=5.10                # 贝叶斯建模 (NUTS 采样)
+arviz>=0.17               # 贝叶斯诊断 (R-hat, ESS, trace plot)
+
+# ── 预测模型 (shared/templates/prediction_model_template.py) ──
+dcurves>=0.1              # 决策曲线分析 (DCA)
+simpleNomo>=0.1           # 列线图生成
+
+# ── 工具变量 (shared/templates/instrumental_variable_template.py) ──
+linearmodels>=5.3         # 2SLS / IV 估计
+
+# ── 断点回归 (shared/templates/regression_discontinuity_template.py) ──
+rdrobust>=2.0              # RD 局部线性回归 + 最优带宽
+
+# ── 合成控制法 (shared/templates/synthetic_control_template.py) ──
+cvxpy>=1.4                # 凸优化 (权重求解)
+
+# ── 适应性设计 (shared/templates/adaptive_interim_analysis_template.py) ──
+# 无额外依赖（scipy + numpy + matplotlib 已在 Core 中）
+
+# ── 大规模数据处理 (shared/large_scale_processing/) ─────────────────
+polars>=1.21.0            # 快速内存处理 (<10GB)
+duckdb>=1.1.0             # SQL 友好 OLAP (10-100GB)
+dask[dataframe]>=2024.5.0 # 分布式处理 (>100GB)
+pyarrow>=15.0.0           # 高效数据交换
+
+# ============================================================
+# R 依赖 (通过 install.packages 安装，不在此文件管理)
+# ============================================================
+# MatchIt, tableone, survey, cobalt, ggplot2, rbounds     # PSM
+# survival, geepack, lme4, metafor                         # 生存/GEE/混合模型/Meta
+# logistf, car                                             # Firth Logistic / VIF
+# gtsummary, janitor                                       # 表格生成
+# rdrobust, rstan, bayesplot                               # RD / 贝叶斯

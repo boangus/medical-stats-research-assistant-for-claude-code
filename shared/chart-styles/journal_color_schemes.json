@@ -1,0 +1,82 @@
+{
+  "NEJM_blue": {
+    "name": "NEJM Blue",
+    "primary": "#1f77b4",
+    "secondary": "#aec7e8",
+    "accent": "#ff7f0e",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+  },
+  "JAMA_red": {
+    "name": "JAMA Red",
+    "primary": "#c00000",
+    "secondary": "#ff6b6b",
+    "accent": "#0066cc",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#c00000", "#0066cc", "#008000", "#ff8c00", "#800080", "#008080", "#800000", "#000080", "#808000", "#808080"]
+  },
+  "Lancet_green": {
+    "name": "Lancet Green",
+    "primary": "#00573f",
+    "secondary": "#66b38a",
+    "accent": "#ff4500",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#00573f", "#ff4500", "#0066cc", "#ff8c00", "#800080", "#008080", "#800000", "#000080", "#808000", "#808080"]
+  },
+  "BMJ_blue": {
+    "name": "BMJ Blue",
+    "primary": "#003366",
+    "secondary": "#6699cc",
+    "accent": "#ff6600",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#003366", "#ff6600", "#006633", "#cc0000", "#660066", "#006666", "#660000", "#000066", "#666600", "#666666"]
+  },
+  "CMJ_red": {
+    "name": "中华医学杂志 Red",
+    "primary": "#cc0000",
+    "secondary": "#ff9999",
+    "accent": "#003366",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#cc0000", "#003366", "#006600", "#ff8c00", "#660066", "#006666", "#660000", "#000066", "#666600", "#666666"]
+  },
+  "AIM_green": {
+    "name": "Annals Green",
+    "primary": "#2e8b57",
+    "secondary": "#90ee90",
+    "accent": "#ff4500",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#2e8b57", "#ff4500", "#4169e1", "#daa520", "#8b008b", "#008b8b", "#8b0000", "#00008b", "#bdb76b", "#cd853f"]
+  },
+  "CJE_blue": {
+    "name": "中华流行病学杂志 Blue",
+    "primary": "#003399",
+    "secondary": "#6699ff",
+    "accent": "#ff3300",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#003399", "#ff3300", "#006600", "#cc0066", "#663399", "#009999", "#993300", "#000099", "#999900", "#999999"]
+  },
+  "default": {
+    "name": "Default",
+    "primary": "#1f77b4",
+    "secondary": "#aec7e8",
+    "accent": "#ff7f0e",
+    "background": "#ffffff",
+    "text": "#333333",
+    "grid": "#e0e0e0",
+    "colors": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+  }
+}

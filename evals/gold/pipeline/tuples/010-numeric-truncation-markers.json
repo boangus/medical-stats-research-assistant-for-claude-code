@@ -1,0 +1,23 @@
+{
+  "tuple_id": "010-numeric-truncation-markers",
+  "kind": "format_variant",
+  "test_name": "数值截断标记",
+  "source_pit": 7,
+  "description": "PSA_Level contains 7 truncation markers (<0.1, <1.5, >100 etc), must detect",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "data-prep",
+    "trigger_columns": [
+      "PSA_Level"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 2.5 (numeric truncation detection)",
+    "action": "List all truncation types and frequencies, let user choose strategy"
+  },
+  "failure_pattern": "LLM may treat Chinese truncation markers as text rather than numeric signals"
+}
+
+

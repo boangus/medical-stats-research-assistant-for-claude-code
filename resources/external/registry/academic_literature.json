@@ -1,0 +1,490 @@
+{
+  "schema_version": "1.0.0",
+  "last_updated": "2026-06-22",
+  "categories": {
+    "causal_inference_methods": {
+      "count": 5,
+      "topics": [
+        {
+          "topic": "Mendelian Randomization",
+          "description": "Using genetic variants as instrumental variables for causal inference",
+          "msra_reference": "shared/statistics-methods/chapters/ch45-mendelian-randomization.md",
+          "key_references": [
+            "Burgess & Thompson (2021) - Mendelian Randomization: Methods for Causal Inference",
+            "Hartwig et al. (2017) - Robust methods in Mendelian randomization"
+          ],
+          "research_frontier": ["Two-sample MR", "Mediated MR", "Polygenic MR"]
+        },
+        {
+          "topic": "Doubly Robust Estimation",
+          "description": "Combining outcome regression with propensity score weighting",
+          "msra_reference": "skills/exploratory-causal",
+          "key_references": [
+            "Bang & Robins (2005) - Doubly robust estimation",
+            "Vansteelandt et al. (2023) - Recent advances in doubly robust methods"
+          ],
+          "research_frontier": ["Targeted learning", "Collaborative targeted learning"]
+        },
+        {
+          "topic": "E-value for Sensitivity Analysis",
+          "description": "Quantifying unmeasured confounding bias",
+          "msra_reference": "shared/statistics-methods/chapters/ch28-e-value.md",
+          "key_references": [
+            "VanderWeele & Ding (2017) - Sensitivity analysis in observational research"
+          ],
+          "research_frontier": ["E-value for mediation", "E-value for time-to-event"]
+        },
+        {
+          "topic": "Target Trial Emulation",
+          "description": "Causal inference framework using observational data",
+          "msra_reference": "shared/statistics-methods/chapters/ch44-target-trial-emulation.md",
+          "key_references": [
+            "Hernán & Robins (2016) - Using big data to emulate a trial"
+          ],
+          "research_frontier": ["Sequential emulation", "Nested trial emulation"]
+        },
+        {
+          "topic": "Causal Discovery",
+          "description": "Learning causal structure from data",
+          "msra_reference": "skills/exploratory-causal",
+          "key_references": [
+            "Spirtes et al. (2000) - Causation, Prediction, and Search",
+            "Ramsey et al. (2017) - Algorithms for conditional independence"
+          ],
+          "research_frontier": ["FCI algorithm", "LiNGAM for non-linear"]
+        }
+      ]
+    },
+    "clinical_prediction_models": {
+      "count": 4,
+      "topics": [
+        {
+          "topic": "C-statistic Calibration",
+          "description": "Discrimination and calibration assessment",
+          "msra_reference": "shared/statistics-methods/chapters/ch39-c-statistic.md",
+          "key_references": [
+            "Harrell et al. (1996) - Multivariable prognostic models",
+            "Uno et al. (2011) - Weighted C-statistic for survival data"
+          ],
+          "research_frontier": [" optimism-corrected C-statistic", "Bootstrap validation"]
+        },
+        {
+          "topic": "Decision Curve Analysis (DCA)",
+          "description": "Clinical utility assessment beyond AUC",
+          "msra_reference": "shared/statistics-methods/chapters/ch23-decision-curve-analysis.md",
+          "key_references": [
+            "Vickers & Elkin (2006) - Decision curve analysis",
+            "Fitzgerald et al. (2015) - DCA for clinical outcomes"
+          ],
+          "research_frontier": ["Dynamic DCA", "Microlevel DCA"]
+        },
+        {
+          "topic": "Net Reclassification Improvement (NRI)",
+          "description": "Categorical and continuous NRI for model comparison",
+          "msra_reference": "shared/statistics-methods/chapters/ch39-c-statistic.md",
+          "key_references": [
+            "Pencina et al. (2008) - NRI statistic",
+            "Pickering & Endres (2012) - NRI for continuous biomarkers"
+          ],
+          "research_frontier": ["Integrated NRI", "Decision-specific NRI"]
+        },
+        {
+          "topic": "Model Validation Methods",
+          "description": "Internal and external validation frameworks",
+          "msra_reference": "shared/calibration",
+          "key_references": [
+            "Steyerberg (2019) - Clinical prediction models (2nd ed)",
+            "Collins et al. (2014) - TRIPOD statement"
+          ],
+          "research_frontier": ["Temporal validation", "Geographic validation"]
+        }
+      ]
+    },
+    "missing_data_methods": {
+      "count": 3,
+      "topics": [
+        {
+          "topic": "Multiple Imputation by Chained Equations (MICE)",
+          "description": "State-of-the-art missing data handling",
+          "msra_reference": "shared/statistics-methods/chapters/ch20-multiple-imputation.md",
+          "key_references": [
+            "van Buuren (2018) - Flexible imputation of missing data (2nd ed)",
+            "White et al. (2011) - Multiple imputation for missing data"
+          ],
+          "research_frontier": ["Automatic imputation", "Passive imputation"]
+        },
+        {
+          "topic": "Inverse Probability Weighting (IPW)",
+          "description": "Handling missing data via propensity weighting",
+          "msra_reference": "shared/statistics-methods/chapters/ch35-propensity-scores.md",
+          "key_references": [
+            "Hernán et al. (2000) - IPW for marginal structural models"
+          ],
+          "research_frontier": ["Doubly robust IPW", "Automated IPW"]
+        },
+        {
+          "topic": "Sensitivity Analysis for Missing Data",
+          "description": "Exploring robustness to missingness assumptions",
+          "msra_reference": "shared/statistics-methods/chapters/ch12-missing-data.md",
+          "key_references": [
+            "Carpenter & Kenward (2013) - Multiple imputation and its sensitivity analysis"
+          ],
+          "research_frontier": ["Simulation-based sensitivity", "Pattern-mixture models"]
+        }
+      ]
+    },
+    "systematic_review_methods": {
+      "count": 4,
+      "topics": [
+        {
+          "topic": "PRISMA 2020 Statement",
+          "description": "Updated systematic review reporting standards",
+          "msra_reference": "shared/reporting-guidelines/PRISMA_2020.md",
+          "key_references": [
+            "Page et al. (2021) - PRISMA 2020 statement"
+          ],
+          "research_frontier": ["PRISMA-NMA", "PRISMA-IPD"]
+        },
+        {
+          "topic": "GRADE Evidence Assessment",
+          "description": "Evidence quality evaluation framework",
+          "msra_reference": "shared/risk-of-bias/GRADE.md",
+          "key_references": [
+            "Guyatt et al. (2008) - GRADE approach",
+            "Schünemann et al. (2019) - GRADE handbook"
+          ],
+          "research_frontier": ["GRADE Pro", "Summary of findings tables"]
+        },
+        {
+          "topic": "Risk of Bias Tools",
+          "description": "Quality assessment for different study designs",
+          "msra_reference": "shared/risk-of-bias",
+          "key_references": [
+            "Sterne et al. (2019) - RoB 2 tool",
+            "Sterne et al. (2016) - ROBINS-I tool",
+            "Wolff et al. (2019) - PROBAST tool"
+          ],
+          "research_frontier": ["ROBINS-E", "QUADAS-3"]
+        },
+        {
+          "topic": "Network Meta-analysis",
+          "description": "Comparing multiple treatments indirectly",
+          "msra_reference": "shared/statistics-methods/chapters/ch46-network-meta-analysis.md",
+          "key_references": [
+            "Dias et al. (2011) - NICE DSU methods for NMA",
+            "Rücker (2012) - Network meta-analysis of rare events"
+          ],
+          "research_frontier": ["Node-splitting", "CINeMA framework"]
+        }
+      ]
+    },
+    "bayesian_statistics": {
+      "count": 3,
+      "topics": [
+        {
+          "topic": "Bayesian Clinical Trials",
+          "description": "Bayesian approaches to trial design and analysis",
+          "msra_reference": "shared/statistics-methods/chapters/ch22-bayesian-analysis.md",
+          "key_references": [
+            "Berry et al. (2010) - Bayesian adaptive trials",
+            "FDA (2023) - Adaptive designs guidance"
+          ],
+          "research_frontier": ["Master protocols", "Platform trials"]
+        },
+        {
+          "topic": "Hierarchical Bayesian Models",
+          "description": "Borrowing strength across subgroups",
+          "msra_reference": "shared/statistics-methods/chapters/ch38-hierarchical-bayesian-models.md",
+          "key_references": [
+            "Gelman et al. (2013) - Bayesian data analysis (3rd ed)"
+          ],
+          "research_frontier": ["Regional borrowing", "Sparse data extrapolation"]
+        },
+        {
+          "topic": "Bayesian Meta-analysis",
+          "description": "Incorporating prior evidence in meta-analysis",
+          "msra_reference": "shared/statistics-methods/chapters/ch37-random-effects-meta-analysis.md",
+          "key_references": [
+            "Sutton & Abrams (2001) - Bayesian methods for meta-analysis"
+          ],
+          "research_frontier": ["Network meta-analysis priors", "Power priors"]
+        }
+      ]
+    },
+    "reporting_standards": {
+      "count": 4,
+      "topics": [
+        {
+          "topic": "CONSORT 2025",
+          "description": "RCT reporting checklist and flow diagram",
+          "msra_reference": "shared/reporting-guidelines/CONSORT_2025.md",
+          "key_references": [
+            "CONSORT Group (2025) - Updated CONSORT statement"
+          ],
+          "research_frontier": ["CONSORT extensions", "Abstract reporting"]
+        },
+        {
+          "topic": "STROBE Guidelines",
+          "description": "Observational study reporting standards",
+          "msra_reference": "shared/reporting-guidelines/STROBE.md",
+          "key_references": [
+            "von Elm et al. (2007) - STROBE statement"
+          ],
+          "research_frontier": ["STROBE extensions", "Strengthening reporting of SGE"]
+        },
+        {
+          "topic": "TRIPOD Statement",
+          "description": "Prediction model reporting",
+          "msra_reference": "shared/reporting-guidelines/TRIPOD.md",
+          "key_references": [
+            "Collins et al. (2015) - TRIPOD statement"
+          ],
+          "research_frontier": ["TRIPOD-AI", "TRIPOD-LLM"]
+        },
+        {
+          "topic": "CHEERS 2022",
+          "description": "Health economic evaluation reporting",
+          "msra_reference": "shared/reporting-guidelines/CHEERS_2022.md",
+          "key_references": [
+            "Husereau et al. (2022) - CHEERS 2022 statement"
+          ],
+          "research_frontier": ["Budget impact analysis reporting"]
+        }
+      ]
+    },
+    "ml_in_medical_stats": {
+      "count": 3,
+      "topics": [
+        {
+          "topic": "ML Fairness in Clinical Prediction",
+          "description": "Bias and fairness considerations for clinical ML",
+          "msra_reference": "shared/statistics-methods/chapters/ch47-ml-fairness-clinical.md",
+          "key_references": [
+            "Chen et al. (2021) - Fairness in health AI",
+            "Mehr et al. (2023) - Fairness in clinical prediction models"
+          ],
+          "research_frontier": ["Group fairness metrics", "Individual fairness"]
+        },
+        {
+          "topic": "Survival Analysis with ML",
+          "description": "Machine learning for time-to-event data",
+          "msra_reference": "shared/statistics-methods/chapters/ch48-survival-ml-methods.md",
+          "key_references": [
+            "Lee et al. (2019) - DeepSurv",
+            "Kvamme et al. (2019) - MTLR"
+          ],
+          "research_frontier": ["Causal survival forests", "Continuous-time survival"]
+        },
+        {
+          "topic": "XGBoost/LightGBM in Medicine",
+          "description": "Gradient boosting for clinical prediction",
+          "msra_reference": "requirements.txt",
+          "key_references": [
+            "Chen & Guestrin (2016) - XGBoost",
+            "Ke et al. (2017) - LightGBM"
+          ],
+          "research_frontier": ["SHAP for clinical interpretation", "Calibration of GBMs"]
+        }
+      ]
+    },
+    "mediation_interaction": {
+      "count": 2,
+      "topics": [
+        {
+          "topic": "Mediation Analysis",
+          "description": "Direct, indirect, and total effects decomposition",
+          "msra_reference": "shared/statistics-methods/chapters/ch30-mediation-analysis.md",
+          "key_references": [
+            "Pearl (2014) - Mediation and moderation",
+            "VanderWeele (2014) - Mediation analysis toolkit"
+          ],
+          "research_frontier": ["Causal mediation analysis", "Longitudinal mediation"]
+        },
+        {
+          "topic": "Effect Modification",
+          "description": "Interaction assessment and subgroup analysis",
+          "msra_reference": "shared/statistics-methods/chapters/ch31-odds-ratio.md",
+          "key_references": [
+            "VanderWeele & Knol (2014) - Interaction analysis"
+          ],
+          "research_frontier": ["Stochastic interaction", "Qualitative interaction"]
+        }
+      ]
+    },
+    "bioinformatics_methods": {
+      "count": 5,
+      "topics": [
+        {
+          "topic": "Single-cell Multi-omics Integration",
+          "description": "Integrating transcriptomics, epigenomics, and proteomics at single-cell resolution",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Stuart et al. (2019) - Comprehensive integration of single-cell data (Cell)",
+            "Argelaguet et al. (2020) - Multi-omics factor analysis (Nature Genetics)"
+          ],
+          "research_frontier": ["Spatial transcriptomics integration", "AI-driven multi-omics"]
+        },
+        {
+          "topic": "AI-driven Protein Structure Prediction",
+          "description": "Deep learning methods for protein structure and function prediction",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Jumper et al. (2021) - AlphaFold (Nature)",
+            "Abramson et al. (2024) - AlphaFold 3 for molecular biology (Nature)"
+          ],
+          "research_frontier": ["Protein-complex prediction", "Drug-target interaction"]
+        },
+        {
+          "topic": "Spatial Transcriptomics",
+          "description": "Methods for preserving spatial information in transcriptomic analysis",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Stahl et al. (2016) - Spatial transcriptomics (Science)",
+            "Palla et al. (2022) - Squidpy for spatial omics (Nature Methods)"
+          ],
+          "research_frontier": ["Spatially variable genes", "Cell-cell communication mapping"]
+        },
+        {
+          "topic": "Precision Medicine Genomics",
+          "description": "Genomic approaches to personalized medicine",
+          "msra_reference": "shared/statistics-methods/chapters/ch45-mendelian-randomization.md",
+          "key_references": [
+            "Collins & Varmus (2015) - Precision medicine initiative (NEJM)",
+            "Ashley (2016) - Towards precision medicine (Nature Reviews Genetics)"
+          ],
+          "research_frontier": ["Polygenic risk scores", "Clinical genomic interpretation"]
+        },
+        {
+          "topic": "Single-cell RNA-seq Analysis",
+          "description": "Computational methods for scRNA-seq data analysis",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Luecken & Theis (2019) - Current best practices in scRNA-seq (Molecular Systems Biology)",
+            "Korsunsky et al. (2019) - Fast, sensitive, and scalable (Nature Methods)"
+          ],
+          "research_frontier": ["Batch correction", "Cell type annotation automation"]
+        }
+      ]
+    },
+    "medical_imaging_methods": {
+      "count": 5,
+      "topics": [
+        {
+          "topic": "Deep Learning Medical Image Diagnosis",
+          "description": "CNN and transformer-based methods for medical image analysis",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "McKinney et al. (2020) - International evaluation of AI (Nature Medicine)",
+            "Muehlematter et al. (2021) - Medical image classification (Lancet Digital Health)"
+          ],
+          "research_frontier": ["Multi-modal learning", "Self-supervised pre-training"]
+        },
+        {
+          "topic": "Federated Learning in Medical Imaging",
+          "description": "Privacy-preserving distributed learning across institutions",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Kaissis et al. (2021) - Secure AI for medical data (Nature Machine Intelligence)",
+            "Rieke et al. (2020) - The future of digital health (Nature)"
+          ],
+          "research_frontier": ["Differential privacy", "Secure aggregation"]
+        },
+        {
+          "topic": "Explainable AI in Medical Imaging",
+          "description": "Interpretable deep learning for clinical decision support",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Rudin (2019) - Stop explaining black box ML (Nature Machine Intelligence)",
+            "Lundberg et al. (2020) - Explainable AI for healthcare (Nature Medicine)"
+          ],
+          "research_frontier": ["Concept bottleneck models", "Causal explanations"]
+        },
+        {
+          "topic": "Radiomics and Deep Learning Fusion",
+          "description": "Combining hand-crafted radiomic features with deep learning",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Lambin et al. (2012) - Radiomics (Nature Reviews Clinical Oncology)",
+            "Parekh & Jacobs (2022) - Radiomics and deep learning (Radiology AI)"
+          ],
+          "research_frontier": ["Radiomics quality control", "Multi-center validation"]
+        },
+        {
+          "topic": "Real-time Intraoperative Image Navigation",
+          "description": "AI-guided surgical navigation and real-time imaging",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Cohen et al. (2020) - Real-time surgical guidance (Nature Biomedical Engineering)",
+            "Szpala et al. (2021) - Intraoperative MRI guidance (Neurosurgery)"
+          ],
+          "research_frontier": ["AR/VR integration", "Haptic feedback systems"]
+        }
+      ]
+    },
+    "real_time_data_methods": {
+      "count": 5,
+      "topics": [
+        {
+          "topic": "Medical IoT Stream Processing",
+          "description": "Real-time analysis of continuous patient monitoring data",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Bhide et al. (2021) - IoT in healthcare (IEEE Reviews in Biomedical Engineering)",
+            "Rashid et al. (2022) - Streaming analytics for patient monitoring (JMIR)"
+          ],
+          "research_frontier": ["Edge computing", "5G-enabled streaming"]
+        },
+        {
+          "topic": "Continuous Patient Monitoring Analytics",
+          "description": "Streaming analysis for vital signs and bedside monitoring",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Charitos et al. (2021) - Bedside monitoring (Yearbook of Medical Informatics)",
+            "Christensen et al. (2020) - Real-time clinical decision support (JMIR)"
+          ],
+          "research_frontier": ["Anomaly detection", "Predictive alerting"]
+        },
+        {
+          "topic": "Clinical Decision Support Systems",
+          "description": "AI-driven real-time clinical recommendations",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Sutton et al. (2020) - Clinical decision support systems (BMJ)",
+            "Bates et al. (2021) - Improving clinical decision support (NEJM)"
+          ],
+          "research_frontier": ["LLM-powered CDS", "Adaptive clinical protocols"]
+        },
+        {
+          "topic": "Wearable Device Analytics",
+          "description": "Analysis of continuous data from wearable sensors",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Dunn et al. (2021) - Apple Heart Study (NEJM)",
+            "Rogowski et al. (2024) - Wearable ECG screening (Lancet)"
+          ],
+          "research_frontier": ["AF detection algorithms", "Activity recognition"]
+        },
+        {
+          "topic": "Real-time Disease Outbreak Surveillance",
+          "description": "Streaming data analysis for early disease detection",
+          "msra_reference": "resources/external/registry",
+          "key_references": [
+            "Brockmann & Helbing (2013) - Global mobility (Science)",
+            "McGough et al. (2024) - Real-time epidemic tracking (Nature Communications)"
+          ],
+          "research_frontier": ["Syndromic surveillance", "Genomic epidemiology integration"]
+        }
+      ]
+    }
+  },
+  "retrieval_commands": {
+    "pubmed_search": "python scripts/pubmed_search.py --query '<search_term>' --max_results 50",
+    "github_search": "gh search code --language python --repo <owner/repo> '<query>'",
+    "arxiv_search": "python scripts/arxiv_search.py --query '<search_term>' --max_results 30"
+  },
+  "update_frequency": {
+    "github_projects": "monthly",
+    "academic_literature": "quarterly",
+    "integration_status": "weekly"
+  }
+}

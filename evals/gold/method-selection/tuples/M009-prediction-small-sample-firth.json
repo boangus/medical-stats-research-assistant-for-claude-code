@@ -1,0 +1,47 @@
+{
+  "tuple_id": "M009-prediction-small-sample-firth",
+  "kind": "method_selection",
+  "test_name": "预测模型+二分类结局+小样本应选Firth惩罚logistic回归",
+  "description": "开发一个预测术后30天严重并发症的模型，15个候选预测因子，结局事件仅38例（总样本280例，事件率13.6%，EPV=38/15=2.5）。标准logistic回归会严重过拟合且存在小样本偏倚。正确方法为Firth惩罚logistic回归或类似正则化方法。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "prediction model development",
+    "outcome_type": "binary",
+    "outcome_variable": "术后30天严重并发症（有/无）",
+    "events": 38,
+    "total_sample": 280,
+    "event_rate": 0.136,
+    "candidate_predictors": 15,
+    "epv": 2.5,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "Firth惩罚logistic回归",
+    "expected_parameters": "Firth penalized likelihood logistic regression, with penalization factor 0.5 * log(det(I(beta))) added to log-likelihood",
+    "model_specification": "logit(p) = beta_0 + beta_1*x_1 + ... + beta_p*x_p\nFirth correction: maximizes log L(beta) + 0.5 * log(det(I(beta)))\nAlternatively: LASSO/Ridge logistic regression with CV-selected lambda",
+    "model_validation": ["内部验证（Bootstrap optimism correction）", "校准曲线", "C-statistic (bias-corrected)"],
+    "variable_selection": ["先验知识驱动（避免自动化选择在小样本下过拟合）", "LASSO作为替代变量选择方法"],
+    "reporting": "TRIPOD type 2a"
+  },
+  "common_wrong_methods": [
+    {
+      "method": "标准（最大似然）logistic回归",
+      "why_wrong": "EPV<10时标准MLE存在：(1)有限样本偏倚（bias away from null），(2)完全/准完全分离导致不收敛，(3)过度乐观的模型性能。Firth通过Jeffreys先验惩罚缓解这些问题"
+    },
+    {
+      "method": "逐步logistic回归（stepwise变量选择）",
+      "why_wrong": "小样本下逐步选择极不稳定，选出的变量在bootstrap重抽样中变化很大，导致严重过拟合"
+    },
+    {
+      "method": "随机森林/GBM等ML方法",
+      "why_wrong": "非参数ML方法在小样本下过拟合风险极高，且缺乏可靠的不确定性量化；Firth logist回归的偏倚-方差权衡更优"
+    }
+  ],
+  "reasoning": "当每变量事件数（EPV）<10甚至<5时，标准最大似然logistic回归的偏倚和不稳定性是公认的。Firth (1993)提出的惩罚似然方法通过Jeffreys不变先验（等价于对似然函数加0.5*log(det(I(beta)))的惩罚），实现：(1)减少有限样本偏倚，(2)解决分离问题，(3)改善置信区间覆盖率。Heinze & Schemper (2002)系统验证了Firth在小样本临床预测中的优势。TRIPOD声明要求预测模型研究明确报告EPV并选择适当的建模策略。",
+  "references": [
+    "Firth D. Bias reduction of maximum likelihood estimates. Biometrika. 1993;80(1):27-38.",
+    "Heinze G, Schemper M. A solution to the problem of separation in logistic regression. Stat Med. 2002;21(16):2409-2419.",
+    "van Smeden M, et al. Sample size for binary logistic prediction models: Beyond events per variable criteria. Stat Methods Med Res. 2019;28(8):2437-2455."
+  ]
+}

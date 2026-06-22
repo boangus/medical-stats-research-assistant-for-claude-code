@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/data_preparation/v1",
+  "stage": "data_preparation",
+  "description": "Material Passport for Stage 1 — Data Preparation. Tracks all artifacts produced during data cleaning, transformation, and validation.",
+
+  "passport_type": "data_preparation",
+  "stage_number": 1,
+
+  "required_artifacts": [
+    {
+      "artifact_id": "raw_data",
+      "name": "原始数据",
+      "description": "Original unmodified data file(s) as received from the data source.",
+      "file_patterns": ["*.csv", "*.xlsx", "*.sas7bdat", "*.sav", "*.dta"],
+      "required": true,
+      "immutable": true
+    },
+    {
+      "artifact_id": "data_dictionary",
+      "name": "数据字典",
+      "description": "Variable names, labels, types, units, coding schemes, and value ranges.",
+      "file_patterns": ["data_dictionary.*", "codebook.*"],
+      "required": true
+    },
+    {
+      "artifact_id": "cleaning_log",
+      "name": "清洗日志",
+      "description": "Record of all data cleaning actions: queries issued, discrepancies found, resolutions applied.",
+      "required": true
+    },
+    {
+      "artifact_id": "analysis_dataset",
+      "name": "分析数据集",
+      "description": "Final cleaned dataset(s) ready for statistical analysis. Includes derived variables and recoded values.",
+      "file_patterns": ["analysis_*.csv", "analysis_*.rds", "adsl.sas7bdat", "adtte.sas7bdat"],
+      "required": true
+    },
+    {
+      "artifact_id": "variable_listing",
+      "name": "变量清单",
+      "description": "Complete listing of all variables in the analysis dataset with metadata (name, label, type, source, derivation).",
+      "required": true
+    },
+    {
+      "artifact_id": "missing_data_summary",
+      "name": "缺失数据摘要",
+      "description": "Summary of missing data patterns, counts, and percentages by variable and analysis population.",
+      "required": true
+    },
+    {
+      "artifact_id": "demographic_summary",
+      "name": "基线人口统计学摘要",
+      "description": "Baseline demographic and clinical characteristics of the analysis population.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "query_log",
+      "name": "数据质疑日志",
+      "description": "Data management queries and responses."
+    },
+    {
+      "artifact_id": "audit_trail",
+      "name": "数据审计追踪",
+      "description": "SDTM/ADaM compliance verification results."
+    },
+    {
+      "artifact_id": "derive_programs",
+      "name": "变量派生程序",
+      "description": "R/Python/SAS programs used for variable derivation and transformation."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "DG-01",
+      "name": "数据完整性检查",
+      "description": "All expected records are present; no duplicate records; unique identifiers are valid.",
+      "required": true
+    },
+    {
+      "gate_id": "DG-02",
+      "name": "变量范围检查",
+      "description": "All values fall within expected ranges per the data dictionary.",
+      "required": true
+    },
+    {
+      "gate_id": "DG-03",
+      "name": "缺失模式检查",
+      "description": "Missing data patterns are reviewed; no unexpected systematic missingness.",
+      "required": true
+    },
+    {
+      "gate_id": "DG-04",
+      "name": "分析人群一致性",
+      "description": "Analysis population definitions (ITT, PP, safety) are consistently applied.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "analysis_plan",
+    "required_for_handoff": ["analysis_dataset", "data_dictionary", "variable_listing", "demographic_summary"],
+    "handoff_bundle_file": "data_preparation_handoff.json"
+  }
+}

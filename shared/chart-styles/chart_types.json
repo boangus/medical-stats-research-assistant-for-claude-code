@@ -1,0 +1,282 @@
+{
+  "km_curve": {
+    "name": "Kaplan-Meier Curve",
+    "description": "生存分析曲线",
+    "required_elements": [
+      "survival_probability_axis",
+      "time_axis",
+      "censoring_marks",
+      "number_at_risk_table",
+      "confidence_intervals",
+      "p_value",
+      "sample_size"
+    ],
+    "recommended_elements": [
+      "median_survival_time",
+      "hazard_ratio",
+      "log_rank_test"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 100,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "forest_plot": {
+    "name": "Forest Plot",
+    "description": "荟萃分析或亚组分析森林图",
+    "required_elements": [
+      "effect_size_estimates",
+      "confidence_intervals",
+      "reference_line",
+      "weight_indicator",
+      "summary_estimate",
+      "heterogeneity_stats"
+    ],
+    "recommended_elements": [
+      "subgroup_labels",
+      "total_events",
+      "total_patients"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 80,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "roc_curve": {
+    "name": "ROC Curve",
+    "description": "受试者工作特征曲线",
+    "required_elements": [
+      "true_positive_rate",
+      "false_positive_rate",
+      "reference_line",
+      "auc_value",
+      "confidence_interval"
+    ],
+    "recommended_elements": [
+      "optimal_cutoff",
+      "sensitivity",
+      "specificity",
+      "youden_index"
+    ],
+    "dimensions": {
+      "width": 100,
+      "height": 100,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "forest_plot_subgroup": {
+    "name": "Subgroup Forest Plot",
+    "description": "亚组分析森林图",
+    "required_elements": [
+      "subgroup_labels",
+      "effect_size_estimates",
+      "confidence_intervals",
+      "interaction_p_value",
+      "reference_line"
+    ],
+    "recommended_elements": [
+      "subgroup_sizes",
+      "event_counts",
+      "heterogeneity_stats"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 100,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "dose_response_plot": {
+    "name": "Dose-Response Plot",
+    "description": "剂量-反应关系图",
+    "required_elements": [
+      "dose_axis",
+      "response_axis",
+      "dose_points",
+      "confidence_intervals",
+      "trend_line"
+    ],
+    "recommended_elements": [
+      "reference_dose",
+      "threshold_effect",
+      "non_linear_trend"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 80,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "calibration_plot": {
+    "name": "Calibration Plot",
+    "description": "校准曲线",
+    "required_elements": [
+      "predicted_probability_axis",
+      "observed_probability_axis",
+      "calibration_curve",
+      "reference_line",
+      "calibration_slope",
+      "calibration_intercept"
+    ],
+    "recommended_elements": [
+      "brier_score",
+      "hosmer_lemeshow_test",
+      "bootstrap_ci"
+    ],
+    "dimensions": {
+      "width": 100,
+      "height": 100,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "decision_curve": {
+    "name": "Decision Curve",
+    "description": "决策曲线分析",
+    "required_elements": [
+      "threshold_probability_axis",
+      "net_benefit_axis",
+      "model_curve",
+      "treat_all_line",
+      "treat_none_line"
+    ],
+    "recommended_elements": [
+      "clinical_threshold",
+      "optimal_threshold",
+      "comparative_models"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 80,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "box_plot": {
+    "name": "Box Plot",
+    "description": "箱线图",
+    "required_elements": [
+      "median_line",
+      "quartile_box",
+      "whiskers",
+      "outlier_points"
+    ],
+    "recommended_elements": [
+      "individual_data_points",
+      "group_comparison",
+      "significance_bars"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 80,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "bar_chart": {
+    "name": "Bar Chart",
+    "description": "柱状图",
+    "required_elements": [
+      "bar_heights",
+      "error_bars",
+      "group_labels"
+    ],
+    "recommended_elements": [
+      "individual_data_points",
+      "significance_bars",
+      "sample_sizes"
+    ],
+    "dimensions": {
+      "width": 120,
+      "height": 80,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  },
+  "scatter_plot": {
+    "name": "Scatter Plot",
+    "description": "散点图",
+    "required_elements": [
+      "data_points",
+      "trend_line",
+      "correlation_coefficient"
+    ],
+    "recommended_elements": [
+      "confidence_interval",
+      "prediction_interval",
+      "marginal_distribution"
+    ],
+    "dimensions": {
+      "width": 100,
+      "height": 100,
+      "dpi": 300
+    },
+    "font_sizes": {
+      "title": 12,
+      "axis_labels": 10,
+      "tick_labels": 9,
+      "legend": 8
+    },
+    "color_scheme": "journal_specific"
+  }
+}

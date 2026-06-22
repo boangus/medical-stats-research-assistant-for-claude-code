@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "journal": "New England Journal of Medicine",
+    "abbr": "NEJM",
+    "publisher": "Massachusetts Medical Society",
+    "recommended_study_type": ["RCT", "large cohort"],
+    "guideline": "CONSORT",
+    "description": "NEJM-style statistical analysis report template. Focuses on clear primary outcome reporting, standardized Table 1, and concise methods section. Supplementary appendix for secondary/sensitivity analyses."
+  },
+  "sections": [
+    {
+      "id": "methods",
+      "title": "Statistical Analysis",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design and population definition (ITT/PP/Modified ITT)",
+        "Sample size calculation and power justification",
+        "Primary analysis: method, covariates, hypothesis test",
+        "Secondary and exploratory analyses",
+        "Subgroup analyses (pre-specified vs post-hoc)",
+        "Sensitivity analyses (missing data, per-protocol, etc.)",
+        "Multiple comparison adjustment (if applicable)",
+        "Software (SAS/R/Stata version) and significance threshold"
+      ]
+    },
+    {
+      "id": "results_baseline",
+      "title": "Baseline Characteristics",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics of the Patients",
+         "type": "baseline_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "results_primary",
+      "title": "Primary Outcome",
+      "order": 3,
+      "tables": [
+        {"label": "Table 2", "title": "Primary Efficacy Endpoint",
+         "type": "main_results_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "Primary Outcome",
+         "type": "clinical_figure", "alt_types": ["km_curve", "forest_plot", "cumulative_incidence"]}
+      ]
+    },
+    {
+      "id": "results_secondary",
+      "title": "Secondary Outcomes",
+      "order": 4,
+      "content": {"type": "narrative", "style": "brief"}
+    },
+    {
+      "id": "subgroup",
+      "title": "Subgroup Analyses",
+      "order": 5,
+      "figures": [
+        {"label": "Figure 2", "title": "Subgroup Analyses",
+         "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "safety",
+      "title": "Safety (if applicable)",
+      "order": 6,
+      "tables": [
+        {"label": "Table 3", "title": "Adverse Events",
+         "type": "safety_table", "format": "docx_three_line"}
+      ]
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Appendix (online-only)",
+    "sections": [
+      {"id": "supp_methods", "title": "eMethods", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "eTables", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "eFigures", "type": "supplement_figures"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "docx_three_line",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "NEJM_blue",
+    "supplement_as_separate_file": true
+  },
+  "review_profile": {
+    "review_style": "concise_clinical",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.5,
+      "methodological_rigor": 1.0,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "pragmatic_clinician",
+    "common_concerns": [
+      "Is the effect size clinically meaningful?",
+      "Are the confidence intervals narrow enough for practice guidance?",
+      "Is the supplementary material well-organized?"
+    ],
+    "devils_advocate_focus": "clinical_generalizability",
+    "tone": "direct_efficient"
+  }
+}
+
+
+

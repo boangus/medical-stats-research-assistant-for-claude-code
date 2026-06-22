@@ -1,0 +1,3 @@
+{"tuple_id": "008-invalid-category-value", "kind": "logic_conflict", "test_name": "无效分类值", "description": "BloodType 含无效值(XX, 不明)，编码有效性检查必须检出", "source_pit": 14, "input": {"data_file": "tests/msra_test_data.csv", "pipeline_stage": "data-prep", "mode": "guided", "trigger_columns": ["BloodType"]}, "expected": {"detection": true, "severity": "warning", "phase": "Phase 1.5 (Gate项2: 编码有效性)", "action": "标记为 Warning，与用户确认是否为已知编码"}, "failure_pattern": "LLM 可能将 XX 理解为'未知编码'而不标记。"}
+
+

@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "journal": "中华医学杂志",
+    "abbr": "CMJ_v2",
+    "publisher": "中华医学会",
+    "recommended_study_type": ["RCT", "cohort", "case-control", "diagnostic accuracy", "case report"],
+    "guideline": "CONSORT/STROBE/STARD/CARE",
+    "description": "中华医学杂志统计分析报告模板。强调临床实用性、中医西医结合、循证医学证据。"
+  },
+  "sections": [
+    {
+      "id": "methods",
+      "title": "统计学方法",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "研究设计与研究对象",
+        "样本量计算与检验效能",
+        "主要分析：方法、协变量、假设检验",
+        "次要分析与探索性分析",
+        "亚组分析（预设与事后）",
+        "敏感性分析（缺失数据、不同假设）",
+        "多重比较校正（如适用）",
+        "软件与检验水准"
+      ]
+    },
+    {
+      "id": "results_baseline",
+      "title": "基线资料",
+      "order": 2,
+      "tables": [
+        {"label": "表1", "title": "两组患者基线资料比较",
+         "type": "baseline_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "results_primary",
+      "title": "主要结局指标",
+      "order": 3,
+      "tables": [
+        {"label": "表2", "title": "主要结局指标比较",
+         "type": "main_results_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "图1", "title": "主要结局指标",
+         "type": "clinical_figure", "alt_types": ["km_curve", "forest_plot", "cumulative_incidence"]}
+      ]
+    },
+    {
+      "id": "results_secondary",
+      "title": "次要结局指标",
+      "order": 4,
+      "content": {"type": "narrative", "style": "brief"},
+      "tables": [
+        {"label": "表3", "title": "次要结局指标比较",
+         "type": "secondary_results_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "subgroup",
+      "title": "亚组分析",
+      "order": 5,
+      "figures": [
+        {"label": "图2", "title": "亚组分析",
+         "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "safety",
+      "title": "安全性分析",
+      "order": 6,
+      "tables": [
+        {"label": "表4", "title": "不良事件比较",
+         "type": "safety_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "tcm_integration",
+      "title": "中西医结合分析（如适用）",
+      "order": 7,
+      "content": {"type": "narrative", "style": "tcm_integration"}
+    }
+  ],
+  "supplement": {
+    "description": "补充材料（网络版）",
+    "sections": [
+      {"id": "supp_methods", "title": "补充方法", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "补充表", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "补充图", "type": "supplement_figures"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "docx_three_line",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "CMJ_red",
+    "supplement_as_separate_file": true,
+    "language": "Chinese"
+  },
+  "review_profile": {
+    "review_style": "tcm_integrated",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.2,
+      "methodological_rigor": 1.0,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "integrative_medicine_expert",
+    "common_concerns": [
+      "Is TCM-Western integration justified?",
+      "Are diagnostic criteria clearly defined?",
+      "Is the treatment protocol reproducible?"
+    ],
+    "devils_advocate_focus": "western_validation_gap",
+    "tone": "bilingual_academic"
+  }
+}
