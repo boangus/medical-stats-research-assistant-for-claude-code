@@ -13,3 +13,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-23T15:55	586fc97	systematic-survey	82.0	85.0	keep	dim3	失败模式重构为触发条件→一线处理→仍失败兜底三段式	dry_run
 2026-06-23T16:00	bfceb4a	analysis-exec	83.4	85.0	keep	dim5	软语言清理+错误分类阈值表具体化	dry_run
 2026-06-23T16:05	bf59421	report	84.1	86.0	keep	dim4+dim5	检查点升级+模糊语言替换+故障处理具体化	dry_run
+2026-06-23T16:10	c996e34	data-prep	84.7	87.0	keep	dim5	EDA异常阈值具体化+Step0输出格式规范化	dry_run
