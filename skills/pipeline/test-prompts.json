@@ -1,5 +1,17 @@
 [
-  {"id": 1, "prompt": "我有一项RCT的原始数据，请从Stage 1开始完成整个分析流程。", "expected": "启动完整流水线：检测数据→推荐Stage 1→调度data-prep→Stage 2调度analysis-plan→Stage 3调度analysis-exec→Stage 4调度report→Stage 4 CHECKPOINT询问是否继续Paper Track。"},
-  {"id": 2, "prompt": "我已经有分析结果了，只想生成报告和论文。从Stage 4开始。", "expected": "从Stage 4切入：验证Stage 1-3已完成→调度report生成统计报告→CHECKPOINT→如选B则调度论文写作。"},
-  {"id": 3, "prompt": "分析执行阶段出了问题，需要回退到Stage 2重新制定计划。", "expected": "执行回退：记录回退原因→暂停Stage 3→调度analysis-plan重新审查→更新SAP→返回Stage 3重新执行。"}
+  {
+    "id": 1,
+    "prompt": "我有一份RCT的原始数据，想完成整个分析流程",
+    "expected": "检测到原始数据，从Stage 1开始，询问交互模式选择，启动完整的MSRA Pipeline流程"
+  },
+  {
+    "id": 2,
+    "prompt": "我的数据已经清洗好了，但分析计划还没制定，帮我从分析计划开始",
+    "expected": "检测到已清洗数据，从Stage 2开始，前置检查清洗日志存在，进入分析计划制定流程"
+  },
+  {
+    "id": 3,
+    "prompt": "帮我做统计分析，但我不知道从哪里开始，数据有点乱",
+    "expected": "检测到原始数据，从Stage 1开始，提供详细引导模式，帮助用户完成数据准备和后续流程"
+  }
 ]

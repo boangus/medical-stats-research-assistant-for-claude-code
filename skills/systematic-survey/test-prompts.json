@@ -1,5 +1,17 @@
 [
-  {"id": 1, "prompt": "帮我做一项系统综述+meta分析：二甲双胍对2型糖尿病患者心血管结局的影响。", "expected": "执行完整系统综述：PICO定义→PubMed/Embase/Cochrane检索策略→PRISMA流程→偏倚风险评估→效应量合并→GRADE评级→领域检索报告。"},
-  {"id": 2, "prompt": "帮我制定一个关于免疫检查点抑制剂不良反应的PubMed检索策略。", "expected": "执行检索策略制定模式：构建MeSH+自由词组合检索式，覆盖Embase/Cochrane，输出PRISMA-S声明格式的检索策略报告。"},
-  {"id": 3, "prompt": "用苏格拉底模式引导我明确一个关于AI辅助诊断的研究问题。", "expected": "执行苏格拉底引导：通过PICO框架提问，逐步明确人群、干预、对照、结局，评估FINER可行性。"}
+  {
+    "id": 1,
+    "prompt": "我想做一篇关于针灸治疗慢性疼痛的系统综述",
+    "expected": "触发full模式，引导用户定义PICO框架，启动完整的6阶段系统综述流程"
+  },
+  {
+    "id": 2,
+    "prompt": "帮我制定一个关于糖尿病药物治疗的PubMed检索策略",
+    "expected": "触发search-strategy模式，基于PICO框架构建多数据库检索策略，输出PRISMA-S格式的检索式"
+  },
+  {
+    "id": 3,
+    "prompt": "我想了解一下中药治疗阿尔茨海默病的研究现状",
+    "expected": "触发domain-report或quick-scan模式，提供文献全景分析，包括发文趋势、热点聚类等"
+  }
 ]
