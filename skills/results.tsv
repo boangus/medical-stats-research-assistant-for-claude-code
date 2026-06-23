@@ -10,3 +10,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-23T15:40	baseline	report	-	84.1	baseline	-	双模式架构优秀，图表检查点为SLIM	dry_run
 2026-06-23T15:45	d164914	exploratory-causal	77.7	81.0	keep	dim3+dim4+dim5	失败模式具体化+ADAPTIVE检查点+软语言清理	dry_run
 2026-06-23T15:50	19eb0a5	pipeline	81.0	85.0	keep	dim3+dim5	失败模式具体化+软语言清理+阻断逻辑	dry_run
+2026-06-23T15:55	586fc97	systematic-survey	82.0	85.0	keep	dim3	失败模式重构为触发条件→一线处理→仍失败兜底三段式	dry_run
