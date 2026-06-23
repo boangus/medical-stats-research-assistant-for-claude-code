@@ -1,0 +1,10 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-06-23T15:40	baseline	systematic-survey	-	82.0	baseline	-	整体均衡，dim3失败模式偏描述性	dry_run
+2026-06-23T15:40	baseline	calibration	-	87.0	baseline	-	模式5-7理想化设计	dry_run
+2026-06-23T15:40	baseline	pipeline	-	81.0	baseline	-	软语言最多，版本0.3.0较早	dry_run
+2026-06-23T15:40	baseline	peer-review	-	86.7	baseline	-	检查点可更具体	dry_run
+2026-06-23T15:40	baseline	analysis-exec	-	83.4	baseline	-	失败模式部分缺兜底方案	dry_run
+2026-06-23T15:40	baseline	analysis-plan	-	86.7	baseline	-	软语言，测试覆盖可更全面	dry_run
+2026-06-23T15:40	baseline	data-prep	-	84.7	baseline	-	EDA部分描述偏模糊	dry_run
+2026-06-23T15:40	baseline	exploratory-causal	-	77.7	baseline	-	失败模式偏描述，缺Phase4检查点	dry_run
+2026-06-23T15:40	baseline	report	-	84.1	baseline	-	双模式架构优秀，图表检查点为SLIM	dry_run
