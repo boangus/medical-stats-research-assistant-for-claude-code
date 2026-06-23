@@ -15,8 +15,8 @@ from datetime import datetime
 import json
 from pathlib import Path
 
-from .base_agent import BaseAgent
-from .interfaces import (
+from agents.core.base_agent import BaseAgent
+from agents.core.interfaces import (
     AgentCapability,
     AgentStatus,
     Handoff,
