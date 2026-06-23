@@ -27,6 +27,10 @@ _ENGINE_FALLBACK = {
     "pandas": [],  # pandas is always available as compatibility layer
 }
 
+# Known engine types (the vocabulary of engines MSRA supports)
+# Used to distinguish "truly unknown" from "known but not installed"
+_KNOWN_ENGINE_TYPES = {"polars", "duckdb", "dask", "pandas"}
+
 
 class EngineFactory:
     """
@@ -113,7 +117,15 @@ class EngineFactory:
         if engine_lower not in registry:
             available = list(registry.keys())
 
-            # Try fallback engines
+            # Distinguish truly unknown types from known-but-uninstalled
+            if engine_lower not in _KNOWN_ENGINE_TYPES:
+                # Truly unknown engine type — never try fallback
+                raise ValueError(
+                    f"Unknown engine type: {engine_type}. "
+                    f"Available engines: {available if available else 'none'}"
+                )
+
+            # Known engine type but not installed — try fallback
             if allow_fallback:
                 for fallback in _ENGINE_FALLBACK.get(engine_lower, []):
                     if fallback in registry:
@@ -138,7 +150,7 @@ class EngineFactory:
                     )
             else:
                 raise ValueError(
-                    f"Unknown engine type: {engine_type}. "
+                    f"Engine '{engine_type}' is not available. "
                     f"Available engines: {available if available else 'none'}"
                 )
 
