@@ -1,0 +1,23 @@
+{
+  "tuple_id": "013-extreme-group-imbalance",
+  "kind": "statistical_concern",
+  "test_name": "组间极端不平衡",
+  "source_pit": 18,
+  "description": "TreatmentGroup ratio 579:21 (27.6:1), sample size validation must warn",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-exec",
+    "trigger_columns": [
+      "TreatmentGroup"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 0 (sample size: group imbalance)",
+    "action": "Warn about low power, mark as exploratory or suggest matching"
+  },
+  "failure_pattern": "LLM may run analysis on original proportions without flagging imbalance"
+}
+
+

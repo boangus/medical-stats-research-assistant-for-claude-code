@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/analysis_plan/v1",
+  "stage": "analysis_plan",
+  "description": "Material Passport for Stage 2 — Analysis Plan. Tracks all artifacts produced during SAP development and statistical methodology planning.",
+
+  "passport_type": "analysis_plan",
+  "stage_number": 2,
+
+  "required_artifacts": [
+    {
+      "artifact_id": "sap_document",
+      "name": "统计分析计划 (SAP)",
+      "description": "Complete SAP document specifying all planned analyses, methods, endpoints, and multiplicity strategy.",
+      "required": true
+    },
+    {
+      "artifact_id": "endpoint_definitions",
+      "name": "终点定义",
+      "description": "Precise operational definitions of all primary, secondary, and exploratory endpoints.",
+      "required": true
+    },
+    {
+      "artifact_id": "sample_size_justification",
+      "name": "样本量论证",
+      "description": "Sample size calculation with assumptions, power analysis, and effect size justification.",
+      "required": true
+    },
+    {
+      "artifact_id": "analysis_method_table",
+      "name": "分析方法一览表",
+      "description": "Mapping of each research question/hypothesis to its statistical method, endpoint, population, and table/figure number.",
+      "required": true
+    },
+    {
+      "artifact_id": "multiplicity_strategy",
+      "name": "多重比较控制策略",
+      "description": "Pre-specified strategy for controlling Type I error across multiple comparisons (e.g., hierarchical testing, Bonferroni, FDR).",
+      "required": true
+    },
+    {
+      "artifact_id": "table_shells",
+      "name": "表格模板",
+      "description": "Pre-defined shells for all planned tables, figures, and listings (TFLs) with row/column structure.",
+      "required": true
+    },
+    {
+      "artifact_id": "sensitivity_analysis_plan",
+      "name": "敏感性分析计划",
+      "description": "Pre-specified sensitivity analyses, subgroup analyses, and their justification.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "interim_analysis_plan",
+      "name": "期中分析计划",
+      "description": "Details of any planned interim analyses including stopping boundaries and data monitoring committee charter."
+    },
+    {
+      "artifact_id": "sap_amendments",
+      "name": "SAP修正案",
+      "description": "History of SAP amendments with rationale and approval dates."
+    },
+    {
+      "artifact_id": "statistical_consultation_log",
+      "name": "统计咨询记录",
+      "description": "Log of consultations with the trial statistician or external experts."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "AP-01",
+      "name": "SAP完整性检查",
+      "description": "SAP covers all endpoints, all analysis populations, and all planned TFLs.",
+      "required": true
+    },
+    {
+      "gate_id": "AP-02",
+      "name": "方法适当性审查",
+      "description": "Statistical methods are appropriate for the data types and research questions.",
+      "required": true
+    },
+    {
+      "gate_id": "AP-03",
+      "name": "多重比较方案审查",
+      "description": "Multiplicity control is adequate for the number of comparisons and endpoints.",
+      "required": true
+    },
+    {
+      "gate_id": "AP-04",
+      "name": "样本量论证充分性",
+      "description": "Sample size is justified with realistic assumptions and adequate power.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "analysis_execution",
+    "required_for_handoff": ["sap_document", "endpoint_definitions", "sample_size_justification", "analysis_method_table", "multiplicity_strategy", "table_shells"],
+    "handoff_bundle_file": "analysis_plan_handoff.json"
+  }
+}

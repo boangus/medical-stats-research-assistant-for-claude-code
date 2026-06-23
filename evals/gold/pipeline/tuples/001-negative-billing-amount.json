@@ -1,0 +1,23 @@
+{
+  "tuple_id": "001-negative-billing-amount",
+  "kind": "data_value",
+  "test_name": "负值金额检测",
+  "description": "BillingAmount 列存在负值(-2008)，数据验证阶段必须标记为 Critical",
+  "source_pit": 1,
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "data-prep",
+    "mode": "guided",
+    "trigger_columns": ["BillingAmount"]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "critical",
+    "phase": "Phase 1.5 (Gate项1: 范围检查)",
+    "action": "必须展示给用户，作为 Critical 问题暂停流程"
+  },
+  "failure_pattern": "LLM 倾向将负值解释为'退款'或'冲账'而不标记异常。MSRA 不应假设任何业务逻辑，负值金额必须标记。"
+}
+
+
+

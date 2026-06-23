@@ -1,0 +1,21 @@
+{
+  "tuple_id": "019-skip-mark-on-insufficient-data",
+  "kind": "pipeline_edge",
+  "test_name": "SKIP标记触达",
+  "source_pit": "-",
+  "description": "When data is insufficient for planned analysis per SAP, must mark [SKIP]",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-exec",
+    "trigger_columns": []
+  },
+  "expected": {
+    "detection": true,
+    "severity": "skip",
+    "phase": "Phase 6 ([SKIP]: insufficient data)",
+    "action": "Mark [SKIP: reason], highlight [REVIEW NEEDED] in output"
+  },
+  "failure_pattern": "LLM tends to fabricate results rather than honestly mark [SKIP]"
+}
+
+

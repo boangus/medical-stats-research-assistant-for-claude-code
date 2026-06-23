@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "journal": "The BMJ",
+    "abbr": "BMJ",
+    "publisher": "BMJ Publishing Group",
+    "recommended_study_type": ["RCT", "observational", "diagnostic"],
+    "guideline": "CONSORT / STROBE / STARD",
+    "description": "BMJ-style statistical analysis report. Features the most detailed methods section among top journals, with comprehensive sensitivity analyses and transparency reporting (data sharing, code availability)."
+  },
+  "sections": [
+    {
+      "id": "methods",
+      "title": "Statistical Analysis",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design overview",
+        "Patient and public involvement",
+        "Data sources and measurement",
+        "Primary analysis: detailed specification (model, covariates, assumptions)",
+        "Handling of missing data (detail required)",
+        "Sensitivity analyses (multiple approaches)",
+        "Subgroup analyses (pre-specified vs post-hoc distinction)",
+        "Software, reproducibility (code availability), and significance level"
+      ]
+    },
+    {
+      "id": "results_baseline",
+      "title": "Baseline Characteristics",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics of Study Participants",
+         "type": "baseline_table", "format": "docx_three_line"}
+      ]
+    },
+    {
+      "id": "results_primary",
+      "title": "Primary Analysis",
+      "order": 3,
+      "tables": [
+        {"label": "Table 2", "title": "Primary Outcome",
+         "type": "main_results_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "Primary Analysis",
+         "type": "clinical_figure", "alt_types": ["km_curve", "forest_plot", "scatter_plot"]}
+      ]
+    },
+    {
+      "id": "sensitivity",
+      "title": "Sensitivity Analyses",
+      "order": 4,
+      "content": {"type": "detailed_sensitivity", "required_analyses": ["missing_data", "per_protocol", "e_value"]},
+      "tables": [
+        {"label": "Table 3", "title": "Sensitivity Analyses",
+         "type": "sensitivity_table", "format": "docx_three_line"}
+      ],
+      "figures": [
+        {"label": "Figure 2", "title": "Sensitivity Analysis Visualization",
+         "type": "sensitivity_figure"}
+      ]
+    },
+    {
+      "id": "subgroup",
+      "title": "Subgroup Analyses",
+      "order": 5,
+      "figures": [
+        {"label": "eFigure 1", "title": "Subgroup Forest Plot",
+         "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "reproducibility",
+      "title": "Reproducibility and Data Sharing",
+      "order": 6,
+      "content": {"type": "transparency_statement"}
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Materials (online)",
+    "sections": [
+      {"id": "supp_details", "title": "Supplementary Methods and Results", "type": "supplement_detail"},
+      {"id": "supp_code", "title": "Statistical Code", "type": "code_availability"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "docx_three_line",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "BMJ_default",
+    "supplement_as_separate_file": true,
+    "code_availability_required": true
+  },
+  "review_profile": {
+    "review_style": "reproducibility_focused",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.0,
+      "methodological_rigor": 1.2,
+      "evidence_sufficiency": 1.0,
+      "writing_quality": 0.8
+    },
+    "eic_personality": "open_science_advocate",
+    "common_concerns": [
+      "Is the statistical code available?",
+      "Are data sharing statements complete?",
+      "Is the E-value reported?"
+    ],
+    "devils_advocate_focus": "code_data_transparency",
+    "tone": "transparent_rigorous"
+  }
+}
+
+
+

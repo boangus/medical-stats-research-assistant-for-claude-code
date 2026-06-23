@@ -1,0 +1,551 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./shared/compliance_report.schema.json",
+  "title": "临床合规报告",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_id",
+    "study_metadata",
+    "irb_approval",
+    "informed_consent",
+    "hipaa_compliance",
+    "gcp_compliance",
+    "overall_status",
+    "generated_at"
+  ],
+  "properties": {
+    "report_id": {
+      "type": "string",
+      "pattern": "^CR-\\d{8}-\\d{4}$",
+      "description": "合规报告唯一标识符"
+    },
+    "study_metadata": {
+      "type": "object",
+      "required": ["study_id", "study_title", "sponsor", "principal_investigator", "study_type"],
+      "properties": {
+        "study_id": {
+          "type": "string",
+          "pattern": "^NCT\\d{8}$",
+          "description": "ClinicalTrials.gov identifier"
+        },
+        "study_title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "研究标题"
+        },
+        "sponsor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "研究资助方"
+        },
+        "principal_investigator": {
+          "type": "string",
+          "minLength": 1,
+          "description": "主要研究者"
+        },
+        "study_type": {
+          "enum": [
+            "interventional",
+            "observational",
+            "registry",
+            "expanded_access",
+            "systematic_review",
+            "meta_analysis"
+          ],
+          "description": "研究类型"
+        },
+        "phase": {
+          "enum": ["phase_1", "phase_2", "phase_3", "phase_4", "not_applicable"],
+          "description": "临床试验阶段"
+        },
+        "indication": {
+          "type": "string",
+          "description": "研究适应症"
+        }
+      }
+    },
+    "irb_approval": {
+      "type": "object",
+      "required": ["status", "irb_details", "review_date", "expiration_date"],
+      "properties": {
+        "status": {
+          "enum": ["approved", "pending", "expired", "suspended", "withdrawn"],
+          "description": "IRB批准状态"
+        },
+        "irb_details": {
+          "type": "object",
+          "required": ["name", "address", "contact_information"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "IRB名称"
+            },
+            "address": {
+              "type": "string",
+              "description": "IRB地址"
+            },
+            "contact_information": {
+              "type": "object",
+              "properties": {
+                "phone": { "type": "string" },
+                "email": { "type": "string", "format": "email" },
+                "contact_person": { "type": "string" }
+              }
+            },
+            "registration_number": {
+              "type": "string",
+              "description": "IRB注册号（如FWA号）"
+            }
+          }
+        },
+        "review_date": {
+          "type": "string",
+          "format": "date",
+          "description": "IRB审查日期"
+        },
+        "approval_number": {
+          "type": "string",
+          "description": "批准编号"
+        },
+        "expiration_date": {
+          "type": "string",
+          "format": "date",
+          "description": "批准到期日期"
+        },
+        "conditions_of_approval": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "批准条件列表"
+        },
+        "amendments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amendment_id": { "type": "string" },
+              "description": { "type": "string" },
+              "approval_date": { "type": "string", "format": "date" }
+            }
+          },
+          "description": "修正案历史"
+        }
+      }
+    },
+    "informed_consent": {
+      "type": "object",
+      "required": ["process_documented", "consent_form_version", "consent_rate", "vulnerable_populations"],
+      "properties": {
+        "process_documented": {
+          "type": "boolean",
+          "description": "知情同意过程是否有文档记录"
+        },
+        "consent_form_version": {
+          "type": "string",
+          "description": "知情同意书版本"
+        },
+        "consent_form_language": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "知情同意书语言版本"
+        },
+        "consent_rate": {
+          "type": "object",
+          "required": ["total_eligible", "consented", "refused", "rate_percentage"],
+          "properties": {
+            "total_eligible": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "符合条件的受试者总数"
+            },
+            "consented": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "同意参与的受试者数"
+            },
+            "refused": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "拒绝参与的受试者数"
+            },
+            "rate_percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "同意率百分比"
+            }
+          }
+        },
+        "vulnerable_populations": {
+          "type": "object",
+          "required": ["included", "additional_protections"],
+          "properties": {
+            "included": {
+              "type": "boolean",
+              "description": "是否纳入弱势群体"
+            },
+            "population_types": {
+              "type": "array",
+              "enum": [
+                "children",
+                "pregnant_women",
+                "prisoners",
+                "cognitively_impaired",
+                "economically_disadvantaged",
+                "language_barrier",
+                "other"
+              ],
+              "description": "弱势群体类型"
+            },
+            "additional_protections": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "额外保护措施"
+            },
+            "assent_process": {
+              "type": "string",
+              "description": "对于儿童等群体的赞同程序"
+            }
+          }
+        },
+        "withdrawal_process": {
+          "type": "object",
+          "properties": {
+            "process_defined": { "type": "boolean" },
+            "data_handling_on_withdrawal": { "type": "string" }
+          }
+        }
+      }
+    },
+    "hipaa_compliance": {
+      "type": "object",
+      "required": ["status", "data_protection_measures", "phi_handling"],
+      "properties": {
+        "status": {
+          "enum": ["compliant", "non_compliant", "not_applicable"],
+          "description": "HIPAA合规状态"
+        },
+        "data_use_agreement": {
+          "type": "object",
+          "properties": {
+            "executed": { "type": "boolean" },
+            "execution_date": { "type": "string", "format": "date" },
+            "parties": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "data_protection_measures": {
+          "type": "object",
+          "required": ["de_identification_method", "encryption_standard", "access_controls"],
+          "properties": {
+            "de_identification_method": {
+              "enum": [
+                "expert_determination",
+                "safe_harbor",
+                "limited_data_set",
+                "not_de_identified"
+              ],
+              "description": "去标识化方法"
+            },
+            "de_identification_details": {
+              "type": "string",
+              "description": "去标识化具体方法说明"
+            },
+            "encryption_standard": {
+              "enum": ["aes_256", "aes_128", "3des", "other", "none"],
+              "description": "加密标准"
+            },
+            "encryption_at_rest": { "type": "boolean" },
+            "encryption_in_transit": { "type": "boolean" },
+            "access_controls": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "control_type": {
+                    "enum": [
+                      "role_based",
+                      "need_to_know",
+                      "multi_factor_authentication",
+                      "audit_trail",
+                      "other"
+                    ]
+                  },
+                  "description": { "type": "string" }
+                }
+              }
+            },
+            "audit_trail_implemented": { "type": "boolean" },
+            "data_backup_procedure": { "type": "string" }
+          }
+        },
+        "phi_handling": {
+          "type": "object",
+          "required": ["types_of_phi", "minimum_necessary_rule"],
+          "properties": {
+            "types_of_phi": {
+              "type": "array",
+              "enum": [
+                "names",
+                "dates",
+                "phone_numbers",
+                "fax_numbers",
+                "email_addresses",
+                "social_security_numbers",
+                "medical_record_numbers",
+                "health_plan_beneficiary_numbers",
+                "account_numbers",
+                "certificate_license_numbers",
+                "vehicle_identifiers",
+                "device_identifiers",
+                "web_urls",
+                "ip_addresses",
+                "biometric_identifiers",
+                "full_face_photos",
+                "other_unique_identifiers"
+              ],
+              "description": "受保护健康信息类型"
+            },
+            "minimum_necessary_rule": {
+              "type": "boolean",
+              "description": "是否遵循最小必要原则"
+            },
+            "phi_access_log": {
+              "type": "boolean",
+              "description": "是否记录PHI访问日志"
+            }
+          }
+        },
+        "business_associate_agreement": {
+          "type": "object",
+          "properties": {
+            "required": { "type": "boolean" },
+            "executed": { "type": "boolean" },
+            "execution_date": { "type": "string", "format": "date" }
+          }
+        }
+      }
+    },
+    "gcp_compliance": {
+      "type": "object",
+      "required": ["status", "ich_gcp_adherence", "documentation_practices"],
+      "properties": {
+        "status": {
+          "enum": ["compliant", "non_compliant", "partially_compliant"],
+          "description": "GCP合规状态"
+        },
+        "ich_gcp_adherence": {
+          "type": "object",
+          "required": [
+            "ethical_conduct",
+            "scientific_quality",
+            "rights_safety_wellbeing",
+            "informed_consent",
+            "investigator_qualifications"
+          ],
+          "properties": {
+            "ethical_conduct": {
+              "type": "object",
+              "required": ["description", "evidence"],
+              "properties": {
+                "description": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "scientific_quality": {
+              "type": "object",
+              "required": ["description", "evidence"],
+              "properties": {
+                "description": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "rights_safety_wellbeing": {
+              "type": "object",
+              "required": ["description", "evidence"],
+              "properties": {
+                "description": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "informed_consent": {
+              "type": "object",
+              "required": ["description", "evidence"],
+              "properties": {
+                "description": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "investigator_qualifications": {
+              "type": "object",
+              "required": ["description", "evidence"],
+              "properties": {
+                "description": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "documentation_practices": {
+          "type": "object",
+          "required": [
+            "source_documents",
+            "essential_documents",
+            "data_integrity"
+          ],
+          "properties": {
+            "source_documents": {
+              "type": "object",
+              "properties": {
+                "maintained": { "type": "boolean" },
+                "location": { "type": "string" },
+                "retention_period": { "type": "string" }
+              }
+            },
+            "essential_documents": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "document_type": { "type": "string" },
+                  "present": { "type": "boolean" },
+                  "location": { "type": "string" }
+                }
+              }
+            },
+            "data_integrity": {
+              "type": "object",
+              "properties": {
+                "verification_procedure": { "type": "string" },
+                "query_management": { "type": "string" },
+                "change_control": { "type": "string" }
+              }
+            }
+          }
+        },
+        "monitoring_plan": {
+          "type": "object",
+          "properties": {
+            "monitoring_frequency": { "type": "string" },
+            "monitoring_type": {
+              "enum": ["on_site", "remote", "hybrid"],
+              "description": "监查类型"
+            },
+            "monitoring_scope": { "type": "string" }
+          }
+        },
+        "safety_reporting": {
+          "type": "object",
+          "properties": {
+            "sae_reporting_defined": { "type": "boolean" },
+            "suspension_rules_defined": { "type": "boolean" },
+            "dsmb_established": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "overall_status": {
+      "enum": ["compliant", "non_compliant", "partially_compliant", "pending_review"],
+      "description": "整体合规状态"
+    },
+    "compliance_score": {
+      "type": "object",
+      "properties": {
+        "total_items": { "type": "integer", "minimum": 0 },
+        "compliant_items": { "type": "integer", "minimum": 0 },
+        "non_compliant_items": { "type": "integer", "minimum": 0 },
+        "score_percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "severity", "description", "recommendation"],
+        "properties": {
+          "category": {
+            "enum": ["irb", "informed_consent", "hipaa", "gcp", "documentation", "other"],
+            "description": "发现类别"
+          },
+          "severity": {
+            "enum": ["critical", "major", "minor", "observation"],
+            "description": "严重程度"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "问题描述"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "相关证据"
+          },
+          "recommendation": {
+            "type": "string",
+            "minLength": 1,
+            "description": "改进建议"
+          },
+          "corrective_action": {
+            "type": "string",
+            "description": "纠正措施"
+          },
+          "responsible_party": {
+            "type": "string",
+            "description": "责任方"
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date",
+            "description": "目标完成日期"
+          }
+        }
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "document_type": { "type": "string" },
+          "file_name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "报告生成时间"
+    },
+    "reviewed_by": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "review_date": { "type": "string", "format": "date" }
+      }
+    }
+  }
+}

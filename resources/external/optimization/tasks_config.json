@@ -1,0 +1,72 @@
+{
+  "tasks": [
+    {
+      "name": "resource_registry_check",
+      "description": "Check resource registry integrity and validity",
+      "script_path": "resources/external/integration/resource_loader.py",
+      "frequency": "weekly",
+      "last_run": null,
+      "last_status": "pending",
+      "last_output": null,
+      "next_run": null
+    },
+    {
+      "name": "compatibility_check",
+      "description": "Check all integrated resources compatibility with MSRA",
+      "script_path": "resources/external/integration/compatibility_checker.py",
+      "frequency": "weekly",
+      "last_run": null,
+      "last_status": "pending",
+      "last_output": null,
+      "next_run": null
+    },
+    {
+      "name": "update_scan",
+      "description": "Scan for updates in registered resources",
+      "script_path": "resources/external/integration/update_tracker.py",
+      "frequency": "monthly",
+      "last_run": null,
+      "last_status": "pending",
+      "last_output": null,
+      "next_run": null
+    },
+    {
+      "name": "test_suite",
+      "description": "Run complete MSRA test suite",
+      "script_path": "tests/",
+      "frequency": "daily",
+      "last_run": null,
+      "last_status": "pending",
+      "last_output": null,
+      "next_run": null
+    },
+    {
+      "name": "github_resource_scan",
+      "description": "Scan GitHub for new relevant projects",
+      "script_path": "scripts/github_resource_scan.py",
+      "frequency": "monthly",
+      "last_run": null,
+      "last_status": "pending",
+      "last_output": null,
+      "next_run": null
+    },
+    {
+      "name": "academic_literature_scan",
+      "description": "Scan academic databases for new relevant literature",
+      "script_path": "scripts/academic_literature_scan.py",
+      "frequency": "quarterly",
+      "last_run": null,
+      "last_status": "pending",
+      "last_output": null,
+      "next_run": null
+    }
+  ],
+  "optimization_config": {
+    "max_cycle_history": 50,
+    "alert_on_failure": true,
+    "auto_commit_changes": false,
+    "notification_webhook": null
+  },
+  "version": "1.0.0",
+  "last_updated": "2026-06-22"
+}

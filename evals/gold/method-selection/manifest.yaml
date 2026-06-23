@@ -1,0 +1,90 @@
+# MSRA Method Selection Gold Evaluation Set — Manifest
+eval_set_id: msra-method-selection-gold-001
+version: "1.0"
+created: "2026-06-13"
+description: "方法选择准确性与数值准确性评估集 — 覆盖RCT/观察性/诊断/预测等研究设计的常见统计方法选择场景"
+total_tuples: 10
+evaluation_dimensions:
+  - method_selection: "给定研究设计和数据特征，是否选择了正确的统计方法"
+  - parameter_accuracy: "模型参数设定、假设检验方向、效应量指标是否正确"
+  - common_pitfall_awareness: "是否能避免LLM常见的错误方法选择"
+study_designs:
+  RCT:
+    description: "随机对照试验"
+    count: 4
+    ids: ["M001", "M002", "M006", "M008"]
+  observational:
+    description: "观察性研究（队列/病例对照）"
+    count: 3
+    ids: ["M003", "M004", "M007"]
+  diagnostic:
+    description: "诊断准确性研究"
+    count: 1
+    ids: ["M005"]
+  prediction:
+    description: "预测模型开发"
+    count: 1
+    ids: ["M009"]
+  competing_risks:
+    description: "竞争风险分析"
+    count: 1
+    ids: ["M010"]
+outcome_types:
+  continuous:
+    count: 2
+    ids: ["M001", "M006"]
+  binary:
+    count: 2
+    ids: ["M003", "M009"]
+  survival:
+    count: 3
+    ids: ["M002", "M004", "M010"]
+  count:
+    count: 1
+    ids: ["M007"]
+  multiple:
+    count: 1
+    ids: ["M008"]
+  diagnostic:
+    count: 1
+    ids: ["M005"]
+thresholds:
+  aggregate_selection_accuracy: 0.80
+  per_design_accuracy: 0.75
+  max_wrong_method_acceptance: 2
+scoring_rubric:
+  correct_method: 3
+  correct_with_minor_variant: 2
+  common_wrong_method: 0
+  unrelated_method: 0
+tuples:
+  - id: "M001"
+    file: "tuples/M001-rct-continuous-baseline-ancova.json"
+    tags: ["RCT", "continuous", "ANCOVA", "baseline-adjustment"]
+  - id: "M002"
+    file: "tuples/M002-rct-survival-cox-ph.json"
+    tags: ["RCT", "survival", "Cox-PH", "stratification"]
+  - id: "M003"
+    file: "tuples/M003-observational-binary-iptw.json"
+    tags: ["observational", "binary", "IPTW", "propensity-score", "causal"]
+  - id: "M004"
+    file: "tuples/M004-observational-time-varying-msm.json"
+    tags: ["observational", "survival", "MSM", "time-varying", "causal"]
+  - id: "M005"
+    file: "tuples/M005-diagnostic-roc-optimal-threshold.json"
+    tags: ["diagnostic", "continuous", "ROC", "AUC", "threshold"]
+  - id: "M006"
+    file: "tuples/M006-rct-non-inferiority-margin.json"
+    tags: ["RCT", "continuous", "non-inferiority", "margin", "CI"]
+  - id: "M007"
+    file: "tuples/M007-observational-count-overdispersion-nb.json"
+    tags: ["observational", "count", "negative-binomial", "overdispersion"]
+  - id: "M008"
+    file: "tuples/M008-rct-multiple-endpoints-multiplicity.json"
+    tags: ["RCT", "multiple-endpoints", "multiplicity", "gatekeeping"]
+  - id: "M009"
+    file: "tuples/M009-prediction-small-sample-firth.json"
+    tags: ["prediction", "binary", "Firth", "penalized", "small-sample"]
+  - id: "M010"
+    file: "tuples/M010-obs-competing-risks-fine-gray.json"
+    tags: ["observational", "survival", "competing-risks", "Fine-Gray", "CIF"]

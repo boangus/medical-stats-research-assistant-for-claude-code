@@ -1,0 +1,41 @@
+{
+  "eval_set_id": "msra-pipeline-gold-001",
+  "aggregate": {
+    "total_tuples": 21,
+    "pass_threshold": 0.90,
+    "min_pass": 19
+  },
+  "by_kind": {
+    "data_value": { "total": 4, "pass_threshold": 0.75, "min_pass": 3 },
+    "logic_conflict": { "total": 4, "pass_threshold": 0.75, "min_pass": 3 },
+    "format_variant": { "total": 4, "pass_threshold": 0.75, "min_pass": 3 },
+    "statistical_concern": { "total": 4, "pass_threshold": 0.75, "min_pass": 3 },
+    "pipeline_edge": { "total": 5, "pass_threshold": 0.60, "min_pass": 3 }
+  },
+  "outcomes": {
+    "001": { "kind": "data_value", "expected_detection": true, "severity": "critical", "detected_by": "data-prep Phase 1.5 (Gate项1: 范围检查)" },
+    "002": { "kind": "data_value", "expected_detection": true, "severity": "critical", "detected_by": "data-prep Phase 1.5 (Gate项1/3: 范围+逻辑)" },
+    "003": { "kind": "data_value", "expected_detection": true, "severity": "warning", "detected_by": "data-prep Phase 1.5 (Gate项3: 缺失评估)" },
+    "004": { "kind": "data_value", "expected_detection": true, "severity": "critical", "detected_by": "data-prep Phase 1 (结构检查: 重复ID)" },
+    "005": { "kind": "logic_conflict", "expected_detection": true, "severity": "critical", "detected_by": "data-prep Phase 1.5 (Gate项6: 交叉字段一致性)" },
+    "006": { "kind": "logic_conflict", "expected_detection": true, "severity": "critical", "detected_by": "data-prep Phase 1.5 (Gate项6: 日期顺序)" },
+    "007": { "kind": "logic_conflict", "expected_detection": true, "severity": "critical", "detected_by": "data-prep Phase 1.5 (Gate项6: 范围/不可能值)" },
+    "008": { "kind": "logic_conflict", "expected_detection": true, "severity": "warning", "detected_by": "data-prep Phase 1.5 (Gate项2: 编码有效性)" },
+    "009": { "kind": "format_variant", "expected_detection": true, "severity": "warning", "detected_by": "data-prep Phase 2.5 (TCM变体检测)" },
+    "010": { "kind": "format_variant", "expected_detection": true, "severity": "warning", "detected_by": "data-prep Phase 2.5 (数值截断标记检测)" },
+    "011": { "kind": "format_variant", "expected_detection": true, "severity": "warning", "detected_by": "data-prep Phase 2.5 (逗号多值检测)" },
+    "012": { "kind": "format_variant", "expected_detection": true, "severity": "info", "detected_by": "data-prep Phase 2.5 (中文数字检测)" },
+    "013": { "kind": "statistical_concern", "expected_detection": true, "severity": "warning", "detected_by": "analysis-exec Phase 0 (样本量验证: 组间极端不平衡)" },
+    "014": { "kind": "statistical_concern", "expected_detection": true, "severity": "warning", "detected_by": "analysis-exec Phase 8 (质检: 零方差变量)" },
+    "015": { "kind": "statistical_concern", "expected_detection": true, "severity": "info", "detected_by": "analysis-plan Phase 1 (EDA: 稀少类别)" },
+    "016": { "kind": "statistical_concern", "expected_detection": true, "severity": "warning", "detected_by": "analysis-plan Phase 1 (缺失模式: MAR检测)" },
+    "017": { "kind": "pipeline_edge", "expected_detection": true, "severity": "blocking", "detected_by": "pipeline Stage 1.5 (门闸阻断: 3+项未通过场景)" },
+    "018": { "kind": "pipeline_edge", "expected_detection": true, "severity": "adaptive", "detected_by": "analysis-exec Phase 0 (ADAPTIVE: 样本量<70%)" },
+    "019": { "kind": "pipeline_edge", "expected_detection": true, "severity": "skip", "detected_by": "analysis-exec Phase 6 ([SKIP]: 数据不足以分析)" },
+    "020": { "kind": "pipeline_edge", "expected_detection": true, "severity": "warning", "detected_by": "data-prep Phase 4 (EDA: 异常值标记)" },
+    "021": { "kind": "pipeline_edge", "expected_detection": true, "severity": "info", "detected_by": "analysis-exec Phase 5 (安全性分析: SAE标记)" }
+  }
+}
+
+
+

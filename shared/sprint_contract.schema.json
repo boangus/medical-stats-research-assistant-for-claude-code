@@ -1,0 +1,668 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./shared/sprint_contract.schema.json",
+  "title": "分析计划合约",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "study_metadata",
+    "endpoints",
+    "statistical_methods",
+    "timeline",
+    "quality_gates"
+  ],
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "pattern": "^SAP-\\d{8}-\\d{4}$",
+      "description": "分析计划合约唯一标识符"
+    },
+    "study_metadata": {
+      "type": "object",
+      "required": [
+        "protocol_id",
+        "study_title",
+        "study_type",
+        "phase",
+        "sponsor",
+        "indication"
+      ],
+      "properties": {
+        "protocol_id": {
+          "type": "string",
+          "pattern": "^NCT\\d{8}$",
+          "description": "ClinicalTrials.gov identifier"
+        },
+        "study_title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "研究标题"
+        },
+        "study_type": {
+          "enum": [
+            "randomized_controlled_trial",
+            "adaptive_design",
+            "basket_trial",
+            "umbrella_trial",
+            "platform_trial",
+            "single_arm_trial",
+            "observational_cohort",
+            "case_control",
+            "cross_sectional"
+          ],
+          "description": "研究设计类型"
+        },
+        "phase": {
+          "enum": ["phase_1", "phase_2", "phase_3", "phase_4", "pilot_feasibility"],
+          "description": "临床试验阶段"
+        },
+        "sponsor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "研究资助方"
+        },
+        "indication": {
+          "type": "string",
+          "description": "研究适应症"
+        },
+        "estimated_enrollment": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "预计入组人数"
+        },
+        "planned_duration": {
+          "type": "string",
+          "description": "计划研究时长"
+        }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "required": ["primary_endpoints", "secondary_endpoints"],
+      "properties": {
+        "primary_endpoints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "endpoint_id",
+              "name",
+              "description",
+              "timeframe",
+              "analysis_method"
+            ],
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "pattern": "^PE[0-9]+$",
+                "description": "主要终点标识符"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "终点名称"
+              },
+              "description": {
+                "type": "string",
+                "description": "终点详细描述"
+              },
+              "type": {
+                "enum": [
+                  "efficacy",
+                  "safety",
+                  "pharmacokinetic",
+                  "pharmacodynamic",
+                  "patient_reported_outcome",
+                  "biomarker",
+                  "imaging",
+                  "composite"
+                ],
+                "description": "终点类型"
+              },
+              "timeframe": {
+                "type": "string",
+                "description": "评估时间窗"
+              },
+              "analysis_method": {
+                "type": "string",
+                "description": "分析方法"
+              },
+              "hypothesis": {
+                "type": "object",
+                "required": ["null_hypothesis", "alternative_hypothesis"],
+                "properties": {
+                  "null_hypothesis": { "type": "string" },
+                  "alternative_hypothesis": { "type": "string" },
+                  "superiority_margin": { "type": "number" },
+                  "non_inferiority_margin": { "type": "number" },
+                  "equivalence_margin": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "secondary_endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "endpoint_id",
+              "name",
+              "description",
+              "timeframe",
+              "analysis_method"
+            ],
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "pattern": "^SE[0-9]+$",
+                "description": "次要终点标识符"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "终点名称"
+              },
+              "description": {
+                "type": "string",
+                "description": "终点详细描述"
+              },
+              "type": {
+                "enum": [
+                  "efficacy",
+                  "safety",
+                  "pharmacokinetic",
+                  "pharmacodynamic",
+                  "patient_reported_outcome",
+                  "biomarker",
+                  "imaging",
+                  "composite"
+                ]
+              },
+              "timeframe": {
+                "type": "string"
+              },
+              "analysis_method": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "exploratory_endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": { "type": "string" },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "analysis_method": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "statistical_methods": {
+      "type": "object",
+      "required": [
+        "sample_size_calculation",
+        "randomization",
+        "analysis_populations",
+        "primary_analysis",
+        "multiplicity_adjustment"
+      ],
+      "properties": {
+        "sample_size_calculation": {
+          "type": "object",
+          "required": [
+            "method",
+            "alpha_level",
+            "power",
+            "effect_size",
+            "assumptions"
+          ],
+          "properties": {
+            "method": {
+              "type": "string",
+              "description": "样本量计算方法"
+            },
+            "alpha_level": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "I类错误率（双侧）"
+            },
+            "power": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "检验效能"
+            },
+            "effect_size": {
+              "type": "object",
+              "required": ["type", "value"],
+              "properties": {
+                "type": {
+                  "enum": ["absolute", "relative", "odds_ratio", "hazard_ratio", "other"],
+                  "description": "效应量类型"
+                },
+                "value": { "type": "number" },
+                "justification": { "type": "string" }
+              }
+            },
+            "assumptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "parameter": { "type": "string" },
+                  "value": { "type": "string" },
+                  "source": { "type": "string" }
+                }
+              }
+            },
+            "dropout_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "预期脱落率"
+            }
+          }
+        },
+        "randomization": {
+          "type": "object",
+          "required": ["method", "allocation_ratio"],
+          "properties": {
+            "method": {
+              "enum": [
+                "simple",
+                "block",
+                "stratified_block",
+                "minimization",
+                "adaptive",
+                "covariate_adaptive"
+              ],
+              "description": "随机化方法"
+            },
+            "block_size": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "区组大小（如适用）"
+            },
+            "stratification_factors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "factor_name": { "type": "string" },
+                  "levels": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "allocation_ratio": {
+              "type": "string",
+              "pattern": "^\\d+:\\d+$",
+              "description": "分配比例，如1:1"
+            },
+            "blinding": {
+              "type": "object",
+              "properties": {
+                "double_blind": { "type": "boolean" },
+                "sponsor_blinded": { "type": "boolean" },
+                "data_monitoring_committee_blinded": { "type": "boolean" }
+              }
+            }
+          }
+        },
+        "analysis_populations": {
+          "type": "object",
+          "required": ["intent_to_treat", "per_protocol", "safety"],
+          "properties": {
+            "intent_to_treat": {
+              "type": "object",
+              "required": ["definition"],
+              "properties": {
+                "definition": { "type": "string" },
+                "primary_analysis": { "type": "boolean" }
+              }
+            },
+            "per_protocol": {
+              "type": "object",
+              "required": ["definition"],
+              "properties": {
+                "definition": { "type": "string" }
+              }
+            },
+            "safety": {
+              "type": "object",
+              "required": ["definition"],
+              "properties": {
+                "definition": { "type": "string" }
+              }
+            },
+            "modified_intent_to_treat": {
+              "type": "object",
+              "properties": {
+                "definition": { "type": "string" }
+              }
+            }
+          }
+        },
+        "primary_analysis": {
+          "type": "object",
+          "required": ["method", "model_specification"],
+          "properties": {
+            "method": {
+              "type": "string",
+              "description": "主要分析方法"
+            },
+            "model_specification": {
+              "type": "string",
+              "description": "统计模型详细规范"
+            },
+            "covariates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "covariate_name": { "type": "string" },
+                  "covariate_type": {
+                    "enum": ["continuous", "categorical", "time_varying"],
+                    "description": "协变量类型"
+                  },
+                  "handling": { "type": "string" }
+                }
+              }
+            },
+            "missing_data_handling": {
+              "type": "object",
+              "required": ["primary_method"],
+              "properties": {
+                "primary_method": {
+                  "enum": [
+                    "complete_case",
+                    "last_observation_carry_forward",
+                    "multiple_imputation",
+                    "mixed_model_repeated_measures",
+                    "pattern_mixture",
+                    "other"
+                  ],
+                  "description": "缺失数据处理主要方法"
+                },
+                "sensitivity_methods": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "secondary_analyses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": { "type": "string" },
+              "method": { "type": "string" },
+              "model_specification": { "type": "string" }
+            }
+          }
+        },
+        "multiplicity_adjustment": {
+          "type": "object",
+          "required": ["method"],
+          "properties": {
+            "method": {
+              "enum": [
+                "bonferroni",
+                "holm",
+                "hochberg",
+                "hommel",
+                "fdr",
+                "gatekeeping",
+                "fixed_sequence",
+                "other"
+              ],
+              "description": "多重比较调整方法"
+            },
+            "hierarchical_ordering": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "order": { "type": "integer" },
+                  "endpoint_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "subgroup_analyses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "subgroup_name": { "type": "string" },
+              "subgroup_factor": { "type": "string" },
+              "interaction_test": { "type": "boolean" }
+            }
+          }
+        },
+        "interim_analyses": {
+          "type": "object",
+          "properties": {
+            "planned": { "type": "boolean" },
+            "number_of_analyses": { "type": "integer" },
+            "timing": { "type": "string" },
+            "stopping_rules": {
+              "type": "object",
+              "properties": {
+                "efficacy": { "type": "string" },
+                "futility": { "type": "string" },
+                "safety": { "type": "string" }
+              }
+            },
+            "alpha_spending_function": { "type": "string" }
+          }
+        }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "required": ["phases", "milestones"],
+      "properties": {
+        "phases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["phase_id", "name", "start_date", "end_date"],
+            "properties": {
+              "phase_id": {
+                "type": "string",
+                "pattern": "^P[0-9]+$"
+              },
+              "name": {
+                "type": "string",
+                "description": "阶段名称"
+              },
+              "start_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "description": { "type": "string" },
+              "dependencies": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["milestone_id", "name", "target_date"],
+            "properties": {
+              "milestone_id": {
+                "type": "string",
+                "pattern": "^M[0-9]+$"
+              },
+              "name": {
+                "type": "string",
+                "description": "里程碑名称"
+              },
+              "target_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "deliverable": {
+                "type": "string",
+                "description": "交付物"
+              }
+            }
+          }
+        }
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "required": ["gates"],
+      "properties": {
+        "gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "gate_id",
+              "gate_name",
+              "trigger_criteria",
+              "pass_criteria",
+              "responsible_party"
+            ],
+            "properties": {
+              "gate_id": {
+                "type": "string",
+                "pattern": "^QG[0-9]+$                },
+              "gate_name": {
+                "type": "string",
+                "description": "质量门名称"
+              },
+              "gate_type": {
+                "enum": [
+                  "data_quality",
+                  "analysis_validation",
+                  "safety_review",
+                  "interim_analysis",
+                  "data_lock",
+                  "manuscript_review"
+                ],
+                "description": "质量门类型"
+              },
+              "trigger_criteria": {
+                "type": "string",
+                "description": "触发条件"
+              },
+              "pass_criteria": {
+                "type": "string",
+                "description": "通过标准"
+              },
+              "fail_action": {
+                "type": "string",
+                "description": "失败处理措施"
+              },
+              "responsible_party": {
+                "type": "string",
+                "description": "责任方"
+              },
+              "review_board": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "审查委员会"
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_management": {
+      "type": "object",
+      "properties": {
+        "database_system": {
+          "type": "string",
+          "description": "数据库系统"
+        },
+        "data_standards": {
+          "type": "array",
+          "items": {
+            "enum": ["cdisc_sdtm", "cdisc_adam", "oracle_clinical", "other"]
+          }
+        },
+        "data_validation_rules": {
+          "type": "string",
+          "description": "数据验证规则"
+        }
+      }
+    },
+    "regulatory_considerations": {
+      "type": "object",
+      "properties": {
+        "fda_guidance": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ema_guidance": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ich_e9": {
+          "type": "boolean",
+          "description": "是否遵循ICH E9统计原则"
+        }
+      }
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+\\.\\d+$",
+      "description": "合约版本号"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "description": "生效日期"
+    },
+    "approved_by": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "approval_date": { "type": "string", "format": "date" }
+        }
+      }
+    },
+    "amendment_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "amendment_id": { "type": "string" },
+          "version": { "type": "string" },
+          "description": { "type": "string" },
+          "approval_date": { "type": "string", "format": "date" }
+        }
+      }
+    }
+  }
+}

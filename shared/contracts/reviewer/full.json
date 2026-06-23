@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "medical_review/reviewer_full/v1",
+  "mode": "reviewer_full",
+  "stage": "medical_peer_review",
+  "baseline_version": "v1.0.0",
+  "description": "Full medical peer review schema for clinical study reports and manuscripts. Simulates a 5-member review panel with distinct expertise roles.",
+
+  "panel_size": 5,
+
+  "reviewer_roles": [
+    {
+      "id": "editor",
+      "label": "Editor / Senior Reviewer",
+      "expertise": "Clinical trial design, regulatory strategy, manuscript coherence",
+      "review_focus": "Overall manuscript quality, significance, and fit for target journal/regulatory submission."
+    },
+    {
+      "id": "methodologist",
+      "label": "Clinical Methodologist",
+      "expertise": "Study design, bias assessment, causal inference",
+      "review_focus": "Internal and external validity, study design appropriateness, bias risk."
+    },
+    {
+      "id": "clinician",
+      "label": "Domain Clinician",
+      "expertise": "Clinical practice, disease understanding, treatment landscape",
+      "review_focus": "Clinical relevance, practical significance, patient outcome interpretation."
+    },
+    {
+      "id": "statistician",
+      "label": "Biostatistician",
+      "expertise": "Statistical methodology, SAP review, software validation",
+      "review_focus": "Statistical method selection, assumption verification, result interpretation, reproducibility."
+    },
+    {
+      "id": "ethicist",
+      "label": "Research Ethicist",
+      "expertise": "Research ethics, informed consent, data privacy, regulatory compliance",
+      "review_focus": "Ethical conduct, informed consent adequacy, data protection, conflicts of interest."
+    }
+  ],
+
+  "acceptance_dimensions": [
+    {
+      "id": "D1",
+      "name": "methodology_rigor",
+      "description": "Study design, data collection, statistical methods, and analytical approach are scientifically rigorous and appropriate for the research question.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D2",
+      "name": "clinical_significance",
+      "description": "Findings have meaningful implications for clinical practice, patient outcomes, or disease understanding.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D3",
+      "name": "statistical_quality",
+      "description": "Statistical analyses are correctly performed, appropriately reported, and results are interpreted accurately.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D4",
+      "name": "ethics_compliance",
+      "description": "Study meets ethical standards, regulatory requirements, and data protection obligations.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D5",
+      "name": "writing_and_presentation",
+      "description": "Manuscript is well-organized, clearly written, and adheres to target journal or regulatory formatting requirements.",
+      "priority": "normal"
+    }
+  ],
+
+  "scoring_dimensions_for_reviewers": {
+    "methodology_rigor": {
+      "score_scale": "1-5",
+      "score_labels": {
+        "1": "Fundamentally flawed; multiple critical design issues",
+        "2": "Significant weaknesses; major revisions needed",
+        "3": "Adequate but with notable limitations",
+        "4": "Strong methodology with minor issues",
+        "5": "Exemplary; rigorous and well-executed"
+      }
+    },
+    "clinical_significance": {
+      "score_scale": "1-5",
+      "score_labels": {
+        "1": "No clinical relevance; trivial findings",
+        "2": "Limited clinical interest",
+        "3": "Moderately relevant to clinical practice",
+        "4": "Clinically meaningful with practical implications",
+        "5": "Highly significant; changes clinical understanding"
+      }
+    },
+    "statistical_quality": {
+      "score_scale": "1-5",
+      "score_labels": {
+        "1": "Multiple statistical errors; results unreliable",
+        "2": "Significant methodological concerns",
+        "3": "Generally appropriate with some gaps",
+        "4": "Well-executed with minor reporting issues",
+        "5": "Exemplary statistical analysis and reporting"
+      }
+    },
+    "ethics_compliance": {
+      "score_scale": "1-5",
+      "score_labels": {
+        "1": "Serious ethical violations",
+        "2": "Multiple ethical concerns",
+        "3": "Generally compliant with minor gaps",
+        "4": "Fully compliant with best practices",
+        "5": "Exemplary ethical conduct"
+      }
+    }
+  },
+
+  "measurement_procedure": {
+    "reviewer_must_output_before_paper": ["role_specific_assessment", "dimension_scores", "issues_list"],
+    "minimum_review_length": "500 words per reviewer",
+    "requires_evidence_citation": true
+  },
+
+  "failure_conditions": [
+    {
+      "condition_id": "F1",
+      "severity": 95,
+      "cross_reviewer_quantifier": "any",
+      "expression": "any mandatory dimension scores <= 2 from any reviewer",
+      "action": "editorial_decision=reject_or_major_revision"
+    },
+    {
+      "condition_id": "F2",
+      "severity": 80,
+      "cross_reviewer_quantifier": "majority",
+      "expression": "majority of reviewers score any mandatory dimension <= 2",
+      "action": "editorial_decision=major_revision"
+    },
+    {
+      "condition_id": "F3",
+      "severity": 70,
+      "cross_reviewer_quantifier": "any",
+      "expression": "any reviewer identifies ethics_compliance as <= 2",
+      "action": "editorial_decision=reject_or_major_revision"
+    },
+    {
+      "condition_id": "F4",
+      "severity": 60,
+      "cross_reviewer_quantifier": "majority",
+      "expression": "majority of reviewers recommend major_revision or reject",
+      "action": "editorial_decision=major_revision"
+    },
+    {
+      "condition_id": "F0",
+      "severity": 10,
+      "cross_reviewer_quantifier": "all",
+      "expression": "all mandatory dimensions score >= 4 from all reviewers and no reviewer recommends rejection",
+      "action": "editorial_decision=accept"
+    }
+  ]
+}

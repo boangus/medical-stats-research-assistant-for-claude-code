@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/manuscript_draft/v1",
+  "stage": "manuscript_draft",
+  "description": "Material Passport for Stage 5 — Manuscript Draft (Paper Track). Tracks all artifacts produced during academic manuscript writing, from title through references.",
+
+  "passport_type": "manuscript_draft",
+  "stage_number": 5,
+
+  "required_artifacts": [
+    {
+      "artifact_id": "manuscript",
+      "name": "论文手稿",
+      "description": "Complete manuscript draft with all sections: title, abstract, introduction, methods, results, discussion, conclusions, references.",
+      "required": true
+    },
+    {
+      "artifact_id": "structured_abstract",
+      "name": "结构化摘要",
+      "description": "Structured abstract (Background, Methods, Results, Conclusions) conforming to target journal requirements.",
+      "required": true
+    },
+    {
+      "artifact_id": "introduction_draft",
+      "name": "引言草稿",
+      "description": "Introduction section with literature context, knowledge gap, and study objectives.",
+      "required": true
+    },
+    {
+      "artifact_id": "methods_draft",
+      "name": "方法草稿",
+      "description": "Methods section describing study design, participants, interventions, outcomes, and statistical methods.",
+      "required": true
+    },
+    {
+      "artifact_id": "results_draft",
+      "name": "结果草稿",
+      "description": "Results section with narrative description of findings referencing tables and figures.",
+      "required": true
+    },
+    {
+      "artifact_id": "discussion_draft",
+      "name": "讨论草稿",
+      "description": "Discussion section with interpretation, comparison to literature, limitations, and implications.",
+      "required": true
+    },
+    {
+      "artifact_id": "references",
+      "name": "参考文献",
+      "description": "Formatted reference list in the target journal style.",
+      "required": true
+    },
+    {
+      "artifact_id": "target_journal",
+      "name": "目标期刊",
+      "description": "Target journal selection with scope fit analysis and formatting requirements.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "cover_letter",
+      "name": "投稿信",
+      "description": "Cover letter to the editor highlighting novelty and significance."
+    },
+    {
+      "artifact_id": "author_contributions",
+      "name": "作者贡献声明",
+      "description": "CRediT author contribution statement."
+    },
+    {
+      "artifact_id": "conflict_of_interest",
+      "name": "利益冲突声明",
+      "description": "ICMJE conflict of interest disclosure forms."
+    },
+    {
+      "artifact_id": "data_availability",
+      "name": "数据可及性声明",
+      "description": "Data availability statement per journal requirements."
+    },
+    {
+      "artifact_id": "prisma_checklist",
+      "name": "PRISMA清单",
+      "description": "Completed PRISMA checklist if the manuscript is a systematic review."
+    },
+    {
+      "artifact_id": "supplementary_materials",
+      "name": "补充材料",
+      "description": "Supplementary tables, figures, and appendices."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "MD-01",
+      "name": "期刊格式合规",
+      "description": "Manuscript formatting meets target journal requirements (word count, structure, reference style).",
+      "required": true
+    },
+    {
+      "gate_id": "MD-02",
+      "name": "报告指南合规",
+      "description": "All applicable reporting guideline checklist items are addressed.",
+      "required": true
+    },
+    {
+      "gate_id": "MD-03",
+      "name": "文献引用完整性",
+      "description": "All factual claims are supported by appropriate citations; no uncited assertions.",
+      "required": true
+    },
+    {
+      "gate_id": "MD-04",
+      "name": "统计结果一致性",
+      "description": "Results reported in the manuscript match the analysis execution outputs exactly.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": null,
+    "description": "Final manuscript is submitted externally. No downstream MSRA stage.",
+    "required_for_handoff": ["manuscript", "structured_abstract", "references", "target_journal"],
+    "handoff_bundle_file": null
+  }
+}

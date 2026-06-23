@@ -1,0 +1,24 @@
+{
+  "tuple_id": "016-mar-missing-pattern",
+  "kind": "statistical_concern",
+  "test_name": "MAR缺失模式",
+  "source_pit": 20,
+  "description": "Outcome missingness concentrated in Education=文盲 (MAR pattern), must detect",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "analysis-plan",
+    "trigger_columns": [
+      "Outcome",
+      "EducationLevel"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 1 (missing pattern: MAR detection)",
+    "action": "Report MAR pattern, recommend multiple imputation"
+  },
+  "failure_pattern": "LLM may report MCAR without verifying Outcome vs Education association"
+}
+
+

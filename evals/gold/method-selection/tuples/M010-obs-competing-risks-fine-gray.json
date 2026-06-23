@@ -1,0 +1,50 @@
+{
+  "tuple_id": "M010-obs-competing-risks-fine-gray",
+  "kind": "method_selection",
+  "test_name": "观察性研究+竞争风险应选Fine-Gray模型",
+  "description": "一项队列研究评估两种手术方式对髋关节翻修率（复发时间）的影响，但患者在随访期间可能因死亡而无法经历翻修（死亡是竞争风险事件）。正确方法为Fine-Gray次分布风险模型，而非标准Kaplan-Meier/Cox回归。",
+  "source_pit": 2,
+  "input": {
+    "study_design": "retrospective cohort",
+    "outcome_type": "survival with competing risks",
+    "primary_event": "髋关节翻修",
+    "competing_event": "全因死亡",
+    "censoring": "失访或研究结束",
+    "exposure": "手术方式A vs B",
+    "covariates": ["年龄", "性别", "BMI", "ASA分级", "骨质疏松程度"],
+    "follow_up": "中位5.2年",
+    "sample_size": 1200,
+    "events_primary": 95,
+    "events_competing": 180,
+    "pipeline_stage": "method-selection",
+    "mode": "guided"
+  },
+  "expected": {
+    "primary_method": "Fine-Gray次分布风险模型",
+    "expected_parameters": "Subdistribution hazard model (Fine-Gray 1999), treating death as competing event, estimating subdistribution HR (SHR)",
+    "model_specification": "lambda_1(t|Z) = lambda_10(t) * exp(beta * Z)\nwhere lambda_1 is the subdistribution hazard for revision\ntreated individuals who die are kept in the risk set with reduced weight",
+    "cumulative_incidence": "Cumulative Incidence Function (CIF) via Aalen-Johansen estimator",
+    "reported_measures": ["Subdistribution HR (SHR) with 95% CI", "CIF curves by treatment group", "1-CIF (event-free probability)"],
+    "supplementary": ["cause-specific Cox for comparison", "sensitivity: standard KM/Cox to show bias when ignoring competing risks"]
+  },
+  "common_wrong_methods": [
+    {
+      "method": "标准Kaplan-Meier + log-rank检验",
+      "why_wrong": "KM将竞争事件（死亡）当作删失处理，假设这些患者仍有翻修风险，导致累积翻修率被高估（bias upward）；当竞争事件比例高时（本例180/1200=15%），偏差显著"
+    },
+    {
+      "method": "标准Cox回归（将竞争事件作为删失）",
+      "why_wrong": "与KM同样的问题：将死亡者视为删失等价于假设他们仍处于翻修风险中，违反了删失的独立性假设，导致subdistribution HR估计偏倚"
+    },
+    {
+      "method": "仅报告cause-specific HR",
+      "why_wrong": "cause-specific Cox估计的是'如果无竞争事件时'的瞬时风险比，不直接回答'实际观察到的翻修概率差异'这一临床问题；对患者咨询和决策，CIF和SHR更直观"
+    }
+  ],
+  "reasoning": "当存在竞争风险（一个事件的发生阻止了感兴趣事件的发生）时，传统KM和Cox方法将竞争事件错误地当作独立删失，违反了删失假设，导致累积发生率被高估。Fine-Gray模型通过次分布风险（subdistribution hazard）直接建模竞争风险下的累积发生率函数，其系数（SHR）可直接解释为'在竞争事件存在下，暴露对感兴趣事件累积发生率的影响'。在骨科、肿瘤学和心血管研究中竞争风险普遍存在（死亡与其他终点竞争），这是该领域的标准分析方法。",
+  "references": [
+    "Fine JP, Gray RJ. A proportional hazards model for the subdistribution of a competing risk. J Am Stat Assoc. 1999;94(446):496-509.",
+    "Austin PC, et al. The use of different observational study designs to assess the effectiveness of medical interventions: A systematic review. Stat Med. 2012;31(25):2959-2985.",
+    "Koller MT, et al. Competing risks and the clinical community: irrelevance or ignorance? Stat Med. 2012;31(11-12):1089-1097."
+  ]
+}

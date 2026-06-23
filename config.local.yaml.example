@@ -1,0 +1,16 @@
+# MSRA 本地配置示例
+# 复制此文件为 config.local.yaml 并按需修改
+# config.local.yaml 已被 .gitignore 排除，不会提交到仓库
+
+# 数据目录（默认为项目根目录下的 MSRA/）
+# data_dir: ./MSRA/data
+# reports_dir: ./MSRA/reports
+
+# 引擎选择（auto / pandas / polars / duckdb / dask）
+# engine: auto
+
+# 日志级别（DEBUG / INFO / WARNING / ERROR）
+# log_level: INFO
+
+# 校准数据库路径
+# calibration_db: ./MSRA/calibration/calibration.json

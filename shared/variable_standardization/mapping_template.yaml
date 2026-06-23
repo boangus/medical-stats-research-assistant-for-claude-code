@@ -1,0 +1,339 @@
+# 变量名称标准化映射模板
+# Variable Name Standardization Mapping Template
+#
+# 使用说明:
+#   1. 复制此文件并修改为项目特定的映射
+#   2. 通过 VariableStandardizer(mapping_file="your_mapping.yaml") 加载
+#   3. 每个条目的 key 为原始变量名，value 包含标准化信息
+#
+# 字段说明:
+#   zh        - 中文标准名称
+#   en        - 英文标准名称
+#   unit      - 单位
+#   category  - 变量分类
+#   type      - 数据类型 (continuous / categorical / binary / ordinal)
+#   description - 变量描述（可选）
+
+# ── 人口学变量 ──────────────────────────────────────────────
+age:
+  zh: "年龄（岁）"
+  en: "Age (years)"
+  unit: "岁"
+  category: "人口学"
+  type: continuous
+
+性别:
+  zh: "性别"
+  en: "Sex"
+  unit: ""
+  category: "人口学"
+  type: categorical
+  description: "Male / Female"
+
+male:
+  zh: "男性"
+  en: "Male"
+  unit: ""
+  category: "人口学"
+  type: binary
+
+# ── 体格检查 ──────────────────────────────────────────────
+身高_cm:
+  zh: "身高（cm）"
+  en: "Height (cm)"
+  unit: "cm"
+  category: "体格检查"
+  type: continuous
+
+体重_kg:
+  zh: "体重（kg）"
+  en: "Weight (kg)"
+  unit: "kg"
+  category: "体格检查"
+  type: continuous
+
+BMI:
+  zh: "体质指数（BMI）"
+  en: "Body mass index (BMI)"
+  unit: "kg/m²"
+  category: "体格检查"
+  type: continuous
+
+腰围_cm:
+  zh: "腰围（cm）"
+  en: "Waist circumference (cm)"
+  unit: "cm"
+  category: "体格检查"
+  type: continuous
+
+收缩压:
+  zh: "收缩压（mmHg）"
+  en: "Systolic blood pressure (mmHg)"
+  unit: "mmHg"
+  category: "体格检查"
+  type: continuous
+
+舒张压:
+  zh: "舒张压（mmHg）"
+  en: "Diastolic blood pressure (mmHg)"
+  unit: "mmHg"
+  category: "体格检查"
+  type: continuous
+
+# ── 前列腺相关 ────────────────────────────────────────────
+PSA:
+  zh: "前列腺特异性抗原（PSA）"
+  en: "Prostate-specific antigen (PSA)"
+  unit: "ng/mL"
+  category: "实验室检查"
+  type: continuous
+
+fPSA:
+  zh: "游离前列腺特异性抗原（fPSA）"
+  en: "Free prostate-specific antigen (fPSA)"
+  unit: "ng/mL"
+  category: "实验室检查"
+  type: continuous
+
+fPSA_ratio:
+  zh: "游离 PSA 比值（fPSA/tPSA）"
+  en: "Free PSA ratio (fPSA/tPSA)"
+  unit: ""
+  category: "实验室检查"
+  type: continuous
+
+GS:
+  zh: "Gleason 评分（GS）"
+  en: "Gleason score (GS)"
+  unit: "分"
+  category: "病理"
+  type: ordinal
+
+crpc_月:
+  zh: "CRPC 时间（月）"
+  en: "CRPC duration (months)"
+  unit: "月"
+  category: "时间变量"
+  type: continuous
+
+T_stage:
+  zh: "T 分期"
+  en: "T stage"
+  unit: ""
+  category: "肿瘤分期"
+  type: categorical
+
+N_stage:
+  zh: "N 分期"
+  en: "N stage"
+  unit: ""
+  category: "肿瘤分期"
+  type: categorical
+
+M_stage:
+  zh: "M 分期"
+  en: "M stage"
+  unit: ""
+  category: "肿瘤分期"
+  type: categorical
+
+isup_grade:
+  zh: "ISUP 分级"
+  en: "ISUP grade group"
+  unit: ""
+  category: "病理"
+  type: ordinal
+
+# ── 实验室检查 ────────────────────────────────────────────
+HbA1c:
+  zh: "糖化血红蛋白（HbA1c）"
+  en: "Glycated hemoglobin (HbA1c)"
+  unit: "%"
+  category: "实验室检查"
+  type: continuous
+
+eGFR:
+  zh: "估算肾小球滤过率（eGFR）"
+  en: "Estimated GFR (eGFR)"
+  unit: "mL/min/1.73m²"
+  category: "实验室检查"
+  type: continuous
+
+WBC:
+  zh: "白细胞计数（WBC）"
+  en: "White blood cell count (WBC)"
+  unit: "×10⁹/L"
+  category: "实验室检查"
+  type: continuous
+
+Hb:
+  zh: "血红蛋白（Hb）"
+  en: "Hemoglobin (Hb)"
+  unit: "g/L"
+  category: "实验室检查"
+  type: continuous
+
+PLT:
+  zh: "血小板计数（PLT）"
+  en: "Platelet count (PLT)"
+  unit: "×10⁹/L"
+  category: "实验室检查"
+  type: continuous
+
+ALT:
+  zh: "丙氨酸氨基转移酶（ALT）"
+  en: "Alanine aminotransferase (ALT)"
+  unit: "U/L"
+  category: "实验室检查"
+  type: continuous
+
+AST:
+  zh: "天冬氨酸氨基转移酶（AST）"
+  en: "Aspartate aminotransferase (AST)"
+  unit: "U/L"
+  category: "实验室检查"
+  type: continuous
+
+Cr:
+  zh: "血肌酐（Cr）"
+  en: "Serum creatinine (Cr)"
+  unit: "μmol/L"
+  category: "实验室检查"
+  type: continuous
+
+BUN:
+  zh: "血尿素氮（BUN）"
+  en: "Blood urea nitrogen (BUN)"
+  unit: "mmol/L"
+  category: "实验室检查"
+  type: continuous
+
+ALB:
+  zh: "白蛋白（ALB）"
+  en: "Serum albumin (ALB)"
+  unit: "g/L"
+  category: "实验室检查"
+  type: continuous
+
+TC:
+  zh: "总胆固醇（TC）"
+  en: "Total cholesterol (TC)"
+  unit: "mmol/L"
+  category: "实验室检查"
+  type: continuous
+
+TG:
+  zh: "甘油三酯（TG）"
+  en: "Triglycerides (TG)"
+  unit: "mmol/L"
+  category: "实验室检查"
+  type: continuous
+
+LDL:
+  zh: "低密度脂蛋白胆固醇（LDL-C）"
+  en: "Low-density lipoprotein cholesterol (LDL-C)"
+  unit: "mmol/L"
+  category: "实验室检查"
+  type: continuous
+
+HDL:
+  zh: "高密度脂蛋白胆固醇（HDL-C）"
+  en: "High-density lipoprotein cholesterol (HDL-C)"
+  unit: "mmol/L"
+  category: "实验室检查"
+  type: continuous
+
+# ── 合并症 ────────────────────────────────────────────────
+charlson_index:
+  zh: "Charlson 合并症指数"
+  en: "Charlson Comorbidity Index"
+  unit: "分"
+  category: "合并症"
+  type: ordinal
+
+diabetes:
+  zh: "糖尿病"
+  en: "Diabetes mellitus"
+  unit: ""
+  category: "合并症"
+  type: binary
+
+hypertension:
+  zh: "高血压"
+  en: "Hypertension"
+  unit: ""
+  category: "合并症"
+  type: binary
+
+# ── 治疗相关 ──────────────────────────────────────────────
+ADT_type:
+  zh: "雄激素剥夺治疗类型"
+  en: "ADT type"
+  unit: ""
+  category: "治疗"
+  type: categorical
+
+RT_dose:
+  zh: "放疗剂量（Gy）"
+  en: "Radiation therapy dose (Gy)"
+  unit: "Gy"
+  category: "治疗"
+  type: continuous
+
+surgery_type:
+  zh: "手术类型"
+  en: "Surgery type"
+  unit: ""
+  category: "治疗"
+  type: categorical
+
+# ── 结局变量 ──────────────────────────────────────────────
+OS:
+  zh: "总生存期（OS）"
+  en: "Overall survival (OS)"
+  unit: "月"
+  category: "结局"
+  type: continuous
+
+PFS:
+  zh: "无进展生存期（PFS）"
+  en: "Progression-free survival (PFS)"
+  unit: "月"
+  category: "结局"
+  type: continuous
+
+CSS:
+  zh: "肿瘤特异性生存期（CSS）"
+  en: "Cancer-specific survival (CSS)"
+  unit: "月"
+  category: "结局"
+  type: continuous
+
+BCR:
+  zh: "生化复发（BCR）"
+  en: "Biochemical recurrence (BCR)"
+  unit: ""
+  category: "结局"
+  type: binary
+
+death:
+  zh: "死亡"
+  en: "Death"
+  unit: ""
+  category: "结局"
+  type: binary
+
+# ── 时间变量 ──────────────────────────────────────────────
+follow_up_months:
+  zh: "随访时间（月）"
+  en: "Follow-up time (months)"
+  unit: "月"
+  category: "时间变量"
+  type: continuous
+
+time_to_event:
+  zh: "事件发生时间（月）"
+  en: "Time to event (months)"
+  unit: "月"
+  category: "时间变量"
+  type: continuous

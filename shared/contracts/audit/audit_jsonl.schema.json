@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./shared/contracts/audit/audit_jsonl.schema.json",
+  "title": "Clinical Analysis Audit Log Event",
+  "description": "Schema for one entry in the clinical analysis audit trail. Each JSONL line records a discrete analysis action — method invocation, assumption check, result generation, or deviation — forming a tamper-evident chain for regulatory compliance (ICH E6(R2) Section 5.18.4).",
+  "type": "object",
+  "required": ["timestamp", "analysis_step", "method_used", "analyst_id", "event_type"],
+  "additionalProperties": false,
+
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 UTC timestamp of the analysis event, millisecond precision."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "method_invoked",
+        "assumption_checked",
+        "result_generated",
+        "deviation_recorded",
+        "sensitivity_run",
+        "safety_signal_detected",
+        "quality_gate_evaluated"
+      ],
+      "description": "Category of audit event."
+    },
+    "analyst_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier of the analyst or automated pipeline that performed the action."
+    },
+    "analysis_step": {
+      "type": "string",
+      "enum": [
+        "descriptive",
+        "inferential",
+        "sensitivity",
+        "safety",
+        "subgroup",
+        "regression",
+        "survival",
+        "multiplicity_adjustment",
+        "missing_data",
+        "model_diagnostics"
+      ],
+      "description": "Analysis phase within the SAP. Each event belongs to exactly one step."
+    },
+    "method_used": {
+      "type": "string",
+      "enum": [
+        "t_test",
+        "anova",
+        "ancova",
+        "chi_square",
+        "fisher_exact",
+        "mann_whitney_u",
+        "kruskal_wallis",
+        "wilcoxon_signed_rank",
+        "mcnemar",
+        "cox_proportional_hazards",
+        "kaplan_meier",
+        "log_rank",
+        "logistic_regression",
+        "linear_regression",
+        "mixed_effects_model",
+        "generalized_estimating_equations",
+        "probit",
+        "poisson_regression",
+        "negative_binomial",
+        "fine_gray",
+        "competing_risks",
+        "propensity_score_matching",
+        "propensity_score_weighting",
+        "instrumental_variable",
+        "multiple_imputation",
+        "tipping_point",
+        "bootstrap",
+        "bayesian_analysis",
+        "other"
+      ],
+      "description": "Statistical method applied. 'other' requires method_name in details."
+    },
+    "input_variables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["variable_name", "variable_role"],
+        "additionalProperties": false,
+        "properties": {
+          "variable_name": {
+            "type": "string",
+            "description": "Column or variable name in the analysis dataset."
+          },
+          "variable_role": {
+            "type": "string",
+            "enum": ["outcome", "exposure", "covariate", "stratification", "subgroup", "mediator", "time_to_event", "censoring_indicator"],
+            "description": "Role of the variable in this analysis."
+          },
+          "variable_type": {
+            "type": "string",
+            "enum": ["continuous", "binary", "ordinal", "categorical", "time_to_event", "date"],
+            "description": "Statistical type of the variable."
+          }
+        }
+      },
+      "description": "Variables consumed by the analysis step."
+    },
+    "output_results": {
+      "type": "object",
+      "description": "Key numeric and categorical outputs from the analysis. Structure varies by method_used.",
+      "properties": {
+        "test_statistic": {
+          "type": ["number", "null"],
+          "description": "Value of the test statistic (t, F, chi2, z, etc.)."
+        },
+        "p_value": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Two-sided p-value. Null if test does not produce a p-value."
+        },
+        "confidence_interval_lower": {
+          "type": ["number", "null"],
+          "description": "Lower bound of the confidence interval."
+        },
+        "confidence_interval_upper": {
+          "type": ["number", "null"],
+          "description": "Upper bound of the confidence interval."
+        },
+        "confidence_level": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence level (e.g. 0.95)."
+        },
+        "effect_estimate": {
+          "type": ["number", "null"],
+          "description": "Point estimate of the effect (OR, HR, RR, mean difference, etc.)."
+        },
+        "effect_measure": {
+          "type": ["string", "null"],
+          "enum": ["OR", "HR", "RR", "RD", "MD", "SMD", "NNT", "ARR", "AHR", null],
+          "description": "Type of effect measure."
+        },
+        "sample_size": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Number of observations used in this analysis."
+        },
+        "num_events": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Number of events (for time-to-event or binary outcomes)."
+        },
+        "r_squared": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "R-squared for regression models."
+        },
+        "aic": {
+          "type": ["number", "null"],
+          "description": "Akaike Information Criterion, if applicable."
+        }
+      },
+      "additionalProperties": false
+    },
+    "assumption_checks": {
+      "type": "array",
+      "description": "Statistical assumptions verified before running the method.",
+      "items": {
+        "type": "object",
+        "required": ["assumption_name", "test_method", "result"],
+        "additionalProperties": false,
+        "properties": {
+          "assumption_name": {
+            "type": "string",
+            "enum": [
+              "normality",
+              "homoscedasticity",
+              "independence",
+              "proportional_hazards",
+              "linearity",
+              "multicollinearity",
+              "overdispersion",
+              "goodness_of_fit",
+              "sphericity",
+              "equal_variances",
+              "proportionality_of_odds",
+              "missing_at_random"
+            ],
+            "description": "Statistical assumption being tested."
+          },
+          "test_method": {
+            "type": "string",
+            "enum": [
+              "shapiro_wilk",
+              "kolmogorov_smirnov",
+              "anderson_darling",
+              "levene",
+              "bartlett",
+              "breusch_pagan",
+              "white",
+              "schoenfeld",
+              "durbin_watson",
+              "vif",
+              "hosmer_lemeshow",
+              "mauchly",
+              "box_m",
+              "little_mcar",
+              "visual_inspection",
+              "not_tested"
+            ],
+            "description": "Statistical test or method used to check the assumption."
+          },
+          "result": {
+            "type": "string",
+            "enum": ["met", "violated", "borderline", "not_applicable", "not_tested"],
+            "description": "Outcome of the assumption check."
+          },
+          "test_statistic_value": {
+            "type": ["number", "null"],
+            "description": "Observed test statistic for the assumption check."
+          },
+          "p_value": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "maximum": 1,
+            "description": "p-value for the assumption test."
+          },
+          "remedial_action": {
+            "type": ["string", "null"],
+            "description": "Action taken when assumption is violated (e.g., 'switched to non-parametric', 'applied log transform')."
+          }
+        }
+      }
+    },
+    "deviations_from_sap": {
+      "type": "array",
+      "description": "Recorded deviations from the Statistical Analysis Plan. Empty array if none.",
+      "items": {
+        "type": "object",
+        "required": ["deviation_id", "sap_section", "description", "justification"],
+        "additionalProperties": false,
+        "properties": {
+          "deviation_id": {
+            "type": "string",
+            "pattern": "^DEV-[0-9]{3,}$",
+            "description": "Unique deviation identifier (e.g., DEV-001)."
+          },
+          "sap_section": {
+            "type": "string",
+            "description": "Section number or title in the SAP that was deviated from."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Clear description of what was done instead of the planned approach."
+          },
+          "justification": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Clinical or statistical rationale for the deviation."
+          },
+          "impact_assessment": {
+            "type": "string",
+            "enum": ["none", "minor", "moderate", "major"],
+            "description": "Assessed impact on study conclusions."
+          },
+          "approved_by": {
+            "type": ["string", "null"],
+            "description": "Name or ID of the statistician/medical officer who approved the deviation."
+          }
+        }
+      }
+    },
+    "details": {
+      "type": "object",
+      "description": "Free-form additional context for the event (e.g., R code snippet, software warning, model convergence status).",
+      "properties": {
+        "code_snippet": {
+          "type": ["string", "null"],
+          "description": "Relevant R, Python, or SAS code executed."
+        },
+        "convergence": {
+          "type": ["string", "null"],
+          "enum": ["converged", "failed_to_converge", "singular_fit", "singular_convergence", null],
+          "description": "Model convergence status, if applicable."
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Software warnings produced during execution."
+        },
+        "method_name": {
+          "type": ["string", "null"],
+          "description": "Free-text method name when method_used == 'other'."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

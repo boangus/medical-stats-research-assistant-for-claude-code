@@ -1,0 +1,24 @@
+{
+  "tuple_id": "011-comma-multi-value",
+  "kind": "format_variant",
+  "test_name": "逗号多值",
+  "source_pit": 8,
+  "description": "BillingAmount/LabResult_Multi contain comma-separated multi-values, must detect",
+  "input": {
+    "data_file": "tests/msra_test_data.csv",
+    "pipeline_stage": "data-prep",
+    "trigger_columns": [
+      "BillingAmount",
+      "LabResult_Multi"
+    ]
+  },
+  "expected": {
+    "detection": true,
+    "severity": "warning",
+    "phase": "Phase 2.5 (comma multi-value detection)",
+    "action": "Show multi-value records, user chooses mean / first / flag"
+  },
+  "failure_pattern": "LLM may treat 1.2, 2.3, 3.1 as a single string without splitting"
+}
+
+

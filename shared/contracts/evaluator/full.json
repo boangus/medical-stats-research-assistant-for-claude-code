@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "medical_report/evaluator_full/v1",
+  "mode": "evaluator_full",
+  "stage": "medical_report_evaluation",
+  "baseline_version": "v1.0.0",
+  "description": "Evaluation schema for clinical/statistical reports against reporting guidelines (CONSORT, STROBE, PRISMA, STARD) and medical writing quality standards.",
+
+  "reporting_guidelines": [
+    {
+      "id": "CONSORT",
+      "full_name": "Consolidated Standards of Reporting Trials",
+      "applicable_to": ["RCT", "cluster_RCT", "non_inferiority", "equivalence"],
+      "description": "Standard for reporting randomized controlled trials."
+    },
+    {
+      "id": "STROBE",
+      "full_name": "Strengthening the Reporting of Observational Studies in Epidemiology",
+      "applicable_to": ["cohort", "case_control", "cross_sectional"],
+      "description": "Standard for reporting observational studies."
+    },
+    {
+      "id": "PRISMA",
+      "full_name": "Preferred Reporting Items for Systematic Reviews and Meta-Analyses",
+      "applicable_to": ["systematic_review", "meta_analysis"],
+      "description": "Standard for systematic reviews and meta-analyses."
+    },
+    {
+      "id": "STARD",
+      "full_name": "Standards for Reporting of Diagnostic Accuracy Studies",
+      "applicable_to": ["diagnostic_accuracy", "diagnostic_prognostic"],
+      "description": "Standard for diagnostic accuracy studies."
+    },
+    {
+      "id": "TRIPOD",
+      "full_name": "Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis",
+      "applicable_to": ["prediction_model", "clinical_prediction"],
+      "description": "Standard for prediction model studies."
+    },
+    {
+      "id": "PRISMA_HTA",
+      "full_name": "PRISMA extension for Health Technology Assessment",
+      "applicable_to": ["systematic_review", "meta_analysis", "HTA"],
+      "description": "Extension for HTA-oriented systematic reviews."
+    }
+  ],
+
+  "acceptance_dimensions": [
+    {
+      "id": "D1",
+      "name": "reporting_guideline_compliance",
+      "description": "Report adheres to the applicable reporting guideline checklist items.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D2",
+      "name": "statistical_accuracy",
+      "description": "Statistical methods, results, and interpretations are technically correct.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D3",
+      "name": "clinical_relevance",
+      "description": "Findings are interpreted in clinical context; practical implications are stated; limitations are clinically informed.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D4",
+      "name": "data_presentation",
+      "description": "Tables, figures, and listings follow CONSORT/STROBE flow diagrams, present appropriate statistics, and are correctly labeled.",
+      "priority": "high"
+    },
+    {
+      "id": "D5",
+      "name": "reproducibility",
+      "description": "Enough methodological detail is provided for an independent statistician to reproduce the analysis.",
+      "priority": "mandatory"
+    },
+    {
+      "id": "D6",
+      "name": "regulatory_alignment",
+      "description": "Report meets ICH E3/E6(R2)/E9 regulatory expectations for the applicable submission type.",
+      "priority": "high"
+    },
+    {
+      "id": "D7",
+      "name": "writing_quality",
+      "description": "Medical writing is clear, precise, uses standard medical terminology, and is free of ambiguity.",
+      "priority": "normal"
+    }
+  ],
+
+  "scoring_plan": {
+    "per_dimension_criteria": [
+      {
+        "dimension_id": "D1",
+        "what_to_look_for": "All applicable checklist items from the relevant guideline are addressed; each item is present or explicitly marked not applicable with justification.",
+        "what_triggers_block": "More than 3 mandatory checklist items are missing or inadequately addressed; no flow diagram provided.",
+        "what_triggers_warn": "1-3 checklist items are missing or inadequately addressed; flow diagram present but incomplete."
+      },
+      {
+        "dimension_id": "D2",
+        "what_to_look_for": "Statistical methods match the research question and data type; p-values, confidence intervals, and effect sizes are correctly reported; no calculation errors; multiplicity adjustments are appropriate.",
+        "what_triggers_block": "Incorrect statistical method applied; calculation errors in key results; p-values inconsistent with reported test statistics; no adjustment for multiple comparisons when required.",
+        "what_triggers_warn": "Minor reporting omissions (e.g., missing exact p-values for non-significant results); some effect measures could be more informative."
+      },
+      {
+        "dimension_id": "D3",
+        "what_to_look_for": "Clinical significance is discussed alongside statistical significance; NNT/NNH provided where applicable; limitations acknowledge clinical generalizability.",
+        "what_triggers_block": "Statistical results presented without clinical interpretation; clinically irrelevant endpoints treated as primary without justification.",
+        "what_triggers_warn": "Clinical interpretation present but superficial; some limitations not addressed."
+      },
+      {
+        "dimension_id": "D4",
+        "what_to_look_for": "All tables and figures are referenced in text; baseline characteristics table is complete; primary endpoint results are clearly presented; CONSORT/STROBE flow diagram is accurate.",
+        "what_triggers_block": "Tables or figures referenced in text but missing; inconsistent numbers between text and tables.",
+        "what_triggers_warn": "Minor inconsistencies in table formatting; some figures could benefit from clearer labeling."
+      },
+      {
+        "dimension_id": "D5",
+        "what_to_look_for": "Analysis code or pseudocode is available; data dictionary is provided; SAP is referenced; randomization and blinding procedures are described.",
+        "what_triggers_block": "No code or pseudocode available; key analysis steps not described; data source not documented.",
+        "what_triggers_warn": "Code available but not fully annotated; some analysis steps could be described in more detail."
+      },
+      {
+        "dimension_id": "D6",
+        "what_to_look_for": "Report structure follows ICH E3 for clinical study reports; safety reporting meets ICH E2A requirements; efficacy analysis follows ICH E9.",
+        "what_triggers_block": "Major ICH E3 sections missing; safety data not presented per ICH E2A; primary analysis deviates from SAP without justification.",
+        "what_triggers_warn": "Minor ICH E3 formatting issues; some safety tables could be more complete."
+      },
+      {
+        "dimension_id": "D7",
+        "what_to_look_for": "Medical terminology is used correctly and consistently; abbreviations are defined on first use; grammar and spelling are correct.",
+        "what_triggers_block": "Frequent terminology errors that could cause misinterpretation; abbreviations used inconsistently.",
+        "what_triggers_warn": "Minor grammar or spelling issues; some terminology could be more precise."
+      }
+    ]
+  },
+
+  "failure_conditions": [
+    {
+      "condition_id": "F1",
+      "severity": 95,
+      "expression": "any mandatory dimension scores 'block'",
+      "action": "evaluator_decision=request_revision"
+    },
+    {
+      "condition_id": "F2",
+      "severity": 80,
+      "expression": "two or more mandatory dimensions score 'warn'",
+      "action": "evaluator_decision=request_revision"
+    },
+    {
+      "condition_id": "F3",
+      "severity": 65,
+      "expression": "any high-priority dimension scores 'block'",
+      "action": "evaluator_decision=request_revision"
+    },
+    {
+      "condition_id": "F4",
+      "severity": 50,
+      "expression": "one mandatory dimension scores 'warn' and no mandatory dimension scores 'block'",
+      "action": "evaluator_decision=accept_with_conditions"
+    },
+    {
+      "condition_id": "F5",
+      "severity": 40,
+      "expression": "any normal-priority dimension scores 'block' and all mandatory dimensions pass",
+      "action": "evaluator_decision=accept_with_minor_revision"
+    },
+    {
+      "condition_id": "F0",
+      "severity": 10,
+      "expression": "every mandatory dimension scores 'pass' and no high-priority dimension scores 'block'",
+      "action": "evaluator_decision=accept"
+    }
+  ]
+}

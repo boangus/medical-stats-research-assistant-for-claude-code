@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./shared/contracts/audit/audit_sidecar.schema.json",
+  "title": "Clinical Analysis Audit Metadata",
+  "description": "Sidecar metadata for a clinical analysis audit run. Captures study identity, protocol/SAP versions, data snapshot timing, analysis population, and software environment. Paired with audit_jsonl.schema.json events and audit_verdict.schema.json outcomes to form the complete audit trail.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "study_id",
+    "protocol_version",
+    "sap_version",
+    "data_snapshot_date",
+    "analysis_population",
+    "software_versions",
+    "run_timing"
+  ],
+
+  "properties": {
+    "study_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique clinical study identifier (e.g., NCT number, EudraCT number, or internal sponsor protocol number)."
+    },
+    "protocol_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+",
+      "description": "Version of the clinical study protocol under which this analysis is performed."
+    },
+    "sap_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+",
+      "description": "Version of the Statistical Analysis Plan."
+    },
+    "sap_amendments": {
+      "type": "array",
+      "description": "List of SAP amendments applied prior to this analysis run. Empty if none.",
+      "items": {
+        "type": "object",
+        "required": ["amendment_number", "date", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "amendment_number": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Sequential amendment number."
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the amendment was finalized."
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Brief description of what changed."
+          },
+          "approved_by": {
+            "type": ["string", "null"],
+            "description": "Name or role of the approving statistician or medical officer."
+          }
+        }
+      }
+    },
+    "data_snapshot_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the data cut / snapshot used for this analysis."
+    },
+    "lock_date": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Date the database was locked. Null if data is not yet locked."
+    },
+    "analysis_population": {
+      "type": "string",
+      "enum": ["ITT", "mITT", "PP", "safety", "per_protocol", "modified_intent_to_treat", "all_randomized", "all_treated"],
+      "description": "Primary analysis population per ICH E9."
+    },
+    "analysis_populations_detail": {
+      "type": "object",
+      "description": "Detailed definition of each analysis population used in the study.",
+      "properties": {
+        "ITT": {
+          "type": ["string", "null"],
+          "description": "Intent-to-Treat population definition."
+        },
+        "mITT": {
+          "type": ["string", "null"],
+          "description": "Modified Intent-to-Treat population definition."
+        },
+        "PP": {
+          "type": ["string", "null"],
+          "description": "Per-Protocol population definition."
+        },
+        "safety": {
+          "type": ["string", "null"],
+          "description": "Safety population definition."
+        }
+      },
+      "additionalProperties": false
+    },
+    "software_versions": {
+      "type": "object",
+      "description": "Versions of all software used in the analysis. At least one statistical computing environment must be specified.",
+      "properties": {
+        "R_version": {
+          "type": ["string", "null"],
+          "description": "R version (e.g., '4.3.2')."
+        },
+        "R_packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["package_name", "version"],
+            "additionalProperties": false,
+            "properties": {
+              "package_name": { "type": "string", "minLength": 1 },
+              "version": { "type": "string", "minLength": 1 }
+            }
+          },
+          "description": "R packages and their versions."
+        },
+        "Python_version": {
+          "type": ["string", "null"],
+          "description": "Python version (e.g., '3.11.7')."
+        },
+        "Python_packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["package_name", "version"],
+            "additionalProperties": false,
+            "properties": {
+              "package_name": { "type": "string", "minLength": 1 },
+              "version": { "type": "string", "minLength": 1 }
+            }
+          },
+          "description": "Python packages and their versions."
+        },
+        "SAS_version": {
+          "type": ["string", "null"],
+          "description": "SAS version (e.g., '9.4')."
+        },
+        "SAS_products": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "SAS licensed products used (e.g., 'STAT', 'ETS', 'IML')."
+        },
+        "other_software": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "version": { "type": "string", "minLength": 1 }
+            }
+          },
+          "description": "Any additional software (e.g., Stan, JAGS, WinBUGS)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "run_timing": {
+      "type": "object",
+      "required": ["started_at", "ended_at", "duration_seconds"],
+      "additionalProperties": false,
+      "properties": {
+        "started_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339 UTC timestamp when the analysis run began."
+        },
+        "ended_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339 UTC timestamp when the analysis run completed."
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Wall-clock duration of the analysis run in seconds."
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "Computing environment metadata for reproducibility.",
+      "properties": {
+        "hostname": {
+          "type": ["string", "null"],
+          "description": "Hostname of the analysis server."
+        },
+        "os": {
+          "type": ["string", "null"],
+          "description": "Operating system (e.g., 'Windows 11', 'Ubuntu 22.04', 'RHEL 8')."
+        },
+        "seed": {
+          "type": ["integer", "null"],
+          "description": "Random seed used for reproducibility."
+        },
+        "parallel_workers": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Number of parallel workers used."
+        }
+      },
+      "additionalProperties": false
+    },
+    "regulatory_context": {
+      "type": "object",
+      "description": "Regulatory framework context for the analysis.",
+      "properties": {
+        "framework": {
+          "type": ["string", "null"],
+          "enum": ["ICH_E6_R2", "ICH_E9", "ICH_E10", "FDA_21CFR312", "EMA", "NMPA", "PMDA", null],
+          "description": "Applicable regulatory framework."
+        },
+        "submission_type": {
+          "type": ["string", "null"],
+          "enum": ["NDA", "BLA", "IND", "CTA", "PMDA_J-NDA", "NMPA_NDA", null],
+          "description": "Submission type if this analysis is for regulatory filing."
+        },
+        "data_cut_number": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Sequential data cut number for interim analyses."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
