@@ -14,3 +14,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-23T16:00	bfceb4a	analysis-exec	83.4	85.0	keep	dim5	软语言清理+错误分类阈值表具体化	dry_run
 2026-06-23T16:05	bf59421	report	84.1	86.0	keep	dim4+dim5	检查点升级+模糊语言替换+故障处理具体化	dry_run
 2026-06-23T16:10	c996e34	data-prep	84.7	87.0	keep	dim5	EDA异常阈值具体化+Step0输出格式规范化	dry_run
+2026-06-23T16:15	f792033	peer-review	86.7	88.0	keep	dim4+dim5	检查点视觉标记+软语言清理	dry_run
+2026-06-23T16:15	f792033	analysis-plan	86.7	88.0	keep	dim5	软语言清理+检查点标准明确化	dry_run
