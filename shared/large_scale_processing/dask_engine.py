@@ -2,12 +2,30 @@
 Dask engine adapter for distributed data processing.
 
 Provides scalable distributed processing for datasets >100GB using Dask.
+
+Note: Dask is an optional dependency. If not installed, this module
+will raise ImportError when DaskEngine is instantiated, but the
+module itself can be safely imported for type checking.
 """
 
-import dask.dataframe as dd
-from typing import Any, List, Optional, Union
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 from .base_engine import BaseEngine
+
+logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    import dask.dataframe as dd
+
+try:
+    import dask.dataframe as _dd
+    _DASK_AVAILABLE = True
+except ImportError:
+    _dd = None  # type: ignore
+    _DASK_AVAILABLE = False
 
 
 class DaskEngine(BaseEngine):
@@ -16,10 +34,17 @@ class DaskEngine(BaseEngine):
 
     Suitable for datasets >100GB, supports parallel processing
     across multiple workers or cluster nodes.
+
+    Raises:
+        ImportError: If dask is not installed when methods are called.
     """
 
     def __init__(self):
         """Initialize Dask engine."""
+        if not _DASK_AVAILABLE:
+            raise ImportError(
+                "Dask is not installed. Install it with: pip install dask[dataframe]"
+            )
         self._name = "Dask"
         self._supports_gpu = False
 
@@ -46,7 +71,7 @@ class DaskEngine(BaseEngine):
             Dask DataFrame
         """
         blocksize = kwargs.pop("blocksize", "100MB")
-        return dd.read_csv(file_path, blocksize=blocksize, **kwargs)
+        return _dd.read_csv(file_path, blocksize=blocksize, **kwargs)
 
     def read_parquet(self, file_path: str, **kwargs) -> dd.DataFrame:
         """
@@ -59,7 +84,7 @@ class DaskEngine(BaseEngine):
         Returns:
             Dask DataFrame
         """
-        return dd.read_parquet(file_path, **kwargs)
+        return _dd.read_parquet(file_path, **kwargs)
 
     def filter(
         self,

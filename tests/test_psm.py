@@ -82,11 +82,8 @@ class TestNearestNeighborMatch:
         df = psm.estimate_propensity(
             psm_data, "treatment", ["x1", "x2", "x3"]
         )
-        treated = df[df["treatment"] == 1].copy()
-        control = df[df["treatment"] == 0].copy()
-
         try:
-            matches = psm.nearest_neighbor_match(treated, control, caliper=0.5)
+            matches = psm.nearest_neighbor_match(df, "treatment", caliper=0.5)
             assert len(matches) > 0
         except ValueError:
             pytest.skip("No matches found with this data")
@@ -95,11 +92,8 @@ class TestNearestNeighborMatch:
         df = psm.estimate_propensity(
             psm_data, "treatment", ["x1", "x2", "x3"]
         )
-        treated = df[df["treatment"] == 1].copy()
-        control = df[df["treatment"] == 0].copy()
-
         try:
-            matches = psm.nearest_neighbor_match(treated, control, caliper=0.8)
+            matches = psm.nearest_neighbor_match(df, "treatment", caliper=0.8)
             assert "match_id" in matches.columns
             assert "match_group" in matches.columns
         except ValueError:
@@ -113,11 +107,8 @@ class TestEstimateATE:
         df = psm.estimate_propensity(
             psm_data, "treatment", ["x1", "x2", "x3"]
         )
-        treated = df[df["treatment"] == 1].copy()
-        control = df[df["treatment"] == 0].copy()
-
         try:
-            matches = psm.nearest_neighbor_match(treated, control, caliper=0.8)
+            matches = psm.nearest_neighbor_match(df, "treatment", caliper=0.8)
             if len(matches) > 10:
                 ate = psm.estimate_ate(matches, "outcome", "treatment")
                 assert "ate" in ate

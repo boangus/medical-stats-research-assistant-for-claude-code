@@ -605,5 +605,237 @@ QC Inspector:
   - "阻断条件必须严格执行，不得自行解释'可以通融'。"
 ```
 
+---
 
+## 五、详细案例与代码示例
 
+> 以下为各反模式的具体代码示例，展示**错误写法**与**正确写法**的对比。
+
+### 案例 A1: 正态性假定默认化
+
+**❌ 错误写法**:
+```python
+# 直接 t 检验，不检查分布
+from scipy.stats import ttest_ind
+stat, p = ttest_ind(group_a, group_b)
+print(f"t={stat:.3f}, p={p:.4f}")
+```
+
+**✅ 正确写法**:
+```python
+from scipy.stats import ttest_ind, shapiro, mannwhitneyu
+
+# Step 1: 正态性检验
+sw_a = shapiro(group_a)
+sw_b = shapiro(group_b)
+print(f"Shapiro-Wilk: Group A p={sw_a.pvalue:.4f}, Group B p={sw_b.pvalue:.4f}")
+
+# Step 2: 根据结果选择方法
+if sw_a.pvalue < 0.10 or sw_b.pvalue < 0.10:
+    # 不满足正态性 → 非参数检验
+    stat, p = mannwhitneyu(group_a, group_b, alternative="two-sided")
+    method = "Mann-Whitney U"
+else:
+    # 满足正态性 → 参数检验
+    stat, p = ttest_ind(group_a, group_b)
+    method = "Independent t-test"
+
+print(f"Method: {method}, statistic={stat:.3f}, p={p:.4f}")
+```
+
+### 案例 A2: 缺失数据静默处理
+
+**❌ 错误写法**:
+```python
+import pandas as pd
+df = pd.read_csv("data.csv")
+df_clean = df.dropna()  # 静默删除所有缺失行
+result = analyze(df_clean)  # 不报告删除了多少数据
+```
+
+**✅ 正确写法**:
+```python
+import pandas as pd
+
+df = pd.read_csv("data.csv")
+n_original = len(df)
+
+# Step 1: 报告缺失模式
+missing_report = df.isnull().sum()
+missing_pct = (missing_report / n_original * 100).round(2)
+print(f"原始数据: {n_original} 行")
+print(f"缺失变量统计:\n{missing_report[missing_report > 0]}")
+
+# Step 2: 评估缺失机制 (MCAR/MAR/MNAR)
+# 使用 Little's MCAR 检验或可视化模式
+from statsmodels.imputation.mice import MCAR
+# ... (实际实现需要更复杂的逻辑)
+
+# Step 3: 记录处理策略
+strategy = "complete-case (CC) — 用户确认"
+n_clean = len(df.dropna())
+removed = n_original - n_clean
+print(f"处理策略: {strategy}")
+print(f"删除行数: {removed} ({removed/n_original:.1%})")
+
+# Step 4: 敏感性分析
+# compare CC results with multiple imputation results
+```
+
+### 案例 A5: 过度解读亚组分析
+
+**❌ 错误写法**:
+```python
+# 不做交互检验，直接分亚组报告 P 值
+for subgroup in ["male", "female"]:
+    sub_data = df[df["sex"] == subgroup]
+    stat, p = ttest_ind(sub_data[treatment == 1], sub_data[treatment == 0])
+    if p < 0.05:
+        print(f"  {subgroup}: p={p:.4f} *** SIGNIFICANT ***")
+```
+
+**✅ 正确写法**:
+```python
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+# Step 1: 先做交互检验
+model_interaction = smf.ols("outcome ~ treatment * sex", data=df).fit()
+interaction_term = "treatment:sex"
+interaction_p = model_interaction.pvalues.get(interaction_term, None)
+
+print(f"Interaction test (treatment × sex): p={interaction_p:.4f}")
+
+if interaction_p is not None and interaction_p < 0.10:
+    # 交互显著 → 亚组分析有意义
+    print("→ Interaction detected, subgroup analysis is justified")
+    for subgroup in ["male", "female"]:
+        sub_data = df[df["sex"] == subgroup]
+        stat, p = ttest_ind(sub_data[treatment == 1], sub_data[treatment == 0])
+        print(f"  {subgroup}: effect={stat:.3f}, p={p:.4f}")
+else:
+    # 交互不显著 → 不应做亚组比较
+    print("→ No significant interaction, subgroup analysis is NOT justified")
+    print("  Report overall effect only")
+```
+
+### 案例 A6: 多重比较不校正
+
+**❌ 错误写法**:
+```python
+# 5 个终点各自检验，不做校正
+for endpoint in ["endpoint1", "endpoint2", "endpoint3", "endpoint4", "endpoint5"]:
+    stat, p = ttest_ind(df_treatment[endpoint], df_control[endpoint])
+    significant = "***" if p < 0.05 else ""
+    print(f"  {endpoint}: p={p:.4f} {significant}")
+```
+
+**✅ 正确写法**:
+```python
+from statsmodels.stats.multitest import multipletests
+
+raw_pvalues = []
+for endpoint in ["endpoint1", "endpoint2", "endpoint3", "endpoint4", "endpoint5"]:
+    stat, p = ttest_ind(df_treatment[endpoint], df_control[endpoint])
+    raw_pvalues.append(p)
+
+# Benjamini-Hochberg 校正 (控制 FDR)
+rejected, corrected_p, _, _ = multipletests(raw_pvalues, method="fdr_bh")
+
+for endpoint, raw_p, corr_p, sig in zip(
+    ["endpoint1", "endpoint2", "endpoint3", "endpoint4", "endpoint5"],
+    raw_pvalues, corrected_p, rejected
+):
+    status = "*** SIG" if sig else ""
+    print(f"  {endpoint}: raw p={raw_p:.4f}, FDR-adjusted p={corr_p:.4f} {status}")
+```
+
+### 案例 B1: SAP 偏离未记录
+
+**❌ 错误写法**:
+```python
+# SAP 说用 ANCOVA，但代码里用了 t 检验
+# 原因：数据不完全满足 ANCOVA 假设
+# 问题：没有记录这个偏离
+stat, p = ttest_ind(group_a, group_b)  # 偏离 SAP，无记录
+```
+
+**✅ 正确写法**:
+```python
+# SAP 定义: ANCOVA with baseline as covariate
+# 执行中检查假设
+from scipy.stats import levene
+
+# Check homogeneity of regression slopes
+model_interaction = smf.ols("y ~ treatment * baseline", data=df).fit()
+slope_test_p = model_interaction.pvalues.get("treatment:baseline", 1.0)
+
+if slope_test_p < 0.10:
+    # ANCOVA 假设不满足 → 需要偏离
+    deviation = {
+        "sap_method": "ANCOVA",
+        "actual_method": "Welch t-test (no covariate)",
+        "reason": f"Regression slope homogeneity violated (interaction p={slope_test_p:.4f})",
+        "user_approved": False,  # 必须等待用户确认
+    }
+    print("⚠️ SAP DEVIATION DETECTED")
+    print(f"   SAP method: {deviation['sap_method']}")
+    print(f"   Proposed: {deviation['actual_method']}")
+    print(f"   Reason: {deviation['reason']}")
+    print("   → MUST obtain user approval before proceeding")
+    # ... 等待用户确认 ...
+else:
+    # 假设满足，按 SAP 执行
+    model = smf.ols("y ~ treatment + baseline", data=df).fit()
+```
+
+### 案例 D1: P 值格式不统一
+
+**❌ 错误写法**:
+```python
+# P 值格式混乱
+print(f"Test 1: p = 0.000")        # P = 0.000 是错误的
+print(f"Test 2: P < 0.05")          # 二元报告，丢失信息
+print(f"Test 3: p=0.0349")          # 小数位不一致
+print(f"Test 4: P=0.03492")         # 小数位不一致
+```
+
+**✅ 正确写法**:
+```python
+def format_p_value(p: float) -> str:
+    """统一 P 值格式: P < 0.001 或 P = 0.XXX"""
+    if p < 0.001:
+        return "P < 0.001"
+    else:
+        return f"P = {p:.3f}"
+
+# 所有 P 值统一处理
+for test_name, p_value in results:
+    print(f"{test_name}: {format_p_value(p_value)}")
+# Output:
+# Test 1: P < 0.001
+# Test 2: P = 0.035
+# Test 3: P = 0.035
+# Test 4: P = 0.035
+```
+
+---
+
+## 六、反模式检测检查清单
+
+> 以下检查清单可在 Gate 1.5/2.5/3.5 中引用，用于自动检测反模式。
+
+| 编号 | 检查项 | 检测方法 | 对应反模式 |
+|------|--------|---------|-----------|
+| AP-01 | 正态性检验存在 | 搜索代码中是否出现 `shapiro`/`normaltest`/`ks_2samp` | A1 |
+| AP-02 | 缺失数据处理记录 | 检查是否有 `dropna` 但无缺失报告 | A2 |
+| AP-03 | 亚组交互检验 | 搜索 `*` 交互项或 `interaction` 关键词 | A5 |
+| AP-04 | 多重比较校正 | 搜索 `multipletests`/`bonferroni`/`fdr` | A6 |
+| AP-05 | SAP 偏离记录 | 检查是否有 `deviation`/`变更` 记录 | B1 |
+| AP-06 | P 值格式统一 | 正则匹配 `p\s*[=<>]\s*0\.` 格式 | D1 |
+| AP-07 | 效应量+CI 报告 | 检查是否有 `ci`/`confidence interval` | D2 |
+| AP-08 | 随机种子设置 | 搜索 `random_state`/`set.seed` | C2 |
+
+---
+
+*本文件持续更新。发现新的反模式时，请按上述格式添加。*
