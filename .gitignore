@@ -99,6 +99,9 @@ scripts/benchmark_output/
 # Sphinx 文档构建产物
 docs/sphinx/build/
 
+# 开发文档（本地开发参考，不上传公共仓库）
+docs/dev/
+
 # 实测产物与个人研究文献（不属于插件核心）
 MSRA/
 references/literature/
