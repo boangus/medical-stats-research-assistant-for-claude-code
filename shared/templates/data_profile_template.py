@@ -120,33 +120,33 @@ def generate_data_profile(
 
     # ── 组装 Markdown ──
     lines = []
-    lines.append(f"# 数据画像报告：{file_label}")
+    lines.append(f"# \u6570\u636e\u753b\u50cf\u62a5\u544a\uff1a{file_label}")
     lines.append("")
 
     # 极端情况告警（如有）
     if alerts:
-        lines.append("## 🚨 极端情况告警")
+        lines.append("## \U0001f6a8 \u6781\u7aef\u60c5\u51b5\u544a\u8b66")
         lines.append("")
         for a in alerts:
             lines.append(f"- {a}")
         lines.append("")
-        lines.append("> 上述告警需在进入 Phase 1 数据验证前确认，Checkpoint 升级为 **MANDATORY**。")
+        lines.append("> \u4e0a\u8ff0\u544a\u8b66\u9700\u5728\u8fdb\u5165 Phase 1 \u6570\u636e\u9a8c\u8bc1\u524d\u786e\u8ba4\uff0cCheckpoint \u5347\u7ea7\u4e3a **MANDATORY**\u3002")
         lines.append("")
 
     # 1. 数据规模
-    lines.append("## 1. 数据规模")
+    lines.append("## 1. \u6570\u636e\u89c4\u6a21")
     lines.append("")
-    lines.append("| 指标 | 值 |")
+    lines.append("| \u6307\u6807 | \u503c |")
     lines.append("|------|-----|")
-    lines.append(f"| 行数（样本量） | {rows:,} |")
-    lines.append(f"| 列数（变量数） | {cols} |")
-    lines.append(f"| 内存占用 | {mem_mb:.2f} MB |")
+    lines.append(f"| \u884c\u6570\uff08\u6837\u672c\u91cf\uff09 | {rows:,} |")
+    lines.append(f"| \u5217\u6570\uff08\u53d8\u91cf\u6570\uff09 | {cols} |")
+    lines.append(f"| \u5185\u5b58\u5360\u7528 | {mem_mb:.2f} MB |")
     lines.append("")
 
     # 2. 变量类型分布
-    lines.append("## 2. 变量类型分布")
+    lines.append("## 2. \u53d8\u91cf\u7c7b\u578b\u5206\u5e03")
     lines.append("")
-    lines.append("| 类型 | 数量 | 占比 |")
+    lines.append("| \u7c7b\u578b | \u6570\u91cf | \u5360\u6bd4 |")
     lines.append("|------|------|------|")
     for label, cnt in type_dist.items():
         if cnt > 0:
@@ -155,26 +155,26 @@ def generate_data_profile(
     lines.append("")
 
     # 3. 缺失率
-    lines.append("## 3. 缺失情况")
+    lines.append("## 3. \u7f3a\u5931\u60c5\u51b5")
     lines.append("")
-    lines.append(f"**总缺失率**：{total_missing_pct}%")
+    lines.append(f"**\u603b\u7f3a\u5931\u7387**\uff1a{total_missing_pct}%")
     lines.append("")
     if len(top10_missing) > 0:
-        lines.append("**Top 10 高缺失变量**：")
+        lines.append("**Top 10 \u9ad8\u7f3a\u5931\u53d8\u91cf**\uff1a")
         lines.append("")
-        lines.append("| 变量 | 缺失数 | 缺失率(%) |")
+        lines.append("| \u53d8\u91cf | \u7f3a\u5931\u6570 | \u7f3a\u5931\u7387(%) |")
         lines.append("|------|--------|-----------|")
         for _, r in top10_missing.iterrows():
-            lines.append(f"| {r['变量']} | {int(r['缺失数']):,} | {r['缺失率(%)']:.2f} |")
+            lines.append(f"| {r['\u53d8\u91cf']} | {int(r['\u7f3a\u5931\u6570']):,} | {r['\u7f3a\u5931\u7387(%)']:.2f} |")
     else:
-        lines.append("✅ 无缺失值。")
+        lines.append("\u2705 \u65e0\u7f3a\u5931\u503c\u3002")
     lines.append("")
 
     # 4. 数值变量概要
     if numeric_summary is not None:
-        lines.append("## 4. 数值变量概要")
+        lines.append("## 4. \u6570\u503c\u53d8\u91cf\u6982\u8981")
         lines.append("")
-        lines.append("| 变量 | Min | Max | Mean | Median | SD |")
+        lines.append("| \u53d8\u91cf | Min | Max | Mean | Median | SD |")
         lines.append("|------|-----|-----|------|--------|----|")
         for var, r in numeric_summary.iterrows():
             lines.append(f"| {var} | {r['Min']} | {r['Max']} | {r['Mean']} | {r['Median']} | {r['SD']} |")
@@ -182,19 +182,19 @@ def generate_data_profile(
 
     # 5. 分类变量概要
     if cat_summary is not None and len(cat_summary) > 0:
-        lines.append("## 5. 分类变量概要")
+        lines.append("## 5. \u5206\u7c7b\u53d8\u91cf\u6982\u8981")
         lines.append("")
-        lines.append("| 变量 | 层级数 | 最大层级 | 最大层级频次 |")
+        lines.append("| \u53d8\u91cf | \u5c42\u7ea7\u6570 | \u6700\u5927\u5c42\u7ea7 | \u6700\u5927\u5c42\u7ea7\u9891\u6b21 |")
         lines.append("|------|--------|---------|-------------|")
         for _, r in cat_summary.iterrows():
-            lines.append(f"| {r['变量']} | {r['层级数']} | {r['最大层级']} | {r['最大层级频次']} |")
+            lines.append(f"| {r['\u53d8\u91cf']} | {r['\u5c42\u7ea7\u6570']} | {r['\u6700\u5927\u5c42\u7ea7']} | {r['\u6700\u5927\u5c42\u7ea7\u9891\u6b21']} |")
         lines.append("")
 
     # 6. 时间跨度
     if time_info:
-        lines.append("## 6. 时间跨度")
+        lines.append("## 6. \u65f6\u95f4\u8de8\u5ea6")
         lines.append("")
-        lines.append("| 列 | 最早日期 | 最晚日期 | 跨度(天) |")
+        lines.append("| \u5217 | \u65e9\u6700\u65e5\u671f | \u6700\u665a\u65e5\u671f | \u8de8\u5ea6(\u5929) |")
         lines.append("|-----|---------|---------|---------|")
         lines.append(f"| {time_info['column']} | {time_info['earliest']} | {time_info['latest']} | {time_info['span_days']} |")
         lines.append("")
