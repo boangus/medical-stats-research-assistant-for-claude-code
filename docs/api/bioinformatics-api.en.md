@@ -1,648 +1,650 @@
-# MSRA Bioinformatics Module API Reference
+# Bioinformatics Module API Reference
 
-| Field | Value |
-|-------|-------|
-| **Module** | `msra_modules.bioinformatics` |
-| **Version** | 1.1.0 |
-| **Date** | 2026-07-13 |
-| **Status** | Released (v1.0.0) |
-| **Language** | English |
+> **Version**: v1.0.0 | **Date**: 2026-06-26 | **Status**: Stable
+> **Module**: Bioinformatics | **Command**: `/bio`
 
 ---
 
-## Overview
+## Table of Contents
 
-The Bioinformatics module provides single-cell RNA-seq full-pipeline analysis powered by Scanpy and gseapy, including data loading, quality control, dimensionality reduction, clustering, differential expression, pathway enrichment, batch correction, and quality gate checks.
-
-### Dependencies
-
-- `scanpy` — Core single-cell analysis library
-- `gseapy` — Pathway enrichment analysis
-- `harmonypy` — Harmony batch correction
-- `biopython` — FASTA sequence reading
-- `scipy` — Statistical tests
-- `matplotlib` — Visualization
+- [ScRNASeqLoader — Single-Cell Data Loader](#scrnaseqloader)
+- [SingleCellQC — Single-Cell Quality Control](#singlecellqc)
+- [DimensionalityReduction — Dimensionality Reduction](#dimensionalityreduction)
+- [DifferentialExpression — Differential Expression Analysis](#differentialexpression)
+- [PathwayEnrichment — Pathway Enrichment Analysis](#pathwayenrichment)
+- [BatchCorrector — Batch Effect Correction](#batchcorrector)
+- [BioQualityGateChecker — Quality Gate Checker](#bioqualitygatechecker)
 
 ---
 
-## Public API
+## ScRNASeqLoader
 
-### `ScRNASeqLoader`
+> Single-cell RNA-seq data loader supporting 10x MTX/H5, CSV expression matrices, and FASTA sequence files.
 
-**Description**: Single-cell RNA-seq data loader supporting 10x MTX / H5 / CSV formats and FASTA sequence files.
+**Signature**:
 
-**Parameters**: None.
+```python
+ScRNASeqLoader()
+```
 
 **Methods**:
 
-#### `read_10x_mtx(mtx_dir, var_names="gene_symbols", cache=True)`
+### `read_10x_mtx`
+
+```python
+read_10x_mtx(mtx_dir: str, var_names: str = "gene_symbols", cache: bool = True) -> AnnData
+```
 
 Read 10x Genomics MTX format data.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `mtx_dir` | `str` | Yes | — | 10x output directory (containing matrix.mtx, features.tsv, barcodes.tsv) |
-| `var_names` | `str` | No | `"gene_symbols"` | Gene name type (`"gene_symbols"` or `"gene_ids"`) |
-| `cache` | `bool` | No | `True` | Whether to cache |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| mtx_dir | str | — | Required. 10x output directory (containing matrix.mtx, features.tsv, barcodes.tsv) |
+| var_names | str | "gene_symbols" | Gene name type ("gene_symbols" or "gene_ids") |
+| cache | bool | True | Whether to cache |
 
-- **Returns**: `anndata.AnnData`
-- **Example**:
+**Returns**: `AnnData` — Single-cell expression matrix
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import ScRNASeqLoader
 
 loader = ScRNASeqLoader()
-adata = loader.read_10x_mtx("/data/pbmc_10x/")
-print(adata.shape)
+adata = loader.read_10x_mtx("data/pbmc_10x/")
+print(f"Cells: {adata.shape[0]}, Genes: {adata.shape[1]}")
 ```
 
-#### `read_10x_h5(h5_path, genome=None)`
+**Exceptions**: `FileNotFoundError` — directory not found; `ImportError` — scanpy not installed
+
+### `read_10x_h5`
+
+```python
+read_10x_h5(h5_path: str, genome: Optional[str] = None) -> AnnData
+```
 
 Read 10x Genomics H5 format data.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `h5_path` | `str` | Yes | — | H5 file path |
-| `genome` | `str` | No | `None` | Genome name |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| h5_path | str | — | Required. H5 file path |
+| genome | Optional[str] | None | Genome name (optional) |
 
-- **Returns**: `anndata.AnnData`
+**Returns**: `AnnData`
 
-#### `read_csv(csv_path, **kwargs)`
+### `read_csv`
 
-Read CSV format expression matrix.
+```python
+read_csv(csv_path: str, **kwargs) -> AnnData
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `csv_path` | `str` | Yes | — | CSV file path |
-| `**kwargs` | — | No | — | Arguments passed to `pandas.read_csv` |
+Read CSV format expression matrix. `**kwargs` are passed to `pandas.read_csv`.
 
-- **Returns**: `anndata.AnnData`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| csv_path | str | — | Required. CSV file path |
+| **kwargs | — | — | Arguments passed to pandas.read_csv |
 
-#### `read_fasta(fasta_path)`
+**Returns**: `AnnData`
 
-Read FASTA sequence file (using Biopython).
+### `read_fasta`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `fasta_path` | `str` | Yes | — | FASTA file path |
+```python
+read_fasta(fasta_path: str) -> List[SeqRecord]
+```
 
-- **Returns**: `list[Bio.SeqRecord.SeqRecord]`
+Read FASTA sequence file (requires Biopython).
 
-#### `get_metadata()`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| fasta_path | str | — | Required. FASTA file path |
+
+**Returns**: `List[SeqRecord]` — List of Biopython sequence records
+
+**Exceptions**: `ImportError` — Biopython not installed
+
+### `get_metadata`
+
+```python
+get_metadata() -> Dict
+```
 
 Get metadata of currently loaded data.
 
-- **Returns**: `dict` — contains `n_cells`, `n_genes`, `obs_columns`, `var_columns`, `is_sparse`
-- Returns `{"error": "No data loaded"}` if no data loaded.
+**Returns**: `Dict` — Contains `n_cells`, `n_genes`, `obs_columns`, `var_columns`, `is_sparse`
 
-**Exceptions**: `ImportError` (scanpy/biopython not installed), `FileNotFoundError` (file not found)
+### Convenience Function
 
----
-
-### `read_10x_mtx(mtx_dir, **kwargs)`
-
-**Description**: Convenience function, equivalent to `ScRNASeqLoader().read_10x_mtx(mtx_dir, **kwargs)`.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `mtx_dir` | `str` | Yes | — | 10x output directory |
-| `**kwargs` | — | No | — | Arguments passed to `ScRNASeqLoader.read_10x_mtx` |
-
-- **Returns**: `anndata.AnnData`
+```python
+from msra_modules.bioinformatics import read_10x_mtx
+adata = read_10x_mtx("data/pbmc_10x/")
+```
 
 ---
 
-### `SingleCellQC`
+## SingleCellQC
 
-**Description**: Single-cell quality control including mitochondrial percentage, gene count, and UMI filtering.
+> Single-cell quality control supporting cell/gene filtering based on gene count, mitochondrial percentage, and other metrics.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `min_genes` | `int` | No | `200` | Minimum genes per cell |
-| `max_genes` | `int` | No | `5000` | Maximum genes per cell |
-| `max_pct_mito` | `float` | No | `20.0` | Maximum mitochondrial gene percentage |
-| `min_cells` | `int` | No | `3` | Minimum cells per gene |
+```python
+SingleCellQC(min_genes: int = 200, max_genes: int = 5000, max_pct_mito: float = 20.0, min_cells: int = 3)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| min_genes | int | 200 | Minimum genes per cell |
+| max_genes | int | 5000 | Maximum genes per cell |
+| max_pct_mito | float | 20.0 | Maximum mitochondrial gene percentage |
+| min_cells | int | 3 | Minimum cells per gene |
 
 **Methods**:
 
-#### `compute_qc_metrics(adata)`
+### `compute_qc_metrics`
 
-Compute QC metrics (mark mitochondrial genes and calculate QC metrics).
+```python
+compute_qc_metrics(adata: AnnData) -> AnnData
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
+Compute QC metrics (mark mitochondrial genes, calculate n_genes_by_counts, pct_counts_mt, etc.). Modifies in-place and returns.
 
-- **Returns**: `AnnData` (with QC metrics, modified in-place)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
 
-#### `filter_cells(adata, verbose=True)`
+**Returns**: `AnnData` — AnnData with QC metrics
 
-Filter low-quality cells (based on gene count and mitochondrial percentage).
+### `filter_cells`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `verbose` | `bool` | No | `True` | Whether to print info |
+```python
+filter_cells(adata: AnnData, verbose: bool = True) -> AnnData
+```
 
-- **Returns**: `AnnData` (filtered)
+Filter low-quality cells based on gene count and mitochondrial percentage.
 
-#### `filter_genes(adata, verbose=True)`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| verbose | bool | True | Whether to print filtering info |
 
-Filter low-expression genes.
+**Returns**: `AnnData` — Filtered AnnData
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `verbose` | `bool` | No | `True` | Whether to print info |
+### `filter_genes`
 
-- **Returns**: `AnnData` (filtered)
+```python
+filter_genes(adata: AnnData, verbose: bool = True) -> AnnData
+```
 
-#### `run_qc(adata, verbose=True)`
+Filter low-expression genes based on minimum cell count.
 
-Run complete QC pipeline (compute metrics -> filter cells -> filter genes).
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| verbose | bool | True | Whether to print filtering info |
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `verbose` | `bool` | No | `True` | Whether to print info |
+**Returns**: `AnnData` — Filtered AnnData
 
-- **Returns**: `AnnData` (after QC)
-- **Example**:
+### `run_qc`
+
+```python
+run_qc(adata: AnnData, verbose: bool = True) -> AnnData
+```
+
+Run complete QC pipeline (compute_qc_metrics → filter_cells → filter_genes).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| verbose | bool | True | Whether to print info |
+
+**Returns**: `AnnData` — QC'd AnnData
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import ScRNASeqLoader, SingleCellQC
 
 loader = ScRNASeqLoader()
-adata = loader.read_10x_mtx("/data/pbmc_10x/")
+adata = loader.read_10x_mtx("data/pbmc_10x/")
 
 qc = SingleCellQC(min_genes=200, max_genes=5000, max_pct_mito=20.0)
 adata = qc.run_qc(adata)
+print(f"After QC: {adata.shape[0]} cells, {adata.shape[1]} genes")
 ```
 
-#### `get_qc_summary(adata)`
+### `get_qc_summary`
 
-Get QC summary.
+```python
+get_qc_summary(adata: AnnData) -> Dict
+```
 
-- **Returns**: `dict` — contains `n_cells`, `n_genes`, `mean_genes_per_cell`, `median_genes_per_cell`, `mean_counts_per_cell`, `mean_pct_mito`, `max_pct_mito`
+Get QC summary statistics.
 
-**Exceptions**: `ImportError` (scanpy not installed)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+
+**Returns**: `Dict` — Contains `n_cells`, `n_genes`, `mean_genes_per_cell`, `mean_counts_per_cell`, `mean_pct_mito`, `max_pct_mito`
 
 ---
 
-### `DimensionalityReduction`
+## DimensionalityReduction
 
-**Description**: Dimensionality reduction analysis supporting PCA / UMAP / Leiden clustering.
+> Dimensionality reduction providing normalization, HVG selection, PCA, UMAP, and Leiden clustering pipeline.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `n_pcs` | `int` | No | `50` | Number of PCA components |
-| `n_neighbors` | `int` | No | `15` | Number of neighbors |
+```python
+DimensionalityReduction(n_pcs: int = 50, n_neighbors: int = 15)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| n_pcs | int | 50 | Number of PCA components |
+| n_neighbors | int | 15 | Number of neighbors |
 
 **Methods**:
 
-#### `normalize_and_log(adata, target_sum=1e4)`
+### `normalize_and_log`
+
+```python
+normalize_and_log(adata: AnnData, target_sum: int = 1e4) -> AnnData
+```
 
 Normalize and log-transform.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `target_sum` | `int` | No | `10000` | Target sum |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| target_sum | int | 1e4 | Target sum |
 
-- **Returns**: `AnnData`
+**Returns**: `AnnData` — Normalized AnnData
 
-#### `find_hvg(adata, n_top_genes=2000)`
+### `find_hvg`
+
+```python
+find_hvg(adata: AnnData, n_top_genes: int = 2000) -> AnnData
+```
 
 Find highly variable genes.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `n_top_genes` | `int` | No | `2000` | Number of highly variable genes |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| n_top_genes | int | 2000 | Number of top HVGs |
 
-- **Returns**: `AnnData`
+**Returns**: `AnnData` — AnnData with HVG markers
 
-#### `run_pca(adata)`
+### `run_pca`
 
-Run PCA.
+```python
+run_pca(adata: AnnData) -> AnnData
+```
 
-- **Returns**: `AnnData` (adds `obsm["X_pca"]`)
+Run PCA dimensionality reduction.
 
-#### `run_umap(adata)`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
 
-Run UMAP (requires PCA first).
+**Returns**: `AnnData` — AnnData with PCA results (`obsm["X_pca"]`)
 
-- **Returns**: `AnnData` (adds `obsm["X_umap"]`)
+### `run_umap`
 
-#### `cluster(adata, resolution=1.0)`
+```python
+run_umap(adata: AnnData) -> AnnData
+```
 
-Leiden clustering.
+Run UMAP dimensionality reduction (requires PCA first).
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `resolution` | `float` | No | `1.0` | Clustering resolution |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
 
-- **Returns**: `AnnData` (adds `obs["leiden"]`)
+**Returns**: `AnnData` — AnnData with UMAP results (`obsm["X_umap"]`)
 
-#### `run_full_pipeline(adata, resolution=1.0)`
+### `cluster`
 
-Run complete dimensionality reduction pipeline (normalize -> HVG -> PCA -> UMAP -> cluster).
+```python
+cluster(adata: AnnData, resolution: float = 1.0) -> AnnData
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `resolution` | `float` | No | `1.0` | Clustering resolution |
+Leiden clustering analysis.
 
-- **Returns**: `AnnData`
-- **Example**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| resolution | float | 1.0 | Clustering resolution |
+
+**Returns**: `AnnData` — AnnData with clustering results (`obs["leiden"]`)
+
+### `run_full_pipeline`
+
+```python
+run_full_pipeline(adata: AnnData, resolution: float = 1.0) -> AnnData
+```
+
+Run complete dimensionality reduction pipeline (normalize_and_log → find_hvg → run_pca → run_umap → cluster).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| resolution | float | 1.0 | Clustering resolution |
+
+**Returns**: `AnnData` — Processed AnnData
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import DimensionalityReduction
 
-dr = DimensionalityReduction(n_pcs=50, n_neighbors=15)
+dr = DimensionalityReduction(n_pcs=50)
 adata = dr.run_full_pipeline(adata, resolution=0.8)
+print(f"Clusters: {adata.obs['leiden'].nunique()}")
 ```
-
-**Exceptions**: `ImportError` (scanpy not installed)
 
 ---
 
-### `DifferentialExpression`
+## DifferentialExpression
 
-**Description**: Differential expression analysis supporting Wilcoxon / t-test / logreg methods.
+> Differential expression analysis supporting Wilcoxon, t-test, and logreg methods, with marker gene discovery and DE gene filtering.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `method` | `str` | No | `"wilcoxon"` | DE method (`"wilcoxon"`, `"t-test"`, `"logreg"`) |
+```python
+DifferentialExpression(method: str = "wilcoxon")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| method | str | "wilcoxon" | DE method ("wilcoxon", "t-test", "logreg") |
 
 **Methods**:
 
-#### `find_markers(adata, groupby="leiden", use_raw=True)`
+### `find_markers`
+
+```python
+find_markers(adata: AnnData, groupby: str = "leiden", use_raw: bool = True) -> pd.DataFrame
+```
 
 Find marker genes.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `groupby` | `str` | No | `"leiden"` | Grouping column name |
-| `use_raw` | `bool` | No | `True` | Whether to use raw data |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| groupby | str | "leiden" | Grouping column name |
+| use_raw | bool | True | Whether to use raw data |
 
-- **Returns**: `pd.DataFrame` — marker genes table (columns are group names, rows are rankings)
+**Returns**: `pd.DataFrame` — Marker genes DataFrame (each column is markers for one cluster)
 
-#### `get_de_table(adata, group, n_genes=100)`
+### `get_de_table`
 
-Get differential expression table.
+```python
+get_de_table(adata: AnnData, group: str, n_genes: int = 100) -> pd.DataFrame
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `group` | `str` | Yes | — | Group name |
-| `n_genes` | `int` | No | `100` | Number of genes to return |
+Get differential expression table for a specified group.
 
-- **Returns**: `pd.DataFrame` — contains `names`, `logfoldchanges`, `pvals`, `pvals_adj`, `log2FC` columns
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| group | str | — | Required. Group name |
+| n_genes | int | 100 | Number of genes to return |
 
-#### `filter_de_genes(de_table, log2fc_threshold=1.0, pval_threshold=0.05)`
+**Returns**: `pd.DataFrame` — DE table (contains log2FC, pvals_adj)
 
-Filter differentially expressed genes.
+### `filter_de_genes`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `de_table` | `pd.DataFrame` | Yes | — | DE table |
-| `log2fc_threshold` | `float` | No | `1.0` | log2FC threshold |
-| `pval_threshold` | `float` | No | `0.05` | Adjusted p-value threshold |
+```python
+filter_de_genes(de_table: pd.DataFrame, log2fc_threshold: float = 1.0, pval_threshold: float = 0.05) -> pd.DataFrame
+```
 
-- **Returns**: `pd.DataFrame` — filtered DE genes with `direction` column (`"up"` / `"down"`)
+Filter significant DE genes.
 
-- **Example**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| de_table | pd.DataFrame | — | Required. DE table |
+| log2fc_threshold | float | 1.0 | log2FC threshold |
+| pval_threshold | float | 0.05 | p-value threshold |
+
+**Returns**: `pd.DataFrame` — Filtered DE genes (with `direction` column: "up"/"down")
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import DifferentialExpression
 
 de = DifferentialExpression(method="wilcoxon")
 markers = de.find_markers(adata, groupby="leiden")
-de_table = de.get_de_table(adata, group="0", n_genes=100)
+de_table = de.get_de_table(adata, group="0", n_genes=200)
 sig_genes = de.filter_de_genes(de_table, log2fc_threshold=1.0, pval_threshold=0.05)
+print(f"Significant DE genes: {len(sig_genes)}")
 ```
 
-**Exceptions**: `ImportError` (scanpy not installed)
-
 ---
 
-### `TrajectoryAnalysis`
+## PathwayEnrichment
 
-**Description**: Trajectory analysis supporting PAGA and DPT (Diffusion Pseudotime).
+> Pathway enrichment analysis engine implementing GO (BP/MF/CC), KEGG, GSEA, and Enrichr via gseapy.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `method` | `str` | No | `"paga"` | Method (`"paga"` or `"dpt"`) |
+```python
+PathwayEnrichment(organism: str = "human", gene_sets: Optional[str] = None, outdir: Optional[str] = None)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| organism | str | "human" | Organism name ("human", "mouse", "rat", etc.) |
+| gene_sets | Optional[str] | None | Custom .gmt gene set file path (optional) |
+| outdir | Optional[str] | None | Output directory (optional) |
 
 **Methods**:
 
-#### `run_paga(adata, groups="leiden")`
-
-Run PAGA trajectory analysis.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `groups` | `str` | No | `"leiden"` | Grouping column name |
-
-- **Returns**: `AnnData`
-
-#### `run_dpt(adata, root_key="xroot")`
-
-Run DPT (Diffusion Pseudotime).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `root_key` | `str` | No | `"xroot"` | Root cell key name |
-
-- **Returns**: `AnnData`
-
-**Exceptions**: `ImportError` (scanpy not installed)
-
----
-
-### `CellBenderDenoiser`
-
-**Description**: CellBender single-cell denoising (background removal) via command-line invocation.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `expected_cells` | `int` | No | `3000` | Expected number of cells |
-| `total_droplets` | `int` | No | `30000` | Total number of droplets |
-| `epochs` | `int` | No | `200` | Training epochs |
-
-**Methods**:
-
-#### `check_installation()`
-
-Check if CellBender is installed.
-
-- **Returns**: `bool`
-
-#### `run_remove_background(input_h5, output_h5, expected_cells=None, total_droplets=None)`
-
-Run background removal.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `input_h5` | `str` | Yes | — | Input H5 file path |
-| `output_h5` | `str` | Yes | — | Output H5 file path |
-| `expected_cells` | `int` | No | `None` | Expected cells (overrides default) |
-| `total_droplets` | `int` | No | `None` | Total droplets (overrides default) |
-
-- **Returns**: `dict` — contains `success`, `output_file`/`error`, `stdout`
-
-#### `load_denoised(h5_path)`
-
-Load denoised data.
-
-- **Returns**: `AnnData`
-
-#### `compare_before_after(raw_adata, denoised_adata)`
-
-Compare data before and after denoising.
-
-- **Returns**: `dict` — contains `raw_mean`, `denoised_mean`, `raw_std`, `denoised_std`, `mean_difference`, `std_difference`, etc.
-
-**Exceptions**: `RuntimeError` (CellBender not installed), `FileNotFoundError`, `ImportError`
-
----
-
-### `BioVisualizer`
-
-**Description**: Bioinformatics visualization tool based on matplotlib + scanpy.pl.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `figsize` | `tuple` | No | `(8, 6)` | Figure size |
-| `dpi` | `int` | No | `100` | Resolution |
-
-**Methods**:
-
-#### `plot_umap(adata, color=None, save_path=None)`
-
-Plot UMAP.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object (requires `X_umap`) |
-| `color` | `str` | No | `None` | Color column name |
-| `save_path` | `str` | No | `None` | Save path |
-
-- **Returns**: `matplotlib.figure.Figure`
-
-#### `plot_violin(adata, keys, groupby=None, save_path=None)`
-
-Plot violin plot.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `keys` | `list[str]` | Yes | — | Gene name list |
-| `groupby` | `str` | No | `None` | Grouping column name |
-| `save_path` | `str` | No | `None` | Save path |
-
-- **Returns**: `matplotlib.figure.Figure`
-
-#### `plot_dotplot(adata, var_names, groupby="leiden", save_path=None)`
-
-Plot dot plot.
-
-- **Returns**: `matplotlib.figure.Figure`
-
-#### `plot_heatmap(adata, var_names, groupby="leiden", save_path=None)`
-
-Plot heatmap.
-
-- **Returns**: `matplotlib.figure.Figure`
-
-#### `plot_paga(adata, color=None, save_path=None)`
-
-Plot PAGA trajectory.
-
-- **Returns**: `matplotlib.figure.Figure`
-
-**Exceptions**: `ImportError` (scanpy not installed), `ValueError` (UMAP not computed)
-
----
-
-### `PathwayEnrichment`
-
-**Description**: Pathway enrichment analysis engine based on gseapy, implementing GO (BP/MF/CC), KEGG, GSEA, and Enrichr enrichment analysis.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `organism` | `str` | No | `"human"` | Organism name (`"human"`, `"mouse"`, etc.) |
-| `gene_sets` | `str` | No | `None` | Custom `.gmt` gene set file path |
-| `outdir` | `str` | No | `None` | Output directory |
-
-**Methods**:
-
-#### `run_enrichr(gene_list, gene_sets_library="GO_Biological_Process_2023", cutoff=0.05)`
-
-Run Enrichr enrichment analysis (Over-Representation Analysis).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `gene_list` | `list[str]` | Yes | — | Gene list (gene symbols) |
-| `gene_sets_library` | `str` | No | `"GO_Biological_Process_2023"` | Gene set library name |
-| `cutoff` | `float` | No | `0.05` | FDR cutoff |
-
-- **Returns**: `pd.DataFrame` — columns: `Term`, `Overlap`, `P-value`, `Adjusted P-value`, `Odds Ratio`, `Combined Score`, `Genes`
-
-#### `run_gsea(ranked_genes, gene_sets="GO_Biological_Process_2023", min_size=15, max_size=500, permutation_num=100)`
-
-Run GSEA gene set enrichment analysis.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `ranked_genes` | `pd.Series` | Yes | — | Ranked gene series (index=gene symbols, values=ranking metric) |
-| `gene_sets` | `str` | No | `"GO_Biological_Process_2023"` | Gene set library name or `.gmt` file path |
-| `min_size` | `int` | No | `15` | Minimum gene set size |
-| `max_size` | `int` | No | `500` | Maximum gene set size |
-| `permutation_num` | `int` | No | `100` | Number of permutations |
-
-- **Returns**: `pd.DataFrame` — columns: `Term`, `ES`, `NES`, `NOM p-val`, `FDR q-val`, `FWER p-val`, `Tag %`, `Lead_genes`
-
-#### `run_go(gene_list, ontology="BP", cutoff=0.05)`
+### `run_go`
+
+```python
+run_go(gene_list: List[str], ontology: str = "BP", cutoff: float = 0.05) -> pd.DataFrame
+```
 
 Run GO enrichment analysis (convenience method).
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `gene_list` | `list[str]` | Yes | — | Gene list |
-| `ontology` | `str` | No | `"BP"` | GO ontology type (`"BP"` / `"MF"` / `"CC"`) |
-| `cutoff` | `float` | No | `0.05` | FDR cutoff |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| gene_list | List[str] | — | Required. Gene list (gene symbols) |
+| ontology | str | "BP" | GO ontology type ("BP" / "MF" / "CC") |
+| cutoff | float | 0.05 | FDR threshold |
 
-- **Returns**: `pd.DataFrame`
+**Returns**: `pd.DataFrame` — GO enrichment results (Term, Overlap, P-value, Adjusted P-value, Genes)
 
-#### `run_kegg(gene_list, cutoff=0.05)`
+**Exceptions**: `ValueError` — ontology not BP/MF/CC; `RuntimeError` — analysis failed
 
-Run KEGG pathway enrichment analysis (convenience method).
+### `run_kegg`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `gene_list` | `list[str]` | Yes | — | Gene list |
-| `cutoff` | `float` | No | `0.05` | FDR cutoff |
+```python
+run_kegg(gene_list: List[str], cutoff: float = 0.05) -> pd.DataFrame
+```
 
-- **Returns**: `pd.DataFrame`
+Run KEGG pathway enrichment analysis.
 
-#### `get_top_pathways(results, n=20, sort_by="Adjusted P-value")`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| gene_list | List[str] | — | Required. Gene list |
+| cutoff | float | 0.05 | FDR threshold |
+
+**Returns**: `pd.DataFrame` — KEGG pathway enrichment results
+
+### `run_gsea`
+
+```python
+run_gsea(ranked_genes: pd.Series, gene_sets: str = "GO_Biological_Process_2023", min_size: int = 15, max_size: int = 500, permutation_num: int = 100) -> pd.DataFrame
+```
+
+Run GSEA gene set enrichment analysis.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| ranked_genes | pd.Series | — | Required. Ranked gene series (index=gene symbols, values=ranking metric) |
+| gene_sets | str | "GO_Biological_Process_2023" | Gene set library name or .gmt file path |
+| min_size | int | 15 | Minimum gene set size |
+| max_size | int | 500 | Maximum gene set size |
+| permutation_num | int | 100 | Number of permutations |
+
+**Returns**: `pd.DataFrame` — GSEA results (Term, ES, NES, NOM p-val, FDR q-val, Lead_genes)
+
+**Exceptions**: `RuntimeError` — analysis failed
+
+### `run_enrichr`
+
+```python
+run_enrichr(gene_list: List[str], gene_sets_library: str = "GO_Biological_Process_2023", cutoff: float = 0.05) -> pd.DataFrame
+```
+
+Run Enrichr over-representation analysis.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| gene_list | List[str] | — | Required. Gene list |
+| gene_sets_library | str | "GO_Biological_Process_2023" | Gene set library name |
+| cutoff | float | 0.05 | FDR threshold |
+
+**Returns**: `pd.DataFrame` — Enrichr results
+
+**Exceptions**: `RuntimeError` — analysis failed
+
+### `get_top_pathways`
+
+```python
+get_top_pathways(results: pd.DataFrame, n: int = 20, sort_by: str = "Adjusted P-value") -> pd.DataFrame
+```
 
 Get top N pathways.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `results` | `pd.DataFrame` | Yes | — | Enrichment results DataFrame |
-| `n` | `int` | No | `20` | Number of pathways to return |
-| `sort_by` | `str` | No | `"Adjusted P-value"` | Sort field |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| results | pd.DataFrame | — | Required. Enrichment results DataFrame |
+| n | int | 20 | Number of pathways to return |
+| sort_by | str | "Adjusted P-value" | Sort field |
 
-- **Returns**: `pd.DataFrame`
+**Returns**: `pd.DataFrame` — Sorted top N results
 
-#### `export_results(results, output_path, format="csv")`
+### `export_results`
+
+```python
+export_results(results: pd.DataFrame, output_path: str, format: str = "csv") -> str
+```
 
 Export enrichment results.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `results` | `pd.DataFrame` | Yes | — | Enrichment results DataFrame |
-| `output_path` | `str` | Yes | — | Output file path |
-| `format` | `str` | No | `"csv"` | Output format (`"csv"` / `"json"` / `"tsv"`) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| results | pd.DataFrame | — | Required. Enrichment results |
+| output_path | str | — | Required. Output file path |
+| format | str | "csv" | Output format ("csv" / "json" / "tsv") |
 
-- **Returns**: `str` — output file path
-- **Example**:
+**Returns**: `str` — Output file path
+
+**Exceptions**: `ValueError` — unsupported format
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import PathwayEnrichment
 
 enricher = PathwayEnrichment(organism="human")
-go_results = enricher.run_go(sig_genes["names"].tolist(), ontology="BP")
-top_go = enricher.get_top_pathways(go_results, n=20)
-enricher.export_results(top_go, "/output/go_results.csv", format="csv")
+go_results = enricher.run_go(gene_list=["CD3D", "CD3E", "IL7R"], ontology="BP")
+top_pathways = enricher.get_top_pathways(go_results, n=10)
+enricher.export_results(go_results, "output/go_enrichment.csv")
 ```
-
-**Exceptions**: `ImportError` (gseapy not installed), `RuntimeError` (analysis failed), `ValueError` (unsupported format)
 
 ---
 
-### `BatchCorrector`
+## BatchCorrector
 
-**Description**: Batch effect detection and correction supporting ComBat and Harmony methods.
+> Batch effect detection and correction supporting ComBat and Harmony methods.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `batch_key` | `str` | No | `"batch"` | Batch column name in `obs` |
-| `method` | `str` | No | `"combat"` | Default correction method (`"combat"` or `"harmony"`) |
+```python
+BatchCorrector(batch_key: str = "batch", method: str = "combat")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| batch_key | str | "batch" | Batch column name in obs |
+| method | str | "combat" | Default correction method ("combat" or "harmony") |
 
 **Methods**:
 
-#### `detect_batch_effect(adata, n_pcs=50, threshold=0.10)`
+### `detect_batch_effect`
 
-Detect batch effect strength (via variance explained by batch on PCA).
+```python
+detect_batch_effect(adata: AnnData, n_pcs: int = 50, threshold: float = 0.10) -> Dict[str, Any]
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `n_pcs` | `int` | No | `50` | Number of PCA components |
-| `threshold` | `float` | No | `0.10` | Batch effect threshold (10%) |
+Detect batch effect intensity via variance explained by batch on PCA.
 
-- **Returns**: `dict` — contains `batch_variance_ratio`, `has_batch_effect`, `recommendation`, `pca_variance_explained`, `n_batches`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| n_pcs | int | 50 | Number of PCA components |
+| threshold | float | 0.10 | Batch effect threshold (default 10%) |
 
-#### `run_combat(adata, key=None)`
+**Returns**: `Dict` — Contains `batch_variance_ratio`, `has_batch_effect`, `recommendation`, `pca_variance_explained`, `n_batches`
+
+**Exceptions**: `ValueError` — batch column not found or < 2 batches
+
+### `run_combat`
+
+```python
+run_combat(adata: AnnData, key: Optional[str] = None) -> AnnData
+```
 
 Run ComBat batch correction (modifies `adata.X` in-place).
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `key` | `str` | No | `None` | obs column to correct (defaults to `self.batch_key`) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| key | Optional[str] | None | obs column to correct (defaults to batch_key) |
 
-- **Returns**: `AnnData` (modified in-place and returned)
+**Returns**: `AnnData` — Corrected data
 
-#### `run_harmony(adata, basis="X_pca", adjusted_basis="X_pca_harmony")`
+### `run_harmony`
 
-Run Harmony batch correction (in PCA embedding space).
+```python
+run_harmony(adata: AnnData, basis: str = "X_pca", adjusted_basis: str = "X_pca_harmony") -> AnnData
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `basis` | `str` | No | `"X_pca"` | Input embedding key |
-| `adjusted_basis` | `str` | No | `"X_pca_harmony"` | Adjusted embedding key |
+Run Harmony batch correction in PCA embedding space.
 
-- **Returns**: `AnnData` (adds `obsm[adjusted_basis]`)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| basis | str | "X_pca" | Input embedding key |
+| adjusted_basis | str | "X_pca_harmony" | Corrected embedding key |
 
-#### `compare_before_after(adata_raw, adata_corrected, n_pcs=50)`
+**Returns**: `AnnData` — Corrected data (adds `obsm[adjusted_basis]`)
 
-Compare correction effect before and after.
+**Exceptions**: `ImportError` — harmonypy not installed
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata_raw` | `AnnData` | Yes | — | Pre-correction AnnData |
-| `adata_corrected` | `AnnData` | Yes | — | Post-correction AnnData |
-| `n_pcs` | `int` | No | `50` | Number of PCA components |
+### `compare_before_after`
 
-- **Returns**: `dict` — contains `raw_batch_variance_ratio`, `corrected_batch_variance_ratio`, `improvement`, `raw_per_pc_variance`, `corrected_per_pc_variance`
-- **Example**:
+```python
+compare_before_after(adata_raw: AnnData, adata_corrected: AnnData, n_pcs: int = 50) -> Dict[str, Any]
+```
+
+Compare correction effectiveness before and after.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata_raw | AnnData | — | Required. Pre-correction AnnData |
+| adata_corrected | AnnData | — | Required. Post-correction AnnData |
+| n_pcs | int | 50 | Number of PCA components |
+
+**Returns**: `Dict` — Contains `raw_batch_variance_ratio`, `corrected_batch_variance_ratio`, `improvement`
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import BatchCorrector
@@ -652,102 +654,115 @@ detection = corrector.detect_batch_effect(adata)
 if detection["has_batch_effect"]:
     adata_corrected = corrector.run_combat(adata)
     comparison = corrector.compare_before_after(adata, adata_corrected)
+    print(f"Improvement: {comparison['improvement']:.3f}")
 ```
-
-**Exceptions**: `ImportError` (scanpy/harmonypy not installed), `ValueError` (batch key not found or insufficient batches)
 
 ---
 
-### `BioQualityGateChecker`
+## BioQualityGateChecker
 
-**Description**: Bioinformatics quality gate checker implementing Gate Bio-1.5 (data quality gate) and Gate Bio-3.5 (results quality gate).
+> Bioinformatics quality gate checker encapsulating Gate Bio-1.5 (data quality) and Gate Bio-3.5 (results quality).
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `study_id` | `str` | Yes | — | Study ID |
-| `project_root` | `str` | No | `None` | Project root directory |
+```python
+BioQualityGateChecker(study_id: str, project_root: Optional[str] = None)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| study_id | str | — | Required. Study ID |
+| project_root | Optional[str] | None | Project root directory (optional) |
 
 **Methods**:
 
-#### `run_bio_gate_15(adata, sample_info=None, batch_key=None)`
+### `run_bio_gate_15`
 
-Execute Gate Bio-1.5 with all 5 checks: count matrix integrity, sample consistency, library size, gene annotation coverage, batch effect detection.
+```python
+run_bio_gate_15(adata: AnnData, sample_info: Optional[pd.DataFrame] = None, batch_key: Optional[str] = None) -> GateResult
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `adata` | `AnnData` | Yes | — | AnnData object |
-| `sample_info` | `pd.DataFrame` | No | `None` | Sample info DataFrame |
-| `batch_key` | `str` | No | `None` | Batch column name |
+Execute Gate Bio-1.5 with 5 checks: count matrix integrity, sample info consistency, library size, gene annotation coverage, batch effect detection.
 
-- **Returns**: `GateResult` — verdict (`PASS` / `CONDITIONAL` / `BLOCKED`)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| adata | AnnData | — | Required. AnnData object |
+| sample_info | Optional[pd.DataFrame] | None | Sample info DataFrame (optional) |
+| batch_key | Optional[str] | None | Batch column name (optional) |
 
-#### `run_bio_gate_35(de_results, enrichment_df=None, visualization_paths=None)`
+**Returns**: `GateResult` — Verdict (PASS / CONDITIONAL / BLOCKED)
 
-Execute Gate Bio-3.5 with all 5 checks: p-value distribution, log2FC-p-value consistency, multiple testing correction, enrichment FDR, visualization consistency.
+### `run_bio_gate_35`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `de_results` | `pd.DataFrame` | Yes | — | DE results (must contain pvals/pvals_adj columns) |
-| `enrichment_df` | `pd.DataFrame` | No | `None` | Pathway enrichment results |
-| `visualization_paths` | `list[str]` | No | `None` | Visualization file path list |
+```python
+run_bio_gate_35(de_results: pd.DataFrame, enrichment_df: Optional[pd.DataFrame] = None, visualization_paths: Optional[List[str]] = None) -> GateResult
+```
 
-- **Returns**: `GateResult`
-- **Example**:
+Execute Gate Bio-3.5 with 5 checks: p-value distribution, log2FC-pvalue consistency, multiple testing correction, pathway enrichment FDR, visualization consistency.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| de_results | pd.DataFrame | — | Required. DE results (must contain pvals, pvals_adj columns) |
+| enrichment_df | Optional[pd.DataFrame] | None | Pathway enrichment results (optional) |
+| visualization_paths | Optional[List[str]] | None | Visualization file paths (optional) |
+
+**Returns**: `GateResult` — Verdict
+
+**GateResult Properties**:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| gate_type | GateType | Gate type |
+| study_id | str | Study ID |
+| verdict | GateVerdict | Verdict (PASS / CONDITIONAL / BLOCKED) |
+| total_items | int | Total check items |
+| passed_items | int | Passed items |
+| failed_items | int | Failed items |
+| key_items_status | str | Key items status |
+| check_results | List[CheckItemResult] | Detailed results per item |
+| risks | List[str] | Risk list |
+| pass_rate | float | Pass rate |
+
+**Example**:
 
 ```python
 from msra_modules.bioinformatics import BioQualityGateChecker
 
 checker = BioQualityGateChecker(study_id="BIO-2026-001")
-gate_15 = checker.run_bio_gate_15(adata, sample_info=sample_df, batch_key="batch")
-gate_35 = checker.run_bio_gate_35(de_table, enrichment_df=go_results)
-print(gate_15.verdict, gate_35.verdict)
-```
 
-**Exceptions**: `ImportError` (scanpy/scipy not installed — corresponding check items marked as FAIL/SKIP)
+# Gate Bio-1.5: Data quality
+gate_15 = checker.run_bio_gate_15(adata, batch_key="batch")
+print(f"Bio-1.5 verdict: {gate_15.verdict.value}")
+
+# Gate Bio-3.5: Results quality
+gate_35 = checker.run_bio_gate_35(de_table, enrichment_df=go_results)
+print(f"Bio-3.5 verdict: {gate_35.verdict.value}")
+print(f"Pass rate: {gate_35.pass_rate:.1%}")
+```
 
 ---
 
-## Full Usage Example
+## Shared Types Reference
 
-```python
-from msra_modules.bioinformatics import (
-    ScRNASeqLoader, SingleCellQC, DimensionalityReduction,
-    DifferentialExpression, PathwayEnrichment, BatchCorrector,
-    BioQualityGateChecker,
-)
+### CheckItemResult
 
-# 1. Load data
-loader = ScRNASeqLoader()
-adata = loader.read_10x_mtx("/data/pbmc_10x/")
+> Single check item result.
 
-# 2. Quality control
-qc = SingleCellQC(min_genes=200, max_genes=5000, max_pct_mito=20.0)
-adata = qc.run_qc(adata)
+| Property | Type | Description |
+|----------|------|-------------|
+| item_id | str | Check item ID |
+| name | str | Check item name |
+| is_key | bool | Whether it is a key item |
+| status | str | Status (PASS / FAIL / N/A / SKIP) |
+| evidence | str | Evidence description |
+| notes | str | Notes |
 
-# 3. Batch correction (if batch info available)
-corrector = BatchCorrector(batch_key="batch")
-detection = corrector.detect_batch_effect(adata)
-if detection["has_batch_effect"]:
-    adata = corrector.run_combat(adata)
+### GateVerdict
 
-# 4. Dimensionality reduction & clustering
-dr = DimensionalityReduction(n_pcs=50)
-adata = dr.run_full_pipeline(adata, resolution=1.0)
+> Gate verdict enum.
 
-# 5. Differential expression
-de = DifferentialExpression(method="wilcoxon")
-markers = de.find_markers(adata, groupby="leiden")
-de_table = de.get_de_table(adata, group="0")
-sig_genes = de.filter_de_genes(de_table, log2fc_threshold=1.0, pval_threshold=0.05)
-
-# 6. Pathway enrichment
-enricher = PathwayEnrichment(organism="human")
-go_results = enricher.run_go(sig_genes["names"].tolist(), ontology="BP")
-
-# 7. Quality gates
-checker = BioQualityGateChecker(study_id="BIO-2026-001")
-gate_15 = checker.run_bio_gate_15(adata)
-gate_35 = checker.run_bio_gate_35(de_table, enrichment_df=go_results)
-```
+| Value | Description |
+|-------|-------------|
+| PASS | All passed |
+| CONDITIONAL | Conditional pass (1-2 non-key items failed) |
+| BLOCKED | Blocked (3+ items failed or key item failed) |

@@ -1,239 +1,419 @@
-# MSRA Cross-Domain Module API Reference
+# Cross-Domain Module API Reference
 
-| Field | Value |
-|-------|-------|
-| **Module** | `msra_modules.cross_domain` |
-| **Version** | 1.0.0 |
-| **Date** | 2026-07-13 |
-| **Status** | Released (v1.0.0) |
-| **Language** | English |
+> **Version**: v1.0.0 | **Date**: 2026-06-26 | **Status**: Stable
+> **Module**: Cross-Domain | **Command**: `/cross-domain`
 
 ---
 
-## Overview
+## Table of Contents
 
-The Cross-Domain module provides cross-domain integration across medical imaging, bioinformatics, and real-time analytics, including radiomics-DEG correlation analysis, real-time prediction modeling, multi-modal linked visualization, data alignment, and quality gate checks.
-
-### Dependencies
-
-- `numpy` / `pandas` — Data processing
-- `scipy` — Correlation analysis
-- `scikit-learn` — Logistic Regression / Random Forest / model evaluation
-- `matplotlib` — Visualization
+- [RadiomicsDEGCorrelation — Radiomics-Gene Correlation](#radiomicsdegcorrelation)
+- [RealtimePredictionModel — Realtime Prediction Model](#realtimepredictionmodel)
+- [MultiModalVisualizer — Multi-Modal Visualizer](#multimodalvisualizer)
+- [CrossDomainQualityGateChecker — Quality Gate](#crossdomainqualitygatechecker)
+- [DataAligner — Data Alignment](#dataaligner)
+- [export_v1_schema() — Schema Export](#export_v1_schema)
 
 ---
 
-## Public API
+## RadiomicsDEGCorrelation
 
-### `RadiomicsDEGCorrelation`
+> Radiomics and differentially expressed gene correlation analysis supporting Pearson, Spearman, and Kendall methods with FDR correction.
 
-**Description**: Radiomics and differentially expressed gene (DEG) correlation analysis, supporting Pearson / Spearman / Kendall correlation coefficients with FDR correction (Benjamini-Hochberg / Bonferroni).
+**Signature**:
 
-**Parameters**:
+```python
+RadiomicsDEGCorrelation(correlation_method: str = "spearman",
+                        pval_threshold: float = 0.05,
+                        fdr_method: str = "bh")
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `correlation_method` | `str` | No | `"spearman"` | Correlation method (`"pearson"`, `"spearman"`, `"kendall"`) |
-| `pval_threshold` | `float` | No | `0.05` | P-value threshold |
-| `fdr_method` | `str` | No | `"bh"` | FDR correction method (`"bh"` or `"bonferroni"`) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| correlation_method | str | "spearman" | Correlation method ("pearson", "spearman", "kendall") |
+| pval_threshold | float | 0.05 | p-value threshold |
+| fdr_method | str | "bh" | FDR correction method ("bh", "bonferroni") |
 
 **Methods**:
 
-#### `correlate(radiomics_features, deg_expression)`
+### `correlate`
 
-Compute correlations between radiomics features and DEG expression.
+```python
+correlate(radiomics_features: pd.DataFrame, deg_expression: pd.DataFrame) -> Dict
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `radiomics_features` | `pd.DataFrame` | Yes | — | Radiomics features (samples x features) |
-| `deg_expression` | `pd.DataFrame` | Yes | — | DEG expression (samples x genes) |
+Compute correlations between radiomics features and differential gene expression.
 
-- **Returns**: `dict` — contains `correlations` (pd.DataFrame: feature, gene, correlation, p_value, p_adj, significant), `n_significant`, `n_total`, `method`, `samples`
-- **Exceptions**: `ValueError` (common samples < 3 or unknown method)
-- **Example**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| radiomics_features | pd.DataFrame | — | Required. Radiomics features (samples × features) |
+| deg_expression | pd.DataFrame | — | Required. Differential gene expression (samples × genes) |
+
+**Returns**: `Dict` — Contains `correlations` (DataFrame), `n_significant`, `n_total`, `method`, `samples`
+
+**Exceptions**: `ValueError` — fewer than 3 common samples; `ValueError` — unknown method
+
+### `generate_heatmap_data`
+
+```python
+generate_heatmap_data(correlations: pd.DataFrame, top_n: int = 20) -> Dict
+```
+
+Generate heatmap data.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| correlations | pd.DataFrame | — | Required. Correlation results (the correlations DataFrame from correlate()) |
+| top_n | int | 20 | Number of top results to show |
+
+**Returns**: `Dict` — Contains `features`, `genes`, `matrix` (2D list)
+
+**Example**:
 
 ```python
 from msra_modules.cross_domain import RadiomicsDEGCorrelation
 
-analyzer = RadiomicsDEGCorrelation(correlation_method="spearman", pval_threshold=0.05)
-result = analyzer.correlate(radiomics_df, expression_df)
-print(result["n_significant"], result["n_total"])
+correlator = RadiomicsDEGCorrelation(correlation_method="spearman", pval_threshold=0.05)
+results = correlator.correlate(radiomics_df, expression_df)
+print(f"Significant correlations: {results['n_significant']}/{results['n_total']}")
+
+heatmap = correlator.generate_heatmap_data(results["correlations"], top_n=20)
 ```
-
-#### `generate_heatmap_data(correlations, top_n=20)`
-
-Generate heatmap data.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `correlations` | `pd.DataFrame` | Yes | — | Correlation results (the `correlations` field from `correlate()` output) |
-| `top_n` | `int` | No | `20` | Number of top correlations to show |
-
-- **Returns**: `dict` — contains `features` (list), `genes` (list), `matrix` (list of lists)
 
 ---
 
-### `RealtimePredictionModel`
+## RealtimePredictionModel
 
-**Description**: Real-time prediction model that extracts statistical features from time-series data (mean, std, trend slope, CV, etc. — 10 features total), performs binary classification using Logistic Regression or Random Forest, and outputs risk levels.
+> Realtime prediction model supporting Logistic Regression and Random Forest, extracting time-series features for risk prediction.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `window_size` | `int` | No | `60` | Feature window size (seconds) |
-| `prediction_horizon` | `int` | No | `30` | Prediction time horizon (seconds) |
-| `model_type` | `str` | No | `"logistic"` | Model type (`"logistic"` or `"random_forest"`) |
+```python
+RealtimePredictionModel(window_size: int = 60, prediction_horizon: int = 30,
+                        model_type: str = "logistic")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| window_size | int | 60 | Feature window size (seconds) |
+| prediction_horizon | int | 30 | Prediction horizon (seconds) |
+| model_type | str | "logistic" | Model type ("logistic", "random_forest") |
 
 **Methods**:
 
-#### `train(historical_data, labels)`
+### `train`
+
+```python
+train(historical_data: pd.DataFrame, labels: np.ndarray)
+```
 
 Train the model.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `historical_data` | `pd.DataFrame` | Yes | — | Historical data (one sample per row) |
-| `labels` | `np.ndarray` | Yes | — | Labels (0/1) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| historical_data | pd.DataFrame | — | Required. Historical data (one sample per row) |
+| labels | np.ndarray | — | Required. Labels (0/1) |
 
-- **Exceptions**: `ValueError` (unknown model type), `ImportError` (scikit-learn not installed)
+**Exceptions**: `ValueError` — unknown model type; `ImportError` — scikit-learn not installed
 
-#### `predict(current_data)`
+### `predict`
 
-Make a prediction.
+```python
+predict(current_data: List[float]) -> Dict
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `current_data` | `list[float]` | Yes | — | Current time-series data |
+Predict risk level for current data.
 
-- **Returns**: `dict` — contains `prediction` (int), `probability` (float), `risk_level` (str: `"high"` / `"medium"` / `"low"` / `"minimal"`), `features` (dict)
-- **Exceptions**: `RuntimeError` (model not trained)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| current_data | List[float] | — | Required. Current time-series data |
 
-#### `evaluate(X_test, y_test)`
+**Returns**: `Dict` — Contains `prediction` (0/1), `probability` (float), `risk_level` ("high"/"medium"/"low"/"minimal"), `features` (Dict)
 
-Evaluate the model.
+**Exceptions**: `RuntimeError` — model not trained
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `X_test` | `np.ndarray` | Yes | — | Test data |
-| `y_test` | `np.ndarray` | Yes | — | Test labels |
+### `evaluate`
 
-- **Returns**: `dict` — contains `accuracy`, `precision`, `recall`, `f1`, `auroc`
-- **Example**:
+```python
+evaluate(X_test: np.ndarray, y_test: np.ndarray) -> Dict
+```
+
+Evaluate model performance.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| X_test | np.ndarray | — | Required. Test data |
+| y_test | np.ndarray | — | Required. Test labels |
+
+**Returns**: `Dict` — Contains `accuracy`, `precision`, `recall`, `f1`, `auroc`
+
+**Example**:
 
 ```python
 from msra_modules.cross_domain import RealtimePredictionModel
 
 model = RealtimePredictionModel(window_size=60, model_type="logistic")
 model.train(train_df, train_labels)
-result = model.predict([75, 76, 74, 80, 85, 90, 120, 160])
-print(result["risk_level"], result["probability"])
+
+result = model.predict([75, 78, 80, 120, 130])
+print(f"Prediction: {result['prediction']}, Risk: {result['risk_level']}, Probability: {result['probability']:.4f}")
+
 metrics = model.evaluate(X_test, y_test)
+print(f"AUROC: {metrics['auroc']:.4f}")
 ```
 
 ---
 
-### `MultiModalVisualizer`
+## MultiModalVisualizer
 
-**Description**: Multi-modal data linked visualization tool supporting four-quadrant linked views and summary dashboards.
+> Multi-modal data visualization creating linked views of imaging, expression, clinical, and realtime data.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `figsize` | `tuple` | No | `(16, 10)` | Figure size |
-| `dpi` | `int` | No | `100` | Resolution |
+```python
+MultiModalVisualizer(figsize: tuple = (16, 10), dpi: int = 100)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| figsize | tuple | (16, 10) | Figure size |
+| dpi | int | 100 | DPI resolution |
 
 **Methods**:
 
-#### `create_linked_view(imaging_data=None, imaging_mask=None, expression_data=None, clinical_data=None, realtime_data=None, save_path=None)`
+### `create_linked_view`
 
-Create a linked view (four quadrants: imaging, gene expression heatmap, clinical data boxplot, real-time monitoring trend).
+```python
+create_linked_view(imaging_data: Optional[np.ndarray] = None, imaging_mask: Optional[np.ndarray] = None,
+                   expression_data: Optional[pd.DataFrame] = None,
+                   clinical_data: Optional[pd.DataFrame] = None,
+                   realtime_data: Optional[Dict] = None,
+                   save_path: Optional[str] = None)
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `imaging_data` | `np.ndarray` | No | `None` | Imaging data |
-| `imaging_mask` | `np.ndarray` | No | `None` | Imaging mask |
-| `expression_data` | `pd.DataFrame` | No | `None` | Expression data |
-| `clinical_data` | `pd.DataFrame` | No | `None` | Clinical data |
-| `realtime_data` | `dict` | No | `None` | Real-time data (metric -> values list) |
-| `save_path` | `str` | No | `None` | Save path |
+Create a linked view (2×2 subplots: imaging, expression heatmap, clinical boxplot, realtime trend).
 
-- **Returns**: `matplotlib.figure.Figure`
-- **Exceptions**: `ValueError` (at least one data source required)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| imaging_data | Optional[np.ndarray] | None | Imaging data |
+| imaging_mask | Optional[np.ndarray] | None | Imaging mask |
+| expression_data | Optional[pd.DataFrame] | None | Expression data |
+| clinical_data | Optional[pd.DataFrame] | None | Clinical data |
+| realtime_data | Optional[Dict] | None | Realtime data (metric name → value list) |
+| save_path | Optional[str] | None | Save path |
 
-#### `create_summary_dashboard(data_sources, save_path=None)`
+**Returns**: `matplotlib.figure.Figure`
 
-Create a summary dashboard.
+**Exceptions**: `ValueError` — no data source provided
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `data_sources` | `dict[str, Any]` | Yes | — | Data source dict (name -> data) |
-| `save_path` | `str` | No | `None` | Save path |
+### `create_summary_dashboard`
 
-- **Returns**: `matplotlib.figure.Figure`
-- **Example**:
+```python
+create_summary_dashboard(data_sources: Dict[str, Any], save_path: Optional[str] = None)
+```
+
+Create a summary dashboard (multiple subplots showing each data source overview side by side).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| data_sources | Dict[str, Any] | — | Required. Data source dictionary |
+| save_path | Optional[str] | None | Save path |
+
+**Returns**: `matplotlib.figure.Figure`
+
+**Example**:
 
 ```python
 from msra_modules.cross_domain import MultiModalVisualizer
 
 viz = MultiModalVisualizer(figsize=(16, 10))
 fig = viz.create_linked_view(
-    imaging_data=img_array,
-    expression_data=expr_df,
-    realtime_data={"heart_rate": [75, 76, 80, 85, 120]},
-    save_path="/output/linked_view.png"
+    imaging_data=image_array,
+    imaging_mask=mask_array,
+    expression_data=expression_df,
+    realtime_data={"heart_rate": hr_list, "spo2": spo2_list},
+    save_path="output/linked_view.png"
 )
 ```
 
 ---
 
-### `DataAligner`
+## CrossDomainQualityGateChecker
 
-**Description**: Multi-modal data aligner supporting three alignment strategies: inner (strict match, intersection), outer (allow missing, union + imputation), time_based (time-window alignment for time-series data).
+> Cross-domain quality gate checker encapsulating Gate CD-1.5 (data alignment) and Gate CD-3.5 (fusion results).
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `strategy` | `str` | No | `"inner"` | Alignment strategy (`"inner"`, `"outer"`, `"time_based"`) |
-| `fill_method` | `str` | No | `"mean"` | Missing value fill method (`"mean"`, `"median"`, `"zero"`, `"ffill"`) |
+```python
+CrossDomainQualityGateChecker(study_id: str, project_root: Optional[str] = None)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| study_id | str | — | Required. Study ID |
+| project_root | Optional[str] | None | Project root directory (optional) |
 
 **Methods**:
 
-#### `align(data_sources, strategy=None)`
+### `run_gate_cd15`
+
+```python
+run_gate_cd15(data_sources: Dict[str, Any], min_samples: int = 3,
+              scenario: str = "correlation") -> GateResult
+```
+
+Execute Gate CD-1.5 with 3 checks: sample alignment, modality completeness, data type match.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| data_sources | Dict[str, Any] | — | Required. Data source dict (e.g., `{"radiomics": df, "expression": df}`) |
+| min_samples | int | 3 | Minimum sample count |
+| scenario | str | "correlation" | Scenario type ("correlation", "prediction", "visualization", "full") |
+
+**Returns**: `GateResult` — Verdict (PASS / CONDITIONAL / BLOCKED)
+
+**Scenario Required Modalities**:
+
+| Scenario | Required Modalities |
+|----------|-------------------|
+| correlation | radiomics, expression |
+| prediction | realtime, labels |
+| visualization | ≥ 1 modality |
+| full | radiomics, expression, realtime, labels |
+
+### `run_gate_cd35`
+
+```python
+run_gate_cd35(correlation_results: Optional[Dict] = None,
+              model_metrics: Optional[Dict] = None,
+              visualization_data: Optional[Dict] = None) -> GateResult
+```
+
+Execute Gate CD-3.5 with 3 checks: correlation significance, model performance, visualization consistency.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| correlation_results | Optional[Dict] | None | Correlation results (contains correlations DataFrame, n_significant) |
+| model_metrics | Optional[Dict] | None | Model metrics (contains accuracy, auroc, precision, recall, f1) |
+| visualization_data | Optional[Dict] | None | Visualization data (contains matrix_shape, curve_points, etc.) |
+
+**Returns**: `GateResult` — Verdict
+
+**Example**:
+
+```python
+from msra_modules.cross_domain import CrossDomainQualityGateChecker
+
+checker = CrossDomainQualityGateChecker(study_id="CD-2026-001")
+
+# Gate CD-1.5: Data alignment
+gate_15 = checker.run_gate_cd15(
+    data_sources={"radiomics": df_features, "expression": df_expr},
+    min_samples=3,
+    scenario="correlation"
+)
+print(f"CD-1.5 verdict: {gate_15.verdict.value}")
+
+# Gate CD-3.5: Fusion results
+gate_35 = checker.run_gate_cd35(
+    correlation_results=corr_dict,
+    model_metrics=metrics_dict
+)
+print(f"CD-3.5 verdict: {gate_35.verdict.value}")
+print(f"Pass rate: {gate_35.pass_rate:.1%}")
+```
+
+---
+
+## DataAligner
+
+> Multi-modal data aligner supporting inner (strict match), outer (allow missing), and time_based (temporal alignment) strategies.
+
+**Signature**:
+
+```python
+DataAligner(strategy: str = "inner", fill_method: str = "mean")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| strategy | str | "inner" | Alignment strategy ("inner", "outer", "time_based") |
+| fill_method | str | "mean" | Missing value fill method ("mean", "median", "zero", "ffill") |
+
+**Exceptions**: `ValueError` — invalid strategy or fill_method
+
+**Methods**:
+
+### `align`
+
+```python
+align(data_sources: Dict[str, Any], strategy: Optional[str] = None) -> Dict[str, Any]
+```
 
 Execute data alignment.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `data_sources` | `dict[str, Any]` | Yes | — | Data source dict {name: DataFrame or Dict} |
-| `strategy` | `str` | No | `None` | Override default strategy |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| data_sources | Dict[str, Any] | — | Required. Data source dict `{name: DataFrame or Dict}` |
+| strategy | Optional[str] | None | Override default strategy |
 
-- **Returns**: `dict[str, Any]` — aligned data source dict (all DataFrames share the same index)
-- **Exceptions**: `ValueError` (empty data sources, inner join result < 3 samples, unknown strategy)
-- **Example**:
+**Returns**: `Dict[str, Any]` — Aligned data sources (all DataFrames share the same index)
+
+**Exceptions**: `ValueError` — empty data_sources; inner join result < 3 samples; unknown strategy
+
+**Alignment Strategies**:
+
+| Strategy | Description |
+|----------|-------------|
+| inner | Strict match: intersection of all DataFrame indices (errors if < 3 samples) |
+| outer | Allow missing: union of all DataFrame indices, fill missing with fill_method |
+| time_based | Temporal alignment: group by time window (default 60s), aggregate with mean per window |
+
+**Example**:
 
 ```python
 from msra_modules.cross_domain import DataAligner
 
 aligner = DataAligner(strategy="inner")
 aligned = aligner.align({
-    "radiomics": radiomics_df,
-    "expression": expression_df,
+    "radiomics": df_features,
+    "expression": df_expr,
 })
-# aligned["radiomics"], aligned["expression"] are aligned to the same samples
+# aligned["radiomics"] and aligned["expression"] are aligned to the same samples
+print(f"Aligned samples: {len(aligned['radiomics'])}")
 ```
-
-**Exceptions**: `ValueError` (invalid strategy or fill method)
 
 ---
 
-### `export_v1_schema(correlation_results=None, model_metrics=None, visualization_data=None, output_dir=".")`
+## export_v1_schema
 
-**Description**: Export `msra/cross_domain_result/v1` standard format.
+> Export msra/cross_domain_result/v1 standard format, outputting correlation results, model metrics, visualization files, and a comprehensive report.
 
-Output file structure:
+**Signature**:
+
+```python
+export_v1_schema(correlation_results: Optional[Dict] = None,
+                 model_metrics: Optional[Dict] = None,
+                 visualization_data: Optional[Dict] = None,
+                 output_dir: str = ".") -> Dict[str, str]
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| correlation_results | Optional[Dict] | None | Correlation results (return value of RadiomicsDEGCorrelation.correlate()) |
+| model_metrics | Optional[Dict] | None | Model metrics (return value of RealtimePredictionModel.evaluate()) |
+| visualization_data | Optional[Dict] | None | Visualization data (output of MultiModalVisualizer) |
+| output_dir | str | "." | Output directory |
+
+**Returns**: `Dict[str, str]` — File path mapping:
+- `correlation_results`: path to correlation_results.csv
+- `model_metrics`: path to model_metrics.json
+- `visualization_bundle`: path to visualization_bundle/ directory
+- `report`: path to cross_domain_report.md
+- `schema_version`: "msra/cross_domain_result/v1"
+
+**Output File Structure**:
+
 ```
 output_dir/
 ├── correlation_results.csv     # Correlation analysis results
@@ -244,150 +424,63 @@ output_dir/
 └── cross_domain_report.md       # Comprehensive report
 ```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `correlation_results` | `dict` | No | `None` | Output of `RadiomicsDEGCorrelation.correlate()` |
-| `model_metrics` | `dict` | No | `None` | Output of `RealtimePredictionModel.evaluate()` |
-| `visualization_data` | `dict` | No | `None` | Visualization data (containing `paths` list) |
-| `output_dir` | `str` | No | `"."` | Output directory |
-
-- **Returns**: `dict[str, str]` — file path mapping, contains `correlation_results`, `model_metrics`, `visualization_bundle`, `report`, `schema_version` (`"msra/cross_domain_result/v1"`)
-- **Example**:
+**Example**:
 
 ```python
 from msra_modules.cross_domain import export_v1_schema
 
-paths = export_v1_schema(
-    correlation_results=corr_result,
-    model_metrics=metrics,
-    visualization_data={"paths": ["/output/linked_view.png"]},
-    output_dir="/output/cross_domain/"
+result = export_v1_schema(
+    correlation_results=corr_dict,
+    model_metrics=metrics_dict,
+    visualization_data={"paths": ["output/linked_view.png"]},
+    output_dir="output/cross_domain/"
 )
+print(f"Report path: {result['report']}")
+print(f"Schema version: {result['schema_version']}")
 ```
 
 ---
 
-### `CrossDomainQualityGateChecker`
+## Shared Types Reference
 
-**Description**: Cross-domain fusion quality gate checker implementing Gate CD-1.5 (data alignment gate) and Gate CD-3.5 (fusion results gate).
+### CheckItemResult
 
-**Parameters**:
+| Property | Type | Description |
+|----------|------|-------------|
+| item_id | str | Check item ID |
+| name | str | Check item name |
+| is_key | bool | Whether it is a key item |
+| status | str | Status (PASS / FAIL / N/A / SKIP) |
+| evidence | str | Evidence description |
+| notes | str | Notes |
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `study_id` | `str` | Yes | — | Study ID |
-| `project_root` | `str` | No | `None` | Project root directory |
+### GateResult
 
-**Methods**:
+| Property | Type | Description |
+|----------|------|-------------|
+| gate_type | GateType | Gate type |
+| study_id | str | Study ID |
+| verdict | GateVerdict | Verdict (PASS / CONDITIONAL / BLOCKED) |
+| total_items | int | Total check items |
+| passed_items | int | Passed items |
+| failed_items | int | Failed items |
+| key_items_status | str | Key items status |
+| check_results | List[CheckItemResult] | Detailed results per item |
+| risks | List[str] | Risk list |
+| pass_rate | float | Pass rate |
 
-#### `run_gate_cd15(data_sources, min_samples=3, scenario="correlation")`
+### GateVerdict
 
-Execute Gate CD-1.5 with all 3 checks: sample alignment (intersection >= min_samples), modality completeness (all required modalities for scenario provided), data type match (dimensions and dtype match expectations).
+| Value | Description |
+|-------|-------------|
+| PASS | All passed |
+| CONDITIONAL | Conditional pass (1-2 non-key items failed) |
+| BLOCKED | Blocked (3+ items failed or key item failed) |
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `data_sources` | `dict[str, Any]` | Yes | — | Data source dict |
-| `min_samples` | `int` | No | `3` | Minimum sample count |
-| `scenario` | `str` | No | `"correlation"` | Scenario type (`"correlation"`, `"prediction"`, `"visualization"`, `"full"`) |
+### GateType
 
-- **Returns**: `GateResult` — verdict (`PASS` / `CONDITIONAL` / `BLOCKED`)
-
-#### `run_gate_cd35(correlation_results=None, model_metrics=None, visualization_data=None)`
-
-Execute Gate CD-3.5 with all 3 checks: correlation significance (at least 1 significant pair after FDR or AUROC > 0.5), model performance (accuracy >= 0.5; AUROC >= 0.55; no NaN metrics), visualization consistency (heatmap matrix dimensions, curve point counts match input data).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `correlation_results` | `dict` | No | `None` | Correlation analysis results |
-| `model_metrics` | `dict` | No | `None` | Model evaluation metrics |
-| `visualization_data` | `dict` | No | `None` | Visualization data |
-
-- **Returns**: `GateResult`
-- **Example**:
-
-```python
-from msra_modules.cross_domain import CrossDomainQualityGateChecker
-
-checker = CrossDomainQualityGateChecker(study_id="CD-2026-001")
-
-# Gate CD-1.5
-gate_15 = checker.run_gate_cd15(
-    data_sources={"radiomics": radiomics_df, "expression": expression_df},
-    min_samples=3,
-    scenario="correlation",
-)
-
-# Gate CD-3.5
-gate_35 = checker.run_gate_cd35(
-    correlation_results=corr_result,
-    model_metrics=metrics,
-)
-print(gate_15.verdict, gate_35.verdict)
-```
-
----
-
-## Scenario Required Modalities
-
-| Scenario | Required Modalities |
-|----------|-------------------|
-| `correlation` | `radiomics`, `expression` |
-| `prediction` | `realtime`, `labels` |
-| `visualization` | >= 1 modality |
-| `full` | `radiomics`, `expression`, `realtime`, `labels` |
-
----
-
-## Full Usage Example
-
-```python
-from msra_modules.cross_domain import (
-    RadiomicsDEGCorrelation, RealtimePredictionModel,
-    MultiModalVisualizer, DataAligner, export_v1_schema,
-    CrossDomainQualityGateChecker,
-)
-import pandas as pd
-import numpy as np
-
-# 1. Data alignment
-aligner = DataAligner(strategy="inner")
-aligned = aligner.align({
-    "radiomics": radiomics_df,
-    "expression": expression_df,
-})
-
-# 2. Correlation analysis
-analyzer = RadiomicsDEGCorrelation(correlation_method="spearman")
-corr_result = analyzer.correlate(aligned["radiomics"], aligned["expression"])
-
-# 3. Real-time prediction model
-model = RealtimePredictionModel(model_type="logistic")
-model.train(train_df, train_labels)
-metrics = model.evaluate(X_test, y_test)
-
-# 4. Multi-modal visualization
-viz = MultiModalVisualizer()
-fig = viz.create_linked_view(
-    imaging_data=img_array,
-    expression_data=aligned["expression"],
-    realtime_data={"heart_rate": hr_list},
-    save_path="/output/linked_view.png"
-)
-
-# 5. Export v1 schema
-paths = export_v1_schema(
-    correlation_results=corr_result,
-    model_metrics=metrics,
-    visualization_data={"paths": ["/output/linked_view.png"]},
-    output_dir="/output/cross_domain/"
-)
-
-# 6. Quality gates
-checker = CrossDomainQualityGateChecker(study_id="CD-2026-001")
-gate_15 = checker.run_gate_cd15(
-    data_sources=aligned, min_samples=3, scenario="correlation"
-)
-gate_35 = checker.run_gate_cd35(
-    correlation_results=corr_result, model_metrics=metrics
-)
-```
+| Value | Description |
+|-------|-------------|
+| DATA_QUALITY | Data quality gate (Gate 1.5) |
+| SAP_QUALITY | SAP quality gate (Gate 2.5) |
+| RESULTS_QUALITY | Results quality gate (Gate 3.5) |

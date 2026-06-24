@@ -1,810 +1,947 @@
-# MSRA Realtime Analytics 模块 API 参考
+# 实时分析模块 API 参考
 
-| 字段 | 值 |
-|------|-----|
-| **模块** | `msra_modules.realtime_analytics` |
-| **版本** | 1.2.0 |
-| **日期** | 2026-07-13 |
-| **状态** | Released (v1.0.0) |
-| **语言** | 中文 |
+> **版本**: v1.0.0 | **日期**: 2026-06-26 | **状态**: Stable
+> **模块**: Realtime Analytics | **命令**: `/realtime`
 
 ---
 
-## 概述
+## 目录
 
-Realtime Analytics 模块提供实时流处理、异常检测、告警通知和仪表盘功能。支持模拟器、Redis、Kafka、CSV 等多种数据源，适用于生命体征实时监测场景。
-
-### 依赖
-
-- `numpy` — 数值计算
-- `scikit-learn` — Isolation Forest 异常检测
-- `kafka-python` — Kafka 消费者/生产者（可选）
-- `streamlit` / `plotly` — 实时仪表盘（可选）
-- `matplotlib` — 可视化
+- [StreamProcessor — 流处理器](#streamprocessor)
+- [AnomalyDetector — 异常检测器](#anomalydetector)
+- [DetectionResult — 检测结果](#detectionresult)
+- [MultivariateDetector — 多变量检测](#multivariatedetector)
+- [AlertSystem — 告警系统](#alertsystem)
+- [Alert — 告警数据类](#alert)
+- [RealtimeDashboard — 仪表盘](#realtimedashboard)
+- [VitalSignsSimulator — 生命体征模拟器](#vitalsignssimulator)
+- [RealtimeQualityGateChecker — 质量门闸](#realtimequalitygatechecker)
 
 ---
 
-## 公开 API
+## StreamProcessor
 
-### `StreamProcessor`
+> 流处理器，提供滑动窗口统计、Kafka 消费、事件处理和聚合计算功能。
 
-**描述**: 流数据处理器，支持滑动窗口统计、Kafka 消费、事件处理和聚合计算。
+**签名**:
 
-**参数**:
+```python
+StreamProcessor(window_size: int = 60, kafka_bootstrap_servers: str = "localhost:9092")
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `window_size` | `int` | 否 | `60` | 滑动窗口大小（秒） |
-| `kafka_bootstrap_servers` | `str` | 否 | `"localhost:9092"` | Kafka 服务器地址 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| window_size | int | 60 | 滑动窗口大小（秒） |
+| kafka_bootstrap_servers | str | "localhost:9092" | Kafka 服务器地址 |
 
 **方法**:
 
-#### `register_metric(name, window_size=None)`
+### `register_metric`
+
+```python
+register_metric(name: str, window_size: Optional[int] = None)
+```
 
 注册监控指标。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `name` | `str` | 是 | — | 指标名称 |
-| `window_size` | `int` | 否 | `None` | 窗口大小（覆盖默认值） |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| name | str | — | 必填，指标名称 |
+| window_size | Optional[int] | None | 窗口大小（覆盖默认值） |
 
-#### `add_data_point(metric, value, timestamp=None)`
+### `add_data_point`
 
-添加数据点。如果指标未注册则自动注册。
+```python
+add_data_point(metric: str, value: float, timestamp: Optional[float] = None)
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `metric` | `str` | 是 | — | 指标名称 |
-| `value` | `float` | 是 | — | 数据值 |
-| `timestamp` | `float` | 否 | `None` | 时间戳（默认当前时间） |
+添加数据点（自动注册未注册的指标，并触发所有处理器）。
 
-#### `get_metric_stats(metric)`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| metric | str | — | 必填，指标名称 |
+| value | float | — | 必填，数据值 |
+| timestamp | Optional[float] | None | 时间戳（默认当前时间） |
 
-获取指定指标的窗口统计。
+### `get_metric_stats`
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `metric` | `str` | 是 | — | 指标名称 |
+```python
+get_metric_stats(metric: str) -> Dict[str, float]
+```
 
-- **返回值**: `dict` — 含 `count`, `mean`, `std`, `min`, `max`, `median`, `p25`, `p75`
+获取指定指标的统计。
 
-#### `get_all_stats()`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| metric | str | — | 必填，指标名称 |
+
+**返回值**: `Dict[str, float]` — 含 count、mean、std、min、max、median、p25、p75
+
+### `get_all_stats`
+
+```python
+get_all_stats() -> Dict[str, Dict[str, float]]
+```
 
 获取所有指标的统计。
 
-- **返回值**: `dict[str, dict]`
+**返回值**: `Dict[str, Dict[str, float]]` — 所有指标统计字典
 
-#### `add_handler(handler)`
+### `aggregate`
 
-添加数据处理器（回调函数）。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `handler` | `Callable[[str, float, Optional[float]], None]` | 是 | — | 处理函数 (metric, value, timestamp) |
-
-#### `start_kafka_consumer(topic, metric_field="value")`
-
-启动 Kafka 消费者。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `topic` | `str` | 是 | — | Kafka 主题 |
-| `metric_field` | `str` | 否 | `"value"` | 值字段名 |
-
-#### `stop()`
-
-停止处理。
-
-#### `get_all_metrics()`
-
-获取所有已注册的指标名。
-
-- **返回值**: `list[str]`
-
-#### `aggregate(metric, func="mean")`
+```python
+aggregate(metric: str, func: str = "mean") -> float
+```
 
 对窗口数据进行聚合计算。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `metric` | `str` | 是 | — | 指标名称 |
-| `func` | `str` | 否 | `"mean"` | 聚合函数（`"mean"`, `"std"`, `"min"`, `"max"`, `"median"`, `"sum"`, `"count"`, `"p25"`, `"p75"`） |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| metric | str | — | 必填，指标名称 |
+| func | str | "mean" | 聚合函数名（"mean"、"std"、"min"、"max"、"median"、"sum"、"count"、"p25"、"p75"） |
 
-- **返回值**: `float`
-- **异常**: `ValueError`（指标不存在或函数不支持）
+**返回值**: `float` — 聚合结果
 
-#### `process_event(event)`
+**异常**: `ValueError` — 指标不存在、无数据、或不支持的聚合函数
+
+### `process_event`
+
+```python
+process_event(event: Dict[str, Any]) -> Dict[str, Any]
+```
 
 统一事件处理入口。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `event` | `dict` | 是 | — | 事件字典，须含 `metric` 和 `value`，可选 `timestamp` |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| event | Dict[str, Any] | — | 必填，事件字典（需含 metric、value，可选 timestamp、metadata） |
 
-- **返回值**: `dict` — 含 `metric`, `value`, `timestamp`, `stats`, `handlers_called`
-- **异常**: `ValueError`（缺少 `metric` 或 `value`）
+**返回值**: `Dict[str, Any]` — 含 metric、value、timestamp、stats、handlers_called
 
-#### `create_faust_app(app_name="msra-stream")`
+**异常**: `ValueError` — 事件缺少 metric 或 value 字段
 
-创建 Faust 应用。
+### `add_handler`
 
-- **返回值**: `faust.App` 或 `None`（Faust 未安装时）
-- **示例**:
+```python
+add_handler(handler: Callable[[str, float, Optional[float]], None])
+```
+
+添加数据处理器。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| handler | Callable | — | 必填，处理函数 (metric, value, timestamp) |
+
+### `start_kafka_consumer`
+
+```python
+start_kafka_consumer(topic: str, metric_field: str = "value")
+```
+
+启动 Kafka 消费者。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| topic | str | — | 必填，Kafka 主题 |
+| metric_field | str | "value" | 值字段名 |
+
+### `get_all_metrics`
+
+```python
+get_all_metrics() -> List[str]
+```
+
+获取所有已注册的指标名。
+
+**返回值**: `List[str]` — 指标名列表
+
+### `stop`
+
+```python
+stop()
+```
+
+停止处理。
+
+**示例**:
 
 ```python
 from msra_modules.realtime_analytics import StreamProcessor
 
-processor = StreamProcessor(window_size=60)
-processor.register_metric("heart_rate")
-processor.add_data_point("heart_rate", 75.0)
-stats = processor.get_metric_stats("heart_rate")
-print(stats["mean"])
+sp = StreamProcessor(window_size=60)
+sp.register_metric("heart_rate")
+
+for hr in [75, 78, 72, 80, 76]:
+    sp.add_data_point("heart_rate", hr)
+
+stats = sp.get_metric_stats("heart_rate")
+print(f"心率均值: {stats['mean']:.1f}, 标准差: {stats['std']:.1f}")
+
+result = sp.process_event({"metric": "heart_rate", "value": 120})
+print(f"处理结果: {result['stats']}")
 ```
 
 ---
 
-### `SlidingWindowStats`
+## AnomalyDetector
 
-**描述**: 滑动窗口统计器。
+> 异常检测器，基于规则引擎实现阈值告警，支持持续时间要求和冷却时间。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `window_size` | `int` | 否 | `60` | 窗口大小（秒） |
-
-**方法**:
-
-#### `add(value, timestamp=None)`
-
-添加数据点。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `value` | `float` | 是 | — | 数据值 |
-| `timestamp` | `float` | 否 | `None` | 时间戳（默认当前时间） |
-
-#### `get_stats()`
-
-获取统计指标。
-
-- **返回值**: `dict` — 含 `count`, `mean`, `std`, `min`, `max`, `median`, `p25`, `p75`
-
-#### `clear()`
-
-清空数据。
-
----
-
-### `AlertLevel`
-
-**描述**: 警报级别枚举。
-
-| 值 | 说明 |
-|----|------|
-| `INFO` | 信息级别 |
-| `WARNING` | 警告级别 |
-| `CRITICAL` | 严重级别 |
-
----
-
-### `AlertRule`
-
-**描述**: 警报规则数据类。
-
-**字段**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `name` | `str` | 是 | — | 规则名称 |
-| `metric` | `str` | 是 | — | 指标名称 |
-| `condition` | `str` | 是 | — | 条件（`"gt"`, `"lt"`, `"gte"`, `"lte"`, `"range"`） |
-| `threshold` | `float` | 是 | — | 阈值 |
-| `threshold_max` | `float` | 否 | `None` | 范围上限（`condition="range"` 时使用） |
-| `level` | `AlertLevel` | 否 | `AlertLevel.WARNING` | 警报级别 |
-| `sustained_seconds` | `int` | 否 | `0` | 持续时间要求（秒） |
-| `cooldown_seconds` | `int` | 否 | `300` | 冷却时间（秒） |
-| `description` | `str` | 否 | `""` | 描述 |
+```python
+AnomalyDetector()
+```
 
 **方法**:
 
-#### `evaluate(value)`
+### `add_rule`
 
-评估规则是否触发。
+```python
+add_rule(rule: AlertRule)
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `value` | `float` | 是 | — | 当前值 |
+添加告警规则。
 
-- **返回值**: `bool`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| rule | AlertRule | — | 必填，告警规则 |
 
----
+### `add_default_vital_signs_rules`
 
-### `Alert` (anomaly_detector)
+```python
+add_default_vital_signs_rules()
+```
 
-**描述**: 警报事件数据类（来自 `anomaly_detector` 模块）。
+添加默认生命体征规则（心率过缓/过速、血氧过低、血压过高/过低、体温过高/过低）。
 
-**字段**: `rule_name`, `metric`, `value`, `level` (AlertLevel), `message`, `timestamp`, `context`
+### `evaluate`
 
----
+```python
+evaluate(metric: str, value: float, timestamp: Optional[float] = None) -> List[Alert]
+```
 
-### `DetectionResult`
+评估指标，返回触发的告警列表。
 
-**描述**: 多变量异常检测结果数据类（用于 Isolation Forest）。
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| metric | str | — | 必填，指标名称 |
+| value | float | — | 必填，当前值 |
+| timestamp | Optional[float] | None | 时间戳（默认当前时间） |
 
-**字段**:
+**返回值**: `List[Alert]` — 触发的告警列表
 
-| 参数名 | 类型 | 说明 |
-|--------|------|------|
-| `index` | `int` | 数据点在原始数据中的索引 |
-| `is_anomaly` | `bool` | 是否为异常 |
-| `score` | `float` | 异常分数（越低越异常） |
-| `features` | `dict[str, float]` | 特征值 |
-| `method` | `str` | 检测方法名称 |
-| `timestamp` | `float` | 时间戳（可选） |
+### `add_alert_handler`
 
-**方法**:
+```python
+add_alert_handler(handler: Callable[[Alert], None])
+```
 
-#### `to_dict()`
+添加告警处理器。
 
-转换为字典。
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| handler | Callable[[Alert], None] | — | 必填，处理函数 |
 
-- **返回值**: `dict`
+### `get_rules`
 
----
-
-### `AnomalyDetector`
-
-**描述**: 异常检测器，基于规则引擎进行实时异常检测，支持持续时间要求和冷却时间。
-
-**参数**: 无构造参数。
-
-**方法**:
-
-#### `add_rule(rule)`
-
-添加警报规则。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `rule` | `AlertRule` | 是 | — | 警报规则 |
-
-#### `add_default_vital_signs_rules()`
-
-添加默认生命体征规则（心率、血氧、血压、体温的异常检测规则）。
-
-#### `evaluate(metric, value, timestamp=None)`
-
-评估指标，返回触发的警报列表。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `metric` | `str` | 是 | — | 指标名称 |
-| `value` | `float` | 是 | — | 当前值 |
-| `timestamp` | `float` | 否 | `None` | 时间戳 |
-
-- **返回值**: `list[Alert]`
-
-#### `add_alert_handler(handler)`
-
-添加警报处理器（回调函数）。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `handler` | `Callable[[Alert], None]` | 是 | — | 处理函数 |
-
-#### `get_rules()`
+```python
+get_rules() -> List[AlertRule]
+```
 
 获取所有规则。
 
-- **返回值**: `list[AlertRule]`
-- **示例**:
+**返回值**: `List[AlertRule]` — 规则列表
+
+### AlertRule 数据类
+
+```python
+AlertRule(name: str, metric: str, condition: str, threshold: float,
+          threshold_max: Optional[float] = None, level: AlertLevel = AlertLevel.WARNING,
+          sustained_seconds: int = 0, cooldown_seconds: int = 300, description: str = "")
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| name | str | — | 规则名称 |
+| metric | str | — | 指标名称 |
+| condition | str | — | 条件（"gt"、"lt"、"gte"、"lte"、"range"） |
+| threshold | float | — | 阈值 |
+| threshold_max | Optional[float] | None | 范围上限（range 条件用） |
+| level | AlertLevel | WARNING | 警报级别 |
+| sustained_seconds | int | 0 | 持续时间要求（秒） |
+| cooldown_seconds | int | 300 | 冷却时间（秒） |
+| description | str | "" | 描述 |
+
+### AlertLevel 枚举
+
+| 值 | 说明 |
+|----|------|
+| INFO | 信息 |
+| WARNING | 警告 |
+| CRITICAL | 严重 |
+
+**示例**:
 
 ```python
 from msra_modules.realtime_analytics import AnomalyDetector, AlertRule, AlertLevel
 
 detector = AnomalyDetector()
 detector.add_default_vital_signs_rules()
-alerts = detector.evaluate("heart_rate", 160.0)
+
+alerts = detector.evaluate("heart_rate", 160)
 for alert in alerts:
-    print(alert.rule_name, alert.level, alert.message)
+    print(f"[{alert.level.value}] {alert.message}")
 ```
 
 ---
 
-### `TrendDetector`
+## DetectionResult
 
-**描述**: 趋势检测器，基于 CUSUM 算法检测数据趋势变化。
+> 异常检测结果数据类，用于多变量异常检测方法（如 Isolation Forest）的输出。
 
-**参数**:
+**属性**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `window_size` | `int` | 否 | `60` | 窗口大小 |
-| `cusum_threshold` | `float` | 否 | `5.0` | CUSUM 阈值 |
+| 属性 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| index | int | — | 数据点在原始数据中的索引 |
+| is_anomaly | bool | — | 是否为异常 |
+| score | float | — | 异常分数（越低越异常） |
+| features | Dict[str, float] | {} | 特征值 |
+| method | str | "" | 检测方法名称 |
+| timestamp | Optional[float] | None | 时间戳 |
 
 **方法**:
 
-#### `update(value)`
+### `to_dict`
 
-更新检测器。
+```python
+to_dict() -> Dict
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `value` | `float` | 是 | — | 新数据点 |
+转换为字典。
 
-- **返回值**: `dict` — 含 `status` (`"calibrating"` / `"monitoring"`), `value`, `baseline_mean`, `baseline_std`, `cusum_pos`, `cusum_neg`, `trend_detected`, `trend_direction`
-
-#### `reset()`
-
-重置检测器。
+**返回值**: `Dict` — 包含所有属性的字典
 
 ---
 
-### `MultivariateDetector`
+## MultivariateDetector
 
-**描述**: 多变量异常检测器，基于 Isolation Forest 算法。适用于同时分析多个生命体征指标的异常模式。
+> 多变量异常检测器，基于 Isolation Forest 算法进行多变量异常检测。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `contamination` | `float` | 否 | `0.05` | 预期异常比例（5%） |
-| `random_state` | `int` | 否 | `42` | 随机种子 |
+```python
+MultivariateDetector(contamination: float = 0.05, random_state: int = 42)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| contamination | float | 0.05 | 预期异常比例（默认 5%） |
+| random_state | int | 42 | 随机种子，保证可复现性 |
 
 **方法**:
 
-#### `fit(data, feature_names=None)`
+### `fit`
+
+```python
+fit(data: np.ndarray, feature_names: Optional[List[str]] = None)
+```
 
 训练 Isolation Forest 模型。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `data` | `np.ndarray` | 是 | — | 数据矩阵 (n_samples, n_features) |
-| `feature_names` | `list[str]` | 否 | `None` | 特征名称列表 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| data | np.ndarray | — | 必填，形状为 (n_samples, n_features) 的数据矩阵 |
+| feature_names | Optional[List[str]] | None | 特征名称列表 |
 
-#### `detect(data, feature_names=None, timestamps=None)`
+**异常**: `ValueError` — 输入不是 2D 数组；`ImportError` — scikit-learn 未安装
 
-执行多变量异常检测。如果模型未训练则自动训练。
+### `detect`
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `data` | `np.ndarray` | 是 | — | 数据矩阵 (n_samples, n_features) |
-| `feature_names` | `list[str]` | 否 | `None` | 特征名称列表 |
-| `timestamps` | `list[float]` | 否 | `None` | 时间戳列表 |
+```python
+detect(data: np.ndarray, feature_names: Optional[List[str]] = None, timestamps: Optional[List[float]] = None) -> List[DetectionResult]
+```
 
-- **返回值**: `list[DetectionResult]`
-- **示例**:
+执行多变量异常检测（未训练时自动训练）。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| data | np.ndarray | — | 必填，形状为 (n_samples, n_features) 的数据矩阵 |
+| feature_names | Optional[List[str]] | None | 特征名称列表 |
+| timestamps | Optional[List[float]] | None | 时间戳列表 |
+
+**返回值**: `List[DetectionResult]` — 检测结果列表
+
+### `reset`
+
+```python
+reset()
+```
+
+重置检测器。
+
+**示例**:
 
 ```python
 from msra_modules.realtime_analytics import MultivariateDetector
 import numpy as np
 
 detector = MultivariateDetector(contamination=0.05)
-data = np.array([[75, 98, 120], [160, 85, 190], [72, 97, 118]])
-results = detector.detect(data, feature_names=["hr", "spo2", "sbp"])
+data = np.random.randn(100, 3)
+data[95:] += 5  # 注入异常
+
+results = detector.detect(data, feature_names=["hr", "spo2", "bp"])
 anomalies = [r for r in results if r.is_anomaly]
+print(f"检测到 {len(anomalies)} 个异常")
 ```
 
-#### `reset()`
-
-重置检测器。
-
-**异常**: `ImportError`（scikit-learn 未安装）、`ValueError`（数据维度不符）
-
 ---
 
-### `AlertChannel`
+## AlertSystem
 
-**描述**: 警报渠道枚举。
+> 告警系统，支持多渠道告警通知（日志、文件、Webhook、邮件、Slack）。
 
-| 值 | 说明 |
-|----|------|
-| `LOG` | 日志 |
-| `WEBHOOK` | Webhook |
-| `EMAIL` | 邮件 |
-| `SLACK` | Slack |
-| `FILE` | 文件 |
+**签名**:
 
----
+```python
+AlertSystem(log_file: Optional[str] = None)
+```
 
-### `Alert` (alert_system)
-
-**描述**: 警报事件数据类（来自 `alert_system` 模块）。
-
-**字段**: `rule_name`, `metric`, `value`, `level` (str), `message`, `timestamp`, `context`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| log_file | Optional[str] | None | 日志文件路径 |
 
 **方法**:
 
-#### `to_dict()`
+### `register_handler`
 
-转换为字典。
+```python
+register_handler(channel: AlertChannel, handler: Callable[[Alert], None])
+```
 
-#### `to_json()`
+注册告警处理器。
 
-转换为 JSON 字符串。
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| channel | AlertChannel | — | 必填，告警渠道 |
+| handler | Callable[[Alert], None] | — | 必填，处理函数 |
 
----
+### `send_alert`
 
-### `AlertSystem`
+```python
+send_alert(alert: Alert, channels: Optional[List[AlertChannel]] = None)
+```
 
-**描述**: 警报系统，支持多渠道通知（日志、文件、Webhook、邮件、Slack）。
+发送告警。
 
-**参数**:
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| alert | Alert | — | 必填，告警事件 |
+| channels | Optional[List[AlertChannel]] | None | 发送渠道列表（默认所有已注册渠道） |
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `log_file` | `str` | 否 | `None` | 日志文件路径 |
+### `webhook_handler`
 
-**方法**:
-
-#### `register_handler(channel, handler)`
-
-注册警报处理器。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `channel` | `AlertChannel` | 是 | — | 渠道 |
-| `handler` | `Callable[[Alert], None]` | 是 | — | 处理函数 |
-
-#### `send_alert(alert, channels=None)`
-
-发送警报。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `alert` | `Alert` | 是 | — | 警报事件 |
-| `channels` | `list[AlertChannel]` | 否 | `None` | 发送渠道列表（默认所有已注册渠道） |
-
-#### `webhook_handler(webhook_url)`
+```python
+webhook_handler(webhook_url: str) -> Callable[[Alert], None]
+```
 
 创建 Webhook 处理器。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `webhook_url` | `str` | 是 | — | Webhook URL |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| webhook_url | str | — | 必填，Webhook URL |
 
-- **返回值**: `Callable[[Alert], None]`
+**返回值**: `Callable[[Alert], None]` — 处理函数
 
-#### `email_handler(smtp_server, smtp_port, sender, password, recipients)`
+### `email_handler`
+
+```python
+email_handler(smtp_server: str, smtp_port: int, sender: str, password: str, recipients: List[str]) -> Callable[[Alert], None]
+```
 
 创建邮件处理器。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `smtp_server` | `str` | 是 | — | SMTP 服务器 |
-| `smtp_port` | `int` | 是 | — | SMTP 端口 |
-| `sender` | `str` | 是 | — | 发件人 |
-| `password` | `str` | 是 | — | 密码 |
-| `recipients` | `list[str]` | 是 | — | 收件人列表 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| smtp_server | str | — | 必填，SMTP 服务器 |
+| smtp_port | int | — | 必填，SMTP 端口 |
+| sender | str | — | 必填，发件人 |
+| password | str | — | 必填，密码 |
+| recipients | List[str] | — | 必填，收件人列表 |
 
-- **返回值**: `Callable[[Alert], None]`
+**返回值**: `Callable[[Alert], None]` — 处理函数
 
-#### `slack_handler(webhook_url)`
+### `slack_handler`
+
+```python
+slack_handler(webhook_url: str) -> Callable[[Alert], None]
+```
 
 创建 Slack 处理器。
 
-- **返回值**: `Callable[[Alert], None]`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| webhook_url | str | — | 必填，Slack Webhook URL |
 
-#### `get_history(level=None, limit=100)`
+**返回值**: `Callable[[Alert], None]` — 处理函数
 
-获取警报历史。
+### `get_history`
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `level` | `str` | 否 | `None` | 警报级别筛选 |
-| `limit` | `int` | 否 | `100` | 返回数量 |
+```python
+get_history(level: Optional[str] = None, limit: int = 100) -> List[Alert]
+```
 
-- **返回值**: `list[Alert]`
+获取告警历史。
 
-#### `get_statistics()`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| level | Optional[str] | None | 警报级别筛选 |
+| limit | int | 100 | 返回数量 |
 
-获取警报统计。
+**返回值**: `List[Alert]` — 告警列表
 
-- **返回值**: `dict` — 含 `total_alerts`, `by_level`, `by_rule`
-- **示例**:
+### `get_statistics`
+
+```python
+get_statistics() -> Dict
+```
+
+获取告警统计。
+
+**返回值**: `Dict` — 含 total_alerts、by_level、by_rule
+
+### AlertChannel 枚举
+
+| 值 | 说明 |
+|----|------|
+| LOG | 日志 |
+| WEBHOOK | Webhook |
+| EMAIL | 邮件 |
+| SLACK | Slack |
+| FILE | 文件 |
+
+---
+
+## Alert
+
+> 告警事件数据类（来自 alert_system.py）。
+
+**属性**:
+
+| 属性 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| rule_name | str | — | 规则名称 |
+| metric | str | — | 指标名称 |
+| value | float | — | 当前值 |
+| level | str | — | 警报级别（"info"、"warning"、"critical"） |
+| message | str | — | 告警消息 |
+| timestamp | float | — | 时间戳 |
+| context | Dict | None | 上下文 |
+
+**方法**:
+
+### `to_dict`
+
+```python
+to_dict() -> Dict
+```
+
+转换为字典。
+
+### `to_json`
+
+```python
+to_json() -> str
+```
+
+转换为 JSON 字符串。
+
+**示例**:
 
 ```python
 from msra_modules.realtime_analytics import AlertSystem, Alert, AlertChannel
 
-system = AlertSystem(log_file="/logs/alerts.jsonl")
-system.register_handler(AlertChannel.WEBHOOK, system.webhook_handler("https://hook.example.com"))
-alert = Alert(rule_name="tachycardia", metric="heart_rate", value=160.0,
-              level="critical", message="HR > 150", timestamp=1234567890.0)
+system = AlertSystem(log_file="alerts.jsonl")
+system.register_handler(AlertChannel.WEBHOOK, system.webhook_handler("https://hooks.example.com/alert"))
+
+alert = Alert(
+    rule_name="tachycardia", metric="heart_rate", value=160,
+    level="critical", message="HR > 150 bpm", timestamp=1719400000.0
+)
 system.send_alert(alert)
+print(system.get_statistics())
 ```
 
 ---
 
-### `VitalSignsSimulator`
+## RealtimeDashboard
 
-**描述**: 生命体征数据模拟器，可生成带噪声的生命体征数据流，支持触发异常事件。
+> 实时仪表盘，支持指标监控、状态判断和 Streamlit 可视化。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `baseline_hr` | `float` | 否 | `75` | 基线心率 |
-| `baseline_sbp` | `float` | 否 | `120` | 基线收缩压 |
-| `baseline_dbp` | `float` | 否 | `80` | 基线舒张压 |
-| `baseline_spo2` | `float` | 否 | `98` | 基线血氧 |
-| `baseline_temp` | `float` | 否 | `37.0` | 基线体温 |
-| `baseline_rr` | `float` | 否 | `16` | 基线呼吸率 |
+```python
+RealtimeDashboard(max_points: int = 1000, update_interval: float = 1.0)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| max_points | int | 1000 | 最大数据点数 |
+| update_interval | float | 1.0 | 更新间隔（秒） |
 
 **方法**:
 
-#### `generate_sample(timestamp=None)`
+### `add_metric`
 
-生成单个样本。
+```python
+add_metric(name: str, display_name: Optional[str] = None, unit: str = "",
+           warning_range: Optional[tuple] = None, critical_range: Optional[tuple] = None)
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `timestamp` | `float` | 否 | `None` | 时间戳 |
+添加监控指标。
 
-- **返回值**: `VitalSigns`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| name | str | — | 必填，指标名 |
+| display_name | Optional[str] | None | 显示名 |
+| unit | str | "" | 单位 |
+| warning_range | Optional[tuple] | None | 警告范围 |
+| critical_range | Optional[tuple] | None | 危险范围 |
 
-#### `trigger_anomaly(anomaly_type, duration=60)`
+### `update`
 
-触发异常。支持类型：`"tachycardia"`, `"bradycardia"`, `"hypoxemia"`, `"hypertension"`, `"hypotension"`, `"hyperthermia"`。
+```python
+update(metric: str, value: float, timestamp: Optional[float] = None)
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `anomaly_type` | `str` | 是 | — | 异常类型 |
-| `duration` | `int` | 否 | `60` | 持续时间（秒） |
+更新指标值。
 
-#### `stop_anomaly()`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| metric | str | — | 必填，指标名 |
+| value | float | — | 必填，值 |
+| timestamp | Optional[float] | None | 时间戳 |
+
+### `add_alert`
+
+```python
+add_alert(alert: Dict)
+```
+
+添加告警到仪表盘。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| alert | Dict | — | 必填，告警字典 |
+
+### `get_dashboard_data`
+
+```python
+get_dashboard_data() -> Dict
+```
+
+获取仪表盘数据。
+
+**返回值**: `Dict` — 含 metrics（含 data 和 stats）、alerts、timestamp
+
+### `get_metric_status`
+
+```python
+get_metric_status(metric: str) -> str
+```
+
+获取指标状态。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| metric | str | — | 必填，指标名 |
+
+**返回值**: `str` — 状态（"normal"、"warning"、"critical"、"unknown"）
+
+### `export_snapshot`
+
+```python
+export_snapshot(filepath: str)
+```
+
+导出快照到 JSON 文件。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| filepath | str | — | 必填，文件路径 |
+
+### `create_streamlit_app`
+
+```python
+create_streamlit_app()
+```
+
+创建 Streamlit 应用（需安装 streamlit 和 plotly）。
+
+**返回值**: Streamlit 应用对象
+
+**异常**: `ImportError` — streamlit/plotly 未安装
+
+**示例**:
+
+```python
+from msra_modules.realtime_analytics import RealtimeDashboard
+
+dashboard = RealtimeDashboard(max_points=500)
+dashboard.add_metric("heart_rate", display_name="心率", unit="bpm",
+                     warning_range=(100, 150), critical_range=(0, 40))
+
+dashboard.update("heart_rate", 75)
+print(dashboard.get_metric_status("heart_rate"))  # "normal"
+dashboard.export_snapshot("dashboard_snapshot.json")
+```
+
+---
+
+## VitalSignsSimulator
+
+> 生命体征模拟器，生成带有随机噪声的生命体征数据，支持异常注入和流式生成。
+
+**签名**:
+
+```python
+VitalSignsSimulator(baseline_hr: float = 75, baseline_sbp: float = 120,
+                     baseline_dbp: float = 80, baseline_spo2: float = 98,
+                     baseline_temp: float = 37.0, baseline_rr: float = 16)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| baseline_hr | float | 75 | 基线心率 |
+| baseline_sbp | float | 120 | 基线收缩压 |
+| baseline_dbp | float | 80 | 基线舒张压 |
+| baseline_spo2 | float | 98 | 基线血氧 |
+| baseline_temp | float | 37.0 | 基线体温 |
+| baseline_rr | float | 16 | 基线呼吸率 |
+
+**方法**:
+
+### `generate_sample`
+
+```python
+generate_sample(timestamp: Optional[float] = None) -> VitalSigns
+```
+
+生成单个生命体征样本。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| timestamp | Optional[float] | None | 时间戳（默认当前时间） |
+
+**返回值**: `VitalSigns` — 生命体征数据对象
+
+### `trigger_anomaly`
+
+```python
+trigger_anomaly(anomaly_type: str, duration: int = 60)
+```
+
+触发异常。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| anomaly_type | str | — | 必填，异常类型（"tachycardia"、"bradycardia"、"hypoxemia"、"hypertension"、"hypotension"、"hyperthermia"） |
+| duration | int | 60 | 持续时间（秒） |
+
+### `stop_anomaly`
+
+```python
+stop_anomaly()
+```
 
 停止异常。
 
-#### `generate_stream(duration=3600, interval=1.0, callback=None)`
+### `generate_stream`
+
+```python
+generate_stream(duration: int = 3600, interval: float = 1.0,
+                callback: Optional[Callable[[VitalSigns], None]] = None) -> List[VitalSigns]
+```
 
 生成数据流。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `duration` | `int` | 否 | `3600` | 持续时间（秒） |
-| `interval` | `float` | 否 | `1.0` | 采样间隔（秒） |
-| `callback` | `Callable[[VitalSigns], None]` | 否 | `None` | 回调函数 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| duration | int | 3600 | 持续时间（秒） |
+| interval | float | 1.0 | 采样间隔（秒） |
+| callback | Optional[Callable] | None | 回调函数 |
 
-- **返回值**: `list[VitalSigns]`
+**返回值**: `List[VitalSigns]` — 生命体征列表
 
-#### `generate_to_kafka(topic, duration=3600, interval=1.0, kafka_servers="localhost:9092")`
+### `generate_to_kafka`
+
+```python
+generate_to_kafka(topic: str, duration: int = 3600, interval: float = 1.0,
+                  kafka_servers: str = "localhost:9092")
+```
 
 生成数据并发送到 Kafka。
-- **示例**:
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| topic | str | — | 必填，Kafka 主题 |
+| duration | int | 3600 | 持续时间 |
+| interval | float | 1.0 | 采样间隔 |
+| kafka_servers | str | "localhost:9092" | Kafka 服务器 |
+
+### VitalSigns 数据类
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| timestamp | float | 时间戳 |
+| heart_rate | float | 心率 |
+| systolic_bp | float | 收缩压 |
+| diastolic_bp | float | 舒张压 |
+| spo2 | float | 血氧饱和度 |
+| temperature | float | 体温 |
+| respiratory_rate | float | 呼吸率 |
+
+**示例**:
 
 ```python
 from msra_modules.realtime_analytics import VitalSignsSimulator
 
-simulator = VitalSignsSimulator(baseline_hr=75, baseline_sbp=120)
-sample = simulator.generate_sample()
-print(sample.heart_rate, sample.spo2)
+sim = VitalSignsSimulator(baseline_hr=75)
+sample = sim.generate_sample()
+print(f"心率: {sample.heart_rate:.1f}")
 
-# 触发心动过速异常
-simulator.trigger_anomaly("tachycardia", duration=60)
+sim.trigger_anomaly("tachycardia", duration=30)
+abnormal = sim.generate_sample()
+print(f"异常心率: {abnormal.heart_rate:.1f}")
 ```
 
 ---
 
-### `VitalSigns`
+## RealtimeQualityGateChecker
 
-**描述**: 生命体征数据类。
+> 实时分析质量门闸检查器，封装 Gate RT-1 的检查逻辑。
 
-**字段**: `timestamp`, `heart_rate`, `systolic_bp`, `diastolic_bp`, `spo2`, `temperature`, `respiratory_rate`
+**签名**:
 
-**方法**:
+```python
+RealtimeQualityGateChecker(study_id: str, project_root: Optional[str] = None)
+```
 
-#### `to_dict()`
-
-转换为字典。
-
-#### `to_json()`
-
-转换为 JSON 字符串。
-
----
-
-### `RealtimeDashboard`
-
-**描述**: 实时仪表盘，支持指标监控、状态判定、快照导出和 Streamlit 应用。
-
-**参数**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `max_points` | `int` | 否 | `1000` | 最大数据点数 |
-| `update_interval` | `float` | 否 | `1.0` | 更新间隔（秒） |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| study_id | str | — | 必填，研究编号 |
+| project_root | Optional[str] | None | 项目根目录（可选） |
 
 **方法**:
 
-#### `add_metric(name, display_name=None, unit="", warning_range=None, critical_range=None)`
+### `run_gate_rt1`
 
-添加监控指标。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `name` | `str` | 是 | — | 指标名 |
-| `display_name` | `str` | 否 | `None` | 显示名 |
-| `unit` | `str` | 否 | `""` | 单位 |
-| `warning_range` | `tuple` | 否 | `None` | 警告范围 |
-| `critical_range` | `tuple` | 否 | `None` | 危险范围 |
-
-#### `update(metric, value, timestamp=None)`
-
-更新指标值。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `metric` | `str` | 是 | — | 指标名 |
-| `value` | `float` | 是 | — | 值 |
-| `timestamp` | `float` | 否 | `None` | 时间戳 |
-
-#### `add_alert(alert)`
-
-添加警报。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `alert` | `dict` | 是 | — | 警报字典 |
-
-#### `get_dashboard_data()`
-
-获取仪表盘数据。
-
-- **返回值**: `dict` — 含 `metrics`（各指标的 data 和 stats）、`alerts`、`timestamp`
-
-#### `get_metric_status(metric)`
-
-获取指标状态。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `metric` | `str` | 是 | — | 指标名 |
-
-- **返回值**: `str` — `"normal"`, `"warning"`, `"critical"`, `"unknown"`
-
-#### `export_snapshot(filepath)`
-
-导出快照为 JSON 文件。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `filepath` | `str` | 是 | — | 文件路径 |
-
-#### `create_streamlit_app()`
-
-创建 Streamlit 应用。
-
-- **返回值**: Streamlit 应用对象
-- **异常**: `ImportError`（streamlit/plotly 未安装）
-
----
-
-### `ReportGenerator`
-
-**描述**: 报告生成器，支持 HTML 和 Markdown 格式的影像报告、生信报告和监测报告。
-
-**参数**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `output_dir` | `str` | 否 | `"reports"` | 输出目录 |
-
-**方法**:
-
-#### `generate_imaging_report(patient_info, imaging_findings, radiomics_features, output_format="html")`
-
-生成影像分析报告。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `patient_info` | `dict` | 是 | — | 患者信息 |
-| `imaging_findings` | `dict` | 是 | — | 影像发现 |
-| `radiomics_features` | `dict` | 是 | — | 影像组学特征 |
-| `output_format` | `str` | 否 | `"html"` | 输出格式（`"html"` 或 `"markdown"`） |
-
-- **返回值**: `str` — 报告文件路径
-
-#### `generate_bio_report(sample_info, qc_summary, analysis_results, output_format="html")`
-
-生成生物信息报告。
-
-- **返回值**: `str` — 报告文件路径
-
-#### `generate_monitoring_report(duration, stats, alerts, output_format="html")`
-
-生成实时监测报告。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `duration` | `str` | 是 | — | 监测时长 |
-| `stats` | `dict` | 是 | — | 统计数据 |
-| `alerts` | `list[dict]` | 是 | — | 警报列表 |
-| `output_format` | `str` | 否 | `"html"` | 输出格式 |
-
-- **返回值**: `str` — 报告文件路径
-
----
-
-### `RealtimeQualityGateChecker`
-
-**描述**: 实时分析质量门闸检查器，封装 Gate RT-1（实时数据质量门闸）。
-
-**参数**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `study_id` | `str` | 是 | — | 研究编号 |
-| `project_root` | `str` | 否 | `None` | 项目根目录 |
-
-**方法**:
-
-#### `run_gate_rt1(source=None, timestamps=None, detection_rate=None, window_size=60, max_gap_multiplier=2.0, min_rate=0.01, max_rate=0.20)`
+```python
+run_gate_rt1(source: Any = None, timestamps: Optional[List[float]] = None,
+             detection_rate: Optional[float] = None, window_size: int = 60,
+             max_gap_multiplier: float = 2.0, min_rate: float = 0.01,
+             max_rate: float = 0.20) -> GateResult
+```
 
 执行 Gate RT-1 全部 3 项检查：数据流连接正常、时间戳连续性、异常检测灵敏度校准。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `source` | `Any` | 否 | `None` | 数据源对象（模拟器或其他数据源） |
-| `timestamps` | `list[float]` | 否 | `None` | 时间戳列表 |
-| `detection_rate` | `float` | 否 | `None` | 异常检测率 |
-| `window_size` | `int` | 否 | `60` | 窗口大小（秒） |
-| `max_gap_multiplier` | `float` | 否 | `2.0` | 最大间隔倍数 |
-| `min_rate` | `float` | 否 | `0.01` | 最小检测率 |
-| `max_rate` | `float` | 否 | `0.20` | 最大检测率 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| source | Any | None | 数据源对象（模拟器或其他数据源） |
+| timestamps | Optional[List[float]] | None | 时间戳列表 |
+| detection_rate | Optional[float] | None | 异常检测率 |
+| window_size | int | 60 | 窗口大小（秒） |
+| max_gap_multiplier | float | 2.0 | 最大间隔倍数 |
+| min_rate | float | 0.01 | 最小检测率 |
+| max_rate | float | 0.20 | 最大检测率 |
 
-- **返回值**: `GateResult` — 判定结果（`PASS` / `CONDITIONAL` / `BLOCKED`）
-- **示例**:
+**返回值**: `GateResult` — 判定结果（PASS / CONDITIONAL / BLOCKED）
+
+### `check_data_source_available`
+
+```python
+check_data_source_available(source: Any) -> CheckItemResult
+```
+
+检查数据流连接是否正常。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| source | Any | — | 必填，数据源对象 |
+
+**返回值**: `CheckItemResult`
+
+### `check_timestamp_continuity`
+
+```python
+check_timestamp_continuity(timestamps: List[float], window_size: int = 60,
+                           max_gap_multiplier: float = 2.0) -> CheckItemResult
+```
+
+检查时间戳连续性。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| timestamps | List[float] | — | 必填，时间戳列表（应已排序） |
+| window_size | int | 60 | 窗口大小（秒） |
+| max_gap_multiplier | float | 2.0 | 最大间隔倍数 |
+
+**返回值**: `CheckItemResult`
+
+### `check_detection_sensitivity`
+
+```python
+check_detection_sensitivity(detection_rate: float, min_rate: float = 0.01,
+                            max_rate: float = 0.20) -> CheckItemResult
+```
+
+检查异常检测灵敏度校准。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| detection_rate | float | — | 必填，实际检测到的异常比例 (0.0-1.0) |
+| min_rate | float | 0.01 | 最小可接受检测率 |
+| max_rate | float | 0.20 | 最大可接受检测率 |
+
+**返回值**: `CheckItemResult`
+
+**示例**:
 
 ```python
 from msra_modules.realtime_analytics import RealtimeQualityGateChecker, VitalSignsSimulator
 
-simulator = VitalSignsSimulator()
 checker = RealtimeQualityGateChecker(study_id="RT-2026-001")
-result = checker.run_gate_rt1(source=simulator, detection_rate=0.05)
-print(result.verdict)
+sim = VitalSignsSimulator()
+
+gate_result = checker.run_gate_rt1(
+    source=sim,
+    timestamps=[1719400000.0 + i for i in range(100)],
+    detection_rate=0.05
+)
+print(f"RT-1 判定: {gate_result.verdict.value}")
+print(f"通过率: {gate_result.pass_rate:.1%}")
 ```
 
 ---
 
-## 完整使用示例
+## 共享类型参考
 
-```python
-from msra_modules.realtime_analytics import (
-    StreamProcessor, AnomalyDetector, AlertSystem, AlertChannel,
-    VitalSignsSimulator, RealtimeDashboard, RealtimeQualityGateChecker,
-)
+### CheckItemResult
 
-# 1. 创建模拟器
-simulator = VitalSignsSimulator(baseline_hr=75, baseline_sbp=120)
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| item_id | str | 检查项编号 |
+| name | str | 检查项名称 |
+| is_key | bool | 是否为关键项 |
+| status | str | 状态（PASS / FAIL / N/A / SKIP） |
+| evidence | str | 证据描述 |
+| notes | str | 备注 |
 
-# 2. 创建流处理器
-processor = StreamProcessor(window_size=60)
-processor.register_metric("heart_rate")
-processor.register_metric("spo2")
+### GateVerdict
 
-# 3. 创建异常检测器
-detector = AnomalyDetector()
-detector.add_default_vital_signs_rules()
-
-# 4. 创建告警系统
-alert_system = AlertSystem(log_file="/logs/alerts.jsonl")
-
-# 5. 创建仪表盘
-dashboard = RealtimeDashboard()
-dashboard.add_metric("heart_rate", display_name="HR", unit="bpm",
-                     warning_range=(100, 150), critical_range=(0, 40))
-
-# 6. 模拟数据流
-for i in range(100):
-    sample = simulator.generate_sample()
-    processor.add_data_point("heart_rate", sample.heart_rate)
-    alerts = detector.evaluate("heart_rate", sample.heart_rate)
-    for alert in alerts:
-        alert_system.send_alert(alert)
-    dashboard.update("heart_rate", sample.heart_rate)
-
-# 7. 质量门闸
-checker = RealtimeQualityGateChecker(study_id="RT-2026-001")
-result = checker.run_gate_rt1(source=simulator, detection_rate=0.05)
-```
+| 值 | 说明 |
+|----|------|
+| PASS | 全部通过 |
+| CONDITIONAL | 条件通过 |
+| BLOCKED | 阻断 |

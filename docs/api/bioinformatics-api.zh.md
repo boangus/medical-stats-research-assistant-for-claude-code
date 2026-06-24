@@ -1,655 +1,650 @@
-# MSRA Bioinformatics 模块 API 参考
+# 生物信息学模块 API 参考
 
-| 字段 | 值 |
-|------|-----|
-| **模块** | `msra_modules.bioinformatics` |
-| **版本** | 1.1.0 |
-| **日期** | 2026-07-13 |
-| **状态** | Released (v1.0.0) |
-| **语言** | 中文 |
+> **版本**: v1.0.0 | **日期**: 2026-06-26 | **状态**: Stable
+> **模块**: Bioinformatics | **命令**: `/bio`
 
 ---
 
-## 概述
+## 目录
 
-Bioinformatics 模块提供基于 Scanpy 和 gseapy 的单细胞 RNA-seq 全流程分析功能，包括数据加载、质量控制、降维聚类、差异表达、通路富集、批次校正和质量门闸检查。
-
-### 依赖
-
-- `scanpy` — 单细胞分析核心库
-- `gseapy` — 通路富集分析
-- `harmonypy` — Harmony 批次校正
-- `biopython` — FASTA 序列读取
-- `scipy` — 统计检验
-- `matplotlib` — 可视化
+- [ScRNASeqLoader — 单细胞数据加载器](#scrnaseqloader)
+- [SingleCellQC — 单细胞质量控制](#singlecellqc)
+- [DimensionalityReduction — 降维分析](#dimensionalityreduction)
+- [DifferentialExpression — 差异表达分析](#differentialexpression)
+- [PathwayEnrichment — 通路富集分析](#pathwayenrichment)
+- [BatchCorrector — 批次校正](#batchcorrector)
+- [BioQualityGateChecker — 质量门闸](#bioqualitygatechecker)
 
 ---
 
-## 公开 API
+## ScRNASeqLoader
 
-### `ScRNASeqLoader`
+> 单细胞 RNA-seq 数据加载器，支持 10x MTX/H5、CSV 表达矩阵和 FASTA 序列文件。
 
-**描述**: 单细胞 RNA-seq 数据加载器，支持 10x MTX / H5 / CSV 格式以及 FASTA 序列文件。
+**签名**:
 
-**参数**:
-
-无构造参数。
+```python
+ScRNASeqLoader()
+```
 
 **方法**:
 
-#### `read_10x_mtx(mtx_dir, var_names="gene_symbols", cache=True)`
+### `read_10x_mtx`
+
+```python
+read_10x_mtx(mtx_dir: str, var_names: str = "gene_symbols", cache: bool = True) -> AnnData
+```
 
 读取 10x Genomics MTX 格式数据。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `mtx_dir` | `str` | 是 | — | 10x 输出目录（包含 matrix.mtx, features.tsv, barcodes.tsv） |
-| `var_names` | `str` | 否 | `"gene_symbols"` | 基因名类型（`"gene_symbols"` 或 `"gene_ids"`） |
-| `cache` | `bool` | 否 | `True` | 是否缓存 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| mtx_dir | str | — | 必填，10x 输出目录（含 matrix.mtx, features.tsv, barcodes.tsv） |
+| var_names | str | "gene_symbols" | 基因名类型（"gene_symbols" 或 "gene_ids"） |
+| cache | bool | True | 是否缓存 |
 
-- **返回值**: `anndata.AnnData` 对象
-- **示例**:
+**返回值**: `AnnData` — 单细胞表达矩阵对象
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import ScRNASeqLoader
 
 loader = ScRNASeqLoader()
-adata = loader.read_10x_mtx("/data/pbmc_10x/")
-print(adata.shape)
+adata = loader.read_10x_mtx("data/pbmc_10x/")
+print(f"细胞数: {adata.shape[0]}, 基因数: {adata.shape[1]}")
 ```
 
-#### `read_10x_h5(h5_path, genome=None)`
+**异常**: `FileNotFoundError` — 目录不存在；`ImportError` — scanpy 未安装
+
+### `read_10x_h5`
+
+```python
+read_10x_h5(h5_path: str, genome: Optional[str] = None) -> AnnData
+```
 
 读取 10x Genomics H5 格式数据。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `h5_path` | `str` | 是 | — | H5 文件路径 |
-| `genome` | `str` | 否 | `None` | 基因组名称 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| h5_path | str | — | 必填，H5 文件路径 |
+| genome | Optional[str] | None | 基因组名称（可选） |
 
-- **返回值**: `anndata.AnnData` 对象
-- **示例**:
+**返回值**: `AnnData`
+
+### `read_csv`
 
 ```python
-adata = loader.read_10x_h5("/data/pbmc.h5")
+read_csv(csv_path: str, **kwargs) -> AnnData
 ```
 
-#### `read_csv(csv_path, **kwargs)`
+读取 CSV 格式表达矩阵，`**kwargs` 传递给 `pandas.read_csv`。
 
-读取 CSV 格式表达矩阵。
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| csv_path | str | — | 必填，CSV 文件路径 |
+| **kwargs | — | — | 传递给 pandas.read_csv 的参数 |
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `csv_path` | `str` | 是 | — | CSV 文件路径 |
-| `**kwargs` | — | 否 | — | 传递给 `pandas.read_csv` 的参数 |
+**返回值**: `AnnData`
 
-- **返回值**: `anndata.AnnData` 对象
+### `read_fasta`
 
-#### `read_fasta(fasta_path)`
+```python
+read_fasta(fasta_path: str) -> List[SeqRecord]
+```
 
-读取 FASTA 序列文件（使用 Biopython）。
+读取 FASTA 序列文件（需安装 Biopython）。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `fasta_path` | `str` | 是 | — | FASTA 文件路径 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| fasta_path | str | — | 必填，FASTA 文件路径 |
 
-- **返回值**: `list[Bio.SeqRecord.SeqRecord]` — 序列列表
+**返回值**: `List[SeqRecord]` — Biopython 序列记录列表
 
-#### `get_metadata()`
+**异常**: `ImportError` — Biopython 未安装
+
+### `get_metadata`
+
+```python
+get_metadata() -> Dict
+```
 
 获取当前已加载数据的元数据。
 
-- **返回值**: `dict` — 包含 `n_cells`、`n_genes`、`obs_columns`、`var_columns`、`is_sparse` 字段
-- **异常**: 无异常，未加载数据时返回 `{"error": "No data loaded"}`
+**返回值**: `Dict` — 包含 `n_cells`、`n_genes`、`obs_columns`、`var_columns`、`is_sparse`
 
-**异常**: `ImportError`（scanpy/biopython 未安装）、`FileNotFoundError`（文件不存在）
+### 便捷函数
 
----
-
-### `read_10x_mtx(mtx_dir, **kwargs)`
-
-**描述**: 便捷函数，等价于 `ScRNASeqLoader().read_10x_mtx(mtx_dir, **kwargs)`。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `mtx_dir` | `str` | 是 | — | 10x 输出目录 |
-| `**kwargs` | — | 否 | — | 传递给 `ScRNASeqLoader.read_10x_mtx` 的参数 |
-
-- **返回值**: `anndata.AnnData` 对象
+```python
+from msra_modules.bioinformatics import read_10x_mtx
+adata = read_10x_mtx("data/pbmc_10x/")
+```
 
 ---
 
-### `SingleCellQC`
+## SingleCellQC
 
-**描述**: 单细胞质量控制，包括线粒体比例、基因数、UMI 过滤。
+> 单细胞质量控制，支持基于基因数、线粒体百分比等指标的细胞/基因过滤。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `min_genes` | `int` | 否 | `200` | 每个细胞最少基因数 |
-| `max_genes` | `int` | 否 | `5000` | 每个细胞最多基因数 |
-| `max_pct_mito` | `float` | 否 | `20.0` | 最大线粒体基因百分比 |
-| `min_cells` | `int` | 否 | `3` | 每个基因最少细胞数 |
+```python
+SingleCellQC(min_genes: int = 200, max_genes: int = 5000, max_pct_mito: float = 20.0, min_cells: int = 3)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| min_genes | int | 200 | 每个细胞最少基因数 |
+| max_genes | int | 5000 | 每个细胞最多基因数 |
+| max_pct_mito | float | 20.0 | 最大线粒体基因百分比 |
+| min_cells | int | 3 | 每个基因最少细胞数 |
 
 **方法**:
 
-#### `compute_qc_metrics(adata)`
+### `compute_qc_metrics`
 
-计算 QC 指标（标记线粒体基因并计算 QC metrics）。
+```python
+compute_qc_metrics(adata: AnnData) -> AnnData
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
+计算 QC 指标（标记线粒体基因、计算 n_genes_by_counts、pct_counts_mt 等），原地修改并返回。
 
-- **返回值**: `AnnData`（带有 QC 指标，原地修改）
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
 
-#### `filter_cells(adata, verbose=True)`
+**返回值**: `AnnData` — 带有 QC 指标的 AnnData
+
+### `filter_cells`
+
+```python
+filter_cells(adata: AnnData, verbose: bool = True) -> AnnData
+```
 
 过滤低质量细胞（基于基因数和线粒体百分比）。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `verbose` | `bool` | 否 | `True` | 是否打印信息 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| verbose | bool | True | 是否打印过滤信息 |
 
-- **返回值**: `AnnData`（过滤后）
+**返回值**: `AnnData` — 过滤后的 AnnData
 
-#### `filter_genes(adata, verbose=True)`
+### `filter_genes`
 
-过滤低表达基因。
+```python
+filter_genes(adata: AnnData, verbose: bool = True) -> AnnData
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `verbose` | `bool` | 否 | `True` | 是否打印信息 |
+过滤低表达基因（基于最少细胞数）。
 
-- **返回值**: `AnnData`（过滤后）
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| verbose | bool | True | 是否打印过滤信息 |
 
-#### `run_qc(adata, verbose=True)`
+**返回值**: `AnnData` — 过滤后的 AnnData
 
-运行完整 QC 流程（计算指标 → 过滤细胞 → 过滤基因）。
+### `run_qc`
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `verbose` | `bool` | 否 | `True` | 是否打印信息 |
+```python
+run_qc(adata: AnnData, verbose: bool = True) -> AnnData
+```
 
-- **返回值**: `AnnData`（QC 后）
-- **示例**:
+运行完整 QC 流程（compute_qc_metrics → filter_cells → filter_genes）。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| verbose | bool | True | 是否打印信息 |
+
+**返回值**: `AnnData` — QC 后的 AnnData
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import ScRNASeqLoader, SingleCellQC
 
 loader = ScRNASeqLoader()
-adata = loader.read_10x_mtx("/data/pbmc_10x/")
+adata = loader.read_10x_mtx("data/pbmc_10x/")
 
 qc = SingleCellQC(min_genes=200, max_genes=5000, max_pct_mito=20.0)
 adata = qc.run_qc(adata)
+print(f"QC 后: {adata.shape[0]} 细胞, {adata.shape[1]} 基因")
 ```
 
-#### `get_qc_summary(adata)`
+### `get_qc_summary`
 
-获取 QC 摘要。
+```python
+get_qc_summary(adata: AnnData) -> Dict
+```
 
-- **返回值**: `dict` — 包含 `n_cells`、`n_genes`、`mean_genes_per_cell`、`median_genes_per_cell`、`mean_counts_per_cell`、`mean_pct_mito`、`max_pct_mito`
+获取 QC 摘要统计。
 
-**异常**: `ImportError`（scanpy 未安装）
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+
+**返回值**: `Dict` — 包含 `n_cells`、`n_genes`、`mean_genes_per_cell`、`mean_counts_per_cell`、`mean_pct_mito`、`max_pct_mito`
 
 ---
 
-### `DimensionalityReduction`
+## DimensionalityReduction
 
-**描述**: 降维分析，支持 PCA / UMAP / 聚类（Leiden）。
+> 降维分析，提供标准化、高变基因筛选、PCA、UMAP 和 Leiden 聚集流程。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `n_pcs` | `int` | 否 | `50` | PCA 主成分数 |
-| `n_neighbors` | `int` | 否 | `15` | 邻居数 |
+```python
+DimensionalityReduction(n_pcs: int = 50, n_neighbors: int = 15)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| n_pcs | int | 50 | PCA 主成分数 |
+| n_neighbors | int | 15 | 邻居数 |
 
 **方法**:
 
-#### `normalize_and_log(adata, target_sum=1e4)`
+### `normalize_and_log`
+
+```python
+normalize_and_log(adata: AnnData, target_sum: int = 1e4) -> AnnData
+```
 
 标准化和对数转换。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `target_sum` | `int` | 否 | `10000` | 目标总和 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| target_sum | int | 1e4 | 目标总和 |
 
-- **返回值**: `AnnData`
+**返回值**: `AnnData` — 标准化后的 AnnData
 
-#### `find_hvg(adata, n_top_genes=2000)`
+### `find_hvg`
+
+```python
+find_hvg(adata: AnnData, n_top_genes: int = 2000) -> AnnData
+```
 
 寻找高变基因。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `n_top_genes` | `int` | 否 | `2000` | 高变基因数 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| n_top_genes | int | 2000 | 高变基因数 |
 
-- **返回值**: `AnnData`
+**返回值**: `AnnData` — 带有高变基因标记的 AnnData
 
-#### `run_pca(adata)`
+### `run_pca`
 
-运行 PCA。
+```python
+run_pca(adata: AnnData) -> AnnData
+```
 
-- **返回值**: `AnnData`（新增 `obsm["X_pca"]`）
+运行 PCA 降维。
 
-#### `run_umap(adata)`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
 
-运行 UMAP（需先运行 PCA）。
+**返回值**: `AnnData` — 带有 PCA 结果（`obsm["X_pca"]`）的 AnnData
 
-- **返回值**: `AnnData`（新增 `obsm["X_umap"]`）
+### `run_umap`
 
-#### `cluster(adata, resolution=1.0)`
+```python
+run_umap(adata: AnnData) -> AnnData
+```
 
-Leiden 聚类。
+运行 UMAP 降维（需先运行 PCA）。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `resolution` | `float` | 否 | `1.0` | 聚类分辨率 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
 
-- **返回值**: `AnnData`（新增 `obs["leiden"]`）
+**返回值**: `AnnData` — 带有 UMAP 结果（`obsm["X_umap"]`）的 AnnData
 
-#### `run_full_pipeline(adata, resolution=1.0)`
+### `cluster`
 
-运行完整降维聚类 pipeline（标准化 → HVG → PCA → UMAP → 聚类）。
+```python
+cluster(adata: AnnData, resolution: float = 1.0) -> AnnData
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `resolution` | `float` | 否 | `1.0` | 聚类分辨率 |
+Leiden 聚类分析。
 
-- **返回值**: `AnnData`
-- **示例**:
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| resolution | float | 1.0 | 聚类分辨率 |
+
+**返回值**: `AnnData` — 带有聚类结果（`obs["leiden"]`）的 AnnData
+
+### `run_full_pipeline`
+
+```python
+run_full_pipeline(adata: AnnData, resolution: float = 1.0) -> AnnData
+```
+
+运行完整降维聚类 pipeline（normalize_and_log → find_hvg → run_pca → run_umap → cluster）。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| resolution | float | 1.0 | 聚类分辨率 |
+
+**返回值**: `AnnData` — 处理后的 AnnData
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import DimensionalityReduction
 
-dr = DimensionalityReduction(n_pcs=50, n_neighbors=15)
+dr = DimensionalityReduction(n_pcs=50)
 adata = dr.run_full_pipeline(adata, resolution=0.8)
+print(f"聚类数: {adata.obs['leiden'].nunique()}")
 ```
-
-**异常**: `ImportError`（scanpy 未安装）
 
 ---
 
-### `DifferentialExpression`
+## DifferentialExpression
 
-**描述**: 差异表达分析，支持 Wilcoxon / t-test / logreg 方法。
+> 差异表达分析，支持 Wilcoxon、t-test、logreg 方法，提供标记基因发现和差异基因筛选。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `method` | `str` | 否 | `"wilcoxon"` | 差异分析方法（`"wilcoxon"`, `"t-test"`, `"logreg"`） |
+```python
+DifferentialExpression(method: str = "wilcoxon")
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| method | str | "wilcoxon" | 差异分析方法（"wilcoxon"、"t-test"、"logreg"） |
 
 **方法**:
 
-#### `find_markers(adata, groupby="leiden", use_raw=True)`
+### `find_markers`
+
+```python
+find_markers(adata: AnnData, groupby: str = "leiden", use_raw: bool = True) -> pd.DataFrame
+```
 
 寻找标记基因。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `groupby` | `str` | 否 | `"leiden"` | 分组列名 |
-| `use_raw` | `bool` | 否 | `True` | 是否使用原始数据 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| groupby | str | "leiden" | 分组列名 |
+| use_raw | bool | True | 是否使用原始数据 |
 
-- **返回值**: `pd.DataFrame` — 标记基因表（列为各分组名，行为排名）
+**返回值**: `pd.DataFrame` — 标记基因 DataFrame（每列为一个聚类的标记基因）
 
-#### `get_de_table(adata, group, n_genes=100)`
+### `get_de_table`
 
-获取差异表达表格。
+```python
+get_de_table(adata: AnnData, group: str, n_genes: int = 100) -> pd.DataFrame
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `group` | `str` | 是 | — | 分组名 |
-| `n_genes` | `int` | 否 | `100` | 返回的基因数 |
+获取指定分组的差异表达表格。
 
-- **返回值**: `pd.DataFrame` — 含 `names`, `logfoldchanges`, `pvals`, `pvals_adj`, `log2FC` 列
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| group | str | — | 必填，分组名 |
+| n_genes | int | 100 | 返回的基因数 |
 
-#### `filter_de_genes(de_table, log2fc_threshold=1.0, pval_threshold=0.05)`
+**返回值**: `pd.DataFrame` — 差异表达表格（含 log2FC、pvals_adj）
 
-过滤差异基因。
+### `filter_de_genes`
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `de_table` | `pd.DataFrame` | 是 | — | 差异表达表 |
-| `log2fc_threshold` | `float` | 否 | `1.0` | log2FC 阈值 |
-| `pval_threshold` | `float` | 否 | `0.05` | 校正 p 值阈值 |
+```python
+filter_de_genes(de_table: pd.DataFrame, log2fc_threshold: float = 1.0, pval_threshold: float = 0.05) -> pd.DataFrame
+```
 
-- **返回值**: `pd.DataFrame` — 过滤后的差异基因表，含 `direction` 列（`"up"` / `"down"`）
+过滤显著差异基因。
 
-- **示例**:
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| de_table | pd.DataFrame | — | 必填，差异表达表 |
+| log2fc_threshold | float | 1.0 | log2FC 阈值 |
+| pval_threshold | float | 0.05 | p 值阈值 |
+
+**返回值**: `pd.DataFrame` — 过滤后的差异基因表（含 `direction` 列："up"/"down"）
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import DifferentialExpression
 
 de = DifferentialExpression(method="wilcoxon")
 markers = de.find_markers(adata, groupby="leiden")
-de_table = de.get_de_table(adata, group="0", n_genes=100)
+de_table = de.get_de_table(adata, group="0", n_genes=200)
 sig_genes = de.filter_de_genes(de_table, log2fc_threshold=1.0, pval_threshold=0.05)
+print(f"显著差异基因: {len(sig_genes)}")
 ```
 
-**异常**: `ImportError`（scanpy 未安装）
-
 ---
 
-### `TrajectoryAnalysis`
+## PathwayEnrichment
 
-**描述**: 轨迹分析，支持 PAGA 和 DPT（Diffusion Pseudotime）。
+> 通路富集分析引擎，基于 gseapy 实现 GO (BP/MF/CC)、KEGG、GSEA 和 Enrichr 分析。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `method` | `str` | 否 | `"paga"` | 方法（`"paga"` 或 `"dpt"`） |
+```python
+PathwayEnrichment(organism: str = "human", gene_sets: Optional[str] = None, outdir: Optional[str] = None)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| organism | str | "human" | 物种名称（"human"、"mouse"、"rat" 等） |
+| gene_sets | Optional[str] | None | 自定义 .gmt 基因集文件路径（可选） |
+| outdir | Optional[str] | None | 输出目录（可选） |
 
 **方法**:
 
-#### `run_paga(adata, groups="leiden")`
-
-运行 PAGA 轨迹分析。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `groups` | `str` | 否 | `"leiden"` | 分组列名 |
-
-- **返回值**: `AnnData`
-
-#### `run_dpt(adata, root_key="xroot")`
-
-运行 DPT（Diffusion Pseudotime）。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `root_key` | `str` | 否 | `"xroot"` | 根细胞键名 |
-
-- **返回值**: `AnnData`
-
-**异常**: `ImportError`（scanpy 未安装）
-
----
-
-### `CellBenderDenoiser`
-
-**描述**: CellBender 单细胞去噪（背景去除），通过命令行调用 CellBender。
-
-**参数**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `expected_cells` | `int` | 否 | `3000` | 预期细胞数 |
-| `total_droplets` | `int` | 否 | `30000` | 总液滴数 |
-| `epochs` | `int` | 否 | `200` | 训练轮数 |
-
-**方法**:
-
-#### `check_installation()`
-
-检查 CellBender 是否已安装。
-
-- **返回值**: `bool`
-
-#### `run_remove_background(input_h5, output_h5, expected_cells=None, total_droplets=None)`
-
-运行背景去除。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `input_h5` | `str` | 是 | — | 输入 H5 文件路径 |
-| `output_h5` | `str` | 是 | — | 输出 H5 文件路径 |
-| `expected_cells` | `int` | 否 | `None` | 预期细胞数（覆盖默认值） |
-| `total_droplets` | `int` | 否 | `None` | 总液滴数（覆盖默认值） |
-
-- **返回值**: `dict` — 包含 `success`, `output_file`/`error`, `stdout`
-
-#### `load_denoised(h5_path)`
-
-加载去噪后的数据。
-
-- **返回值**: `AnnData`
-
-#### `compare_before_after(raw_adata, denoised_adata)`
-
-比较去噪前后数据。
-
-- **返回值**: `dict` — 包含 `raw_mean`, `denoised_mean`, `raw_std`, `denoised_std`, `mean_difference`, `std_difference` 等
-
-**异常**: `RuntimeError`（CellBender 未安装）、`FileNotFoundError`、`ImportError`
-
----
-
-### `BioVisualizer`
-
-**描述**: 生物信息可视化工具，基于 matplotlib + scanpy.pl。
-
-**参数**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `figsize` | `tuple` | 否 | `(8, 6)` | 图像大小 |
-| `dpi` | `int` | 否 | `100` | 分辨率 |
-
-**方法**:
-
-#### `plot_umap(adata, color=None, save_path=None)`
-
-绘制 UMAP 图。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象（需含 `X_umap`） |
-| `color` | `str` | 否 | `None` | 着色列名 |
-| `save_path` | `str` | 否 | `None` | 保存路径 |
-
-- **返回值**: `matplotlib.figure.Figure`
-
-#### `plot_violin(adata, keys, groupby=None, save_path=None)`
-
-绘制小提琴图。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `keys` | `list[str]` | 是 | — | 基因名列表 |
-| `groupby` | `str` | 否 | `None` | 分组列名 |
-| `save_path` | `str` | 否 | `None` | 保存路径 |
-
-- **返回值**: `matplotlib.figure.Figure`
-
-#### `plot_dotplot(adata, var_names, groupby="leiden", save_path=None)`
-
-绘制点图。
-
-- **返回值**: `matplotlib.figure.Figure`
-
-#### `plot_heatmap(adata, var_names, groupby="leiden", save_path=None)`
-
-绘制热图。
-
-- **返回值**: `matplotlib.figure.Figure`
-
-#### `plot_paga(adata, color=None, save_path=None)`
-
-绘制 PAGA 轨迹图。
-
-- **返回值**: `matplotlib.figure.Figure`
-
-**异常**: `ImportError`（scanpy 未安装）、`ValueError`（UMAP 未计算）
-
----
-
-### `PathwayEnrichment`
-
-**描述**: 通路富集分析引擎，基于 gseapy 实现 GO (BP/MF/CC)、KEGG、GSEA 和 Enrichr 富集分析。
-
-**参数**:
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `organism` | `str` | 否 | `"human"` | 物种名称（`"human"`, `"mouse"` 等） |
-| `gene_sets` | `str` | 否 | `None` | 自定义 `.gmt` 基因集文件路径 |
-| `outdir` | `str` | 否 | `None` | 输出目录 |
-
-**方法**:
-
-#### `run_enrichr(gene_list, gene_sets_library="GO_Biological_Process_2023", cutoff=0.05)`
-
-运行 Enrichr 富集分析（Over-Representation Analysis）。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `gene_list` | `list[str]` | 是 | — | 基因列表（gene symbols） |
-| `gene_sets_library` | `str` | 否 | `"GO_Biological_Process_2023"` | 基因集库名称 |
-| `cutoff` | `float` | 否 | `0.05` | FDR 阈值 |
-
-- **返回值**: `pd.DataFrame` — 列含 `Term`, `Overlap`, `P-value`, `Adjusted P-value`, `Odds Ratio`, `Combined Score`, `Genes`
-
-#### `run_gsea(ranked_genes, gene_sets="GO_Biological_Process_2023", min_size=15, max_size=500, permutation_num=100)`
-
-运行 GSEA 基因集富集分析。
-
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `ranked_genes` | `pd.Series` | 是 | — | 基因排名序列（index=gene symbols, values=ranking metric） |
-| `gene_sets` | `str` | 否 | `"GO_Biological_Process_2023"` | 基因集库名称或 `.gmt` 文件路径 |
-| `min_size` | `int` | 否 | `15` | 基因集最小大小 |
-| `max_size` | `int` | 否 | `500` | 基因集最大大小 |
-| `permutation_num` | `int` | 否 | `100` | 置换次数 |
-
-- **返回值**: `pd.DataFrame` — 列含 `Term`, `ES`, `NES`, `NOM p-val`, `FDR q-val`, `FWER p-val`, `Tag %`, `Lead_genes`
-
-#### `run_go(gene_list, ontology="BP", cutoff=0.05)`
+### `run_go`
+
+```python
+run_go(gene_list: List[str], ontology: str = "BP", cutoff: float = 0.05) -> pd.DataFrame
+```
 
 运行 GO 富集分析（便捷方法）。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `gene_list` | `list[str]` | 是 | — | 基因列表 |
-| `ontology` | `str` | 否 | `"BP"` | GO 本体类型（`"BP"` / `"MF"` / `"CC"`） |
-| `cutoff` | `float` | 否 | `0.05` | FDR 阈值 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| gene_list | List[str] | — | 必填，基因列表（gene symbols） |
+| ontology | str | "BP" | GO 本体类型（"BP" / "MF" / "CC"） |
+| cutoff | float | 0.05 | FDR 阈值 |
 
-- **返回值**: `pd.DataFrame`
+**返回值**: `pd.DataFrame` — GO 富集结果（含 Term、Overlap、P-value、Adjusted P-value、Genes）
 
-#### `run_kegg(gene_list, cutoff=0.05)`
+**异常**: `ValueError` — ontology 不是 BP/MF/CC；`RuntimeError` — 分析失败
 
-运行 KEGG 通路富集分析（便捷方法）。
+### `run_kegg`
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `gene_list` | `list[str]` | 是 | — | 基因列表 |
-| `cutoff` | `float` | 否 | `0.05` | FDR 阈值 |
+```python
+run_kegg(gene_list: List[str], cutoff: float = 0.05) -> pd.DataFrame
+```
 
-- **返回值**: `pd.DataFrame`
+运行 KEGG 通路富集分析。
 
-#### `get_top_pathways(results, n=20, sort_by="Adjusted P-value")`
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| gene_list | List[str] | — | 必填，基因列表 |
+| cutoff | float | 0.05 | FDR 阈值 |
+
+**返回值**: `pd.DataFrame` — KEGG 通路富集结果
+
+### `run_gsea`
+
+```python
+run_gsea(ranked_genes: pd.Series, gene_sets: str = "GO_Biological_Process_2023", min_size: int = 15, max_size: int = 500, permutation_num: int = 100) -> pd.DataFrame
+```
+
+运行 GSEA 基因集富集分析。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| ranked_genes | pd.Series | — | 必填，基因排名序列（index=gene symbols, values=ranking metric） |
+| gene_sets | str | "GO_Biological_Process_2023" | 基因集库名称或 .gmt 文件路径 |
+| min_size | int | 15 | 基因集最小大小 |
+| max_size | int | 500 | 基因集最大大小 |
+| permutation_num | int | 100 | 置换次数 |
+
+**返回值**: `pd.DataFrame` — GSEA 结果（含 Term、ES、NES、NOM p-val、FDR q-val、Lead_genes）
+
+**异常**: `RuntimeError` — 分析失败
+
+### `run_enrichr`
+
+```python
+run_enrichr(gene_list: List[str], gene_sets_library: str = "GO_Biological_Process_2023", cutoff: float = 0.05) -> pd.DataFrame
+```
+
+运行 Enrichr 富集分析（Over-Representation Analysis）。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| gene_list | List[str] | — | 必填，基因列表 |
+| gene_sets_library | str | "GO_Biological_Process_2023" | 基因集库名称 |
+| cutoff | float | 0.05 | FDR 阈值 |
+
+**返回值**: `pd.DataFrame` — Enrichr 结果
+
+**异常**: `RuntimeError` — 分析失败
+
+### `get_top_pathways`
+
+```python
+get_top_pathways(results: pd.DataFrame, n: int = 20, sort_by: str = "Adjusted P-value") -> pd.DataFrame
+```
 
 获取 Top N 通路。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `results` | `pd.DataFrame` | 是 | — | 富集结果 DataFrame |
-| `n` | `int` | 否 | `20` | 返回的通路数 |
-| `sort_by` | `str` | 否 | `"Adjusted P-value"` | 排序字段 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| results | pd.DataFrame | — | 必填，富集结果 DataFrame |
+| n | int | 20 | 返回的通路数 |
+| sort_by | str | "Adjusted P-value" | 排序字段 |
 
-- **返回值**: `pd.DataFrame`
+**返回值**: `pd.DataFrame` — 排序后的 Top N 结果
 
-#### `export_results(results, output_path, format="csv")`
+### `export_results`
+
+```python
+export_results(results: pd.DataFrame, output_path: str, format: str = "csv") -> str
+```
 
 导出富集结果。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `results` | `pd.DataFrame` | 是 | — | 富集结果 DataFrame |
-| `output_path` | `str` | 是 | — | 输出文件路径 |
-| `format` | `str` | 否 | `"csv"` | 输出格式（`"csv"` / `"json"` / `"tsv"`） |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| results | pd.DataFrame | — | 必填，富集结果 |
+| output_path | str | — | 必填，输出文件路径 |
+| format | str | "csv" | 输出格式（"csv" / "json" / "tsv"） |
 
-- **返回值**: `str` — 输出文件路径
-- **示例**:
+**返回值**: `str` — 输出文件路径
+
+**异常**: `ValueError` — 不支持的格式
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import PathwayEnrichment
 
 enricher = PathwayEnrichment(organism="human")
-go_results = enricher.run_go(sig_genes["names"].tolist(), ontology="BP")
-top_go = enricher.get_top_pathways(go_results, n=20)
-enricher.export_results(top_go, "/output/go_results.csv", format="csv")
+go_results = enricher.run_go(gene_list=["CD3D", "CD3E", "IL7R"], ontology="BP")
+top_pathways = enricher.get_top_pathways(go_results, n=10)
+enricher.export_results(go_results, "output/go_enrichment.csv")
 ```
-
-**异常**: `ImportError`（gseapy 未安装）、`RuntimeError`（分析失败）、`ValueError`（不支持的格式）
 
 ---
 
-### `BatchCorrector`
+## BatchCorrector
 
-**描述**: 批次效应检测与校正，支持 ComBat 和 Harmony 方法。
+> 批次效应检测与校正，支持 ComBat 和 Harmony 方法。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `batch_key` | `str` | 否 | `"batch"` | `obs` 中批次列名 |
-| `method` | `str` | 否 | `"combat"` | 默认校正方法（`"combat"` 或 `"harmony"`） |
+```python
+BatchCorrector(batch_key: str = "batch", method: str = "combat")
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| batch_key | str | "batch" | obs 中批次列名 |
+| method | str | "combat" | 默认校正方法（"combat" 或 "harmony"） |
 
 **方法**:
 
-#### `detect_batch_effect(adata, n_pcs=50, threshold=0.10)`
+### `detect_batch_effect`
+
+```python
+detect_batch_effect(adata: AnnData, n_pcs: int = 50, threshold: float = 0.10) -> Dict[str, Any]
+```
 
 检测批次效应强度（通过 PCA 上 batch 解释的方差占比）。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `n_pcs` | `int` | 否 | `50` | PCA 主成分数 |
-| `threshold` | `float` | 否 | `0.10` | 批次效应判定阈值（10%） |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| n_pcs | int | 50 | PCA 主成分数 |
+| threshold | float | 0.10 | 批次效应判定阈值（默认 10%） |
 
-- **返回值**: `dict` — 含 `batch_variance_ratio`, `has_batch_effect`, `recommendation`, `pca_variance_explained`, `n_batches`
+**返回值**: `Dict` — 含 `batch_variance_ratio`、`has_batch_effect`、`recommendation`、`pca_variance_explained`、`n_batches`
 
-#### `run_combat(adata, key=None)`
+**异常**: `ValueError` — 批次列不存在或批次数 < 2
+
+### `run_combat`
+
+```python
+run_combat(adata: AnnData, key: Optional[str] = None) -> AnnData
+```
 
 运行 ComBat 批次校正（原地修改 `adata.X`）。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `key` | `str` | 否 | `None` | 要校正的 obs 列名（默认使用 `self.batch_key`） |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| key | Optional[str] | None | 要校正的 obs 列名（默认使用 batch_key） |
 
-- **返回值**: `AnnData`（原地修改并返回）
+**返回值**: `AnnData` — 校正后的数据
 
-#### `run_harmony(adata, basis="X_pca", adjusted_basis="X_pca_harmony")`
+### `run_harmony`
 
-运行 Harmony 批次校正（在 PCA 嵌入空间）。
+```python
+run_harmony(adata: AnnData, basis: str = "X_pca", adjusted_basis: str = "X_pca_harmony") -> AnnData
+```
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `basis` | `str` | 否 | `"X_pca"` | 输入嵌入键名 |
-| `adjusted_basis` | `str` | 否 | `"X_pca_harmony"` | 校正后的嵌入键名 |
+运行 Harmony 批次校正（在 PCA 嵌入空间校正）。
 
-- **返回值**: `AnnData`（新增 `obsm[adjusted_basis]`）
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| basis | str | "X_pca" | 输入嵌入键名 |
+| adjusted_basis | str | "X_pca_harmony" | 校正后的嵌入键名 |
 
-#### `compare_before_after(adata_raw, adata_corrected, n_pcs=50)`
+**返回值**: `AnnData` — 校正后的数据（新增 `obsm[adjusted_basis]`）
+
+**异常**: `ImportError` — harmonypy 未安装
+
+### `compare_before_after`
+
+```python
+compare_before_after(adata_raw: AnnData, adata_corrected: AnnData, n_pcs: int = 50) -> Dict[str, Any]
+```
 
 比较校正前后效果。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata_raw` | `AnnData` | 是 | — | 校正前 AnnData |
-| `adata_corrected` | `AnnData` | 是 | — | 校正后 AnnData |
-| `n_pcs` | `int` | 否 | `50` | PCA 主成分数 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata_raw | AnnData | — | 必填，校正前 AnnData |
+| adata_corrected | AnnData | — | 必填，校正后 AnnData |
+| n_pcs | int | 50 | PCA 主成分数 |
 
-- **返回值**: `dict` — 含 `raw_batch_variance_ratio`, `corrected_batch_variance_ratio`, `improvement`, `raw_per_pc_variance`, `corrected_per_pc_variance`
-- **示例**:
+**返回值**: `Dict` — 含 `raw_batch_variance_ratio`、`corrected_batch_variance_ratio`、`improvement`
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import BatchCorrector
@@ -659,102 +654,115 @@ detection = corrector.detect_batch_effect(adata)
 if detection["has_batch_effect"]:
     adata_corrected = corrector.run_combat(adata)
     comparison = corrector.compare_before_after(adata, adata_corrected)
+    print(f"改善: {comparison['improvement']:.3f}")
 ```
-
-**异常**: `ImportError`（scanpy/harmonypy 未安装）、`ValueError`（批次列不存在或批次数不足）
 
 ---
 
-### `BioQualityGateChecker`
+## BioQualityGateChecker
 
-**描述**: 生信质量门闸检查器，封装 Gate Bio-1.5（数据质量门闸）和 Gate Bio-3.5（分析结果门闸）。
+> 生信质量门闸检查器，封装 Gate Bio-1.5（数据质量）和 Gate Bio-3.5（分析结果）的检查逻辑。
 
-**参数**:
+**签名**:
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `study_id` | `str` | 是 | — | 研究编号 |
-| `project_root` | `str` | 否 | `None` | 项目根目录 |
+```python
+BioQualityGateChecker(study_id: str, project_root: Optional[str] = None)
+```
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| study_id | str | — | 必填，研究编号 |
+| project_root | Optional[str] | None | 项目根目录（可选） |
 
 **方法**:
 
-#### `run_bio_gate_15(adata, sample_info=None, batch_key=None)`
+### `run_bio_gate_15`
+
+```python
+run_bio_gate_15(adata: AnnData, sample_info: Optional[pd.DataFrame] = None, batch_key: Optional[str] = None) -> GateResult
+```
 
 执行 Gate Bio-1.5 全部 5 项检查：Count 矩阵完整性、样本信息一致性、文库大小合理性、基因注释覆盖率、批次效应检测。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `adata` | `AnnData` | 是 | — | AnnData 对象 |
-| `sample_info` | `pd.DataFrame` | 否 | `None` | 样本信息 DataFrame |
-| `batch_key` | `str` | 否 | `None` | 批次列名 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| adata | AnnData | — | 必填，AnnData 对象 |
+| sample_info | Optional[pd.DataFrame] | None | 样本信息 DataFrame（可选） |
+| batch_key | Optional[str] | None | 批次列名（可选） |
 
-- **返回值**: `GateResult` — 判定结果（`PASS` / `CONDITIONAL` / `BLOCKED`）
+**返回值**: `GateResult` — 判定结果（PASS / CONDITIONAL / BLOCKED）
 
-#### `run_bio_gate_35(de_results, enrichment_df=None, visualization_paths=None)`
+### `run_bio_gate_35`
+
+```python
+run_bio_gate_35(de_results: pd.DataFrame, enrichment_df: Optional[pd.DataFrame] = None, visualization_paths: Optional[List[str]] = None) -> GateResult
+```
 
 执行 Gate Bio-3.5 全部 5 项检查：P 值分布合理性、log2FC 与 P 值一致性、多重比较校正、通路富集 FDR、可视化一致性。
 
-| 参数名 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `de_results` | `pd.DataFrame` | 是 | — | 差异表达结果（需含 pvals/pvals_adj 列） |
-| `enrichment_df` | `pd.DataFrame` | 否 | `None` | 通路富集结果 |
-| `visualization_paths` | `list[str]` | 否 | `None` | 可视化文件路径列表 |
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| de_results | pd.DataFrame | — | 必填，差异表达结果（需含 pvals、pvals_adj 列） |
+| enrichment_df | Optional[pd.DataFrame] | None | 通路富集结果（可选） |
+| visualization_paths | Optional[List[str]] | None | 可视化文件路径列表（可选） |
 
-- **返回值**: `GateResult`
-- **示例**:
+**返回值**: `GateResult` — 判定结果
+
+**GateResult 属性**:
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| gate_type | GateType | 门闸类型 |
+| study_id | str | 研究编号 |
+| verdict | GateVerdict | 判定结果（PASS / CONDITIONAL / BLOCKED） |
+| total_items | int | 总检查项数 |
+| passed_items | int | 通过项数 |
+| failed_items | int | 失败项数 |
+| key_items_status | str | 关键项状态 |
+| check_results | List[CheckItemResult] | 各项详细结果 |
+| risks | List[str] | 风险列表 |
+| pass_rate | float | 通过率 |
+
+**示例**:
 
 ```python
 from msra_modules.bioinformatics import BioQualityGateChecker
 
 checker = BioQualityGateChecker(study_id="BIO-2026-001")
-gate_15 = checker.run_bio_gate_15(adata, sample_info=sample_df, batch_key="batch")
-gate_35 = checker.run_bio_gate_35(de_table, enrichment_df=go_results)
-print(gate_15.verdict, gate_35.verdict)
-```
 
-**异常**: `ImportError`（scanpy/scipy 未安装时对应检查项标记为 FAIL/SKIP）
+# Gate Bio-1.5: 数据质量检查
+gate_15 = checker.run_bio_gate_15(adata, batch_key="batch")
+print(f"Bio-1.5 判定: {gate_15.verdict.value}")
+
+# Gate Bio-3.5: 分析结果检查
+gate_35 = checker.run_bio_gate_35(de_table, enrichment_df=go_results)
+print(f"Bio-3.5 判定: {gate_35.verdict.value}")
+print(f"通过率: {gate_35.pass_rate:.1%}")
+```
 
 ---
 
-## 完整使用示例
+## 共享类型参考
 
-```python
-from msra_modules.bioinformatics import (
-    ScRNASeqLoader, SingleCellQC, DimensionalityReduction,
-    DifferentialExpression, PathwayEnrichment, BatchCorrector,
-    BioQualityGateChecker,
-)
+### CheckItemResult
 
-# 1. 加载数据
-loader = ScRNASeqLoader()
-adata = loader.read_10x_mtx("/data/pbmc_10x/")
+> 单个检查项结果。
 
-# 2. 质量控制
-qc = SingleCellQC(min_genes=200, max_genes=5000, max_pct_mito=20.0)
-adata = qc.run_qc(adata)
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| item_id | str | 检查项编号 |
+| name | str | 检查项名称 |
+| is_key | bool | 是否为关键项 |
+| status | str | 状态（PASS / FAIL / N/A / SKIP） |
+| evidence | str | 证据描述 |
+| notes | str | 备注 |
 
-# 3. 批次校正（如有批次信息）
-corrector = BatchCorrector(batch_key="batch")
-detection = corrector.detect_batch_effect(adata)
-if detection["has_batch_effect"]:
-    adata = corrector.run_combat(adata)
+### GateVerdict
 
-# 4. 降维聚类
-dr = DimensionalityReduction(n_pcs=50)
-adata = dr.run_full_pipeline(adata, resolution=1.0)
+> 门闸判定结果枚举。
 
-# 5. 差异表达
-de = DifferentialExpression(method="wilcoxon")
-markers = de.find_markers(adata, groupby="leiden")
-de_table = de.get_de_table(adata, group="0")
-sig_genes = de.filter_de_genes(de_table, log2fc_threshold=1.0, pval_threshold=0.05)
-
-# 6. 通路富集
-enricher = PathwayEnrichment(organism="human")
-go_results = enricher.run_go(sig_genes["names"].tolist(), ontology="BP")
-
-# 7. 质量门闸
-checker = BioQualityGateChecker(study_id="BIO-2026-001")
-gate_15 = checker.run_bio_gate_15(adata)
-gate_35 = checker.run_bio_gate_35(de_table, enrichment_df=go_results)
-```
+| 值 | 说明 |
+|----|------|
+| PASS | 全部通过 |
+| CONDITIONAL | 条件通过（1-2 项未过，非关键项） |
+| BLOCKED | 阻断（3+ 项未过或关键项未过） |

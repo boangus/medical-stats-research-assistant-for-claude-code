@@ -1,671 +1,695 @@
-# MSRA Medical Imaging Module API Reference
+# Medical Imaging Module API Reference
 
-| Field | Value |
-|-------|-------|
-| **Module** | `msra_modules.medical_imaging` |
-| **Version** | 1.2.0 |
-| **Date** | 2026-07-13 |
-| **Status** | Released (v1.0.0) |
-| **Language** | English |
+> **Version**: v1.0.0 | **Date**: 2026-06-26 | **Status**: Stable
+> **Module**: Medical Imaging | **Command**: `/imaging`
 
 ---
 
-## Overview
+## Table of Contents
 
-The Medical Imaging module provides medical image analysis powered by MONAI and SimpleITK, including DICOM/NIfTI/NRRD loading, preprocessing (resampling, normalization, denoising, N4 bias field correction), segmentation (3D U-Net), classification, registration, radiomics feature extraction, feature selection, and quality gate checks.
-
-### Dependencies
-
-- `SimpleITK` — Image loading and processing
-- `nibabel` — NIfTI file reading
-- `MONAI` — Deep learning segmentation
-- `torch` / `torchvision` — Deep learning models
-- `scipy` — Scientific computing
-- `scikit-image` — GLCM texture features
-- `scikit-learn` — PCA, feature selection
-- `matplotlib` — Visualization
+- [load_dicom_series() — DICOM Loading](#load_dicom_series)
+- [load_nifti() — NIfTI Loading](#load_nifti)
+- [load_nrrd() — NRRD Loading](#load_nrrd)
+- [preprocess_image() — Preprocessing](#preprocess_image)
+- [SegmentationPipeline — Segmentation](#segmentationpipeline)
+- [ImageRegistration — Registration](#imageregistration)
+- [RadiomicsExtractor — Radiomics Features](#radiomicsextractor)
+- [FeatureSelector — Feature Selection](#featureselector)
+- [ImagingQualityGateChecker — Quality Gate](#imagingqualitygatechecker)
 
 ---
 
-## Public API
+## load_dicom_series
 
-### `DICOMLoader`
+> Convenience function: load a DICOM series and return numpy array with metadata.
 
-**Description**: DICOM image loader supporting DICOM series loading, metadata extraction, and window level/width adjustment.
+**Signature**:
 
-**Parameters**:
+```python
+load_dicom_series(dicom_dir: str) -> Tuple[np.ndarray, Dict]
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `window_level` | `float` | No | `None` | Window level (HU center) |
-| `window_width` | `float` | No | `None` | Window width (HU range) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| dicom_dir | str | — | Required. DICOM file directory |
 
-**Methods**:
+**Returns**: `Tuple[np.ndarray, Dict]` — (numpy array, metadata dict)
 
-#### `load_dicom_series(dicom_dir)`
-
-Load a DICOM series.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `dicom_dir` | `str` | Yes | — | DICOM file directory |
-
-- **Returns**: `SimpleITK.Image`
-- **Exceptions**: `FileNotFoundError` (directory not found or no DICOM files)
-
-#### `load_dicom(dicom_path)`
-
-Load a single DICOM file.
-
-- **Returns**: `SimpleITK.Image`
-
-#### `to_numpy(image)`
-
-Convert SimpleITK Image to numpy array.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `SimpleITK.Image` | Yes | — | SimpleITK Image |
-
-- **Returns**: `np.ndarray` — (D, H, W) or (H, W)
-
-#### `extract_metadata(image)`
-
-Extract DICOM metadata.
-
-- **Returns**: `dict` — contains `size`, `spacing`, `origin`, `direction`, `pixel_type`, `dimensions`, and DICOM tags (e.g., `patient_name`, `modality`)
-
-#### `apply_window(image, window_level=None, window_width=None)`
-
-Apply window level/width.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `SimpleITK.Image` | Yes | — | Input image |
-| `window_level` | `float` | No | `None` | Window level (defaults to init value) |
-| `window_width` | `float` | No | `None` | Window width (defaults to init value) |
-
-- **Returns**: `SimpleITK.Image`
-
-**Exceptions**: `ImportError` (SimpleITK not installed), `FileNotFoundError`
-
----
-
-### `load_dicom_series(dicom_dir)`
-
-**Description**: Convenience function that loads a DICOM series and returns numpy array and metadata.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `dicom_dir` | `str` | Yes | — | DICOM directory |
-
-- **Returns**: `tuple[np.ndarray, dict]` — (numpy_array, metadata_dict)
-- **Example**:
+**Example**:
 
 ```python
 from msra_modules.medical_imaging import load_dicom_series
 
-array, metadata = load_dicom_series("/data/dicom/")
-print(array.shape, metadata["spacing"])
+array, metadata = load_dicom_series("data/CT_scans/")
+print(f"Image shape: {array.shape}, spacing: {metadata['spacing']}")
 ```
 
----
-
-### `load_nifti(nifti_path)`
-
-**Description**: Convenience function that loads a NIfTI file (`.nii` / `.nii.gz`) using nibabel.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `nifti_path` | `str` | Yes | — | NIfTI file path |
-
-- **Returns**: `tuple[np.ndarray, dict]` — (numpy_array, metadata_dict), metadata contains `size`, `spacing`, `dtype`, `dimensions`, `affine`, `sform`, `qform`
-- **Exceptions**: `ImportError` (nibabel not installed), `FileNotFoundError`
+**Exceptions**: `FileNotFoundError` — directory not found or no DICOM files; `ImportError` — SimpleITK not installed
 
 ---
 
-### `load_nrrd(nrrd_path)`
+## load_nifti
 
-**Description**: Convenience function that loads a NRRD file using SimpleITK.
+> Convenience function: load a NIfTI file (.nii / .nii.gz) and return numpy array with metadata.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `nrrd_path` | `str` | Yes | — | NRRD file path |
-
-- **Returns**: `tuple[np.ndarray, dict]` — (numpy_array, metadata_dict)
-- **Exceptions**: `ImportError` (SimpleITK not installed), `FileNotFoundError`
-
----
-
-### `ImagePreprocessor`
-
-**Description**: Medical image preprocessor supporting resampling, intensity normalization, denoising, and N4 bias field correction.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `target_spacing` | `tuple[float, float, float]` | No | `None` | Target voxel spacing (x, y, z) |
-| `normalize` | `bool` | No | `True` | Whether to normalize to [0, 1] |
-
-**Methods**:
-
-#### `resample(image, target_spacing=None)`
-
-Resample image to target spacing.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `SimpleITK.Image` | Yes | — | Input image |
-| `target_spacing` | `tuple` | No | `None` | Target spacing (overrides default) |
-
-- **Returns**: `SimpleITK.Image`
-
-#### `normalize_intensity(image, method="min_max")`
-
-Normalize image intensity.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `SimpleITK.Image` | Yes | — | Input image |
-| `method` | `str` | No | `"min_max"` | Method (`"min_max"` or `"z_score"`) |
-
-- **Returns**: `SimpleITK.Image`
-
-#### `denoise(image, method="curvature_flow")`
-
-Denoise image.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `SimpleITK.Image` | Yes | — | Input image |
-| `method` | `str` | No | `"curvature_flow"` | Denoise method (`"curvature_flow"` or `"median"`) |
-
-- **Returns**: `SimpleITK.Image`
-
-#### `bias_correction(image)`
-
-N4 bias field correction.
-
-- **Returns**: `SimpleITK.Image`
-
-#### `preprocess_pipeline(image)`
-
-Complete preprocessing pipeline (resample -> denoise -> normalize).
-
-- **Returns**: `SimpleITK.Image`
-- **Example**:
+**Signature**:
 
 ```python
-from msra_modules.medical_imaging import ImagePreprocessor, load_nifti
-
-array, meta = load_nifti("/data/scan.nii.gz")
-preprocessor = ImagePreprocessor(target_spacing=(1.0, 1.0, 1.0), normalize=True)
-# Note: preprocess_pipeline accepts SimpleITK.Image
+load_nifti(nifti_path: str) -> Tuple[np.ndarray, Dict]
 ```
 
-**Exceptions**: `ImportError` (SimpleITK not installed), `ValueError` (unknown method)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| nifti_path | str | — | Required. NIfTI file path |
+
+**Returns**: `Tuple[np.ndarray, Dict]` — (numpy array, metadata dict with size, spacing, dtype, dimensions, affine)
+
+**Exceptions**: `ImportError` — nibabel not installed; `FileNotFoundError` — file not found
 
 ---
 
-### `normalize_intensity(array, method="min_max")`
+## load_nrrd
 
-**Description**: Convenience function that normalizes numpy array intensity.
+> Convenience function: load a NRRD file and return numpy array with metadata.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `array` | `np.ndarray` | Yes | — | Input array |
-| `method` | `str` | No | `"min_max"` | Method (`"min_max"` or `"z_score"`) |
+**Signature**:
 
-- **Returns**: `np.ndarray`
+```python
+load_nrrd(nrrd_path: str) -> Tuple[np.ndarray, Dict]
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| nrrd_path | str | — | Required. NRRD file path |
+
+**Returns**: `Tuple[np.ndarray, Dict]` — (numpy array, metadata dict with size, spacing, origin, direction, pixel_type, dimensions)
+
+**Exceptions**: `ImportError` — SimpleITK not installed; `FileNotFoundError` — file not found
 
 ---
 
-### `SegmentationPipeline`
+## preprocess_image
 
-**Description**: Image segmentation pipeline based on MONAI 3D U-Net pretrained models.
+> Convenience function: normalize numpy array intensity (supports min_max and z_score methods).
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `model_name` | `str` | No | `"spleen_ct"` | MONAI pretrained model name |
-| `device` | `str` | No | `"cpu"` | Compute device (`"cpu"` or `"cuda"`) |
+```python
+normalize_intensity(array: np.ndarray, method: str = "min_max") -> np.ndarray
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| array | np.ndarray | — | Required. Input array |
+| method | str | "min_max" | Normalization method ("min_max" or "z_score") |
+
+**Returns**: `np.ndarray` — Normalized array
+
+**Exceptions**: `ValueError` — unknown method
+
+### DICOMLoader Class
+
+For finer-grained control, use the `DICOMLoader` class:
+
+```python
+from msra_modules.medical_imaging import DICOMLoader
+
+loader = DICOMLoader(window_level=40, window_width=400)
+image = loader.load_dicom_series("data/CT_scans/")
+array = loader.to_numpy(image)
+metadata = loader.extract_metadata(image)
+windowed = loader.apply_window(image)
+```
+
+**DICOMLoader Signature**:
+
+```python
+DICOMLoader(window_level: Optional[float] = None, window_width: Optional[float] = None)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| window_level | Optional[float] | None | Window level (HU center) |
+| window_width | Optional[float] | None | Window width (HU range) |
+
+### ImagePreprocessor Class
+
+```python
+from msra_modules.medical_imaging import ImagePreprocessor
+
+preprocessor = ImagePreprocessor(target_spacing=(1.0, 1.0, 1.0), normalize=True)
+processed = preprocessor.preprocess_pipeline(image)
+```
+
+**ImagePreprocessor Signature**:
+
+```python
+ImagePreprocessor(target_spacing: Optional[Tuple[float, float, float]] = None, normalize: bool = True)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| target_spacing | Optional[Tuple[float, float, float]] | None | Target voxel spacing (x, y, z) |
+| normalize | bool | True | Whether to normalize to [0, 1] |
+
+**Methods**: `resample()`, `normalize_intensity()`, `denoise()`, `bias_correction()`, `preprocess_pipeline()`
+
+---
+
+## SegmentationPipeline
+
+> Image segmentation pipeline based on MONAI's 3D U-Net model.
+
+**Signature**:
+
+```python
+SegmentationPipeline(model_name: str = "spleen_ct", device: str = "cpu")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| model_name | str | "spleen_ct" | MONAI pretrained model name |
+| device | str | "cpu" | Compute device ("cpu" or "cuda") |
 
 **Methods**:
 
-#### `preprocess(image)`
+### `segment`
 
-Preprocess image (normalize + add channel dimension).
+```python
+segment(image: np.ndarray) -> np.ndarray
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Input image (D, H, W) |
+Execute segmentation.
 
-- **Returns**: `np.ndarray` — (1, D, H, W) float32
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image | np.ndarray | — | Required. Input image (D, H, W) or (1, D, H, W) |
 
-#### `segment(image)`
+**Returns**: `np.ndarray` — Segmentation mask (D, H, W)
 
-Perform segmentation.
+**Exceptions**: `ImportError` — MONAI not installed
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Input image (D, H, W) or (1, D, H, W) |
+### `segment_with_confidence`
 
-- **Returns**: `np.ndarray` — segmentation mask (D, H, W)
-
-#### `segment_with_confidence(image)`
+```python
+segment_with_confidence(image: np.ndarray) -> Tuple[np.ndarray, np.ndarray]
+```
 
 Segment and return confidence map.
 
-- **Returns**: `tuple[np.ndarray, np.ndarray]` — (segmentation mask, confidence map)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image | np.ndarray | — | Required. Input image |
 
-- **Example**:
+**Returns**: `Tuple[np.ndarray, np.ndarray]` — (segmentation mask, confidence map)
+
+### `preprocess`
+
+```python
+preprocess(image: np.ndarray) -> np.ndarray
+```
+
+Preprocess image (normalize + add channel dimension).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image | np.ndarray | — | Required. Input image (D, H, W) |
+
+**Returns**: `np.ndarray` — Preprocessed image (1, D, H, W)
+
+**Example**:
 
 ```python
 from msra_modules.medical_imaging import SegmentationPipeline
 
-pipeline = SegmentationPipeline(model_name="spleen_ct", device="cpu")
-mask = pipeline.segment(image_array)
-mask, confidence = pipeline.segment_with_confidence(image_array)
+seg = SegmentationPipeline(model_name="spleen_ct", device="cuda")
+mask = seg.segment(image_array)
+mask, confidence = seg.segment_with_confidence(image_array)
 ```
 
-**Exceptions**: `ImportError` (MONAI/torch not installed)
-
 ---
 
-### `ClassificationPipeline`
+## ImageRegistration
 
-**Description**: Image classification pipeline supporting ResNet18 / DenseNet121.
+> Medical image registration supporting rigid, affine, and bspline transformation methods.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `model_name` | `str` | No | `"resnet18"` | Model name |
-| `num_classes` | `int` | No | `2` | Number of classes |
-| `device` | `str` | No | `"cpu"` | Compute device |
+```python
+ImageRegistration(method: str = "rigid")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| method | str | "rigid" | Registration method ("rigid", "affine", "bspline") |
 
 **Methods**:
 
-#### `classify(image)`
+### `register`
 
-Perform classification.
+```python
+register(fixed_image, moving_image, fixed_mask=None, moving_mask=None) -> Dict
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Input image (D, H, W) or (H, W, C) |
+Execute registration.
 
-- **Returns**: `dict` — contains `prediction` (int), `confidence` (float), `probabilities` (list)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| fixed_image | SimpleITK.Image | — | Required. Fixed image |
+| moving_image | SimpleITK.Image | — | Required. Moving image |
+| fixed_mask | SimpleITK.Image | None | Fixed image mask (optional) |
+| moving_mask | SimpleITK.Image | None | Moving image mask (optional) |
 
-**Exceptions**: `ImportError` (PyTorch not installed)
+**Returns**: `Dict` — Contains `transform`, `resampled_image`, `metric_value`, `iterations`, `method`
+
+**Exceptions**: `ValueError` — unknown method
+
+### `evaluate`
+
+```python
+evaluate(fixed_image, moving_image, mask=None) -> Dict
+```
+
+Evaluate registration quality.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| fixed_image | SimpleITK.Image | — | Required. Fixed image |
+| moving_image | SimpleITK.Image | — | Required. Moving image |
+| mask | SimpleITK.Image | None | Evaluation region mask (optional) |
+
+**Returns**: `Dict` — Contains `mse`, `mae`, `correlation`, `ssim`
+
+**Example**:
+
+```python
+from msra_modules.medical_imaging import ImageRegistration
+
+reg = ImageRegistration(method="rigid")
+result = reg.register(fixed_img, moving_img)
+print(f"Metric: {result['metric_value']:.4f}, iterations: {result['iterations']}")
+
+metrics = reg.evaluate(fixed_img, result["resampled_image"])
+print(f"MSE: {metrics['mse']:.4f}, SSIM: {metrics['ssim']:.4f}")
+```
 
 ---
 
-### `RadiomicsExtractor`
+## RadiomicsExtractor
 
-**Description**: Radiomics feature extractor for shape, first-order statistics, and texture (GLCM) features, with v1 schema export support.
+> Radiomics feature extractor for shape, first-order statistics, and texture features.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `bin_width` | `float` | No | `25.0` | Grayscale histogram bin width |
+```python
+RadiomicsExtractor(bin_width: float = 25.0)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| bin_width | float | 25.0 | Gray-level histogram bin width |
 
 **Methods**:
 
-#### `extract_shape_features(mask)`
+### `extract_shape_features`
 
-Extract shape features.
+```python
+extract_shape_features(mask: np.ndarray) -> Dict[str, float]
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `mask` | `np.ndarray` | Yes | — | Segmentation mask (binary) |
+Extract shape features (volume, surface area, max 3D diameter, axis lengths, sphericity).
 
-- **Returns**: `dict[str, float]` — contains `VoxelVolume`, `SurfaceArea`, `Maximum3DDiameter`, `MajorAxisLength`, `MinorAxisLength`, `LeastAxisLength`, `Sphericity`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| mask | np.ndarray | — | Required. Segmentation mask (binary) |
 
-#### `extract_firstorder_features(image, mask)`
+**Returns**: `Dict[str, float]` — Shape features (VoxelVolume, SurfaceArea, Maximum3DDiameter, MajorAxisLength, MinorAxisLength, LeastAxisLength, Sphericity)
 
-Extract first-order statistical features.
+### `extract_firstorder_features`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Image data |
-| `mask` | `np.ndarray` | Yes | — | Segmentation mask |
+```python
+extract_firstorder_features(image: np.ndarray, mask: np.ndarray) -> Dict[str, float]
+```
 
-- **Returns**: `dict[str, float]` — contains `Mean`, `Median`, `Std`, `Variance`, `Minimum`, `Maximum`, `Range`, `Percentile10/25/75/90`, `IQR`, `Skewness`, `Kurtosis`, `Energy`, `Entropy`, `RootMeanSquared`, `MeanAbsoluteDeviation`
+Extract first-order statistics features (mean, median, std, skewness, kurtosis, energy, entropy).
 
-#### `extract_texture_features(image, mask)`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image | np.ndarray | — | Required. Image data |
+| mask | np.ndarray | — | Required. Segmentation mask |
+
+**Returns**: `Dict[str, float]` — First-order features (Mean, Median, Std, Variance, Minimum, Maximum, Range, Percentile10/25/75/90, IQR, Skewness, Kurtosis, Energy, Entropy, RootMeanSquared, MeanAbsoluteDeviation)
+
+### `extract_texture_features`
+
+```python
+extract_texture_features(image: np.ndarray, mask: np.ndarray) -> Dict[str, float]
+```
 
 Extract texture features (simplified GLCM).
 
-- **Returns**: `dict[str, float]` — contains `GLCM_Contrast`, `GLCM_Dissimilarity`, `GLCM_Homogeneity`, `GLCM_Energy`, `GLCM_Correlation`, `GLCM_ASM`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image | np.ndarray | — | Required. Image data |
+| mask | np.ndarray | — | Required. Segmentation mask |
 
-#### `extract_all(image, mask)`
+**Returns**: `Dict[str, float]` — Texture features (GLCM_Contrast, GLCM_Dissimilarity, GLCM_Homogeneity, GLCM_Energy, GLCM_Correlation, GLCM_ASM)
+
+### `extract_all`
+
+```python
+extract_all(image: np.ndarray, mask: np.ndarray) -> Dict[str, Dict[str, float]]
+```
 
 Extract all radiomics features.
 
-- **Returns**: `dict[str, dict[str, float]]` — contains `shape`, `firstorder`, `texture` feature categories
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image | np.ndarray | — | Required. Image data |
+| mask | np.ndarray | — | Required. Segmentation mask |
 
-#### `to_dataframe(features)`
+**Returns**: `Dict[str, Dict[str, float]]` — All features (contains "shape", "firstorder", "texture" categories)
+
+### `to_dataframe`
+
+```python
+to_dataframe(features: Dict) -> pd.DataFrame
+```
 
 Convert to DataFrame format.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `features` | `dict` | Yes | — | Feature dict (output of `extract_all`) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features | Dict | — | Required. Features dict (output of extract_all) |
 
-- **Returns**: `pd.DataFrame` — columns: `feature_class`, `feature_name`, `value`
+**Returns**: `pd.DataFrame` — With feature_class, feature_name, value columns
 
-#### `export_v1_schema(features, output_dir)`
+### `export_v1_schema`
 
-Export `msra/imaging_features/v1` standard format, outputs two files:
-- `feature_matrix.csv`: sample_id + all feature columns
-- `feature_metadata.csv`: feature_name, class, description
+```python
+export_v1_schema(features: Dict, output_dir: str) -> Dict[str, str]
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `features` | `dict` | Yes | — | Feature dict (output of `extract_all`) |
-| `output_dir` | `str` | Yes | — | Output directory |
+Export msra/imaging_features/v1 standard format (feature_matrix.csv + feature_metadata.csv).
 
-- **Returns**: `dict[str, str]` — contains `feature_matrix`, `feature_metadata`, `schema_version` (`"msra/imaging_features/v1"`)
-- **Example**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features | Dict | — | Required. Features dict (output of extract_all) |
+| output_dir | str | — | Required. Output directory |
+
+**Returns**: `Dict[str, str]` — File path mapping (feature_matrix, feature_metadata, schema_version)
+
+**Example**:
 
 ```python
 from msra_modules.medical_imaging import RadiomicsExtractor
 
 extractor = RadiomicsExtractor(bin_width=25.0)
 features = extractor.extract_all(image_array, mask_array)
-paths = extractor.export_v1_schema(features, "/output/radiomics/")
+print(f"Total features: {sum(len(v) for v in features.values())}")
+
+df = extractor.to_dataframe(features)
+extractor.export_v1_schema(features, "output/radiomics/")
 ```
 
 ---
 
-### `ImagingVisualizer`
+## FeatureSelector
 
-**Description**: Image visualization tool supporting slice plotting, multi-slice views, and 3D volume rendering.
+> Radiomics feature selector supporting 7 methods: variance threshold, K-best, mutual info, RFE, and correlation filter.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `figsize` | `tuple` | No | `(12, 8)` | Figure size |
-| `dpi` | `int` | No | `100` | Resolution |
-
-**Methods**:
-
-#### `plot_slice(image, mask=None, slice_idx=None, title="", save_path=None)`
-
-Plot a single slice (original + mask + overlay).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Image data (D, H, W) |
-| `mask` | `np.ndarray` | No | `None` | Segmentation mask |
-| `slice_idx` | `int` | No | `None` | Slice index (defaults to middle) |
-| `title` | `str` | No | `""` | Title |
-| `save_path` | `str` | No | `None` | Save path |
-
-- **Returns**: `matplotlib.figure.Figure`
-
-#### `plot_multi_slice(image, mask=None, num_slices=4, title="", save_path=None)`
-
-Plot multiple slices.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Image data |
-| `mask` | `np.ndarray` | No | `None` | Segmentation mask |
-| `num_slices` | `int` | No | `4` | Number of slices |
-| `title` | `str` | No | `""` | Title |
-| `save_path` | `str` | No | `None` | Save path |
-
-- **Returns**: `matplotlib.figure.Figure`
-
-#### `plot_3d_volume(image, mask=None, threshold=None, title="3D Volume Rendering", save_path=None)`
-
-3D volume rendering.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Image data |
-| `mask` | `np.ndarray` | No | `None` | Segmentation mask |
-| `threshold` | `float` | No | `None` | Threshold (defaults to 90th percentile) |
-| `title` | `str` | No | `"3D Volume Rendering"` | Title |
-| `save_path` | `str` | No | `None` | Save path |
-
-- **Returns**: `matplotlib.figure.Figure`
-
----
-
-### `ImageRegistration`
-
-**Description**: Medical image registration supporting rigid, affine, and B-spline transforms.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `method` | `str` | No | `"rigid"` | Registration method (`"rigid"`, `"affine"`, `"bspline"`) |
+```python
+FeatureSelector()
+```
 
 **Methods**:
 
-#### `register(fixed_image, moving_image, fixed_mask=None, moving_mask=None)`
+### `select`
 
-Perform registration.
+```python
+select(features_df: pd.DataFrame, labels: Optional[np.ndarray] = None, method: str = "auto", n_features: int = 20) -> pd.DataFrame
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `fixed_image` | `SimpleITK.Image` | Yes | — | Fixed image |
-| `moving_image` | `SimpleITK.Image` | Yes | — | Moving image |
-| `fixed_mask` | `SimpleITK.Image` | No | `None` | Fixed image mask |
-| `moving_mask` | `SimpleITK.Image` | No | `None` | Moving image mask |
+Execute feature selection.
 
-- **Returns**: `dict` — contains `transform`, `resampled_image`, `metric_value`, `iterations`, `method`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame (rows=samples, cols=features) |
+| labels | Optional[np.ndarray] | None | Labels array (optional, for supervised methods) |
+| method | str | "auto" | Selection method ("auto", "variance", "k_best", "mutual_info", "rfe", "correlation") |
+| n_features | int | 20 | Desired number of features to keep |
 
-#### `evaluate(fixed_image, moving_image, mask=None)`
+**Returns**: `pd.DataFrame` — Selected features DataFrame
 
-Evaluate registration quality.
+**Exceptions**: `ValueError` — supervised method without labels, or unknown method
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `fixed_image` | `SimpleITK.Image` | Yes | — | Fixed image |
-| `moving_image` | `SimpleITK.Image` | Yes | — | Moving image |
-| `mask` | `SimpleITK.Image` | No | `None` | Evaluation region mask |
+### `variance_threshold`
 
-- **Returns**: `dict` — contains `mse`, `mae`, `correlation`, `ssim`
+```python
+variance_threshold(features_df: pd.DataFrame, threshold: float = 0.01) -> pd.DataFrame
+```
 
-**Exceptions**: `ImportError` (SimpleITK not installed), `ValueError` (unknown method)
+Variance threshold filtering (remove features with variance below threshold).
 
----
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame |
+| threshold | float | 0.01 | Variance threshold |
 
-### `ImageClassifier`
+**Returns**: `pd.DataFrame` — Filtered features DataFrame
 
-**Description**: Image classifier supporting ResNet18 / DenseNet121.
+### `k_best`
 
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `model_type` | `str` | No | `"resnet18"` | Model type |
-| `num_classes` | `int` | No | `2` | Number of classes |
-| `device` | `str` | No | `"cpu"` | Compute device |
-
-**Methods**:
-
-#### `classify(image)`
-
-Perform classification.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image` | `np.ndarray` | Yes | — | Input image |
-
-- **Returns**: `dict` — contains `prediction` (int), `confidence` (float), `probabilities` (list)
-
-**Exceptions**: `ImportError` (PyTorch not installed), `ValueError` (unknown model)
-
----
-
-### `FeatureSelector`
-
-**Description**: Radiomics feature selector supporting 7 selection methods. Unsupervised: auto-uses variance_threshold + correlation_filter; supervised: all methods available.
-
-**Parameters**: None.
-
-**Methods**:
-
-#### `select(features_df, labels=None, method="auto", n_features=20)`
-
-Execute feature selection (unified entry point).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `features_df` | `pd.DataFrame` | Yes | — | Feature DataFrame (rows=samples, cols=features) |
-| `labels` | `np.ndarray` | No | `None` | Label array (for supervised methods) |
-| `method` | `str` | No | `"auto"` | Method (`"auto"`, `"variance"`, `"k_best"`, `"mutual_info"`, `"rfe"`, `"correlation"`) |
-| `n_features` | `int` | No | `20` | Desired number of features to retain |
-
-- **Returns**: `pd.DataFrame` — selected feature DataFrame
-
-#### `variance_threshold(features_df, threshold=0.01)`
-
-Variance threshold filtering.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `features_df` | `pd.DataFrame` | Yes | — | Feature DataFrame |
-| `threshold` | `float` | No | `0.01` | Variance threshold |
-
-- **Returns**: `pd.DataFrame`
-
-#### `k_best(features_df, labels, k=20)`
+```python
+k_best(features_df: pd.DataFrame, labels: np.ndarray, k: int = 20) -> pd.DataFrame
+```
 
 K-best feature selection (F-test).
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `features_df` | `pd.DataFrame` | Yes | — | Feature DataFrame |
-| `labels` | `np.ndarray` | Yes | — | Label array |
-| `k` | `int` | No | `20` | Number of features to select |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame |
+| labels | np.ndarray | — | Required. Labels array |
+| k | int | 20 | Number of features to select |
 
-- **Returns**: `pd.DataFrame`
+**Returns**: `pd.DataFrame` — Selected features DataFrame
 
-#### `mutual_info(features_df, labels, k=20)`
+### `mutual_info`
+
+```python
+mutual_info(features_df: pd.DataFrame, labels: np.ndarray, k: int = 20) -> pd.DataFrame
+```
 
 Mutual information feature selection.
 
-- **Returns**: `pd.DataFrame`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame |
+| labels | np.ndarray | — | Required. Labels array |
+| k | int | 20 | Number of features to select |
 
-#### `rfe(features_df, labels, n_features=20)`
+**Returns**: `pd.DataFrame` — Selected features DataFrame
 
-Recursive feature elimination (RFE, based on RandomForest).
+### `rfe`
 
-- **Returns**: `pd.DataFrame`
+```python
+rfe(features_df: pd.DataFrame, labels: np.ndarray, n_features: int = 20) -> pd.DataFrame
+```
 
-#### `correlation_filter(features_df, threshold=0.95)`
+Recursive feature elimination (RFE + RandomForest).
 
-High correlation filtering.
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame |
+| labels | np.ndarray | — | Required. Labels array |
+| n_features | int | 20 | Desired number of features to keep |
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `features_df` | `pd.DataFrame` | Yes | — | Feature DataFrame |
-| `threshold` | `float` | No | `0.95` | Correlation coefficient threshold |
+**Returns**: `pd.DataFrame` — Selected features DataFrame
 
-- **Returns**: `pd.DataFrame`
+### `correlation_filter`
 
-#### `auto_select(features_df, labels=None, n_features=20)`
+```python
+correlation_filter(features_df: pd.DataFrame, threshold: float = 0.95) -> pd.DataFrame
+```
 
-Automatic selection pipeline. Unsupervised: variance_threshold -> correlation_filter; Supervised: variance_threshold -> correlation_filter -> mutual_info/k_best.
+High correlation filtering (remove highly correlated features).
 
-- **Returns**: `pd.DataFrame`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame |
+| threshold | float | 0.95 | Correlation coefficient threshold |
 
-#### `get_selected_feature_names()`
+**Returns**: `pd.DataFrame` — Filtered features DataFrame
 
-Get the feature names from the most recent selection.
+### `auto_select`
 
-- **Returns**: `list[str]`
-- **Example**:
+```python
+auto_select(features_df: pd.DataFrame, labels: Optional[np.ndarray] = None, n_features: int = 20) -> pd.DataFrame
+```
+
+Auto selection pipeline (unsupervised: variance → correlation; supervised: variance → correlation → k_best/mutual_info).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| features_df | pd.DataFrame | — | Required. Feature DataFrame |
+| labels | Optional[np.ndarray] | None | Labels array (optional) |
+| n_features | int | 20 | Desired number of features to keep |
+
+**Returns**: `pd.DataFrame` — Selected features DataFrame
+
+### `get_selected_feature_names`
+
+```python
+get_selected_feature_names() -> List[str]
+```
+
+Get feature names from the most recent selection.
+
+**Returns**: `List[str]` — Selected feature names
+
+**Example**:
 
 ```python
 from msra_modules.medical_imaging import FeatureSelector
 
 selector = FeatureSelector()
+
 # Unsupervised
-selected = selector.select(features_df, labels=None, method="auto", n_features=20)
+selected = selector.select(features_df, method="auto", n_features=20)
+
 # Supervised
 selected = selector.select(features_df, labels=labels, method="auto", n_features=20)
-print(selector.get_selected_feature_names())
+print(f"Selected: {selector.get_selected_feature_names()}")
 ```
-
-**Exceptions**: `ValueError` (supervised method missing labels, unknown method)
 
 ---
 
-### `ImagingQualityGateChecker`
+## ImagingQualityGateChecker
 
-**Description**: Imaging quality gate checker implementing Gate IMG-1 (data quality gate).
+> Imaging quality gate checker encapsulating Gate IMG-1 check logic.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `study_id` | `str` | Yes | — | Study ID |
-| `project_root` | `str` | No | `None` | Project root directory |
+```python
+ImagingQualityGateChecker(study_id: str, project_root: Optional[str] = None)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| study_id | str | — | Required. Study ID |
+| project_root | Optional[str] | None | Project root directory (optional) |
 
 **Methods**:
 
-#### `run_gate_img1(image_path, mask_path=None)`
+### `run_gate_img1`
 
-Execute Gate IMG-1 with all 4 checks: file readability, voxel spacing validity, ROI mask dimension match, image quality (SNR + NaN/Inf).
+```python
+run_gate_img1(image_path: str, mask_path: Optional[str] = None) -> GateResult
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `image_path` | `str` | Yes | — | Image file path (DICOM/NIfTI/NRRD) |
-| `mask_path` | `str` | No | `None` | ROI mask file path |
+Execute Gate IMG-1 with 4 checks: file readability, voxel spacing, ROI mask dimension match, image quality (SNR + NaN/Inf).
 
-- **Returns**: `GateResult` — verdict (`PASS` / `CONDITIONAL` / `BLOCKED`)
-- **Example**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image_path | str | — | Required. Image file path (DICOM/NIfTI/NRRD) |
+| mask_path | Optional[str] | None | ROI mask file path (optional) |
+
+**Returns**: `GateResult` — Verdict (PASS / CONDITIONAL / BLOCKED)
+
+### `check_file_readable`
+
+```python
+check_file_readable(file_path: str) -> CheckItemResult
+```
+
+Public interface: check file readability.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| file_path | str | — | Required. File path |
+
+**Returns**: `CheckItemResult`
+
+### `check_voxel_spacing`
+
+```python
+check_voxel_spacing(image_metadata: Dict[str, Any], min_spacing: float = 0.5, max_spacing: float = 5.0) -> CheckItemResult
+```
+
+Public interface: check voxel spacing validity.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image_metadata | Dict[str, Any] | — | Required. Image metadata (must contain spacing field) |
+| min_spacing | float | 0.5 | Minimum allowed spacing (mm) |
+| max_spacing | float | 5.0 | Maximum allowed spacing (mm) |
+
+**Returns**: `CheckItemResult`
+
+### `check_roi_match`
+
+```python
+check_roi_match(image_data: np.ndarray, mask_path: str) -> CheckItemResult
+```
+
+Public interface: check ROI mask dimension match with image.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image_data | np.ndarray | — | Required. Image numpy array |
+| mask_path | str | — | Required. Mask file path |
+
+**Returns**: `CheckItemResult`
+
+### `check_image_quality`
+
+```python
+check_image_quality(image_data: np.ndarray) -> CheckItemResult
+```
+
+Public interface: check image quality (SNR + NaN/Inf).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| image_data | np.ndarray | — | Required. Image numpy array |
+
+**Returns**: `CheckItemResult`
+
+**Example**:
 
 ```python
 from msra_modules.medical_imaging import ImagingQualityGateChecker
 
 checker = ImagingQualityGateChecker(study_id="IMG-2026-001")
-result = checker.run_gate_img1(
-    image_path="/data/scan.nii.gz",
-    mask_path="/data/mask.nii.gz"
+gate_result = checker.run_gate_img1(
+    image_path="data/scan.nii.gz",
+    mask_path="data/mask.nii.gz"
 )
-print(result.verdict)
+print(f"IMG-1 verdict: {gate_result.verdict.value}")
+print(f"Pass rate: {gate_result.pass_rate:.1%}")
 ```
-
-**Exceptions**: `ImportError` (SimpleITK/nibabel not installed — corresponding check items marked as FAIL)
 
 ---
 
-## Full Usage Example
+## Shared Types Reference
 
-```python
-from msra_modules.medical_imaging import (
-    load_nifti, ImagePreprocessor, RadiomicsExtractor,
-    FeatureSelector, ImagingQualityGateChecker,
-)
-import SimpleITK as sitk
+### CheckItemResult
 
-# 1. Load image
-array, metadata = load_nifti("/data/scan.nii.gz")
+| Property | Type | Description |
+|----------|------|-------------|
+| item_id | str | Check item ID |
+| name | str | Check item name |
+| is_key | bool | Whether it is a key item |
+| status | str | Status (PASS / FAIL / N/A / SKIP) |
+| evidence | str | Evidence description |
+| notes | str | Notes |
 
-# 2. Quality gate
-checker = ImagingQualityGateChecker(study_id="IMG-2026-001")
-gate_result = checker.run_gate_img1("/data/scan.nii.gz", "/data/mask.nii.gz")
+### GateVerdict
 
-# 3. Feature extraction
-extractor = RadiomicsExtractor(bin_width=25.0)
-features = extractor.extract_all(array, mask_array)
-
-# 4. Export v1 schema
-paths = extractor.export_v1_schema(features, "/output/radiomics/")
-
-# 5. Feature selection (multi-sample scenario)
-selector = FeatureSelector()
-selected = selector.select(features_df, labels=labels, method="auto", n_features=20)
-```
+| Value | Description |
+|-------|-------------|
+| PASS | All passed |
+| CONDITIONAL | Conditional pass |
+| BLOCKED | Blocked |

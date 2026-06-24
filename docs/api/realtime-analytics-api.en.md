@@ -1,810 +1,947 @@
-# MSRA Realtime Analytics Module API Reference
+# Realtime Analytics Module API Reference
 
-| Field | Value |
-|-------|-------|
-| **Module** | `msra_modules.realtime_analytics` |
-| **Version** | 1.2.0 |
-| **Date** | 2026-07-13 |
-| **Status** | Released (v1.0.0) |
-| **Language** | English |
+> **Version**: v1.0.0 | **Date**: 2026-06-26 | **Status**: Stable
+> **Module**: Realtime Analytics | **Command**: `/realtime`
 
 ---
 
-## Overview
+## Table of Contents
 
-The Realtime Analytics module provides real-time stream processing, anomaly detection, alert notification, and dashboard functionality. It supports multiple data sources including simulator, Redis, Kafka, and CSV, suitable for real-time vital signs monitoring scenarios.
-
-### Dependencies
-
-- `numpy` — Numerical computing
-- `scikit-learn` — Isolation Forest anomaly detection
-- `kafka-python` — Kafka consumer/producer (optional)
-- `streamlit` / `plotly` — Real-time dashboard (optional)
-- `matplotlib` — Visualization
+- [StreamProcessor — Stream Processor](#streamprocessor)
+- [AnomalyDetector — Anomaly Detector](#anomalydetector)
+- [DetectionResult — Detection Result](#detectionresult)
+- [MultivariateDetector — Multivariate Detector](#multivariatedetector)
+- [AlertSystem — Alert System](#alertsystem)
+- [Alert — Alert Data Class](#alert)
+- [RealtimeDashboard — Dashboard](#realtimedashboard)
+- [VitalSignsSimulator — Vital Signs Simulator](#vitalsignssimulator)
+- [RealtimeQualityGateChecker — Quality Gate](#realtimequalitygatechecker)
 
 ---
 
-## Public API
+## StreamProcessor
 
-### `StreamProcessor`
+> Stream processor providing sliding window statistics, Kafka consumption, event processing, and aggregation.
 
-**Description**: Stream data processor supporting sliding window statistics, Kafka consumption, event processing, and aggregation.
+**Signature**:
 
-**Parameters**:
+```python
+StreamProcessor(window_size: int = 60, kafka_bootstrap_servers: str = "localhost:9092")
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `window_size` | `int` | No | `60` | Sliding window size (seconds) |
-| `kafka_bootstrap_servers` | `str` | No | `"localhost:9092"` | Kafka server address |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| window_size | int | 60 | Sliding window size (seconds) |
+| kafka_bootstrap_servers | str | "localhost:9092" | Kafka server address |
 
 **Methods**:
 
-#### `register_metric(name, window_size=None)`
+### `register_metric`
+
+```python
+register_metric(name: str, window_size: Optional[int] = None)
+```
 
 Register a monitoring metric.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `name` | `str` | Yes | — | Metric name |
-| `window_size` | `int` | No | `None` | Window size (overrides default) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| name | str | — | Required. Metric name |
+| window_size | Optional[int] | None | Window size (overrides default) |
 
-#### `add_data_point(metric, value, timestamp=None)`
+### `add_data_point`
 
-Add a data point. Auto-registers the metric if not already registered.
+```python
+add_data_point(metric: str, value: float, timestamp: Optional[float] = None)
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `metric` | `str` | Yes | — | Metric name |
-| `value` | `float` | Yes | — | Data value |
-| `timestamp` | `float` | No | `None` | Timestamp (defaults to current time) |
+Add a data point (auto-registers unregistered metrics, triggers all handlers).
 
-#### `get_metric_stats(metric)`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| metric | str | — | Required. Metric name |
+| value | float | — | Required. Data value |
+| timestamp | Optional[float] | None | Timestamp (defaults to current time) |
 
-Get window statistics for a specific metric.
+### `get_metric_stats`
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `metric` | `str` | Yes | — | Metric name |
+```python
+get_metric_stats(metric: str) -> Dict[str, float]
+```
 
-- **Returns**: `dict` — contains `count`, `mean`, `std`, `min`, `max`, `median`, `p25`, `p75`
+Get statistics for a specific metric.
 
-#### `get_all_stats()`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| metric | str | — | Required. Metric name |
+
+**Returns**: `Dict[str, float]` — Contains count, mean, std, min, max, median, p25, p75
+
+### `get_all_stats`
+
+```python
+get_all_stats() -> Dict[str, Dict[str, float]]
+```
 
 Get statistics for all metrics.
 
-- **Returns**: `dict[str, dict]`
+**Returns**: `Dict[str, Dict[str, float]]` — All metric statistics
 
-#### `add_handler(handler)`
+### `aggregate`
 
-Add a data handler (callback function).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `handler` | `Callable[[str, float, Optional[float]], None]` | Yes | — | Handler function (metric, value, timestamp) |
-
-#### `start_kafka_consumer(topic, metric_field="value")`
-
-Start a Kafka consumer.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `topic` | `str` | Yes | — | Kafka topic |
-| `metric_field` | `str` | No | `"value"` | Value field name |
-
-#### `stop()`
-
-Stop processing.
-
-#### `get_all_metrics()`
-
-Get all registered metric names.
-
-- **Returns**: `list[str]`
-
-#### `aggregate(metric, func="mean")`
+```python
+aggregate(metric: str, func: str = "mean") -> float
+```
 
 Aggregate window data.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `metric` | `str` | Yes | — | Metric name |
-| `func` | `str` | No | `"mean"` | Aggregation function (`"mean"`, `"std"`, `"min"`, `"max"`, `"median"`, `"sum"`, `"count"`, `"p25"`, `"p75"`) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| metric | str | — | Required. Metric name |
+| func | str | "mean" | Aggregation function ("mean", "std", "min", "max", "median", "sum", "count", "p25", "p75") |
 
-- **Returns**: `float`
-- **Exceptions**: `ValueError` (metric not found or unsupported function)
+**Returns**: `float` — Aggregated result
 
-#### `process_event(event)`
+**Exceptions**: `ValueError` — metric not found, no data, or unsupported function
+
+### `process_event`
+
+```python
+process_event(event: Dict[str, Any]) -> Dict[str, Any]
+```
 
 Unified event processing entry point.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `event` | `dict` | Yes | — | Event dict, must contain `metric` and `value`, optional `timestamp` |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| event | Dict[str, Any] | — | Required. Event dict (must contain metric, value; optional timestamp, metadata) |
 
-- **Returns**: `dict` — contains `metric`, `value`, `timestamp`, `stats`, `handlers_called`
-- **Exceptions**: `ValueError` (missing `metric` or `value`)
+**Returns**: `Dict[str, Any]` — Contains metric, value, timestamp, stats, handlers_called
 
-#### `create_faust_app(app_name="msra-stream")`
+**Exceptions**: `ValueError` — event missing metric or value field
 
-Create a Faust application.
+### `add_handler`
 
-- **Returns**: `faust.App` or `None` (if Faust not installed)
-- **Example**:
+```python
+add_handler(handler: Callable[[str, float, Optional[float]], None])
+```
+
+Add a data handler.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| handler | Callable | — | Required. Handler function (metric, value, timestamp) |
+
+### `start_kafka_consumer`
+
+```python
+start_kafka_consumer(topic: str, metric_field: str = "value")
+```
+
+Start a Kafka consumer.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| topic | str | — | Required. Kafka topic |
+| metric_field | str | "value" | Value field name |
+
+### `get_all_metrics`
+
+```python
+get_all_metrics() -> List[str]
+```
+
+Get all registered metric names.
+
+**Returns**: `List[str]` — Metric name list
+
+### `stop`
+
+```python
+stop()
+```
+
+Stop processing.
+
+**Example**:
 
 ```python
 from msra_modules.realtime_analytics import StreamProcessor
 
-processor = StreamProcessor(window_size=60)
-processor.register_metric("heart_rate")
-processor.add_data_point("heart_rate", 75.0)
-stats = processor.get_metric_stats("heart_rate")
-print(stats["mean"])
+sp = StreamProcessor(window_size=60)
+sp.register_metric("heart_rate")
+
+for hr in [75, 78, 72, 80, 76]:
+    sp.add_data_point("heart_rate", hr)
+
+stats = sp.get_metric_stats("heart_rate")
+print(f"HR mean: {stats['mean']:.1f}, std: {stats['std']:.1f}")
+
+result = sp.process_event({"metric": "heart_rate", "value": 120})
+print(f"Result: {result['stats']}")
 ```
 
 ---
 
-### `SlidingWindowStats`
+## AnomalyDetector
 
-**Description**: Sliding window statistics calculator.
+> Anomaly detector implementing threshold-based alerting via a rule engine, with sustained duration and cooldown support.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `window_size` | `int` | No | `60` | Window size (seconds) |
-
-**Methods**:
-
-#### `add(value, timestamp=None)`
-
-Add a data point.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `value` | `float` | Yes | — | Data value |
-| `timestamp` | `float` | No | `None` | Timestamp (defaults to current time) |
-
-#### `get_stats()`
-
-Get statistics.
-
-- **Returns**: `dict` — contains `count`, `mean`, `std`, `min`, `max`, `median`, `p25`, `p75`
-
-#### `clear()`
-
-Clear all data.
-
----
-
-### `AlertLevel`
-
-**Description**: Alert level enum.
-
-| Value | Description |
-|-------|-------------|
-| `INFO` | Info level |
-| `WARNING` | Warning level |
-| `CRITICAL` | Critical level |
-
----
-
-### `AlertRule`
-
-**Description**: Alert rule dataclass.
-
-**Fields**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `name` | `str` | Yes | — | Rule name |
-| `metric` | `str` | Yes | — | Metric name |
-| `condition` | `str` | Yes | — | Condition (`"gt"`, `"lt"`, `"gte"`, `"lte"`, `"range"`) |
-| `threshold` | `float` | Yes | — | Threshold |
-| `threshold_max` | `float` | No | `None` | Upper bound (used when `condition="range"`) |
-| `level` | `AlertLevel` | No | `AlertLevel.WARNING` | Alert level |
-| `sustained_seconds` | `int` | No | `0` | Sustained duration requirement (seconds) |
-| `cooldown_seconds` | `int` | No | `300` | Cooldown period (seconds) |
-| `description` | `str` | No | `""` | Description |
+```python
+AnomalyDetector()
+```
 
 **Methods**:
 
-#### `evaluate(value)`
+### `add_rule`
 
-Evaluate whether the rule is triggered.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `value` | `float` | Yes | — | Current value |
-
-- **Returns**: `bool`
-
----
-
-### `Alert` (anomaly_detector)
-
-**Description**: Alert event dataclass (from `anomaly_detector` module).
-
-**Fields**: `rule_name`, `metric`, `value`, `level` (AlertLevel), `message`, `timestamp`, `context`
-
----
-
-### `DetectionResult`
-
-**Description**: Multivariate anomaly detection result dataclass (for Isolation Forest).
-
-**Fields**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `index` | `int` | Index in the original data |
-| `is_anomaly` | `bool` | Whether it is an anomaly |
-| `score` | `float` | Anomaly score (lower = more anomalous) |
-| `features` | `dict[str, float]` | Feature values |
-| `method` | `str` | Detection method name |
-| `timestamp` | `float` | Timestamp (optional) |
-
-**Methods**:
-
-#### `to_dict()`
-
-Convert to dictionary.
-
-- **Returns**: `dict`
-
----
-
-### `AnomalyDetector`
-
-**Description**: Anomaly detector using a rule engine for real-time anomaly detection, supporting sustained duration and cooldown.
-
-**Parameters**: None.
-
-**Methods**:
-
-#### `add_rule(rule)`
+```python
+add_rule(rule: AlertRule)
+```
 
 Add an alert rule.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `rule` | `AlertRule` | Yes | — | Alert rule |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| rule | AlertRule | — | Required. Alert rule |
 
-#### `add_default_vital_signs_rules()`
+### `add_default_vital_signs_rules`
 
-Add default vital signs rules (heart rate, SpO2, blood pressure, temperature anomaly detection rules).
+```python
+add_default_vital_signs_rules()
+```
 
-#### `evaluate(metric, value, timestamp=None)`
+Add default vital signs rules (bradycardia, tachycardia, hypoxemia, hypertension, hypotension, hyperthermia, hypothermia).
+
+### `evaluate`
+
+```python
+evaluate(metric: str, value: float, timestamp: Optional[float] = None) -> List[Alert]
+```
 
 Evaluate a metric and return triggered alerts.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `metric` | `str` | Yes | — | Metric name |
-| `value` | `float` | Yes | — | Current value |
-| `timestamp` | `float` | No | `None` | Timestamp |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| metric | str | — | Required. Metric name |
+| value | float | — | Required. Current value |
+| timestamp | Optional[float] | None | Timestamp (defaults to current time) |
 
-- **Returns**: `list[Alert]`
+**Returns**: `List[Alert]` — Triggered alerts
 
-#### `add_alert_handler(handler)`
+### `add_alert_handler`
 
-Add an alert handler (callback function).
+```python
+add_alert_handler(handler: Callable[[Alert], None])
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `handler` | `Callable[[Alert], None]` | Yes | — | Handler function |
+Add an alert handler.
 
-#### `get_rules()`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| handler | Callable[[Alert], None] | — | Required. Handler function |
+
+### `get_rules`
+
+```python
+get_rules() -> List[AlertRule]
+```
 
 Get all rules.
 
-- **Returns**: `list[AlertRule]`
-- **Example**:
+**Returns**: `List[AlertRule]` — Rule list
+
+### AlertRule Data Class
+
+```python
+AlertRule(name: str, metric: str, condition: str, threshold: float,
+          threshold_max: Optional[float] = None, level: AlertLevel = AlertLevel.WARNING,
+          sustained_seconds: int = 0, cooldown_seconds: int = 300, description: str = "")
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| name | str | — | Rule name |
+| metric | str | — | Metric name |
+| condition | str | — | Condition ("gt", "lt", "gte", "lte", "range") |
+| threshold | float | — | Threshold value |
+| threshold_max | Optional[float] | None | Upper bound (for "range" condition) |
+| level | AlertLevel | WARNING | Alert level |
+| sustained_seconds | int | 0 | Sustained duration requirement (seconds) |
+| cooldown_seconds | int | 300 | Cooldown period (seconds) |
+| description | str | "" | Description |
+
+### AlertLevel Enum
+
+| Value | Description |
+|-------|-------------|
+| INFO | Informational |
+| WARNING | Warning |
+| CRITICAL | Critical |
+
+**Example**:
 
 ```python
 from msra_modules.realtime_analytics import AnomalyDetector, AlertRule, AlertLevel
 
 detector = AnomalyDetector()
 detector.add_default_vital_signs_rules()
-alerts = detector.evaluate("heart_rate", 160.0)
+
+alerts = detector.evaluate("heart_rate", 160)
 for alert in alerts:
-    print(alert.rule_name, alert.level, alert.message)
+    print(f"[{alert.level.value}] {alert.message}")
 ```
 
 ---
 
-### `TrendDetector`
+## DetectionResult
 
-**Description**: Trend detector based on CUSUM algorithm for detecting trend changes in data.
+> Anomaly detection result data class for multivariate detection methods (e.g., Isolation Forest).
 
-**Parameters**:
+**Attributes**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `window_size` | `int` | No | `60` | Window size |
-| `cusum_threshold` | `float` | No | `5.0` | CUSUM threshold |
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| index | int | — | Data point index in original data |
+| is_anomaly | bool | — | Whether it is an anomaly |
+| score | float | — | Anomaly score (lower = more anomalous) |
+| features | Dict[str, float] | {} | Feature values |
+| method | str | "" | Detection method name |
+| timestamp | Optional[float] | None | Timestamp |
 
 **Methods**:
 
-#### `update(value)`
+### `to_dict`
 
-Update the detector.
+```python
+to_dict() -> Dict
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `value` | `float` | Yes | — | New data point |
+Convert to dictionary.
 
-- **Returns**: `dict` — contains `status` (`"calibrating"` / `"monitoring"`), `value`, `baseline_mean`, `baseline_std`, `cusum_pos`, `cusum_neg`, `trend_detected`, `trend_direction`
-
-#### `reset()`
-
-Reset the detector.
+**Returns**: `Dict` — Dictionary containing all attributes
 
 ---
 
-### `MultivariateDetector`
+## MultivariateDetector
 
-**Description**: Multivariate anomaly detector based on Isolation Forest algorithm. Suitable for analyzing anomaly patterns across multiple vital sign indicators simultaneously.
+> Multivariate anomaly detector based on Isolation Forest algorithm.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `contamination` | `float` | No | `0.05` | Expected anomaly ratio (5%) |
-| `random_state` | `int` | No | `42` | Random seed |
+```python
+MultivariateDetector(contamination: float = 0.05, random_state: int = 42)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| contamination | float | 0.05 | Expected anomaly ratio (default 5%) |
+| random_state | int | 42 | Random seed for reproducibility |
 
 **Methods**:
 
-#### `fit(data, feature_names=None)`
+### `fit`
 
-Train the Isolation Forest model.
+```python
+fit(data: np.ndarray, feature_names: Optional[List[str]] = None)
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `data` | `np.ndarray` | Yes | — | Data matrix (n_samples, n_features) |
-| `feature_names` | `list[str]` | No | `None` | Feature name list |
+Train Isolation Forest model.
 
-#### `detect(data, feature_names=None, timestamps=None)`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| data | np.ndarray | — | Required. Data matrix of shape (n_samples, n_features) |
+| feature_names | Optional[List[str]] | None | Feature name list |
 
-Perform multivariate anomaly detection. Auto-trains if model is not fitted.
+**Exceptions**: `ValueError` — input is not 2D; `ImportError` — scikit-learn not installed
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `data` | `np.ndarray` | Yes | — | Data matrix (n_samples, n_features) |
-| `feature_names` | `list[str]` | No | `None` | Feature name list |
-| `timestamps` | `list[float]` | No | `None` | Timestamp list |
+### `detect`
 
-- **Returns**: `list[DetectionResult]`
-- **Example**:
+```python
+detect(data: np.ndarray, feature_names: Optional[List[str]] = None, timestamps: Optional[List[float]] = None) -> List[DetectionResult]
+```
+
+Execute multivariate anomaly detection (auto-trains if not fitted).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| data | np.ndarray | — | Required. Data matrix of shape (n_samples, n_features) |
+| feature_names | Optional[List[str]] | None | Feature name list |
+| timestamps | Optional[List[float]] | None | Timestamp list |
+
+**Returns**: `List[DetectionResult]` — Detection results
+
+### `reset`
+
+```python
+reset()
+```
+
+Reset the detector.
+
+**Example**:
 
 ```python
 from msra_modules.realtime_analytics import MultivariateDetector
 import numpy as np
 
 detector = MultivariateDetector(contamination=0.05)
-data = np.array([[75, 98, 120], [160, 85, 190], [72, 97, 118]])
-results = detector.detect(data, feature_names=["hr", "spo2", "sbp"])
+data = np.random.randn(100, 3)
+data[95:] += 5  # Inject anomalies
+
+results = detector.detect(data, feature_names=["hr", "spo2", "bp"])
 anomalies = [r for r in results if r.is_anomaly]
+print(f"Detected {len(anomalies)} anomalies")
 ```
 
-#### `reset()`
-
-Reset the detector.
-
-**Exceptions**: `ImportError` (scikit-learn not installed), `ValueError` (invalid data dimensions)
-
 ---
 
-### `AlertChannel`
+## AlertSystem
 
-**Description**: Alert channel enum.
+> Alert system supporting multi-channel alert notifications (log, file, webhook, email, Slack).
 
-| Value | Description |
-|-------|-------------|
-| `LOG` | Log |
-| `WEBHOOK` | Webhook |
-| `EMAIL` | Email |
-| `SLACK` | Slack |
-| `FILE` | File |
+**Signature**:
 
----
+```python
+AlertSystem(log_file: Optional[str] = None)
+```
 
-### `Alert` (alert_system)
-
-**Description**: Alert event dataclass (from `alert_system` module).
-
-**Fields**: `rule_name`, `metric`, `value`, `level` (str), `message`, `timestamp`, `context`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| log_file | Optional[str] | None | Log file path |
 
 **Methods**:
 
-#### `to_dict()`
+### `register_handler`
 
-Convert to dictionary.
-
-#### `to_json()`
-
-Convert to JSON string.
-
----
-
-### `AlertSystem`
-
-**Description**: Alert system supporting multi-channel notification (log, file, webhook, email, Slack).
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `log_file` | `str` | No | `None` | Log file path |
-
-**Methods**:
-
-#### `register_handler(channel, handler)`
+```python
+register_handler(channel: AlertChannel, handler: Callable[[Alert], None])
+```
 
 Register an alert handler.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `channel` | `AlertChannel` | Yes | — | Channel |
-| `handler` | `Callable[[Alert], None]` | Yes | — | Handler function |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| channel | AlertChannel | — | Required. Alert channel |
+| handler | Callable[[Alert], None] | — | Required. Handler function |
 
-#### `send_alert(alert, channels=None)`
+### `send_alert`
+
+```python
+send_alert(alert: Alert, channels: Optional[List[AlertChannel]] = None)
+```
 
 Send an alert.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `alert` | `Alert` | Yes | — | Alert event |
-| `channels` | `list[AlertChannel]` | No | `None` | Channel list (defaults to all registered channels) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| alert | Alert | — | Required. Alert event |
+| channels | Optional[List[AlertChannel]] | None | Channels to send to (default: all registered) |
 
-#### `webhook_handler(webhook_url)`
+### `webhook_handler`
+
+```python
+webhook_handler(webhook_url: str) -> Callable[[Alert], None]
+```
 
 Create a webhook handler.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `webhook_url` | `str` | Yes | — | Webhook URL |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| webhook_url | str | — | Required. Webhook URL |
 
-- **Returns**: `Callable[[Alert], None]`
+**Returns**: `Callable[[Alert], None]` — Handler function
 
-#### `email_handler(smtp_server, smtp_port, sender, password, recipients)`
+### `email_handler`
+
+```python
+email_handler(smtp_server: str, smtp_port: int, sender: str, password: str, recipients: List[str]) -> Callable[[Alert], None]
+```
 
 Create an email handler.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `smtp_server` | `str` | Yes | — | SMTP server |
-| `smtp_port` | `int` | Yes | — | SMTP port |
-| `sender` | `str` | Yes | — | Sender email |
-| `password` | `str` | Yes | — | Password |
-| `recipients` | `list[str]` | Yes | — | Recipient list |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| smtp_server | str | — | Required. SMTP server |
+| smtp_port | int | — | Required. SMTP port |
+| sender | str | — | Required. Sender email |
+| password | str | — | Required. Password |
+| recipients | List[str] | — | Required. Recipient list |
 
-- **Returns**: `Callable[[Alert], None]`
+**Returns**: `Callable[[Alert], None]` — Handler function
 
-#### `slack_handler(webhook_url)`
+### `slack_handler`
+
+```python
+slack_handler(webhook_url: str) -> Callable[[Alert], None]
+```
 
 Create a Slack handler.
 
-- **Returns**: `Callable[[Alert], None]`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| webhook_url | str | — | Required. Slack webhook URL |
 
-#### `get_history(level=None, limit=100)`
+**Returns**: `Callable[[Alert], None]` — Handler function
+
+### `get_history`
+
+```python
+get_history(level: Optional[str] = None, limit: int = 100) -> List[Alert]
+```
 
 Get alert history.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `level` | `str` | No | `None` | Alert level filter |
-| `limit` | `int` | No | `100` | Number to return |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| level | Optional[str] | None | Alert level filter |
+| limit | int | 100 | Number to return |
 
-- **Returns**: `list[Alert]`
+**Returns**: `List[Alert]` — Alert list
 
-#### `get_statistics()`
+### `get_statistics`
+
+```python
+get_statistics() -> Dict
+```
 
 Get alert statistics.
 
-- **Returns**: `dict` — contains `total_alerts`, `by_level`, `by_rule`
-- **Example**:
+**Returns**: `Dict` — Contains total_alerts, by_level, by_rule
+
+### AlertChannel Enum
+
+| Value | Description |
+|-------|-------------|
+| LOG | Log |
+| WEBHOOK | Webhook |
+| EMAIL | Email |
+| SLACK | Slack |
+| FILE | File |
+
+---
+
+## Alert
+
+> Alert event data class (from alert_system.py).
+
+**Attributes**:
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| rule_name | str | — | Rule name |
+| metric | str | — | Metric name |
+| value | float | — | Current value |
+| level | str | — | Alert level ("info", "warning", "critical") |
+| message | str | — | Alert message |
+| timestamp | float | — | Timestamp |
+| context | Dict | None | Context |
+
+**Methods**:
+
+### `to_dict`
+
+```python
+to_dict() -> Dict
+```
+
+Convert to dictionary.
+
+### `to_json`
+
+```python
+to_json() -> str
+```
+
+Convert to JSON string.
+
+**Example**:
 
 ```python
 from msra_modules.realtime_analytics import AlertSystem, Alert, AlertChannel
 
-system = AlertSystem(log_file="/logs/alerts.jsonl")
-system.register_handler(AlertChannel.WEBHOOK, system.webhook_handler("https://hook.example.com"))
-alert = Alert(rule_name="tachycardia", metric="heart_rate", value=160.0,
-              level="critical", message="HR > 150", timestamp=1234567890.0)
+system = AlertSystem(log_file="alerts.jsonl")
+system.register_handler(AlertChannel.WEBHOOK, system.webhook_handler("https://hooks.example.com/alert"))
+
+alert = Alert(
+    rule_name="tachycardia", metric="heart_rate", value=160,
+    level="critical", message="HR > 150 bpm", timestamp=1719400000.0
+)
 system.send_alert(alert)
+print(system.get_statistics())
 ```
 
 ---
 
-### `VitalSignsSimulator`
+## RealtimeDashboard
 
-**Description**: Vital signs data simulator that generates noisy vital signs data streams and supports triggering anomaly events.
+> Realtime dashboard supporting metric monitoring, status evaluation, and Streamlit visualization.
 
-**Parameters**:
+**Signature**:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `baseline_hr` | `float` | No | `75` | Baseline heart rate |
-| `baseline_sbp` | `float` | No | `120` | Baseline systolic BP |
-| `baseline_dbp` | `float` | No | `80` | Baseline diastolic BP |
-| `baseline_spo2` | `float` | No | `98` | Baseline SpO2 |
-| `baseline_temp` | `float` | No | `37.0` | Baseline temperature |
-| `baseline_rr` | `float` | No | `16` | Baseline respiratory rate |
+```python
+RealtimeDashboard(max_points: int = 1000, update_interval: float = 1.0)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| max_points | int | 1000 | Maximum data points |
+| update_interval | float | 1.0 | Update interval (seconds) |
 
 **Methods**:
 
-#### `generate_sample(timestamp=None)`
+### `add_metric`
 
-Generate a single sample.
+```python
+add_metric(name: str, display_name: Optional[str] = None, unit: str = "",
+           warning_range: Optional[tuple] = None, critical_range: Optional[tuple] = None)
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `timestamp` | `float` | No | `None` | Timestamp |
+Add a monitoring metric.
 
-- **Returns**: `VitalSigns`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| name | str | — | Required. Metric name |
+| display_name | Optional[str] | None | Display name |
+| unit | str | "" | Unit |
+| warning_range | Optional[tuple] | None | Warning range |
+| critical_range | Optional[tuple] | None | Critical range |
 
-#### `trigger_anomaly(anomaly_type, duration=60)`
+### `update`
 
-Trigger an anomaly. Supported types: `"tachycardia"`, `"bradycardia"`, `"hypoxemia"`, `"hypertension"`, `"hypotension"`, `"hyperthermia"`.
+```python
+update(metric: str, value: float, timestamp: Optional[float] = None)
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `anomaly_type` | `str` | Yes | — | Anomaly type |
-| `duration` | `int` | No | `60` | Duration (seconds) |
+Update metric value.
 
-#### `stop_anomaly()`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| metric | str | — | Required. Metric name |
+| value | float | — | Required. Value |
+| timestamp | Optional[float] | None | Timestamp |
+
+### `add_alert`
+
+```python
+add_alert(alert: Dict)
+```
+
+Add an alert to the dashboard.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| alert | Dict | — | Required. Alert dictionary |
+
+### `get_dashboard_data`
+
+```python
+get_dashboard_data() -> Dict
+```
+
+Get dashboard data.
+
+**Returns**: `Dict` — Contains metrics (with data and stats), alerts, timestamp
+
+### `get_metric_status`
+
+```python
+get_metric_status(metric: str) -> str
+```
+
+Get metric status.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| metric | str | — | Required. Metric name |
+
+**Returns**: `str` — Status ("normal", "warning", "critical", "unknown")
+
+### `export_snapshot`
+
+```python
+export_snapshot(filepath: str)
+```
+
+Export snapshot to JSON file.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| filepath | str | — | Required. File path |
+
+### `create_streamlit_app`
+
+```python
+create_streamlit_app()
+```
+
+Create a Streamlit app (requires streamlit and plotly).
+
+**Returns**: Streamlit app object
+
+**Exceptions**: `ImportError` — streamlit/plotly not installed
+
+**Example**:
+
+```python
+from msra_modules.realtime_analytics import RealtimeDashboard
+
+dashboard = RealtimeDashboard(max_points=500)
+dashboard.add_metric("heart_rate", display_name="Heart Rate", unit="bpm",
+                     warning_range=(100, 150), critical_range=(0, 40))
+
+dashboard.update("heart_rate", 75)
+print(dashboard.get_metric_status("heart_rate"))  # "normal"
+dashboard.export_snapshot("dashboard_snapshot.json")
+```
+
+---
+
+## VitalSignsSimulator
+
+> Vital signs simulator generating noisy vital signs data with anomaly injection and streaming support.
+
+**Signature**:
+
+```python
+VitalSignsSimulator(baseline_hr: float = 75, baseline_sbp: float = 120,
+                     baseline_dbp: float = 80, baseline_spo2: float = 98,
+                     baseline_temp: float = 37.0, baseline_rr: float = 16)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| baseline_hr | float | 75 | Baseline heart rate |
+| baseline_sbp | float | 120 | Baseline systolic BP |
+| baseline_dbp | float | 80 | Baseline diastolic BP |
+| baseline_spo2 | float | 98 | Baseline SpO2 |
+| baseline_temp | float | 37.0 | Baseline temperature |
+| baseline_rr | float | 16 | Baseline respiratory rate |
+
+**Methods**:
+
+### `generate_sample`
+
+```python
+generate_sample(timestamp: Optional[float] = None) -> VitalSigns
+```
+
+Generate a single vital signs sample.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| timestamp | Optional[float] | None | Timestamp (defaults to current time) |
+
+**Returns**: `VitalSigns` — Vital signs data object
+
+### `trigger_anomaly`
+
+```python
+trigger_anomaly(anomaly_type: str, duration: int = 60)
+```
+
+Trigger an anomaly.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| anomaly_type | str | — | Required. Anomaly type ("tachycardia", "bradycardia", "hypoxemia", "hypertension", "hypotension", "hyperthermia") |
+| duration | int | 60 | Duration (seconds) |
+
+### `stop_anomaly`
+
+```python
+stop_anomaly()
+```
 
 Stop the anomaly.
 
-#### `generate_stream(duration=3600, interval=1.0, callback=None)`
+### `generate_stream`
+
+```python
+generate_stream(duration: int = 3600, interval: float = 1.0,
+                callback: Optional[Callable[[VitalSigns], None]] = None) -> List[VitalSigns]
+```
 
 Generate a data stream.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `duration` | `int` | No | `3600` | Duration (seconds) |
-| `interval` | `float` | No | `1.0` | Sampling interval (seconds) |
-| `callback` | `Callable[[VitalSigns], None]` | No | `None` | Callback function |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| duration | int | 3600 | Duration (seconds) |
+| interval | float | 1.0 | Sampling interval (seconds) |
+| callback | Optional[Callable] | None | Callback function |
 
-- **Returns**: `list[VitalSigns]`
+**Returns**: `List[VitalSigns]` — Vital signs list
 
-#### `generate_to_kafka(topic, duration=3600, interval=1.0, kafka_servers="localhost:9092")`
+### `generate_to_kafka`
+
+```python
+generate_to_kafka(topic: str, duration: int = 3600, interval: float = 1.0,
+                  kafka_servers: str = "localhost:9092")
+```
 
 Generate data and send to Kafka.
-- **Example**:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| topic | str | — | Required. Kafka topic |
+| duration | int | 3600 | Duration |
+| interval | float | 1.0 | Sampling interval |
+| kafka_servers | str | "localhost:9092" | Kafka servers |
+
+### VitalSigns Data Class
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| timestamp | float | Timestamp |
+| heart_rate | float | Heart rate |
+| systolic_bp | float | Systolic blood pressure |
+| diastolic_bp | float | Diastolic blood pressure |
+| spo2 | float | SpO2 |
+| temperature | float | Temperature |
+| respiratory_rate | float | Respiratory rate |
+
+**Example**:
 
 ```python
 from msra_modules.realtime_analytics import VitalSignsSimulator
 
-simulator = VitalSignsSimulator(baseline_hr=75, baseline_sbp=120)
-sample = simulator.generate_sample()
-print(sample.heart_rate, sample.spo2)
+sim = VitalSignsSimulator(baseline_hr=75)
+sample = sim.generate_sample()
+print(f"HR: {sample.heart_rate:.1f}")
 
-# Trigger tachycardia anomaly
-simulator.trigger_anomaly("tachycardia", duration=60)
+sim.trigger_anomaly("tachycardia", duration=30)
+abnormal = sim.generate_sample()
+print(f"Abnormal HR: {abnormal.heart_rate:.1f}")
 ```
 
 ---
 
-### `VitalSigns`
+## RealtimeQualityGateChecker
 
-**Description**: Vital signs data class.
+> Realtime analytics quality gate checker encapsulating Gate RT-1 check logic.
 
-**Fields**: `timestamp`, `heart_rate`, `systolic_bp`, `diastolic_bp`, `spo2`, `temperature`, `respiratory_rate`
+**Signature**:
 
-**Methods**:
+```python
+RealtimeQualityGateChecker(study_id: str, project_root: Optional[str] = None)
+```
 
-#### `to_dict()`
-
-Convert to dictionary.
-
-#### `to_json()`
-
-Convert to JSON string.
-
----
-
-### `RealtimeDashboard`
-
-**Description**: Real-time dashboard supporting metric monitoring, status determination, snapshot export, and Streamlit application.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `max_points` | `int` | No | `1000` | Maximum data points |
-| `update_interval` | `float` | No | `1.0` | Update interval (seconds) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| study_id | str | — | Required. Study ID |
+| project_root | Optional[str] | None | Project root directory (optional) |
 
 **Methods**:
 
-#### `add_metric(name, display_name=None, unit="", warning_range=None, critical_range=None)`
+### `run_gate_rt1`
 
-Add a monitoring metric.
+```python
+run_gate_rt1(source: Any = None, timestamps: Optional[List[float]] = None,
+             detection_rate: Optional[float] = None, window_size: int = 60,
+             max_gap_multiplier: float = 2.0, min_rate: float = 0.01,
+             max_rate: float = 0.20) -> GateResult
+```
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `name` | `str` | Yes | — | Metric name |
-| `display_name` | `str` | No | `None` | Display name |
-| `unit` | `str` | No | `""` | Unit |
-| `warning_range` | `tuple` | No | `None` | Warning range |
-| `critical_range` | `tuple` | No | `None` | Critical range |
+Execute Gate RT-1 with 3 checks: data source availability, timestamp continuity, detection sensitivity calibration.
 
-#### `update(metric, value, timestamp=None)`
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| source | Any | None | Data source object (simulator or other source) |
+| timestamps | Optional[List[float]] | None | Timestamp list |
+| detection_rate | Optional[float] | None | Anomaly detection rate |
+| window_size | int | 60 | Window size (seconds) |
+| max_gap_multiplier | float | 2.0 | Max gap multiplier |
+| min_rate | float | 0.01 | Minimum detection rate |
+| max_rate | float | 0.20 | Maximum detection rate |
 
-Update a metric value.
+**Returns**: `GateResult` — Verdict (PASS / CONDITIONAL / BLOCKED)
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `metric` | `str` | Yes | — | Metric name |
-| `value` | `float` | Yes | — | Value |
-| `timestamp` | `float` | No | `None` | Timestamp |
+### `check_data_source_available`
 
-#### `add_alert(alert)`
+```python
+check_data_source_available(source: Any) -> CheckItemResult
+```
 
-Add an alert.
+Check if data source is available and connected.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `alert` | `dict` | Yes | — | Alert dictionary |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| source | Any | — | Required. Data source object |
 
-#### `get_dashboard_data()`
+**Returns**: `CheckItemResult`
 
-Get dashboard data.
+### `check_timestamp_continuity`
 
-- **Returns**: `dict` — contains `metrics` (data and stats for each metric), `alerts`, `timestamp`
+```python
+check_timestamp_continuity(timestamps: List[float], window_size: int = 60,
+                           max_gap_multiplier: float = 2.0) -> CheckItemResult
+```
 
-#### `get_metric_status(metric)`
+Check timestamp continuity.
 
-Get metric status.
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| timestamps | List[float] | — | Required. Timestamp list (should be sorted) |
+| window_size | int | 60 | Window size (seconds) |
+| max_gap_multiplier | float | 2.0 | Max gap multiplier |
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `metric` | `str` | Yes | — | Metric name |
+**Returns**: `CheckItemResult`
 
-- **Returns**: `str` — `"normal"`, `"warning"`, `"critical"`, `"unknown"`
+### `check_detection_sensitivity`
 
-#### `export_snapshot(filepath)`
+```python
+check_detection_sensitivity(detection_rate: float, min_rate: float = 0.01,
+                            max_rate: float = 0.20) -> CheckItemResult
+```
 
-Export snapshot to a JSON file.
+Check detection sensitivity calibration.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `filepath` | `str` | Yes | — | File path |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| detection_rate | float | — | Required. Actual anomaly detection ratio (0.0-1.0) |
+| min_rate | float | 0.01 | Minimum acceptable detection rate |
+| max_rate | float | 0.20 | Maximum acceptable detection rate |
 
-#### `create_streamlit_app()`
+**Returns**: `CheckItemResult`
 
-Create a Streamlit application.
-
-- **Returns**: Streamlit app object
-- **Exceptions**: `ImportError` (streamlit/plotly not installed)
-
----
-
-### `ReportGenerator`
-
-**Description**: Report generator supporting HTML and Markdown formats for imaging, bioinformatics, and monitoring reports.
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `output_dir` | `str` | No | `"reports"` | Output directory |
-
-**Methods**:
-
-#### `generate_imaging_report(patient_info, imaging_findings, radiomics_features, output_format="html")`
-
-Generate an imaging analysis report.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `patient_info` | `dict` | Yes | — | Patient information |
-| `imaging_findings` | `dict` | Yes | — | Imaging findings |
-| `radiomics_features` | `dict` | Yes | — | Radiomics features |
-| `output_format` | `str` | No | `"html"` | Output format (`"html"` or `"markdown"`) |
-
-- **Returns**: `str` — report file path
-
-#### `generate_bio_report(sample_info, qc_summary, analysis_results, output_format="html")`
-
-Generate a bioinformatics report.
-
-- **Returns**: `str` — report file path
-
-#### `generate_monitoring_report(duration, stats, alerts, output_format="html")`
-
-Generate a real-time monitoring report.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `duration` | `str` | Yes | — | Monitoring duration |
-| `stats` | `dict` | Yes | — | Statistics data |
-| `alerts` | `list[dict]` | Yes | — | Alert list |
-| `output_format` | `str` | No | `"html"` | Output format |
-
-- **Returns**: `str` — report file path
-
----
-
-### `RealtimeQualityGateChecker`
-
-**Description**: Realtime analytics quality gate checker implementing Gate RT-1 (real-time data quality gate).
-
-**Parameters**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `study_id` | `str` | Yes | — | Study ID |
-| `project_root` | `str` | No | `None` | Project root directory |
-
-**Methods**:
-
-#### `run_gate_rt1(source=None, timestamps=None, detection_rate=None, window_size=60, max_gap_multiplier=2.0, min_rate=0.01, max_rate=0.20)`
-
-Execute Gate RT-1 with all 3 checks: data source availability, timestamp continuity, anomaly detection sensitivity calibration.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `source` | `Any` | No | `None` | Data source object (simulator or other source) |
-| `timestamps` | `list[float]` | No | `None` | Timestamp list |
-| `detection_rate` | `float` | No | `None` | Anomaly detection rate |
-| `window_size` | `int` | No | `60` | Window size (seconds) |
-| `max_gap_multiplier` | `float` | No | `2.0` | Max gap multiplier |
-| `min_rate` | `float` | No | `0.01` | Minimum detection rate |
-| `max_rate` | `float` | No | `0.20` | Maximum detection rate |
-
-- **Returns**: `GateResult` — verdict (`PASS` / `CONDITIONAL` / `BLOCKED`)
-- **Example**:
+**Example**:
 
 ```python
 from msra_modules.realtime_analytics import RealtimeQualityGateChecker, VitalSignsSimulator
 
-simulator = VitalSignsSimulator()
 checker = RealtimeQualityGateChecker(study_id="RT-2026-001")
-result = checker.run_gate_rt1(source=simulator, detection_rate=0.05)
-print(result.verdict)
+sim = VitalSignsSimulator()
+
+gate_result = checker.run_gate_rt1(
+    source=sim,
+    timestamps=[1719400000.0 + i for i in range(100)],
+    detection_rate=0.05
+)
+print(f"RT-1 verdict: {gate_result.verdict.value}")
+print(f"Pass rate: {gate_result.pass_rate:.1%}")
 ```
 
 ---
 
-## Full Usage Example
+## Shared Types Reference
 
-```python
-from msra_modules.realtime_analytics import (
-    StreamProcessor, AnomalyDetector, AlertSystem, AlertChannel,
-    VitalSignsSimulator, RealtimeDashboard, RealtimeQualityGateChecker,
-)
+### CheckItemResult
 
-# 1. Create simulator
-simulator = VitalSignsSimulator(baseline_hr=75, baseline_sbp=120)
+| Property | Type | Description |
+|----------|------|-------------|
+| item_id | str | Check item ID |
+| name | str | Check item name |
+| is_key | bool | Whether it is a key item |
+| status | str | Status (PASS / FAIL / N/A / SKIP) |
+| evidence | str | Evidence description |
+| notes | str | Notes |
 
-# 2. Create stream processor
-processor = StreamProcessor(window_size=60)
-processor.register_metric("heart_rate")
-processor.register_metric("spo2")
+### GateVerdict
 
-# 3. Create anomaly detector
-detector = AnomalyDetector()
-detector.add_default_vital_signs_rules()
-
-# 4. Create alert system
-alert_system = AlertSystem(log_file="/logs/alerts.jsonl")
-
-# 5. Create dashboard
-dashboard = RealtimeDashboard()
-dashboard.add_metric("heart_rate", display_name="HR", unit="bpm",
-                     warning_range=(100, 150), critical_range=(0, 40))
-
-# 6. Simulate data stream
-for i in range(100):
-    sample = simulator.generate_sample()
-    processor.add_data_point("heart_rate", sample.heart_rate)
-    alerts = detector.evaluate("heart_rate", sample.heart_rate)
-    for alert in alerts:
-        alert_system.send_alert(alert)
-    dashboard.update("heart_rate", sample.heart_rate)
-
-# 7. Quality gate
-checker = RealtimeQualityGateChecker(study_id="RT-2026-001")
-result = checker.run_gate_rt1(source=simulator, detection_rate=0.05)
-```
+| Value | Description |
+|-------|-------------|
+| PASS | All passed |
+| CONDITIONAL | Conditional pass |
+| BLOCKED | Blocked |
