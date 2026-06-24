@@ -106,3 +106,8 @@ references/literature/
 OPTIMIZATION_REPORT.md
 .test_cache/
 skills/results.tsv
+
+# AI 辅助产出与运行时报告（不随仓库发布）
+output/
+deliverables/
+evals/gold/results/
