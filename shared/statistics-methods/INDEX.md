@@ -1,9 +1,10 @@
 # 方法学 统计与方法指南 — 索引
 
 > 来源：*方法学 Guide to Statistics and Methods*（Edward H. Livingston, Roger J. Lewis 主编）
-> 整合日期：2026-05-29
-> 本目录提供 48 个与统计分析直接相关的章节索引，按主题分组，便于在 MSRA 流水线各阶段快速查阅。
+> 整合日期：2026-05-29 | **v1.0.1 更新**: ch49-ch56 新增 8 章
+> 本目录提供 56 个与统计分析直接相关的章节索引，按主题分组，便于在 MSRA 流水线各阶段快速查阅。
 > v0.7.3 新增: ch47 ML公平性, ch48 生存分析ML方法
+> v1.0.1 新增: ch49 等价性检验, ch50 聚类分析, ch51 纵向进阶, ch52 HTE, ch53 TMLE/AIPW, ch54 ROC进阶, ch55 自适应设计, ch56 实施科学
 > 已删除 14 章无关内容（数据库实践指南 ch43-55、深度学习 ch42）。
 
 ---
@@ -86,6 +87,19 @@
 | ch47 | ML 公平性与偏倚评估 | `chapters/ch47-ml-fairness-clinical.md` | `analysis-exec` Phase 7; `report` Phase 6 |
 | ch48 | 生存分析 ML 方法 | `chapters/ch48-survival-ml-methods.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
 
+## 七、v1.0.1 新增方法（第 49–56 章）
+
+| 编号 | 章节 | 文件名 | MSRA 关联阶段 |
+|------|------|--------|-------------|
+| ch49 | 等价性检验 (Equivalence Testing) | `chapters/ch49-equivalence-testing.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
+| ch50 | 聚类分析与无监督学习 | `chapters/ch50-clustering-analysis.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
+| ch51 | 纵向数据分析进阶（边际 vs 条件模型） | `chapters/ch51-longitudinal-advanced.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
+| ch52 | 因果森林与异质性治疗效应 (HTE) | `chapters/ch52-heterogeneous-treatment-effects.md` | `analysis-plan` Phase 3; `analysis-exec` Phase 7 |
+| ch53 | TMLE/AIPW 双重稳健估计 | `chapters/ch53-tmle-aipw.md` | `analysis-plan` Phase 3 观察性; `analysis-exec` Phase 7 |
+| ch54 | 多类别 ROC 与时间依赖 ROC | `chapters/ch54-roc-advanced.md` | `analysis-exec` Phase 7; `report` Phase 1 |
+| ch55 | 自适应试验设计进阶 | `chapters/ch55-adaptive-design-advanced.md` | `analysis-plan` Phase 3; `analysis-plan` Phase 6 期中分析 |
+| ch56 | 实施科学与混合方法研究 | `chapters/ch56-implementation-science.md` | `analysis-plan` Phase 3; `report` Phase 5 |
+
 ---
 
 ## 辅助文件
@@ -113,6 +127,7 @@
 
 ### 报告规范（shared/reporting-guidelines/）
 - CONSORT 2025 30项 / SPIRIT 2025 34项 / STROBE / PRISMA-NMA / TRIPOD-AI / TRIPOD-LLM / CARE / ARRIVE / REMARK / TRUE-AIM / statcheck / **CHEERS 2022 28项** 🆕
+- **v1.0.1 新增**: CONSORT-TCM / SPIRIT-TCM / STRICTA / STROBE-ME / AGREE II / RIGHT / CLAIM / 流程图自动绘制
 
 ### 偏倚评估工具（shared/risk-of-bias/）🆕
 - **RoB 2** — RCT 偏倚风险（5 域信号问题 → Low/Some/High）

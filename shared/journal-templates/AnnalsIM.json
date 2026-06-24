@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "journal": "Annals of Internal Medicine",
+    "abbr": "AnnalsIM",
+    "publisher": "American College of Physicians",
+    "recommended_study_type": ["RCT", "systematic review", "diagnostic accuracy"],
+    "guideline": "CONSORT",
+    "description": "Annals of Internal Medicine template. Emphasizes evidence quality grading, GRADE assessment, and rigorous methodology. Strong focus on internal validity."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background", "Objective", "Design", "Setting", "Patients", "Intervention", "Measurements", "Results", "Limitation", "Conclusion"]
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design and oversight",
+        "Study population and setting",
+        "Randomization and masking",
+        "Intervention protocol",
+        "Outcomes and follow-up",
+        "Sample size calculation",
+        "Statistical analysis (with sensitivity analyses)"
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics", "type": "baseline_table"},
+        {"label": "Table 2", "title": "Primary Outcome", "type": "main_results_table"},
+        {"label": "Table 3", "title": "Secondary Outcomes", "type": "secondary_results"},
+        {"label": "Table 4", "title": "Adverse Events", "type": "safety_table"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "Study Flow Diagram", "type": "flowchart"},
+        {"label": "Figure 2", "title": "Primary Outcome", "type": "clinical_figure"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 3,
+      "paragraphs": ["Key findings", "Comparison with evidence", "Mechanisms", "Limitations", "Implications"]
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Appendix",
+    "sections": [
+      {"id": "supp_protocol", "title": "Protocol", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "Supplementary Tables", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "Supplementary Figures", "type": "supplement_figures"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "annals_style",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "annals_blue",
+    "word_limit_main": 4000,
+    "word_limit_abstract": 250,
+    "reference_limit": 40,
+    "supplement_as_separate_file": true
+  },
+  "review_profile": {
+    "review_style": "evidence_graded",
+    "emphasis_dimensions": {
+      "methodological_rigor": 1.5,
+      "evidence_sufficiency": 1.3,
+      "internal_validity": 1.4,
+      "clinical_significance": 1.0,
+      "reporting_completeness": 1.2
+    },
+    "eic_personality": "evidence_based_reviewer",
+    "common_concerns": [
+      "Is the risk of bias adequately addressed?",
+      "Are confidence intervals properly reported?",
+      "Is the GRADE assessment appropriate?",
+      "Are all CONSORT items addressed?"
+    ],
+    "devils_advocate_focus": "internal_validity_threats",
+    "tone": "thorough_critical"
+  }
+}

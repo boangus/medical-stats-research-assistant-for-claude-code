@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "journal": "Phytomedicine",
+    "abbr": "Phytomed",
+    "publisher": "Elsevier / Urban & Fischer",
+    "recommended_study_type": ["RCT", "preclinical", "pharmacokinetics"],
+    "guideline": "CONSORT",
+    "description": "Phytomedicine template. Phytochemical rigor: herbal medicine standardization, pharmacological evidence, quality control."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background/Purpose", "Methods", "Results", "Conclusion"]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction",
+      "order": 1,
+      "type": "narrative",
+      "content": "Include botanical background, phytochemical evidence, pharmacological rationale"
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 2,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design",
+        "Herbal product characterization (botanical name, plant part, extract type, marker compounds)",
+        "Quality control (HPLC fingerprint, heavy metals, pesticides, microbial limits)",
+        "Participants and eligibility criteria",
+        "Intervention and comparator",
+        "Outcomes",
+        "Pharmacokinetic assessment (if applicable)",
+        "Statistical analysis"
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 3,
+      "tables": [
+        {"label": "Table 1", "title": "Herbal Product Specifications", "type": "product_spec"},
+        {"label": "Table 2", "title": "Baseline Characteristics", "type": "baseline_table"},
+        {"label": "Table 3", "title": "Efficacy Outcomes", "type": "main_results_table"},
+        {"label": "Table 4", "title": "Safety Outcomes", "type": "safety_table"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "HPLC Fingerprint", "type": "chromatogram"},
+        {"label": "Figure 2", "title": "Study Flow", "type": "flowchart"},
+        {"label": "Figure 3", "title": "Efficacy Results", "type": "clinical_figure"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 4,
+      "paragraphs": ["Key findings", "Pharmacological mechanisms", "Comparison with prior studies", "Standardization challenges", "Limitations", "Conclusions"]
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Materials",
+    "sections": [
+      {"id": "supp_phytochemistry", "title": "Phytochemical Analysis Details", "type": "supplement_detail"},
+      {"id": "supp_hplc", "title": "HPLC Chromatograms", "type": "supplement_figures"},
+      {"id": "supp_safety", "title": "Detailed Safety Data", "type": "supplement_tables"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "academic",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "phyto_green",
+    "word_limit_main": 6000,
+    "reference_limit": 60,
+    "botanical_nomenclature_required": true
+  },
+  "review_profile": {
+    "review_style": "phytochemical_rigor",
+    "emphasis_dimensions": {
+      "herbal_standardization": 1.5,
+      "pharmacological_evidence": 1.4,
+      "quality_control": 1.4,
+      "clinical_efficacy": 1.2,
+      "safety_reporting": 1.3
+    },
+    "eic_personality": "pharmacognosy_expert",
+    "common_concerns": [
+      "Is the herbal product well-characterized (HPLC fingerprint, marker compounds)?",
+      "Is quality control adequate (heavy metals, pesticides, microbial)?",
+      "Is the botanical nomenclature correct (genus species, author)?",
+      "Are pharmacokinetic interactions considered?"
+    ],
+    "devils_advocate_focus": "standardization_and_reproducibility",
+    "tone": "scientifically_precise"
+  }
+}

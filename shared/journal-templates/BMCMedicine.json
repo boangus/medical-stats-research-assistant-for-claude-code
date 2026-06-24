@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "journal": "BMC Medicine",
+    "abbr": "BMCMed",
+    "publisher": "BioMed Central (Springer Nature)",
+    "recommended_study_type": ["RCT", "cohort", "systematic review"],
+    "guideline": "CONSORT/STROBE/PRISMA",
+    "description": "BMC Medicine template. Open access, global health focus, methodological transparency."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background", "Methods", "Results", "Conclusions", "Trial registration (if applicable)"]
+    },
+    {
+      "id": "background",
+      "title": "Background",
+      "order": 1,
+      "type": "narrative"
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 2,
+      "type": "structured_methods",
+      "paragraphs": ["Study design", "Participants", "Interventions", "Outcomes", "Sample size", "Statistical analysis", "Ethics"]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 3,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics", "type": "baseline_table"},
+        {"label": "Table 2", "title": "Outcomes", "type": "main_results_table"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "Study Flow", "type": "flowchart"},
+        {"label": "Figure 2", "title": "Main Results", "type": "clinical_figure"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 4
+    }
+  ],
+  "supplement": {
+    "description": "Additional Files",
+    "sections": [
+      {"id": "supp_methods", "title": "Additional File 1: Supplementary Methods", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "Additional File 2: Supplementary Tables", "type": "supplement_tables"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "bmc_style",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "bmc_default",
+    "word_limit_main": 6000,
+    "reference_limit": 60,
+    "open_access": true
+  },
+  "review_profile": {
+    "review_style": "transparency_focused",
+    "emphasis_dimensions": {
+      "methodological_rigor": 1.2,
+      "reporting_transparency": 1.4,
+      "global_health_relevance": 1.2,
+      "clinical_significance": 1.0,
+      "evidence_quality": 1.2
+    },
+    "eic_personality": "open_access_advocate",
+    "common_concerns": [
+      "Is the reporting transparent and complete?",
+      "Are all data and code available?",
+      "Is the study relevant to global health?",
+      "Is the evidence quality adequate?"
+    ],
+    "devils_advocate_focus": "generalizability_and_equity",
+    "tone": "balanced_thorough"
+  }
+}

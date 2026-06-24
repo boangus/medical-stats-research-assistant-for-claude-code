@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "journal": "Nature Medicine",
+    "abbr": "NatureMed",
+    "publisher": "Springer Nature",
+    "recommended_study_type": ["RCT", "large cohort", "phase III trial"],
+    "guideline": "CONSORT",
+    "description": "Nature Medicine-style report template. Emphasizes clinical impact, translational relevance, and clear figures. Concise main text with extensive supplementary materials."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background", "Methods", "Results (with key numbers)", "Conclusions"]
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design and participants",
+        "Interventions and outcomes",
+        "Sample size and randomization",
+        "Statistical analysis",
+        "Ethics and registration"
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics", "type": "baseline_table"},
+        {"label": "Table 2", "title": "Primary and Secondary Outcomes", "type": "main_results_table"}
+      ],
+      "figures": [
+        {"label": "Fig 1", "title": "Study Flow", "type": "flowchart"},
+        {"label": "Fig 2", "title": "Primary Outcome", "type": "clinical_figure"},
+        {"label": "Fig 3", "title": "Subgroup/Sensitivity", "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 3,
+      "paragraphs": ["Key findings", "Comparison with literature", "Mechanisms", "Limitations", "Clinical implications"]
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Information (online-only, extensive)",
+    "sections": [
+      {"id": "supp_methods", "title": "Supplementary Methods", "type": "supplement_detail"},
+      {"id": "supp_tables", "title": "Supplementary Tables", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "Supplementary Figures", "type": "supplement_figures"},
+      {"id": "supp_results", "title": "Supplementary Results", "type": "supplement_detail"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "minimal_lines",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "nature_palette",
+    "word_limit_main": 4500,
+    "word_limit_abstract": 200,
+    "reference_limit": 50,
+    "supplement_as_separate_file": true
+  },
+  "review_profile": {
+    "review_style": "impact_focused",
+    "emphasis_dimensions": {
+      "clinical_significance": 1.5,
+      "novelty": 1.5,
+      "mechanistic_insight": 1.2,
+      "methodological_rigor": 1.0,
+      "translational_relevance": 1.3
+    },
+    "eic_personality": "visionary_editor",
+    "common_concerns": [
+      "Is the finding truly novel and impactful?",
+      "Is the effect size clinically meaningful?",
+      "Are the mechanisms well-characterized?",
+      "Would this change clinical practice?"
+    ],
+    "devils_advocate_focus": "novelty_and_impact",
+    "tone": "rigorous_brief"
+  }
+}

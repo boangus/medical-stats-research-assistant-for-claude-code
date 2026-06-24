@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "journal": "PLOS ONE",
+    "abbr": "PLOSONE",
+    "publisher": "Public Library of Science",
+    "recommended_study_type": ["any"],
+    "guideline": "CONSORT/STROBE/PRISMA",
+    "description": "PLOS ONE template. Open science emphasis: data availability, code sharing, methodological soundness over novelty."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background", "Methods and Findings", "Conclusions"]
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design",
+        "Participants and setting",
+        "Variables and measurements",
+        "Data sources and collection",
+        "Statistical methods",
+        "Ethics statement"
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics", "type": "baseline_table"},
+        {"label": "Table 2", "title": "Main Results", "type": "main_results_table"}
+      ],
+      "figures": [
+        {"label": "Fig 1", "title": "Study Flow", "type": "flowchart"},
+        {"label": "Fig 2", "title": "Main Findings", "type": "clinical_figure"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 3,
+      "paragraphs": ["Summary", "Comparison", "Limitations", "Conclusions"]
+    },
+    {
+      "id": "data_availability",
+      "title": "Data Availability Statement",
+      "order": 4,
+      "type": "mandatory",
+      "content": "All data are available in the manuscript and/or at [repository/DOI]"
+    },
+    {
+      "id": "code_availability",
+      "title": "Code Availability Statement",
+      "order": 5,
+      "type": "mandatory",
+      "content": "Analysis code available at [GitHub/DOI]"
+    }
+  ],
+  "supplement": {
+    "description": "Supporting Information",
+    "sections": [
+      {"id": "supp_tables", "title": "S1 Table, S2 Table...", "type": "supplement_tables"},
+      {"id": "supp_figures", "title": "S1 Fig, S2 Fig...", "type": "supplement_figures"},
+      {"id": "supp_data", "title": "S1 Data", "type": "data_file"},
+      {"id": "supp_code", "title": "S1 Code", "type": "code_file"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "simple_lines",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "plos_default",
+    "word_limit_main": null,
+    "reference_limit": null,
+    "supplement_as_separate_file": true,
+    "data_availability_mandatory": true,
+    "code_availability_mandatory": true
+  },
+  "review_profile": {
+    "review_style": "methodology_soundness",
+    "emphasis_dimensions": {
+      "methodological_rigor": 1.3,
+      "reproducibility": 1.5,
+      "data_transparency": 1.5,
+      "code_availability": 1.3,
+      "clinical_significance": 0.8
+    },
+    "eic_personality": "open_science_advocate",
+    "common_concerns": [
+      "Is the data availability statement complete?",
+      "Is the analysis code reproducible?",
+      "Are all methods described in sufficient detail?",
+      "Is the study ethically sound?"
+    ],
+    "devils_advocate_focus": "reproducibility_and_transparency",
+    "tone": "supportive_rigorous"
+  }
+}

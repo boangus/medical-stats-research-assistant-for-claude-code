@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "journal": "Statistics in Medicine",
+    "abbr": "StatMed",
+    "publisher": "Wiley",
+    "recommended_study_type": ["methodology", "simulation", "RCT"],
+    "guideline": "CONSORT",
+    "description": "Statistics in Medicine template. Statistical methodology focus: mathematical rigor, simulation studies, software implementation."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background", "Methods", "Results", "Conclusions"]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction",
+      "order": 1,
+      "type": "narrative"
+    },
+    {
+      "id": "methods",
+      "title": "Methods / Statistical Framework",
+      "order": 2,
+      "type": "mathematical",
+      "paragraphs": [
+        "Notation and setup",
+        "Proposed method / estimator",
+        "Theoretical properties (consistency, asymptotic normality)",
+        "Implementation details"
+      ]
+    },
+    {
+      "id": "simulation",
+      "title": "Simulation Study",
+      "order": 3,
+      "paragraphs": [
+        "Simulation design",
+        "Data generating process",
+        "Competing methods",
+        "Performance metrics (bias, MSE, coverage, power)"
+      ]
+    },
+    {
+      "id": "application",
+      "title": "Application / Data Analysis",
+      "order": 4,
+      "paragraphs": [
+        "Real data application",
+        "Results and interpretation"
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 5
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Materials",
+    "sections": [
+      {"id": "supp_proofs", "title": "Technical Proofs", "type": "supplement_detail"},
+      {"id": "supp_simulation", "title": "Additional Simulation Results", "type": "supplement_tables"},
+      {"id": "supp_code", "title": "R/Python Code", "type": "code_file"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "academic",
+    "figure_dpi": 300,
+    "figure_format": "pdf",
+    "color_scheme": "statmed_default",
+    "word_limit_main": 8000,
+    "reference_limit": 50,
+    "math_notation": "LaTeX",
+    "code_availability_recommended": true
+  },
+  "review_profile": {
+    "review_style": "statistical_depth",
+    "emphasis_dimensions": {
+      "mathematical_rigor": 1.5,
+      "methodological_novelty": 1.4,
+      "simulation_quality": 1.3,
+      "practical_relevance": 1.0,
+      "reproducibility": 1.2
+    },
+    "eic_personality": "methodological_statistician",
+    "common_concerns": [
+      "Is the mathematical derivation correct?",
+      "Is the simulation design realistic?",
+      "Are competing methods fairly compared?",
+      "Is the method practically useful?"
+    ],
+    "devils_advocate_focus": "theoretical_assumptions",
+    "tone": "mathematically_precise"
+  }
+}

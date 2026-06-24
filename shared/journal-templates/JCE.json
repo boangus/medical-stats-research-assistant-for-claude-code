@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "journal": "Journal of Clinical Epidemiology",
+    "abbr": "JCE",
+    "publisher": "Elsevier",
+    "recommended_study_type": ["observational", "diagnostic", "methodology"],
+    "guideline": "STROBE",
+    "description": "JCE template. Strong emphasis on epidemiological methods, causal inference, bias assessment, and methodology."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Objective", "Study Design and Setting", "Results", "Conclusion"]
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 1,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design",
+        "Data source and study population",
+        "Exposure and outcome definitions",
+        "Covariates and confounders",
+        "Statistical methods (causal inference details)",
+        "Sensitivity analyses",
+        "Ethics"
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 2,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics", "type": "baseline_table"},
+        {"label": "Table 2", "title": "Main Estimates", "type": "main_results_table"},
+        {"label": "Table 3", "title": "Sensitivity Analyses", "type": "sensitivity_table"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "DAG / Directed Acyclic Graph", "type": "dag"},
+        {"label": "Figure 2", "title": "Main Results", "type": "forest_plot"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 3
+    }
+  ],
+  "supplement": {
+    "description": "Online Supplement",
+    "sections": [
+      {"id": "supp_dag", "title": "Supplementary DAG Details", "type": "supplement_detail"},
+      {"id": "supp_sensitivity", "title": "Supplementary Sensitivity Analyses", "type": "supplement_tables"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "jce_style",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "jce_default",
+    "word_limit_main": 4000,
+    "reference_limit": 40
+  },
+  "review_profile": {
+    "review_style": "causal_rigorous",
+    "emphasis_dimensions": {
+      "causal_inference_rigor": 1.5,
+      "confounding_control": 1.4,
+      "bias_assessment": 1.4,
+      "methodological_innovation": 1.2,
+      "reporting_completeness": 1.0
+    },
+    "eic_personality": "epidemiology_purist",
+    "common_concerns": [
+      "Is the DAG appropriate and well-justified?",
+      "Are unmeasured confounders adequately addressed?",
+      "Is the causal claim supported by the design?",
+      "Are sensitivity analyses sufficient?"
+    ],
+    "devils_advocate_focus": "confounding_residual_bias",
+    "tone": "methodologically_strict"
+  }
+}

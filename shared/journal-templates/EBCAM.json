@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "journal": "Evidence-Based Complementary and Alternative Medicine",
+    "abbr": "EBCAM",
+    "publisher": "Hindawi / Wiley",
+    "recommended_study_type": ["RCT", "systematic review", "case series", "observational"],
+    "guideline": "CONSORT/STROBE/STRICTA",
+    "description": "EBCAM template. Complementary and alternative medicine focus: TCM, acupuncture, herbal medicine, integrative approaches."
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "order": 0,
+      "type": "structured_abstract",
+      "paragraphs": ["Background", "Objective", "Methods", "Results", "Conclusion"]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction",
+      "order": 1,
+      "type": "narrative",
+      "content": "Include TCM theoretical background, modern evidence, study rationale"
+    },
+    {
+      "id": "methods",
+      "title": "Methods",
+      "order": 2,
+      "type": "structured_methods",
+      "paragraphs": [
+        "Study design and ethics",
+        "Participants (Western + TCM diagnostic criteria)",
+        "Intervention (detailed TCM protocol: formula/acupuncture points/technique)",
+        "Control/comparator",
+        "Outcomes (Western + TCM syndrome scores)",
+        "Sample size",
+        "Randomization and blinding",
+        "Statistical analysis"
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "order": 3,
+      "tables": [
+        {"label": "Table 1", "title": "Baseline Characteristics (Western + TCM)", "type": "baseline_table"},
+        {"label": "Table 2", "title": "Primary and Secondary Outcomes", "type": "main_results_table"},
+        {"label": "Table 3", "title": "TCM Syndrome Efficacy", "type": "tcm_efficacy"}
+      ],
+      "figures": [
+        {"label": "Figure 1", "title": "Study Flow", "type": "flowchart"},
+        {"label": "Figure 2", "title": "TCM Syndrome Score Changes", "type": "clinical_figure"}
+      ]
+    },
+    {
+      "id": "discussion",
+      "title": "Discussion",
+      "order": 4,
+      "paragraphs": ["Key findings", "TCM mechanism", "Comparison with prior studies", "Limitations", "Conclusions"]
+    }
+  ],
+  "supplement": {
+    "description": "Supplementary Materials",
+    "sections": [
+      {"id": "supp_formula", "title": "Detailed Formula Composition", "type": "supplement_detail"},
+      {"id": "supp_acupuncture", "title": "Acupuncture Protocol Details", "type": "supplement_detail"}
+    ]
+  },
+  "output_rules": {
+    "table_format": "academic",
+    "figure_dpi": 300,
+    "figure_format": "tiff",
+    "color_scheme": "ebcam_default",
+    "word_limit_main": 6000,
+    "reference_limit": 50
+  },
+  "review_profile": {
+    "review_style": "integrative_evidence",
+    "emphasis_dimensions": {
+      "tcm_theory_integration": 1.3,
+      "methodological_rigor": 1.2,
+      "intervention_reporting": 1.4,
+      "clinical_relevance": 1.2,
+      "evidence_quality": 1.0
+    },
+    "eic_personality": "integrative_medicine_researcher",
+    "common_concerns": [
+      "Is the TCM intervention adequately described (CONSORT-TCM/STRICTA)?",
+      "Are both Western and TCM outcomes reported?",
+      "Is the TCM theoretical basis well-justified?",
+      "Is the control group appropriate?"
+    ],
+    "devils_advocate_focus": "tcm_western_validation_gap",
+    "tone": "open_balanced"
+  }
+}
