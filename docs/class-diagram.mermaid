@@ -1,137 +1,78 @@
 classDiagram
     direction TB
 
-    class ScRNASeqLoader {
-        -_adata: AnnData
-        +read_10x_mtx(mtx_dir: str, var_names: str, cache: bool) AnnData
-        +read_10x_h5(h5_path: str, genome: str) AnnData
-        +read_csv(csv_path: str, **kwargs) AnnData
-        +read_fasta(fasta_path: str) List
-        +get_metadata() Dict
+    class DICOMLoader {
+        +window_level: Optional[float]
+        +window_width: Optional[float]
+        +load_dicom_series(dicom_dir: str) SimpleITK.Image
+        +load_dicom(dicom_path: str) SimpleITK.Image
+        +load_nifti(nifti_path: str) SimpleITK.Image
+        +load_nrrd(nrrd_path: str) SimpleITK.Image
+        +to_numpy(image) np.ndarray
+        +extract_metadata(image) Dict
+        +apply_window(image, window_level, window_width) SimpleITK.Image
     }
 
-    class SingleCellQC {
-        +min_genes: int
-        +max_genes: int
-        +max_pct_mito: float
-        +min_cells: int
-        +compute_qc_metrics(adata) AnnData
-        +filter_cells(adata, verbose: bool) AnnData
-        +filter_genes(adata, verbose: bool) AnnData
-        +run_qc(adata, verbose: bool) AnnData
-        +get_qc_summary(adata) Dict
+    class ImagePreprocessor {
+        +target_spacing: Optional[Tuple[float, float, float]]
+        +normalize: bool
+        +resample(image, target_spacing) SimpleITK.Image
+        +normalize_intensity(image, method: str) SimpleITK.Image
+        +denoise(image, method: str) SimpleITK.Image
+        +bias_correction(image) SimpleITK.Image
+        +preprocess_pipeline(image) SimpleITK.Image
     }
 
-    class DimensionalityReduction {
-        +n_pcs: int
-        +n_neighbors: int
-        +normalize_and_log(adata, target_sum: int) AnnData
-        +find_hvg(adata, n_top_genes: int) AnnData
-        +run_pca(adata) AnnData
-        +run_umap(adata) AnnData
-        +cluster(adata, resolution: float) AnnData
-        +run_full_pipeline(adata, resolution: float) AnnData
+    class SegmentationPipeline {
+        +model_name: str
+        +device: str
+        +segment(image: np.ndarray) np.ndarray
+        +segment_with_confidence(image: np.ndarray) Tuple[np.ndarray, np.ndarray]
     }
 
-    class DifferentialExpression {
-        +method: str
-        +find_markers(adata, groupby: str, use_raw: bool) DataFrame
-        +get_de_table(adata, group: str, n_genes: int) DataFrame
-        +filter_de_genes(de_table, log2fc_threshold: float, pval_threshold: float) DataFrame
+    class RadiomicsExtractor {
+        +bin_width: float
+        +extract_shape_features(mask: np.ndarray) Dict[str, float]
+        +extract_firstorder_features(image, mask) Dict[str, float]
+        +extract_texture_features(image, mask) Dict[str, float]
+        +extract_all(image, mask) Dict[str, Dict[str, float]]
+        +to_dataframe(features: Dict) pd.DataFrame
+        +export_v1_schema(features, metadata, output_path) Dict
     }
 
-    class TrajectoryAnalysis {
-        +method: str
-        +run_paga(adata, groups: str) AnnData
-        +run_dpt(adata, root_key: str) AnnData
+    class FeatureSelector {
+        +methods: List[str]
+        +n_features: int
+        +selected_feature_names: List[str]
+        +select_variance_threshold(features_df, threshold: float) pd.DataFrame
+        +select_k_best(features_df, labels, k: int) pd.DataFrame
+        +select_mutual_info(features_df, labels, n_features: int) pd.DataFrame
+        +select_rfe(features_df, labels, n_features: int) pd.DataFrame
+        +select_correlation_filter(features_df, threshold: float) pd.DataFrame
+        +auto_select(features_df, labels, n_features: int) pd.DataFrame
+        +get_selected_feature_names() List[str]
     }
 
-    class BioVisualizer {
-        +figsize: tuple
-        +dpi: int
-        +plot_umap(adata, color: str, save_path: str) Figure
-        +plot_violin(adata, keys: List, groupby: str, save_path: str) Figure
-        +plot_dotplot(adata, var_names: List, groupby: str, save_path: str) Figure
-        +plot_heatmap(adata, var_names: List, groupby: str, save_path: str) Figure
-        +plot_paga(adata, color: str, save_path: str) Figure
-    }
-
-    class CellBenderDenoiser {
-        +expected_cells: int
-        +total_droplets: int
-        +epochs: int
-        +check_installation() bool
-        +run_remove_background(input_h5, output_h5, expected_cells, total_droplets) Dict
-        +load_denoised(h5_path) AnnData
-        +compare_before_after(raw_adata, denoised_adata) Dict
-    }
-
-    class PathwayEnrichment {
-        +organism: str
-        +gene_sets: str
-        +outdir: str
-        +run_enrichr(gene_list: List, gene_sets_libraries: List, cutoff: float) DataFrame
-        +run_gsea(rnk: Series, gene_sets: str, min_size: int, max_size: int) DataFrame
-        +run_go(gene_list: List, ontology: str, cutoff: float) DataFrame
-        +run_kegg(gene_list: List, cutoff: float) DataFrame
-        +get_top_pathways(results: DataFrame, n: int, sort_by: str) DataFrame
-        +export_results(results: DataFrame, output_path: str, format: str) str
-    }
-
-    class BatchCorrector {
-        +batch_key: str
-        +method: str
-        +detect_batch_effect(adata, n_pcs: int) Dict
-        +run_combat(adata, key: str) AnnData
-        +run_harmony(adata, basis: str, adjusted_basis: str) AnnData
-        +compare_before_after(adata_raw, adata_corrected) Dict
-    }
-
-    class BioQualityGateChecker {
-        -study_id: str
-        -_runner: GateRunner
-        +gate_bio_1_5(adata, sample_info: DataFrame, batch_key: str) GateResult
-        +gate_bio_3_5(de_results: DataFrame, enrichment_results: DataFrame, visualization_paths: List) GateResult
-        +register_bio_gates()$
-        -_check_count_matrix_integrity(adata) CheckItemResult
-        -_check_sample_consistency(adata, sample_info) CheckItemResult
-        -_check_library_size(adata) CheckItemResult
-        -_check_gene_annotation(adata) CheckItemResult
-        -_check_batch_effect(adata, batch_key: str) CheckItemResult
-        -_check_pvalue_distribution(pvalues: Series) CheckItemResult
-        -_check_effect_consistency(log2fc: Series, pvalues: Series) CheckItemResult
-        -_check_multiple_testing(pvalues: Series, padj: Series) CheckItemResult
-        -_check_enrichment_fdr(enrichment_df: DataFrame) CheckItemResult
-        -_check_visualization_consistency(visualization_paths: List, de_table: DataFrame) CheckItemResult
+    class ImagingQualityGateChecker {
+        +study_id: str
+        +_runner: GateRunner
+        +run_img_gate_1(image_data, mask, metadata) GateResult
+        -_check_file_readable(file_path: str) CheckItemResult
+        -_check_voxel_spacing(metadata: Dict) CheckItemResult
+        -_check_roi_dimension_match(image, mask) CheckItemResult
+        -_check_image_quality(image) CheckItemResult
+        -_build_gate_result(gate_type, check_results, total_items) GateResult
     }
 
     class GateRunner {
+        <<shared/quality_gates>>
         +study_id: str
-        +get_gate_definition(gate_type) GateDefinition
-        +generate_checklist(gate_type, artifacts: Dict) str
-        +build_agent_task(gate_type, artifacts: Dict, output_path: str) Dict
-        +run_gate(gate_type, artifacts: Dict, mode: RunMode, check_results: List) GateResult
-        +load_gate_report(report_path: str) GateResult
-        +save_gate_report(result: GateResult, output_path: str) str
-    }
-
-    class GateResult {
-        +gate_type: GateType
-        +study_id: str
-        +verdict: GateVerdict
-        +total_items: int
-        +passed_items: int
-        +failed_items: int
-        +key_items_status: str
-        +check_results: List~CheckItemResult~
-        +risks: List~str~
-        +timestamp: str
-        +mode: RunMode
-        +pass_rate: float
-        +to_dict() Dict
+        +generate_checklist(gate_type, artifacts) str
+        +run_gate(gate_type, artifacts, mode, check_results) GateResult
     }
 
     class CheckItemResult {
+        <<shared/quality_gates>>
         +item_id: str
         +name: str
         +is_key: bool
@@ -140,17 +81,37 @@ classDiagram
         +notes: str
     }
 
-    %% 关系
-    BioQualityGateChecker --> GateRunner : 复用门闸执行器
-    BioQualityGateChecker --> CheckItemResult : 产出检查结果
-    GateRunner --> GateResult : 返回门闸结果
-    GateResult *-- CheckItemResult : 包含多个
+    class GateResult {
+        <<shared/quality_gates>>
+        +gate_type: GateType
+        +verdict: GateVerdict
+        +total_items: int
+        +passed_items: int
+        +failed_items: int
+        +check_results: List[CheckItemResult]
+        +risks: List[str]
+        +to_dict() Dict
+    }
 
-    PathwayEnrichment ..> DifferentialExpression : 消费差异基因列表
-    BatchCorrector ..> DimensionalityReduction : 校正后可重新降维
+    class GateVerdict {
+        <<enum>>
+        PASS
+        CONDITIONAL
+        BLOCKED
+    }
 
-    ScRNASeqLoader --> SingleCellQC : 输出AnnData
-    SingleCellQC --> DimensionalityReduction : 输出QC后AnnData
-    DimensionalityReduction --> DifferentialExpression : 输出标准化AnnData
-    DifferentialExpression --> PathwayEnrichment : 输出基因列表
-    DifferentialExpression --> BioVisualizer : 输出DE表供可视化
+    class GateType {
+        <<enum>>
+        DATA_QUALITY
+        SAP_QUALITY
+        RESULTS_QUALITY
+    }
+
+    ImagingQualityGateChecker --> GateRunner : 复用框架
+    ImagingQualityGateChecker --> CheckItemResult : 产出
+    ImagingQualityGateChecker --> GateResult : 产出
+    GateResult --> GateVerdict
+    GateResult --> GateType
+    DICOMLoader ..> RadiomicsExtractor : 影像 → 特征
+    RadiomicsExtractor ..> FeatureSelector : 特征矩阵 → 筛选
+    SegmentationPipeline ..> RadiomicsExtractor : 掩码 → 特征提取

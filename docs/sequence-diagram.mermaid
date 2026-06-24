@@ -1,86 +1,46 @@
 sequenceDiagram
-    participant U as User
-    participant SKILL as SKILL.md
-    participant Loader as ScRNASeqLoader
-    participant QC as SingleCellQC
-    participant DR as DimensionalityReduction
-    participant Gate as BioQualityGateChecker
-    participant DE as DifferentialExpression
-    participant Enrich as PathwayEnrichment
-    participant BC as BatchCorrector
-    participant Vis as BioVisualizer
-    participant Runner as GateRunner
+    participant User as 用户
+    participant Skill as SKILL.md
+    participant Loader as DICOMLoader
+    participant Preproc as ImagePreprocessor
+    participant Seg as SegmentationPipeline
+    participant Gate as ImagingQualityGateChecker
+    participant Radio as RadiomicsExtractor
+    participant Sel as FeatureSelector
+    participant Export as export_v1_schema
 
-    Note over U, Runner: Phase 0: 用户交互配置 (MANDATORY)
-    U->>SKILL: /msra-bio --data path/to/data
-    SKILL->>U: 请求确认: 数据源类型、样本信息、分析目标、参数配置
-    U->>SKILL: 确认配置
+    Note over User, Export: Phase 0: 数据源确认 + 参数配置
+    User->>Skill: /msra-imaging --data dicom_dir/
+    Skill->>User: 确认数据路径、分析模式、分割模型
 
-    Note over U, Runner: Phase 1: 数据预处理 (ADAPTIVE)
-    SKILL->>Loader: read_10x_mtx(path)
-    Loader-->>SKILL: adata (AnnData)
-    SKILL->>SKILL: 加载 sample_info (如有)
-    
-    SKILL->>Gate: gate_bio_1_5(adata, sample_info)
-    Gate->>Gate: check_count_matrix_integrity [🔑]
-    Gate->>Gate: check_sample_consistency [🔑]
-    Gate->>Gate: check_library_size
-    Gate->>Gate: check_gene_annotation
-    Gate->>Gate: check_batch_effect (skip if no batch)
-    Gate->>Runner: run_gate(GateType.BIO_DATA_QUALITY)
-    Runner-->>Gate: GateResult
-    Gate-->>SKILL: GateResult (PASS/CONDITIONAL/BLOCKED)
-    
-    alt BLOCKED
-        SKILL->>U: 阻断: 数据质量问题，请修复后重试
-    else CONDITIONAL
-        SKILL->>U: 警告: 部分检查未通过，继续?
-        U->>SKILL: 确认继续
+    Note over User, Export: Phase 1: 数据加载 → Gate IMG-1 → 预处理
+    Skill->>Loader: load_dicom_series(path) 或 load_nifti(path)
+    Loader-->>Skill: image (SimpleITK.Image) + metadata
+    Skill->>Gate: run_img_gate_1(image, mask=None, metadata)
+    Gate->>Gate: _check_file_readable(path)
+    Gate->>Gate: _check_voxel_spacing(metadata)
+    Gate->>Gate: _check_roi_dimension_match(image, mask)
+    Gate->>Gate: _check_image_quality(image)
+    Gate-->>Skill: GateResult (PASS / CONDITIONAL / BLOCKED)
+    alt Gate BLOCKED
+        Skill->>User: ❌ 阻断：请修复数据质量问题
     end
+    Skill->>Preproc: preprocess_pipeline(image)
+    Preproc-->>Skill: preprocessed_image
 
-    SKILL->>QC: run_qc(adata)
-    QC-->>SKILL: adata_filtered
-    SKILL->>DR: normalize_and_log(adata)
-    DR-->>SKILL: adata_normalized
-    SKILL->>DR: find_hvg(adata)
-    DR-->>SKILL: adata_hvg
+    Note over User, Export: Phase 2: 分割 + 特征提取（子 Agent 后台并行）
+    Skill->>Seg: segment(preprocessed_image)
+    Seg-->>Skill: mask (分割掩码)
+    Skill->>Radio: extract_all(preprocessed_image_array, mask)
+    Radio-->>Skill: features_dict (shape + firstorder + texture)
+    Radio->>Radio: to_dataframe(features_dict)
+    Radio-->>Skill: features_df (pd.DataFrame)
 
-    Note over U, Runner: Phase 2: 重计算 (BACKGROUND - 子Agent并行)
-    par Task A: 降维聚类
-        SKILL->>DR: run_pca → run_umap → cluster
-        DR-->>SKILL: adata_clustered
-    and Task B: 差异表达
-        SKILL->>DE: find_markers(adata, groupby="leiden")
-        DE-->>SKILL: markers_df
-    and Task C: 通路富集
-        SKILL->>Enrich: run_go(gene_list) + run_kegg(gene_list)
-        Enrich-->>SKILL: enrichment_df
-    and Task D: 批次校正 (if batch detected)
-        SKILL->>BC: run_harmony(adata)
-        BC-->>SKILL: adata_corrected
-    end
+    Note over User, Export: Phase 3: 特征选择
+    Skill->>Sel: auto_select(features_df, labels, n_features)
+    Sel-->>Skill: selected_features_df
 
-    Note over U, Runner: Phase 3: 结果审查 (MANDATORY)
-    SKILL->>Gate: gate_bio_3_5(de_results, enrichment_results)
-    Gate->>Gate: check_pvalue_distribution [🔑]
-    Gate->>Gate: check_effect_consistency [🔑]
-    Gate->>Gate: check_multiple_testing [🔑]
-    Gate->>Gate: check_enrichment_fdr
-    Gate->>Gate: check_visualization_consistency
-    Gate->>Runner: run_gate(GateType.BIO_RESULTS_QUALITY)
-    Runner-->>Gate: GateResult
-    Gate-->>SKILL: GateResult
-
-    SKILL->>Vis: plot_umap / plot_violin / plot_dotplot / plot_heatmap
-    Vis-->>SKILL: figures
-
-    SKILL->>U: 展示结果摘要 + 关键发现 + 可视化
-    U->>SKILL: 确认 / 请求调整参数重跑
-
-    Note over U, Runner: Phase 4: 整合与报告 (ADAPTIVE)
-    alt 独立报告
-        SKILL->>SKILL: 生成 bio_analysis_report.md
-        SKILL->>SKILL: 导出 differential_genes.csv + enrichment_results.csv
-    else 接入主 Pipeline
-        SKILL->>SKILL: 输出 bio_covariates.csv → Stage 3
-    end
+    Note over User, Export: Phase 4: 导出 + 报告
+    Skill->>Export: export_v1_schema(selected_features, metadata, output_path)
+    Export-->>Skill: schema_dict + JSON文件路径
+    Skill->>User: ✅ 分析完成，特征矩阵已导出
