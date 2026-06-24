@@ -112,8 +112,8 @@
 
 | # | 模块 | 目录 | 状态 | 完成度 | 说明 |
 |---|------|------|------|--------|------|
-| 59 | 医学影像处理 | `msra_modules/medical_imaging/` | 🟡 Beta | 50% | Skill入口待开发，Python引擎骨架已有，方案C架构已设计，Gate IMG-1 已定义 |
-| 60 | 生物信息学 | `msra_modules/bioinformatics/` | 🟡 Beta | 60% | ✅ Skill入口完成，✅ 通路富集/批次校正/质量门闸实现，✅ 62个测试，✅ /msra-bio 命令注册 |
+| 59 | 医学影像处理 | `msra_modules/medical_imaging/` | 🟡 Beta | 50% | 🔄 Phase 2 开发中：架构师设计完成，工程师实现中 |
+| 60 | 生物信息学 | `msra_modules/bioinformatics/` | 🟡 Beta | 100% | ✅ Phase 1 完成：Skill + 引擎 + 质量门闸 + 62测试全通过 + /msra-bio 注册 |
 | 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | 🔶 | 10→待定 | Skill入口待开发，Python引擎骨架已有 |
 | 62 | 跨领域集成 | `msra_modules/cross_domain/` | 🔶 | 10→待定 | 依赖前三者成熟后开发 |
 
