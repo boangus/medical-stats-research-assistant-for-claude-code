@@ -1,5 +1,11 @@
 # 统计检验决策树 — Medical Statistics Research Assistant
 
+> **规范决策树源**: `skills/stat-method-selector/decision-tree.json`（15-goal, 112-method, 53篇文献支撑）
+> **文献依据**: `skills/stat-method-selector/references.md`（53篇方法学论文结构化摘要 + 效应量解释标准）
+> **方法映射**: `shared/statistics-methods/method_selector_mapping.md`（决策树方法→MSRA章节→R/Python实现）
+>
+> 本文档为本地速查版本。完整的多维度决策树（含因果推断、诊断试验、Meta分析、贝叶斯、缺失数据、等效/非劣效等分支）见 `stat-method-selector/decision-tree.json`。
+>
 > 参考：Epi R Handbook (https://epirhandbook.com/en/new_pages/stat_tests.html)
 >         数据分析常用策略 — 三阶方法：base R (快速查看) → rstatix (管道处理) → gtsummary (出版级表格)
 

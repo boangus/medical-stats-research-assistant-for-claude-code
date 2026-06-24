@@ -95,6 +95,19 @@
 | `glossary.md` | 术语表 |
 | `cheatsheet.md` | 研究设计、统计方法、偏倚类型速查 |
 | `patterns.md` | 8 种常见方法学模式 |
+| `stat_test_decision_tree.md` | 统计检验决策树速查（含 R 代码） |
+| `methods_catalog.md` | 医学统计方法目录 |
+| `method_selector_mapping.md` | 🆕 stat-method-selector 决策树 → MSRA 章节 → R/Python 实现映射（112个方法全覆盖） |
+| `METHOD_REGISTRY.md` | ⭐ **统一注册表**（唯一权威索引，各处引用指向此文件） |
+| `lit_seeding_guide.md` | 文献种子检索策略指南 |
+
+### 第三方方法学资源（skills/stat-method-selector/）
+
+| 文件 | 说明 |
+|------|------|
+| `decision-tree.json` | 15-goal, 112-method 决策树（规范方法选择源） |
+| `references.md` | 53篇方法学论文结构化摘要 + 效应量解释标准 |
+| `THIRD-PARTY-NOTICES.md` | 许可声明（MIT License, ApintLin） |
 
 ## 共享知识库扩展
 

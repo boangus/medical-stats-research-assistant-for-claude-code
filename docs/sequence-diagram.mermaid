@@ -1,0 +1,86 @@
+sequenceDiagram
+    participant U as User
+    participant SKILL as SKILL.md
+    participant Loader as ScRNASeqLoader
+    participant QC as SingleCellQC
+    participant DR as DimensionalityReduction
+    participant Gate as BioQualityGateChecker
+    participant DE as DifferentialExpression
+    participant Enrich as PathwayEnrichment
+    participant BC as BatchCorrector
+    participant Vis as BioVisualizer
+    participant Runner as GateRunner
+
+    Note over U, Runner: Phase 0: 用户交互配置 (MANDATORY)
+    U->>SKILL: /msra-bio --data path/to/data
+    SKILL->>U: 请求确认: 数据源类型、样本信息、分析目标、参数配置
+    U->>SKILL: 确认配置
+
+    Note over U, Runner: Phase 1: 数据预处理 (ADAPTIVE)
+    SKILL->>Loader: read_10x_mtx(path)
+    Loader-->>SKILL: adata (AnnData)
+    SKILL->>SKILL: 加载 sample_info (如有)
+    
+    SKILL->>Gate: gate_bio_1_5(adata, sample_info)
+    Gate->>Gate: check_count_matrix_integrity [🔑]
+    Gate->>Gate: check_sample_consistency [🔑]
+    Gate->>Gate: check_library_size
+    Gate->>Gate: check_gene_annotation
+    Gate->>Gate: check_batch_effect (skip if no batch)
+    Gate->>Runner: run_gate(GateType.BIO_DATA_QUALITY)
+    Runner-->>Gate: GateResult
+    Gate-->>SKILL: GateResult (PASS/CONDITIONAL/BLOCKED)
+    
+    alt BLOCKED
+        SKILL->>U: 阻断: 数据质量问题，请修复后重试
+    else CONDITIONAL
+        SKILL->>U: 警告: 部分检查未通过，继续?
+        U->>SKILL: 确认继续
+    end
+
+    SKILL->>QC: run_qc(adata)
+    QC-->>SKILL: adata_filtered
+    SKILL->>DR: normalize_and_log(adata)
+    DR-->>SKILL: adata_normalized
+    SKILL->>DR: find_hvg(adata)
+    DR-->>SKILL: adata_hvg
+
+    Note over U, Runner: Phase 2: 重计算 (BACKGROUND - 子Agent并行)
+    par Task A: 降维聚类
+        SKILL->>DR: run_pca → run_umap → cluster
+        DR-->>SKILL: adata_clustered
+    and Task B: 差异表达
+        SKILL->>DE: find_markers(adata, groupby="leiden")
+        DE-->>SKILL: markers_df
+    and Task C: 通路富集
+        SKILL->>Enrich: run_go(gene_list) + run_kegg(gene_list)
+        Enrich-->>SKILL: enrichment_df
+    and Task D: 批次校正 (if batch detected)
+        SKILL->>BC: run_harmony(adata)
+        BC-->>SKILL: adata_corrected
+    end
+
+    Note over U, Runner: Phase 3: 结果审查 (MANDATORY)
+    SKILL->>Gate: gate_bio_3_5(de_results, enrichment_results)
+    Gate->>Gate: check_pvalue_distribution [🔑]
+    Gate->>Gate: check_effect_consistency [🔑]
+    Gate->>Gate: check_multiple_testing [🔑]
+    Gate->>Gate: check_enrichment_fdr
+    Gate->>Gate: check_visualization_consistency
+    Gate->>Runner: run_gate(GateType.BIO_RESULTS_QUALITY)
+    Runner-->>Gate: GateResult
+    Gate-->>SKILL: GateResult
+
+    SKILL->>Vis: plot_umap / plot_violin / plot_dotplot / plot_heatmap
+    Vis-->>SKILL: figures
+
+    SKILL->>U: 展示结果摘要 + 关键发现 + 可视化
+    U->>SKILL: 确认 / 请求调整参数重跑
+
+    Note over U, Runner: Phase 4: 整合与报告 (ADAPTIVE)
+    alt 独立报告
+        SKILL->>SKILL: 生成 bio_analysis_report.md
+        SKILL->>SKILL: 导出 differential_genes.csv + enrichment_results.csv
+    else 接入主 Pipeline
+        SKILL->>SKILL: 输出 bio_covariates.csv → Stage 3
+    end

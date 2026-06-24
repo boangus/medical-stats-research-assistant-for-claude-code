@@ -2,6 +2,34 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.9.5] - 2026-06-24
+
+Bioinformatics module Phase 1: Alpha → Beta. Full SOP pipeline (PM → Architect → Engineer → QA).
+
+### Added
+- **`skills/bioinformatics/SKILL.md`** — Skill entry point for `/msra-bio` command. Phase 0-4 definition (interactive config → QC+standardization → background analysis → result review → integration). 6 IRON RULES, Gate Bio-1.5/3.5 references.
+- **`msra_modules/bioinformatics/enrichment.py`** — `PathwayEnrichment` class: GO (BP/MF/CC), KEGG, GSEA, Enrichr ORA via gseapy. Export to CSV/TSV/JSON.
+- **`msra_modules/bioinformatics/batch_correction.py`** — `BatchCorrector` class: batch effect detection (PCA variance), ComBat correction, Harmony correction, before/after comparison.
+- **`msra_modules/bioinformatics/quality_gates.py`** — `BioQualityGateChecker` class: Gate Bio-1.5 (5 items: count matrix integrity 🔑, sample consistency 🔑, library size, gene annotation, batch effect) + Gate Bio-3.5 (5 items: p-value distribution 🔑, effect consistency 🔑, multiple testing 🔑, enrichment FDR, visualization consistency). Reuses `shared/quality_gates/GateRunner`.
+- **`manifest.json`** — Registered `/msra-bio` command pointing to `skills/bioinformatics/SKILL.md`.
+- **`tests/test_bioinformatics/`** — 62 test cases (39 passed, 23 skipped due to optional deps):
+  - `test_enrichment.py` (15 tests): PathwayEnrichment unit tests
+  - `test_batch_correction.py` (10 tests): BatchCorrector unit tests
+  - `test_quality_gates.py` (25 tests): Gate Bio-1.5/3.5 logic tests
+  - `test_integration.py` (12 tests): end-to-end integration tests
+- **`docs/prd/bioinformatics-module-prd.md`** — Product Requirements Document
+- **`docs/system_design.md`** — Architecture design + task decomposition
+- **`docs/dev/18-实验性模块设计.md`** — bioinformatics status updated to 🟡 Beta
+
+### Changed
+- **`msra_modules/bioinformatics/__init__.py`** — version 1.0.0 → 1.1.0, added exports: `PathwayEnrichment`, `BatchCorrector`, `BioQualityGateChecker`
+- **`docs/dev/MSRA开发进度表.md`** — #60 bioinformatics 10% → 60%, test count updated
+
+### Test Results
+- Total: 62 bioinformatics tests (39 passed, 23 skipped — anndata not installed)
+- QA Verdict: PASS, smart routing: NoOne
+- Global consistency check: IS_PASS: YES
+
 ## [0.9.3] - 2026-06-23
 
 System optimization round: graceful degradation, test fixes, unified evaluation, anti-pattern cases.

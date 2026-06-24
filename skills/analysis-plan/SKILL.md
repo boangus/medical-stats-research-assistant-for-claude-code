@@ -510,8 +510,72 @@ Step 2.1: Estimands 定义（五要素 + 伴发事件策略）
 
 #### Step 2.2: 方法选择
 
-> 参考：shared/statistics-methods/stat_test_decision_tree.md 统计检验决策树（检验方法快速选择
-基于 Step 2.1 Estimands、清洗后的数据特征和研究问题，选择统计方法
+> **规范方法选择源**: `skills/stat-method-selector/decision-tree.json`（15-goal, 112-method 决策树，基于53篇方法学论文构建）
+> **方法学文献依据**: `skills/stat-method-selector/references.md`（53篇文献结构化摘要 + 效应量解释标准）
+> **本地速查**: `shared/statistics-methods/stat_test_decision_tree.md`（统计检验决策树，含 R 代码速查）
+> **方法索引**: `shared/statistics-methods/INDEX.md`（48章统计指南章节索引）
+
+基于 Step 2.1 Estimands、清洗后的数据特征和研究问题，选择统计方法。
+
+**方法选择三步流程**:
+
+**Step A: 研究目标维度定位**
+从 `stat-method-selector` 决策树的15个根目标中，根据研究设计和Estimands确定所属分支：
+
+| 根目标 (goal) | 适用场景 | MSRA 研究类型映射 |
+|--------------|---------|-----------------|
+| `compare` | 比较组间差异 | RCT / 观察性 |
+| `correlation` | 变量间关联 | 任意 |
+| `predict` | 预测结局 | 观察性 / 预测模型 |
+| `causal` | 因果推断 | 观察性（PSM/MR/DID） |
+| `survival` | 生存分析 | RCT / 观察性 |
+| `dimension_reduction` | 降维 / 结构验证 | 任意（EFA/CFA/SEM） |
+| `longitudinal` | 纵向/重复测量 | 任意 |
+| `meta_analysis` | Meta分析 | 系统综述 |
+| `diagnostic` | 诊断准确性 | 诊断试验 |
+| `equivalence_non_inferiority` | 等效/非劣效 | RCT |
+| `missing_data` | 缺失数据处理 | 任意 |
+| `multiple_comparisons` | 多重比较校正 | 任意 |
+| `descriptive` | 描述性统计 | 任意 |
+| `reliability` | 一致性/信度 | 诊断试验 / 评估 |
+| `bayesian` | 贝叶斯分析 | 任意 |
+
+> 触发词映射详情见 `shared/statistics-methods/method_selector_mapping.md`
+
+**Step B: 多维度决策路径**
+
+确定根目标后，沿决策树逐层细化。核心维度（按层级）：
+
+```
+根目标 (goal)
+  → 结局类型 (outcome_type): 连续 / 二分类 / 有序分类 / 计数 / 多因变量 / 时间-事件
+    → 组数/比较 (num_groups): 1组 / 2组 / 3组+
+      → 分布特性 (normality): 正态 / 非正态
+        → 设计类型 (design): 独立 / 配对 / 重复测量
+          → 方差齐性 (homogeneity): 齐 / 不齐（仅连续+正态时检查）
+            → 推荐方法 + 文献依据
+```
+
+**需要向用户收集的信息**（EDA 已提供的自动跳过）：
+
+| 维度 | 来源 | 需追问？ |
+|------|------|---------|
+| 结局类型 | Phase 1 EDA / Estimands | ❌ 已知 |
+| 组数/比较 | Phase 1.5 研究要素确认 | ❌ 已知 |
+| 正态性 | Phase 1 EDA（Shapiro-Wilk + Q-Q图） | ❌ 已知 |
+| 设计类型 | Phase 1.5 数据要素确认 | ❌ 已知 |
+| 方差齐性 | Phase 1 EDA（Levene/Brown-Forsythe） | ❌ 已知 |
+| 球对称（重复测量） | Phase 1 EDA（Mauchly检验） | 仅重复测量设计 |
+| 期望频数（分类数据） | Phase 1 EDA | 仅卡方检验 |
+| 分布形状相同（非参） | Phase 1 EDA | 仅两组非参比较 |
+
+> **关键**: Phase 1 EDA 已为方法选择提供了大部分决策依据。仅在信息不足时向用户追问缺失维度。
+
+**Step C: 方法确认 + 文献依据**
+
+从决策树到达叶子节点后，输出推荐卡片（格式见下方）。
+每次推荐**必须引用 `references.md` 中的文献依据**，标注推荐的方法学来源。
+
 **一次性输出格式**:
 ```
 ── 统计分析计划概要 ──
@@ -541,21 +605,101 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 - 样本量
 - 缺失数据模式
 
-**3. 方法推荐决策[CANONICAL Phase 1.5 Step 1.5.6 仅引用此处]**
+**3. 方法推荐决策树（CANONICAL — 完整维度版本）**
 
-> 参考：shared/statistics-methods/INDEX.md 各方法对应统计指南章节速查
+> **规范源**: `skills/stat-method-selector/decision-tree.json`（15-goal, 112-method, 53篇文献支撑）
+> **映射表**: `shared/statistics-methods/method_selector_mapping.md`（决策树方法→MSRA章节→R/Python实现）
+> **文献依据**: `skills/stat-method-selector/references.md` 每次推荐必须引用
 
 ```
-研究设计
-├── RCT: ANCOVA(连续) / Logistic(二分类) / Cox(生存)，均调整基线
-├── 观察性: 先评估混杂 → PSM/IPTW + DAG + 多变量调整
-│   └── 队列/病例对照
-│       结局类型
-│       ├── 连续: 2组 t/Mann-Whitney | >2组 ANOVA/Kruskal-Wallis | 重复: RM-ANOVA/GEE
-│       ├── 二分类: 卡方/Fisher(2组) | 趋势检验(>2组) | Logistic回归
-│       ├── 生存: KM + Cox（检查PH假设）
-│       ├── 计数: Poisson / 负二项
-│       └── 有序/多分类: Ordinal/Multinomial Logistic
+研究目标 (Step A 定位)
+├── 比较差异 (compare)
+│   ├── 连续结局
+│   │   ├── 1组 → 单样本t检验(正态) / Wilcoxon符号秩(非正态)
+│   │   ├── 2组
+│   │   │   ├── 独立 → 独立t检验(正态+方差齐) / Welch t(正态+方差不齐) / Mann-Whitney U(非正态)
+│   │   │   └── 配对 → 配对t检验(差值正态) / Wilcoxon符号秩(差值非正态)
+│   │   ├── 3+组
+│   │   │   ├── 独立 → One-way ANOVA+Tukey(正态+方差齐) / Welch ANOVA+Games-Howell(方差不齐) / Kruskal-Wallis+Dunn(非正态)
+│   │   │   └── 重复测量 → RM-ANOVA(正态+球对称) / Friedman+Wilcoxon事后(非正态)
+│   │   └── 多因变量 → Hotelling's T²(2组) / MANOVA(3+组)
+│   ├── 二分类结局
+│   │   ├── 2组独立 → Pearson卡方(期望≥5) / Fisher精确(小样本)
+│   │   ├── 2组配对 → McNemar检验
+│   │   └── 3+组 → R×C卡方 / Cochran-Armitage趋势(有序暴露)
+│   └── 有序结局
+│       ├── 2组独立 → Mann-Whitney U / 有序Logistic
+│       └── 3+组 → Kruskal-Wallis+Dunn / 有序Logistic
+│
+├── 关联/相关 (correlation)
+│   ├── 连续×连续 → Pearson(双正态+线性) / Spearman(非正态/非线) / Kendall τ(小样本)
+│   ├── 分类×分类 → 卡方独立性 + Cramér's V
+│   └── 有序×有序 → Kendall τ-b / Spearman
+│
+├── 预测 (predict)
+│   ├── 连续结局 → 多元线性回归 / Ridge(VIF≥10) / RCS(非线性)
+│   ├── 二分类结局 → Logistic回归(EPV≥10) / Firth惩罚Logistic(EPV<10或分离) / RCS-Logistic(非线性logit)
+│   ├── 有序结局 → 有序Logistic回归(比例优势假设通过) / 偏比例优势(假设违反)
+│   ├── 计数结局 → 泊松回归(等离散) / 负二项(过离散) / 零膨胀(零过多)
+│   └── 高维(n<p) → LASSO / Elastic Net / 随机森林
+│
+├── 因果推断 (causal) [观察性专用]
+│   ├── PSM → 1:1匹配 / 0.2×SD卡尺 / SMD<0.1均衡诊断
+│   ├── IPTW → 稳定化权重 / 95th截断 / 权重诊断
+│   ├── 双重稳健 → AIPW + Bootstrap
+│   ├── 中介分析 → 因果中介(反事实框架) / Baron-Kenny / Bootstrap CI
+│   ├── 孟德尔随机化 → IVW + MR-Egger(水平多效性) + 加权中位数
+│   ├── 双重差分DID → 平行趋势检验 + 事件研究图
+│   └── E-value敏感性分析 → 未测量混杂影响量化
+│
+├── 生存分析 (survival)
+│   ├── 描述 → Kaplan-Meier + 中位生存时间
+│   ├── 比较曲线 → Log-rank检验
+│   ├── 多因素 → Cox PH回归(PH假设通过) / 分层Cox(PH违反) / RMST(非比例风险)
+│   └── 竞争风险 → Fine-Gray子分布HR / Cause-specific HR
+│
+├── 诊断试验 (diagnostic)
+│   ├── 单试验 → ROC+AUC+Youden截断值 / Se/Sp/PPV/NPV/LR±
+│   ├── 比较两试验 → DeLong检验比较AUC
+│   └── 报告标准 → STARD 2015(30项)
+│
+├── 一致性/信度 (reliability)
+│   ├── 连续测量 → ICC(3维度选择) + Bland-Altman
+│   ├── 分类测量 → Cohen's Kappa(2评估者) / Fleiss' Kappa(多评估者) / 加权Kappa(有序)
+│   └── Kappa悖论(患病率极端) → Gwet's AC1
+│
+├── 等效/非劣效 (equivalence_non_inferiority)
+│   ├── 等效性 → TOST(双单侧检验)
+│   └── 非劣效 → 单侧检验 + 预设Δ界值
+│
+├── Meta分析 (meta_analysis)
+│   ├── 异质性低(I²<50%) → 固定效应Meta
+│   ├── 异质性高(I²≥50%) → 随机效应Meta(DL) + 亚组/Meta回归
+│   └── 发表偏倚 → Egger检验 + 漏斗图
+│
+├── 缺失数据 (missing_data)
+│   ├── MCAR + 缺失<5% → 完整案例分析
+│   ├── MAR通用 → 多重插补MICE
+│   ├── MAR SEM/混合模型 → FIML
+│   └── MNAR → 模式混合模型 / δ调整 / IPW选择模型
+│
+├── 多重比较 (multiple_comparisons)
+│   ├── 全部两两(m≤10) → Bonferroni / Holm(FWER)
+│   ├── 全部两两(11≤m≤50) → Hochberg逐步法
+│   ├── k组vs1对照 → Dunnett检验
+│   ├── 高维(m>50) → Benjamini-Hochberg FDR
+│   └── 多层级终点 → 图形化方法(Bretz 2009)
+│
+├── 贝叶斯分析 (bayesian)
+│   ├── t检验替代 → BEST框架(Kruschke 2015) / JZS先验(Rouder 2009)
+│   ├── ANOVA替代 → 贝叶斯单/多因素ANOVA
+│   ├── 回归替代 → 贝叶斯线性/Logistic回归
+│   └── 模型比较 → Bayes因子(Kass&Raftery 1995: BF10>3/10/30/100)
+│
+└── 纵向分析 (longitudinal)
+    ├── 人群平均效应 → GEE(边际模型)
+    └── 个体特异效应 → LMM/GLMM(条件模型)
+```
 
 假设不满足转换流水线:
   Shapiro-Wilk(正态) + Brown-Forsythe(方差齐性)
@@ -566,6 +710,18 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
   多重比较校正须在SAP预定: Bonferroni/Holm/FDR/图形化方法(Bretz)
 
 其他: 混杂→多变量/PS | 重复测量→混合GEE | 聚类→多水平 | 复杂设计→GLMM/GEE
+
+**方法推荐输出格式**（每个推荐方法附带）:
+```
+## 推荐方法：{方法中文名}
+**英文名：** {method_en}
+**适用条件：** {description}
+**前提假设：** {假设列表}
+**假设检查：** {检验方法}
+**假设不满足时：** {替代方法}
+**效应量：** {效应量指标 + 解释标准}
+**SPSS/R/Python 操作路径：** {操作指引}
+**文献依据：** {references.md 中的引用}
 ```
 
 **4. 观察性研究高级方法选择**

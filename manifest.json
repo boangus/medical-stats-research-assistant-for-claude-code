@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
   "author": "boangus",
   "license": "MIT",
@@ -134,6 +134,18 @@
         "/msra-modules list",
         "/msra-modules info medical_imaging",
         "/msra-modules check bioinformatics"
+      ]
+    },
+    "/msra-bio": {
+      "id": "msra-bio",
+      "name": "Bioinformatics Analysis",
+      "entry_point": "skills/bioinformatics/SKILL.md",
+      "description": "Single-cell / gene expression analysis: data loading, QC, DE, pathway enrichment. Supports 10x Genomics, CSV, H5.",
+      "usage": "/msra-bio [--data count_matrix] [--samples sample_info] [--mode de|cluster|enrichment|full]",
+      "examples": [
+        "/msra-bio --data filtered_feature_bc_matrix/",
+        "/msra-bio --mode de --method deseq2",
+        "/msra-bio --mode enrichment --genes de_genes.csv"
       ]
     }
   },

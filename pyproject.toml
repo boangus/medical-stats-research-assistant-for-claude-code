@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "medical-stats-research-assistant"
-version = "0.9.4"
+version = "0.9.5"
 description = "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper"
 readme = "README.md"
 license = {text = "MIT"}
@@ -94,6 +94,13 @@ dev = [
 docs = [
     "sphinx>=7.0",
     "sphinx-rtd-theme",
+]
+bioinformatics = [
+    "scanpy>=1.9",
+    "anndata>=0.9",
+    "pydeseq2>=0.4",
+    "gseapy>=1.0",
+    "harmonypy>=0.0.9",
 ]
 
 [project.urls]
