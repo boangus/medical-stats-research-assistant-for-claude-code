@@ -6,9 +6,9 @@
 
 一个以 **Pipeline 驱动** 的医学统计分析 + 学术写作工具集。从原始数据到最终报告，再到可投稿论文，6 个统计阶段 + 6 个写作阶段，覆盖完整的医学研究流程。无论你从哪个阶段开始，Pipeline 都能自动识别并引导你完成后续工作。
 
-**9 个内置 Skill，12 个命令，开箱即用，无需额外安装**。
+**9 个内置 Skill，16 个命令，开箱即用，无需额外安装**。
 
-> **English Summary**: A pipeline-driven medical statistics analysis and academic writing toolkit. Covers 6 statistical stages (data preparation → exploratory causal analysis → analysis planning → execution → reporting) + 6 writing stages (literature search → paper writing → peer review → revision → finalization). 9 built-in skills, 12 slash commands, cross-platform (Windows/Mac/Linux). Clone the repo, run `install.sh` (Mac/Linux) or `.\install.ps1` (Windows), then invoke `/msra` in your AI coding assistant to start.
+> **English Summary**: A pipeline-driven medical statistics analysis and academic writing toolkit. Covers 6 statistical stages (data preparation → exploratory causal analysis → analysis planning → execution → reporting) + 6 writing stages (literature search → paper writing → peer review → revision → finalization). 9 built-in skills, 16 slash commands, cross-platform (Windows/Mac/Linux). Clone the repo, run `install.sh` (Mac/Linux) or `.\install.ps1` (Windows), then invoke `/msra` in your AI coding assistant to start.
 
 ---
 
@@ -35,6 +35,9 @@
 
 # 多视角论文评审
 /msra-reviewer
+
+# 跨领域多模态融合分析
+/msra-cross --scenario correlation --radiomics features.csv --expression deg.csv
 ```
 
 ---
@@ -145,7 +148,7 @@
 
 ---
 
-## 命令一览（12个）
+## 命令一览（16个）
 
 ### 📊 统计分析（8个）
 
@@ -168,11 +171,15 @@
 | `/msra-full` | 完整写作流水线：研究→写作→评审→修订→定稿 | `pipeline/SKILL.md` |
 | `/msra-reviewer` | 多视角论文评审（5人评审团） | `peer-review` |
 
-### 🧪 实验性模块（1个）
+### 🧬 扩展模块（5个）
 
 | 命令 | 功能 | 说明 |
 |------|------|------|
-| `/msra-modules [list\|info\|check]` | 管理实验性模块（医学影像、生物信息、实时分析） | `msra_modules` |
+| `/msra-modules [list\|info\|check]` | 管理扩展模块（医学影像、生物信息、实时分析、跨领域） | `msra_modules` |
+| `/msra-cross` | 跨领域多模态融合：放射组学-DEG关联、实时预测建模、多模态可视化 | `cross_domain` |
+| `/msra-bio` | 生物信息学分析：单细胞/基因表达、差异表达、通路富集 | `bioinformatics` |
+| `/msra-imaging` | 医学影像分析：DICOM/NIfTI加载、放射组学特征提取 | `medical_imaging` |
+| `/msra-rt` | 实时分析：生命体征流处理、异常检测、告警 | `realtime_analytics` |
 
 ---
 
@@ -218,7 +225,7 @@ medical-stats-research-assistant/
 │   ├── commands/                 # 命令入口（install创建junction）
 │   └── skills/                   # Skill入口（install创建junction）
 │
-├── commands/                     # 命令定义（12个）
+├── commands/                     # 命令定义（16个）
 │   ├── msra.md                   # 统一流水线入口
 │   ├── msra-data.md              # 数据准备
 │   ├── msra-explore.md           # 探索性因果分析
@@ -230,9 +237,13 @@ medical-stats-research-assistant/
 │   ├── msra-write.md             # 论文写作（9种模式）
 │   ├── msra-full.md              # 完整写作流水线
 │   ├── msra-reviewer.md          # 论文评审
-│   └── msra-modules.md           # 实验性模块管理
+│   ├── msra-modules.md           # 扩展模块管理
+│   ├── msra-cross.md             # 跨领域融合
+│   ├── msra-bio.md               # 生物信息学
+│   ├── msra-imaging.md           # 医学影像
+│   └── msra-rt.md                # 实时分析
 │
-├── skills/                       # 9 个 Skill
+├── skills/                       # 10 个 Skill
 │   ├── pipeline/                 # 🔀 统一编排器（核心）
 │   ├── data-prep/                # 📊 数据准备
 │   ├── exploratory-causal/       # 🔬 探索性因果分析
@@ -241,7 +252,11 @@ medical-stats-research-assistant/
 │   ├── report/                   # 📝 报告生成
 │   ├── calibration/              # 🎯 指标校准
 │   ├── peer-review/              # 🔍 论文评审
-│   └── systematic-survey/        # 📚 文献检索
+│   ├── systematic-survey/        # 📚 文献检索
+│   ├── bioinformatics/           # 🧬 生物信息学
+│   ├── imaging-analysis/         # 📷 医学影像分析
+│   ├── realtime-monitor/         # ⚡ 实时监控
+│   └── cross-domain/             # 🔗 跨领域融合
 │
 ├── agents/                       # 多 Agent 定义
 │   ├── AGENTS.md                 # 团队架构 + 协作协议
@@ -271,11 +286,11 @@ medical-stats-research-assistant/
 ├── resources/                    # 参考资源库（被 skills 引用）
 │   └── external/                 # 外部服务集成（PubMed/Embase API）
 │
-├── msra_modules/                 # 实验性模块（医学影像、生物信息、实时分析）
-│   ├── medical_imaging/          # 📷 医学影像处理（DICOM、分割、分类）
-│   ├── bioinformatics/           # 🧬 生物信息学（scRNA-seq、差异表达）
-│   ├── realtime_analytics/       # ⚡ 实时数据分析（流处理、异常检测）
-│   ├── cross_domain/             # 🔗 跨领域集成
+├── msra_modules/                 # 扩展模块（医学影像、生物信息、实时分析、跨领域）
+│   ├── medical_imaging/          # 📷 医学影像处理（DICOM、分割、分类）🟢 Stable
+│   ├── bioinformatics/           # 🧬 生物信息学（scRNA-seq、差异表达）🟢 Stable
+│   ├── realtime_analytics/       # ⚡ 实时数据分析（流处理、异常检测）🟢 Stable
+│   ├── cross_domain/             # 🔗 跨领域多模态融合 🟢 Stable
 │   ├── __init__.py               # 模块导出接口
 │   └── cli.py                    # 命令行工具
 │
@@ -288,6 +303,18 @@ medical-stats-research-assistant/
 │   ├── lint_gate_counts.py
 │   ├── benchmark_large_scale.py
 │   └── migrate_print_to_logging.py
+│
+├── tests/                        # 测试套件（319 tests, 0 failed）
+│   ├── test_cross_domain/        # 跨领域模块单元测试（42 tests）
+│   ├── test_bioinformatics/      # 生物信息学测试（62 tests）
+│   ├── test_medical_imaging/     # 医学影像测试（60 tests）
+│   ├── test_realtime_analytics/  # 实时分析测试（102 tests）
+│   └── e2e/                      # 端到端测试（53 tests, 10 scenarios）
+│
+├── docs/                         # 文档
+│   ├── dev/                      # 开发文档（28份）
+│   ├── user_guide/               # 用户教程（8份，4模块×中英双语）
+│   └── api/                      # API参考（8份，4模块×中英双语）
 │
 └── MSRA/                         # 运行时输出目录
     ├── data/                     # 用户数据
@@ -344,7 +371,7 @@ chmod +x uninstall.sh
 /msra --status
 ```
 
-应显示所有9个skill已注册，12个命令可用。
+应显示所有9个skill已注册，16个命令可用。
 
 ---
 
@@ -438,6 +465,29 @@ result = engine.groupby_aggregate(df, ["group"], {"value": "mean"})
 | **变量映射** | 自动将原始变量名标准化为学术规范命名 |
 | **统计格式化** | P值/置信区间/中位数IQR/均值SD/生存时间统一格式 |
 | **数据标准化** | DataFrame列级标准化处理 |
+
+### 扩展模块（全部 Stable）
+
+MSRA 提供 4 个扩展模块，覆盖医学影像、生物信息学、实时分析和跨领域融合：
+
+| 模块 | 命令 | 成熟度 | 测试数 | 说明 |
+|------|------|--------|--------|------|
+| **bioinformatics** | `/msra-bio` | 🟢 Stable | 62 | 单细胞/基因表达分析、差异表达、通路富集 |
+| **medical_imaging** | `/msra-imaging` | 🟢 Stable | 60 | DICOM/NIfTI加载、放射组学特征提取、特征选择 |
+| **realtime_analytics** | `/msra-rt` | 🟢 Stable | 102 | 流处理、异常检测（Z-Score/IQR/Isolation Forest）、告警 |
+| **cross_domain** | `/msra-cross` | 🟢 Stable | 42+53 | 多模态融合：放射组学-DEG关联、实时预测建模、多模态可视化 |
+
+**跨领域融合使用示例**:
+```bash
+# 放射组学特征与差异表达基因关联分析
+/msra-cross --scenario correlation --radiomics features.csv --expression deg.csv
+
+# 实时数据预测建模
+/msra-cross --scenario prediction --realtime vitals.csv --labels labels.csv
+
+# 多模态联合可视化
+/msra-cross --scenario visualization --radiomics features.csv --expression deg.csv --clinical clinical.csv --realtime vitals.csv
+```
 
 ---
 

@@ -40,6 +40,7 @@ examples/output/
 # 测试输出
 tests/output/
 .pytest_cache/
+.coverage
 
 # 测试数据（原始Kaggle数据太大，不上传）
 tests/healthcare_dataset.csv

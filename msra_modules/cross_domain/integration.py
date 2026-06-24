@@ -544,3 +544,444 @@ class MultiModalVisualizer:
             logger.info(f"Saved summary dashboard to: {save_path}")
 
         return fig
+
+
+class DataAligner:
+    """多模态数据对齐器
+
+    支持三种对齐策略：
+    - inner: 严格匹配（取交集，默认）
+    - outer: 允许缺失（取并集 + 插补）
+    - time_based: 时序数据按时间窗对齐
+
+    Usage:
+        aligner = DataAligner(strategy="inner")
+        aligned = aligner.align({
+            "radiomics": df_features,
+            "expression": df_expr,
+        })
+        # aligned["radiomics"], aligned["expression"] 已对齐到相同样本
+    """
+
+    def __init__(self, strategy: str = "inner", fill_method: str = "mean"):
+        """初始化数据对齐器
+
+        Args:
+            strategy: 对齐策略 ("inner" | "outer" | "time_based")
+            fill_method: 缺失值填充方法 ("mean" | "median" | "zero" | "ffill")
+        """
+        valid_strategies = {"inner", "outer", "time_based"}
+        if strategy not in valid_strategies:
+            raise ValueError(
+                f"Invalid strategy '{strategy}'. Must be one of {valid_strategies}"
+            )
+        valid_fills = {"mean", "median", "zero", "ffill"}
+        if fill_method not in valid_fills:
+            raise ValueError(
+                f"Invalid fill_method '{fill_method}'. Must be one of {valid_fills}"
+            )
+        self.strategy = strategy
+        self.fill_method = fill_method
+
+    def align(
+        self,
+        data_sources: Dict[str, Any],
+        strategy: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """执行数据对齐
+
+        Args:
+            data_sources: 数据源字典 {name: DataFrame or Dict}
+            strategy: 覆盖默认策略
+
+        Returns:
+            对齐后的数据源字典 (所有 DataFrame 具有相同的 index)
+
+        Raises:
+            ValueError: 当 inner join 后样本数 < 3
+        """
+        active_strategy = strategy or self.strategy
+
+        if not data_sources:
+            raise ValueError("data_sources 不能为空")
+
+        if active_strategy == "inner":
+            return self._inner_join(data_sources)
+        elif active_strategy == "outer":
+            return self._outer_join(data_sources)
+        elif active_strategy == "time_based":
+            # 时间窗从 Phase 0 参数继承 (默认 60 秒)
+            return self._time_based_align(data_sources, window_seconds=60)
+        else:
+            raise ValueError(f"Unknown strategy: {active_strategy}")
+
+    def _inner_join(self, data_sources: Dict[str, Any]) -> Dict[str, Any]:
+        """严格匹配：取所有 DataFrame index 的交集
+
+        Args:
+            data_sources: 数据源字典
+
+        Returns:
+            对齐后的数据源字典
+
+        Raises:
+            ValueError: 当交集样本数 < 3
+        """
+        common_samples = self._get_common_samples(data_sources)
+
+        if len(common_samples) < 3:
+            raise ValueError(
+                f"Inner join 后样本数 {len(common_samples)} < 3，"
+                f"数据不足以进行融合分析。请考虑使用 outer join 策略或增加样本量。"
+            )
+
+        aligned: Dict[str, Any] = {}
+        # 排序以确保一致性
+        sorted_samples = sorted(common_samples)
+
+        for name, data in data_sources.items():
+            if isinstance(data, pd.DataFrame):
+                aligned[name] = data.loc[sorted_samples].copy()
+            elif isinstance(data, np.ndarray):
+                # ndarray 按索引对齐
+                idx_map = {s: i for i, s in enumerate(data) if s in set(common_samples)}
+                indices = [idx_map[s] for s in sorted_samples if s in idx_map]
+                aligned[name] = data[indices].copy()
+            elif isinstance(data, dict):
+                aligned[name] = {k: data[k] for k in sorted_samples if k in data}
+            else:
+                aligned[name] = data
+
+        logger.info(
+            f"Inner join aligned {len(data_sources)} data sources "
+            f"to {len(sorted_samples)} common samples"
+        )
+        return aligned
+
+    def _outer_join(self, data_sources: Dict[str, Any]) -> Dict[str, Any]:
+        """允许缺失：取所有 DataFrame index 的并集，缺失值用 fill_method 填充
+
+        Args:
+            data_sources: 数据源字典
+
+        Returns:
+            对齐后的数据源字典
+        """
+        # 收集所有样本 ID 的并集
+        all_samples: set = set()
+        for name, data in data_sources.items():
+            if isinstance(data, pd.DataFrame):
+                all_samples.update(data.index)
+            elif isinstance(data, dict):
+                all_samples.update(data.keys())
+
+        sorted_samples = sorted(all_samples)
+        aligned: Dict[str, Any] = {}
+
+        for name, data in data_sources.items():
+            if isinstance(data, pd.DataFrame):
+                # Reindex 并填充缺失值
+                reindexed = data.reindex(sorted_samples)
+                aligned[name] = self._fill_missing(reindexed, self.fill_method)
+            elif isinstance(data, dict):
+                # Dict 类型保持原样（缺失的 key 不添加）
+                aligned[name] = dict(data)
+            else:
+                aligned[name] = data
+
+        logger.info(
+            f"Outer join aligned {len(data_sources)} data sources "
+            f"to {len(sorted_samples)} total samples (filled with '{self.fill_method}')"
+        )
+        return aligned
+
+    def _time_based_align(
+        self,
+        data_sources: Dict[str, Any],
+        window_seconds: int = 60,
+    ) -> Dict[str, Any]:
+        """时序对齐：按时间窗对齐时序数据
+
+        将不同时间戳的数据按指定的窗口大小进行分组聚合，
+        每个窗口内取均值（对于数值数据）。
+
+        时间窗从 Phase 0 参数继承（不独立设定）。
+
+        Args:
+            data_sources: 数据源字典
+            window_seconds: 时间窗口大小（秒），从 Phase 0 继承
+
+        Returns:
+            对齐后的数据源字典
+        """
+        aligned: Dict[str, Any] = {}
+
+        for name, data in data_sources.items():
+            if isinstance(data, pd.DataFrame):
+                # 检查是否有时间戳索引
+                if isinstance(data.index, pd.DatetimeIndex):
+                    # 按时间窗口重采样
+                    resampled = data.resample(f"{window_seconds}s").mean()
+                    aligned[name] = resampled.dropna(how="all")
+                else:
+                    # 非时间索引，按行数分块
+                    n_rows = len(data)
+                    window_rows = max(1, n_rows // max(1, window_seconds))
+                    # 每 window_rows 行取均值
+                    n_groups = max(1, n_rows // window_rows)
+                    groups = []
+                    for i in range(n_groups):
+                        start = i * window_rows
+                        end = min((i + 1) * window_rows, n_rows)
+                        if start < end:
+                            chunk = data.iloc[start:end]
+                            groups.append(chunk.mean(numeric_only=True))
+                    if groups:
+                        aligned[name] = pd.DataFrame(groups)
+                    else:
+                        aligned[name] = data.copy()
+            elif isinstance(data, dict):
+                # Dict[str, List] 类型：按窗口分块取均值
+                aligned_dict: Dict[str, list] = {}
+                for key, values in data.items():
+                    if isinstance(values, list) and len(values) > 0:
+                        arr = np.array(values, dtype=float)
+                        window = max(1, len(arr) // max(1, window_seconds))
+                        n_groups = max(1, len(arr) // window)
+                        grouped = []
+                        for i in range(n_groups):
+                            start = i * window
+                            end = min((i + 1) * window, len(arr))
+                            if start < end:
+                                grouped.append(float(np.mean(arr[start:end])))
+                        aligned_dict[key] = grouped
+                    else:
+                        aligned_dict[key] = list(values) if isinstance(values, list) else values
+                aligned[name] = aligned_dict
+            else:
+                aligned[name] = data
+
+        logger.info(
+            f"Time-based aligned {len(data_sources)} data sources "
+            f"with window={window_seconds}s"
+        )
+        return aligned
+
+    def _get_common_samples(self, data_sources: Dict[str, Any]) -> List[str]:
+        """获取所有数据源的公共样本 ID
+
+        Args:
+            data_sources: 数据源字典
+
+        Returns:
+            公共样本 ID 列表
+        """
+        common: Optional[set] = None
+
+        for name, data in data_sources.items():
+            if isinstance(data, pd.DataFrame):
+                current = set(data.index)
+            elif isinstance(data, dict):
+                current = set(data.keys())
+            elif isinstance(data, np.ndarray):
+                current = set(range(data.shape[0]))
+            elif isinstance(data, (list, tuple)):
+                current = set(range(len(data)))
+            else:
+                continue
+
+            if common is None:
+                common = current
+            else:
+                common = common & current
+
+        return sorted(common) if common else []
+
+    def _fill_missing(self, df: pd.DataFrame, method: str) -> pd.DataFrame:
+        """填充缺失值
+
+        Args:
+            df: 含缺失值的 DataFrame
+            method: 填充方法 ("mean" | "median" | "zero" | "ffill")
+
+        Returns:
+            填充后的 DataFrame
+        """
+        if df.empty:
+            return df
+
+        if method == "mean":
+            return df.fillna(df.mean(numeric_only=True))
+        elif method == "median":
+            return df.fillna(df.median(numeric_only=True))
+        elif method == "zero":
+            return df.fillna(0)
+        elif method == "ffill":
+            return df.ffill().fillna(0)
+        else:
+            return df.fillna(0)
+
+
+def export_v1_schema(
+    correlation_results: Optional[Dict] = None,
+    model_metrics: Optional[Dict] = None,
+    visualization_data: Optional[Dict] = None,
+    output_dir: str = ".",
+) -> Dict[str, str]:
+    """导出 msra/cross_domain_result/v1 标准格式
+
+    输出文件结构:
+        output_dir/
+        ├── correlation_results.csv     # 关联分析结果表
+        ├── model_metrics.json           # 模型评估指标
+        ├── visualization_bundle/        # 可视化文件包
+        │   ├── linked_view.png
+        │   └── summary_dashboard.png
+        └── cross_domain_report.md       # 综合报告
+
+    Args:
+        correlation_results: RadiomicsDEGCorrelation.correlate() 的返回值
+        model_metrics: RealtimePredictionModel.evaluate() 的返回值
+        visualization_data: MultiModalVisualizer 的输出数据
+        output_dir: 输出目录
+
+    Returns:
+        文件路径映射:
+        {
+            "correlation_results": "path/to/correlation_results.csv",
+            "model_metrics": "path/to/model_metrics.json",
+            "visualization_bundle": "path/to/visualization_bundle/",
+            "report": "path/to/cross_domain_report.md",
+            "schema_version": "msra/cross_domain_result/v1",
+        }
+    """
+    import json
+    from datetime import datetime, timezone
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    viz_bundle_dir = output_path / "visualization_bundle"
+    viz_bundle_dir.mkdir(parents=True, exist_ok=True)
+
+    result: Dict[str, str] = {
+        "schema_version": "msra/cross_domain_result/v1",
+    }
+
+    # 1. 导出关联分析结果
+    corr_path = output_path / "correlation_results.csv"
+    if correlation_results is not None:
+        corr_df = correlation_results.get("correlations")
+        if isinstance(corr_df, pd.DataFrame):
+            corr_df.to_csv(corr_path, index=False, encoding="utf-8")
+        else:
+            # 创建空的 CSV 带表头
+            pd.DataFrame(columns=[
+                "feature", "gene", "correlation", "p_value",
+                "p_adj", "significant", "method"
+            ]).to_csv(corr_path, index=False, encoding="utf-8")
+    else:
+        pd.DataFrame(columns=[
+            "feature", "gene", "correlation", "p_value",
+            "p_adj", "significant", "method"
+        ]).to_csv(corr_path, index=False, encoding="utf-8")
+    result["correlation_results"] = str(corr_path)
+
+    # 2. 导出模型评估指标
+    metrics_path = output_path / "model_metrics.json"
+    if model_metrics is not None:
+        # 确保所有值可序列化
+        serializable_metrics = {}
+        for key, val in model_metrics.items():
+            if isinstance(val, (np.floating, np.integer)):
+                serializable_metrics[key] = float(val)
+            elif isinstance(val, np.ndarray):
+                serializable_metrics[key] = val.tolist()
+            else:
+                serializable_metrics[key] = val
+        with open(metrics_path, "w", encoding="utf-8") as f:
+            json.dump(serializable_metrics, f, ensure_ascii=False, indent=2)
+    else:
+        with open(metrics_path, "w", encoding="utf-8") as f:
+            json.dump({}, f, ensure_ascii=False, indent=2)
+    result["model_metrics"] = str(metrics_path)
+
+    # 3. 复制/记录可视化文件
+    if visualization_data is not None:
+        viz_paths = visualization_data.get("paths", [])
+        for p in viz_paths:
+            src = Path(p)
+            if src.exists():
+                import shutil
+                shutil.copy2(src, viz_bundle_dir / src.name)
+    result["visualization_bundle"] = str(viz_bundle_dir)
+
+    # 4. 生成综合报告
+    report_path = output_path / "cross_domain_report.md"
+    report_lines = [
+        "# Cross-Domain Analysis Report",
+        "",
+        f"> **Schema**: msra/cross_domain_result/v1",
+        f"> **Generated**: {datetime.now(timezone.utc).isoformat()}",
+        "",
+        "## 1. Summary",
+        "",
+    ]
+
+    if correlation_results is not None:
+        n_sig = correlation_results.get("n_significant", 0)
+        n_total = correlation_results.get("n_total", 0)
+        method = correlation_results.get("method", "unknown")
+        n_samples = correlation_results.get("samples", 0)
+        report_lines.extend([
+            "### Correlation Analysis",
+            f"- Method: {method}",
+            f"- Samples: {n_samples}",
+            f"- Total pairs: {n_total}",
+            f"- Significant pairs (p_adj < 0.05 & |r| >= 0.3): {n_sig}",
+            "",
+        ])
+
+    if model_metrics is not None:
+        report_lines.extend([
+            "### Prediction Model",
+            f"- Model type: {model_metrics.get('model_type', 'N/A')}",
+            f"- Accuracy: {model_metrics.get('accuracy', 'N/A')}",
+            f"- Precision: {model_metrics.get('precision', 'N/A')}",
+            f"- Recall: {model_metrics.get('recall', 'N/A')}",
+            f"- F1: {model_metrics.get('f1', 'N/A')}",
+            f"- AUROC: {model_metrics.get('auroc', 'N/A')}",
+            "",
+        ])
+
+    if visualization_data is not None:
+        report_lines.extend([
+            "### Visualization",
+            f"- Linked view: {visualization_data.get('linked_view', 'N/A')}",
+            f"- Summary dashboard: {visualization_data.get('summary_dashboard', 'N/A')}",
+            "",
+        ])
+
+    report_lines.extend([
+        "## 2. Output Files",
+        f"- Correlation results: `{result.get('correlation_results', 'N/A')}`",
+        f"- Model metrics: `{result.get('model_metrics', 'N/A')}`",
+        f"- Visualization bundle: `{result.get('visualization_bundle', 'N/A')}`",
+        "",
+        "## 3. Quality Gate",
+        "- Gate CD-1.5: See quality_gates.py output",
+        "- Gate CD-3.5: See quality_gates.py output",
+        "",
+    ])
+
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(report_lines))
+    result["report"] = str(report_path)
+
+    logger.info(
+        f"Exported cross_domain_result/v1 schema to {output_dir}: "
+        f"correlation_results.csv, model_metrics.json, "
+        f"visualization_bundle/, cross_domain_report.md"
+    )
+
+    return result

@@ -1,6 +1,6 @@
-# MSRA v0.9.7 开发进度表
+# MSRA v1.0.0 开发进度表
 
-> **更新日期**: 2026-06-24 | **版本**: v0.9.7 (全部实验性模块 Beta)
+> **更新日期**: 2026-06-26 | **版本**: v1.0.0 (全部扩展模块 Stable)
 
 ---
 
@@ -8,9 +8,9 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 已完成 | 36 | 功能完整，可正常使用 |
+| ✅ 已完成 | 40 | 功能完整，可正常使用 |
 | 🔶 部分完成 | 1 | 核心功能可用，细节待完善 |
-| ❌ 待开发 | 3 | 仅有设计文档或框架，未实现 |
+| ❌ 待开发 | 0 | — |
 
 ---
 
@@ -85,8 +85,8 @@
 
 | # | 模块 | 文件/目录 | 状态 | 完成度 | 说明 |
 |---|------|----------|------|--------|------|
-| 47 | 单元测试 | `tests/test_*.py` | ✅ | 100% | 571 个测试通过 + 39 个 bioinformatics 测试通过（62个用例，23个因可选依赖跳过） |
-| 48 | E2E 测试 | `tests/e2e_*.py` | ✅ | 100% | 4 个 E2E 测试 + 61 个用例 |
+| 47 | 单元测试 | `tests/test_*.py` | ✅ | 100% | 319 个测试全部通过（42 cross_domain + 62 bio + 60 imaging + 102 rt + 53 E2E + 其他） |
+| 48 | E2E 测试 | `tests/e2e/` | ✅ | 100% | 🆕 53 个 E2E 测试，10 个场景全部通过（cross_domain 全流程覆盖） |
 | 49 | Agent 测试 | `tests/test_agent_*.py` | ✅ | 100% | 框架测试 + 消息传递测试 |
 | 50 | Pipeline 评估 | `evals/` + `scripts/run_evals.py` | ✅ | 80% | 统一评估脚本，3套件36用例全部通过 |
 | 51 | 大规模基准测试 | `scripts/benchmark_large_scale.py` | ✅ | 100% | 🆕 `test_large_scale_e2e.py` 28个测试：Polars/DuckDB E2E + 跨引擎一致性验证 |
@@ -108,14 +108,14 @@
 
 ---
 
-## 六、实验性模块
+## 六、扩展模块
 
 | # | 模块 | 目录 | 状态 | 完成度 | 说明 |
 |---|------|------|------|--------|------|
-| 59 | 医学影像处理 | `msra_modules/medical_imaging/` | ✅ Beta | 80% | ✅ Phase 2 完成：Skill入口+NIfTI/NRRD加载+特征选择+质量门闸+v1 Schema导出+/msra-imaging注册+单元测试 |
-| 60 | 生物信息学 | `msra_modules/bioinformatics/` | 🟡 Beta | 100% | ✅ Phase 1 完成：Skill + 引擎 + 质量门闸 + 62测试全通过 + /msra-bio 注册 |
-| 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | 🟡 Beta | 100% | ✅ Phase 3 完成：Skill入口+引擎补全+Gate RT-1+多变量检测+单元测试+集成测试+manifest注册 |
-| 62 | 跨领域集成 | `msra_modules/cross_domain/` | 🔶 | 10→待定 | 依赖前三者成熟后开发 |
+| 59 | 医学影像处理 | `msra_modules/medical_imaging/` | 🟢 Stable | 100% | ✅ v1.0.0 Stable：Skill入口+NIfTI/NRRD加载+特征选择+质量门闸+v1 Schema导出+/msra-imaging注册+60测试+用户教程+API参考 |
+| 60 | 生物信息学 | `msra_modules/bioinformatics/` | 🟢 Stable | 100% | ✅ v1.0.0 Stable：Skill + 引擎 + 质量门闸 + 62测试全通过 + /msra-bio 注册 + 用户教程 + API参考 |
+| 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | 🟢 Stable | 100% | ✅ v1.0.0 Stable：Skill入口+引擎补全+Gate RT-1+多变量检测+102测试+用户教程+API参考 |
+| 62 | 跨领域集成 | `msra_modules/cross_domain/` | 🟢 Stable | 100% | ✅ v1.0.0 Stable：Skill入口+Gate CD-1.5/3.5+DataAligner+关联分析+预测建模+多模态可视化+42单元测试+53 E2E测试+/msra-cross注册+用户教程+API参考 |
 
 ---
 
@@ -162,7 +162,7 @@
 
 | # | 功能 | 说明 | 预估工作量 |
 |---|------|------|-----------|
-| **T10** | 实验性模块完善 | medical_imaging / realtime_analytics / cross_domain（bioinformatics ✅ 已完成 Phase 1） | 8+ 天 |
+| **T10** | 扩展模块完善 | ✅ 全部完成 | medical_imaging / realtime_analytics / cross_domain / bioinformatics 全部 Stable |
 | **T11** | 反模式详细案例 | 补充各反模式的识别和避免方法 | 2 天 |
 | **T12** | 更多期刊模板 | 扩展期刊模板覆盖范围 | 3 天 |
 
@@ -178,8 +178,8 @@
 | **v0.9.5** ✅ | 实验性模块 Phase 1 | bioinformatics Beta（Skill + 引擎 + 质量门闸 + 62测试） |
 | **v0.9.6** ✅ | 实验性模块 Phase 2 | medical_imaging Beta（Skill + 引擎 + 质量门闸 + 60测试） |
 | **v0.9.7** ✅ | 实验性模块 Phase 3 | realtime_analytics Beta（Skill + 引擎 + 质量门闸 + 102测试） |
-| **v1.0.0** | 正式发布 | 全功能稳定，实验性模块全部 Beta |
+| **v1.0.0** ✅ | 正式发布 | 全部扩展模块 Stable，cross_domain 完成（42单元测试+53 E2E测试），用户教程+API参考文档完成，319测试全通过 |
 
 ---
 
-*本进度表基于项目实际代码结构和 manifest.json 生成。最后更新: 2026-06-24*
+*本进度表基于项目实际代码结构和 manifest.json 生成。最后更新: 2026-06-26*

@@ -2,6 +2,47 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [1.0.0] - 2026-06-26
+
+**First stable release.** All four extension modules reach Stable maturity. End-to-end test suite covers 10 scenarios. User tutorials and API reference documentation complete.
+
+### Added
+
+- **`msra_modules/cross_domain/quality_gates.py`** — `CrossDomainQualityGateChecker`: Gate CD-1.5 (5 items: feature matrix integrity 🔑, sample ID alignment 🔑, missing rate, data type consistency, modality coverage) + Gate CD-3.5 (5 items: correlation significance 🔑, model performance 🔑, feature stability 🔑, visualization consistency, cross-modal evidence). Reuses `shared/quality_gates/GateRunner`.
+- **`msra_modules/cross_domain/integration.py`** — `DataAligner` class (multi-modal data alignment by sample ID, missing value handling, feature matrix export) + `export_v1_schema()` for msra/cross_domain_result/v1 output + 3 existing classes (CorrelationAnalyzer, PredictionModelBuilder, MultiModalVisualizer).
+- **`msra_modules/cross_domain/__init__.py`** — Exports 6 symbols: `CrossDomainQualityGateChecker`, `DataAligner`, `CorrelationAnalyzer`, `PredictionModelBuilder`, `MultiModalVisualizer`, `export_v1_schema`.
+- **`skills/cross-domain/SKILL.md`** — Skill entry point for `/msra-cross`. Phase 0-4 (interactive config → QC+alignment → background fusion analysis → result review → integration). 4 IRON RULES, Gate CD-1.5/3.5 references.
+- **`shared/contracts/cross_domain_result_schema.md`** — Schema contract for msra/cross_domain_result/v1.
+- **`tests/test_cross_domain/`** — 42 unit tests covering quality gates, data aligner, correlation analyzer, prediction model builder, visualizer, and integration.
+- **`tests/e2e/`** — End-to-end test suite: 53 tests across 10 scenarios (correlation, prediction, visualization, full pipeline, error handling). Includes `conftest.py` + 4 test files + 5 fixture generators.
+- **`docs/user_guide/`** — 8 user tutorial documents (4 modules × zh/en bilingual): bioinformatics, medical_imaging, realtime_analytics, cross_domain.
+- **`docs/api/`** — 8 API reference documents (4 modules × zh/en bilingual): bioinformatics, medical_imaging, realtime_analytics, cross_domain.
+- **`docs/dev/harmonypy-windows-installation.md`** — Windows installation guide for harmonypy (optional bioinformatics dependency).
+- **`pyproject.toml`** — Added `cross_domain` optional dependency group (scipy, scikit-learn, matplotlib). Added `experimental` group (includes all 4 modules). Added `all` group (experimental + dev).
+- **`manifest.json`** — Registered `/msra-cross` command. Updated `/msra-modules` description to include cross-domain.
+
+### Changed
+
+- **Version**: 0.9.7 → 1.0.0 (pyproject.toml, manifest.json)
+- **Development Status classifier**: `4 - Beta` → `5 - Production/Stable`
+- **Module maturity — all 4 modules promoted to Stable**:
+  - `bioinformatics`: 🟡 Beta → 🟢 Stable (62 tests, full Skill + quality gates + documentation)
+  - `medical_imaging`: 🟡 Beta → 🟢 Stable (60 tests, full Skill + quality gates + documentation)
+  - `realtime_analytics`: 🟡 Beta → 🟢 Stable (102 tests, full Skill + quality gates + documentation)
+  - `cross_domain`: 🔴 Alpha → 🟢 Stable (42 unit tests + 53 E2E tests, full Skill + quality gates + documentation)
+- **`README.md`** — Updated command count (12 → 16), added `/msra-cross` to command table, added cross_domain module to maturity table, updated project structure (added `skills/cross-domain/`, `tests/e2e/`, `docs/user_guide/`, `docs/api/` directories), added `/msra-cross` usage examples, updated all 3 experimental modules to Stable.
+- **`docs/dev/18-实验性模块设计.md`** — Updated cross_domain status (🔴 Alpha → 🟢 Stable), updated bio/imaging/rt status (🟡 Beta → 🟢 Stable), added Gate CD-1.5/3.5 definitions, updated §18.8.2 status table.
+- **`docs/dev/MSRA开发进度表.md`** — Added cross_domain module progress (100% Stable), updated three experimental modules to 100% Stable, updated version to v1.0.0.
+
+### Test Results
+
+- **319 passed, 0 failed, 0 skipped**
+  - 42 cross_domain unit tests
+  - 53 E2E tests (10 scenarios)
+  - 62 bioinformatics tests
+  - 60 medical_imaging tests
+  - 102 realtime_analytics tests
+
 ## [0.9.7] - 2026-06-24
 
 Realtime Analytics module Phase 3: Alpha → Beta. Full SOP pipeline (PM → Architect → Engineer → QA).

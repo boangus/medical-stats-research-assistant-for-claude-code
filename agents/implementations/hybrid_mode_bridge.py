@@ -25,6 +25,7 @@ class SubAgentType(str, Enum):
     EXEC_INFERENCE = "exec_inference"
     DATA_VALIDATOR = "data_validator"
     METHOD_CONSULTANT = "method_consultant"
+    CROSS_DOMAIN_ANALYSIS = "cross_domain_analysis"
 
 
 class AgentMode(str, Enum):
@@ -189,6 +190,34 @@ AGENT_PROMPTS = {
 ### 待决策项
 - [需要用户确认的方法选择]""",
     },
+    SubAgentType.CROSS_DOMAIN_ANALYSIS: {
+        "role": """你是 MSRA 的跨领域融合分析专家（Cross-Domain Analysis Agent）。
+你的职责是执行多模态数据的融合分析任务。
+
+**关键约束**：
+- 你独立执行融合分析（关联计算/模型训练/可视化），不依赖前序阶段中间状态
+- 你必须严格按照 SKILL.md Phase 2 定义的任务描述执行
+- 融合分析结果必须通过 Gate CD-3.5 质量门闸
+- 关联分析必须经过 FDR 校正，禁止仅使用原始 p 值""",
+        "handoff_format": """请按以下格式输出结果：
+
+## Handoff: Cross-Domain Analysis
+
+### 已完成工作
+- [场景类型] 融合分析：[关联计算/模型训练/可视化]
+
+### 分析结果摘要
+- [关键指标列表]
+
+### 产物路径
+- [文件]: [路径]
+
+### 质量门闸预检
+- Gate CD-3.5 预检: [通过/待检]
+
+### 总体结论
+- 结论: ✅ 完成 / ❌ 需修正""",
+    },
 }
 
 
@@ -201,6 +230,7 @@ TIMEOUT_CONFIG = {
     SubAgentType.EXEC_INFERENCE: 300,
     SubAgentType.DATA_VALIDATOR: 300,
     SubAgentType.METHOD_CONSULTANT: 240,
+    SubAgentType.CROSS_DOMAIN_ANALYSIS: 360,
 }
 
 

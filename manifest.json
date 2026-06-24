@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.9.7",
+  "version": "1.0.0",
   "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
   "author": "boangus",
   "license": "MIT",
@@ -128,12 +128,25 @@
       "id": "msra-modules",
       "name": "MSRA Modules",
       "entry_point": "commands/msra-modules.md",
-      "description": "Manage experimental modules (medical imaging, bioinformatics, realtime analytics). List modules, check dependencies, view status.",
+      "description": "Manage experimental modules (medical imaging, bioinformatics, realtime analytics, cross-domain). List modules, check dependencies, view status.",
       "usage": "/msra-modules [list|info|check]",
       "examples": [
         "/msra-modules list",
         "/msra-modules info medical_imaging",
-        "/msra-modules check bioinformatics"
+        "/msra-modules check bioinformatics",
+        "/msra-modules info cross_domain"
+      ]
+    },
+    "/msra-cross": {
+      "id": "msra-cross",
+      "name": "Cross-Domain Analysis",
+      "entry_point": "skills/cross-domain/SKILL.md",
+      "description": "Cross-domain multi-modal fusion: radiomics-DEG correlation, realtime prediction model, multi-modal linked visualization. Integrates imaging, bioinformatics, and realtime analytics.",
+      "usage": "/msra-cross [--scenario correlation|prediction|visualization|full] [--radiomics features.csv] [--expression deg.csv] [--clinical clinical.csv] [--realtime vitals.csv]",
+      "examples": [
+        "/msra-cross --scenario correlation --radiomics features.csv --expression deg.csv",
+        "/msra-cross --scenario prediction --realtime vitals.csv --labels labels.csv",
+        "/msra-cross --scenario visualization --radiomics features.csv --expression deg.csv --clinical clinical.csv --realtime vitals.csv"
       ]
     },
     "/msra-bio": {
