@@ -112,10 +112,10 @@
 
 | # | 模块 | 目录 | 状态 | 完成度 | 说明 |
 |---|------|------|------|--------|------|
-| 59 | 医学影像处理 | `msra_modules/medical_imaging/` | ❌ | 10% | 仅有骨架，未实现 |
-| 60 | 生物信息学 | `msra_modules/bioinformatics/` | ❌ | 10% | 仅有骨架，未实现 |
-| 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | ❌ | 10% | 仅有骨架，未实现 |
-| 62 | 跨领域集成 | `msra_modules/cross_domain/` | ❌ | 10% | 仅有骨架，未实现 |
+| 59 | 医学影像处理 | `msra_modules/medical_imaging/` | 🔶→🟡 | 10→待定 | Skill入口待开发，Python引擎骨架已有，方案C架构已设计 |
+| 60 | 生物信息学 | `msra_modules/bioinformatics/` | 🔶→🟡 | 10→待定 | Skill入口待开发，Python引擎骨架已有，方案C架构已设计 |
+| 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | 🔶 | 10→待定 | Skill入口待开发，Python引擎骨架已有 |
+| 62 | 跨领域集成 | `msra_modules/cross_domain/` | 🔶 | 10→待定 | 依赖前三者成熟后开发 |
 
 ---
 
