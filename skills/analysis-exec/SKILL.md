@@ -179,24 +179,118 @@ Phase 4-6: 质检 + 输出 + 审计 → 输出:13项产物
 - 唯一MANDATORY确认点：Phase 3 完成后的主要分析结果确认
 - 后处理(Phase 4-6)：MANDATORY-EXEC-04 质检 + SLIM 产物清单，逐项确认
 
-### Phase 0: SAP验证与执行前检查 🆕
+### Phase 详细规范
 
-> 参考：shared/sap/sap_standard.md — SAP标准格式定义
-> 参考：shared/sap/validate_sap.py — SAP验证脚本
+> 详细的 Phase 执行规范已抽取为独立文件，存放在 `phases/` 目录下。
+> 每个 Phase 文件包含完整的输入输出定义、执行步骤、Checkpoint 规则和异常处理。
 
-开始分析前，首先验证SAP文件的完整性和格式规范性。
+#### Phase 文件索引
 
-**SAP 验证内容**：
-- [ ] SAP文件存在且可读
-- [ ] Frontmatter完整（study_id, version, status, study_type）
-- [ ] 章节完整性（Section 1-8）
-- [ ] 变量构造定义（Section 7）
-- [ ] 分析规范表（Section 8）
-- [ ] SAP状态为"approved"
+| Phase | 文件 | 说明 |
+|-------|------|------|
+| Phase 0/0.5/0.6 | `phases/00-exec-precheck.md` | SAP验证与执行前检查 + 进度跟踪初始化 + 变量名标准化确认 |
+| Phase 1 | `phases/01-variable-construction.md` | 变量构造 |
+| Phase 2 | `phases/02-descriptive-stats.md` | 描述性统计（含依从性与安全性分析） |
+| Phase 3 | `phases/03-inferential-analysis.md` | 推断分析（Hybrid Prompting + 自愈机制 + 观察性高级方法 + 统计约束追踪 + 假设检验 + SAP修正 + 多中心汇总） |
+| Phase 4 | `phases/04-quality-check.md` | 质量检查 |
+| Phase 5 | `phases/05-output-artifacts.md` | 输出产物 |
+| Phase 6 | `phases/06-audit-log.md` | 不可变审计日志 |
 
-**SAP 验证失败处理**：
+#### 快速参考
 
-| 触发条件 | 一线处理 | 仍失败兜底 |
+**执行模式**：
+
+| 模式 | 命令 | 说明 |
+|------|------|------|
+| sap-guided（默认） | `/msra-exec` | 按SAP逐步执行：设置 → 主要分析 → 假设检验 → 敏感性分析 → 质检 |
+| exploratory | `/msra-exec --mode exploratory` | 探索性分析（偏离SAP），自动标记为事后分析，注明解释局限性 |
+
+**检查点汇总**：
+
+| # | 级别 | Checkpoint ID | Phase | 触发条件 |
+|---|------|--------------|-------|---------|
+| 1 | 🟡 | ADAPTIVE | Phase 0 | 样本量(<70%)不足时🛑STOP |
+| 2 | 🟡 | SLIM | Phase 1 | 变量构造完成后展示摘要 |
+| 3 | 🔴 | MANDATORY-EXEC-02 | Phase 2 | 描述性统计完成后 |
+| 4 | 🔴 | MANDATORY-EXEC-03 | Phase 3 | 假设检验完成后 |
+| 5 | 🔴 | MANDATORY-EXEC-05 | Phase 3 | 主要分析结果确认（唯一MANDATORY） |
+| 6 | 🟡 | ADAPTIVE | Phase 3 | ≥2个[SKIP]时🛑STOP |
+| 7 | 🔴 | MANDATORY-EXEC-04 | Phase 4 | 质检结果确认 |
+
+**关键产物**：
+
+| 产物 | 来源 Phase | 格式 | 用途 |
+|------|-----------|------|------|
+| sap_validation_report.md | Phase 0 | Markdown | SAP验证结果 |
+| analysis_dataset.csv | Phase 1 | CSV | 分析数据集 |
+| table1_baseline.md | Phase 2 | Markdown | 基线特征表 |
+| analysis_results.* | Phase 3 | CSV/JSON | 推断分析结果 |
+| quality_report.md | Phase 4 | Markdown | 质检报告 |
+| figures/*.svg + *.png | Phase 5 | SVG/PNG | 发表级图表 |
+| audit_log.jsonl | Phase 6 | JSONL | 审计日志 |
+
+---
+
+## 命令
+
+| 命令 | 说明 |
+|------|------|
+| `/msra-exec` | 启动分析执行流程 |
+| `/msra-exec --sap plan.md --data cleaned.csv` | 指定SAP和数据 |
+| `/msra-exec --type primary` | 仅执行主要分析 |
+| `/msra-exec --check-only --sap plan.md` | 仅执行质量检查（**必须指定 --sap**） |
+
+## Mode
+
+### sap-guided（默认）
+按SAP逐步执行：设置 → 主要分析 → 假设检验 → 敏感性分析 → 质检
+
+### exploratory
+探索性分析（偏离SAP），自动标记为事后分析，注明解释局限性
+
+---
+
+## 反例与黑名单
+
+> **以下行为必须避免**。违反任何一条将导致分析结果不可靠或不可复现。
+> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（A1/A3/B1/E1/E2/F1-F4）
+
+### 🚫 执行纪律禁忌
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 1 | 未经用户批准擅自更改 SAP 中的分析方法 | 破坏分析计划的预注册性，引入选择性偏倚 | 严格按 SAP 执行；如需更改，记录偏差并评估影响 |
+| 2 | 跳过假设检验直接报告推断结果 | 未验证假设的统计推断可能完全错误 | 先检验假设（正态性、方差齐性等），再决定参数/非参数方法 |
+| 3 | 只报告"阳性"结果，隐藏"阴性"结果 | 选择性报告夸大疗效，违反科学诚信 | 报告 SAP 中计划的所有分析，包括阴性结果 |
+| 4 | 事后改变分析人群（如排除"不理想"的受试者） | 破坏随机化平衡，引入选择偏倚 | 使用 SAP 预定义的人群（ITT/PP/Safety），任何变更记录为偏差 |
+
+### 🚫 统计方法禁忌
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 5 | 连续变量不检验正态性直接用 t 检验/ANOVA | 非正态数据用参数检验会导致假阳性/假阴性 | Shapiro-Wilk 检验 → 不满足时用 Mann-Whitney U / Kruskal-Wallis |
+| 6 | 多组比较用多次 t 检验而不做校正 | 总 I 类错误率膨胀 | ANOVA + 事后两两比较（Tukey/Bonferroni） |
+| 7 | Cox 回归不检验比例风险假设 | PH 违反时 HR 解释无效 | Schoenfeld 残差检验 → 违反时用分层 Cox 或时依系数模型 |
+| 8 | 多重回归不检查多重共线性 | VIF>10 时系数估计不稳定 | VIF 检验 → 删除/合并高共线变量 |
+| 9 | ANCOVA 不检验回归斜率齐性 | 斜率不等时协变量调整无效 | Treatment × Covariate 交互检验 → 违反时考虑分层分析 |
+| 10 | 生存分析将删失数据作为事件处理 | 严重高估事件率 | 正确处理删失，使用 KM/Cox 等生存分析方法 |
+
+### 🚫 代码与可复现禁忌
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 11 | 代码中硬编码随机种子或不设随机种子 | 结果不可复现 | `set.seed(20240101)` 或 SAP 中预定义的种子 |
+| 12 | 不记录软件版本和 sessionInfo | 版本差异可能导致结果不同 | 代码开头记录 R/Python 版本和关键包版本 |
+| 13 | 数据预处理和分析在同一个不可分割的脚本中 | 出错时无法定位问题阶段 | 分离：数据准备脚本 + 分析脚本，各自独立可运行 |
+
+### 🚫 流程禁忌
+
+| # | 禁止行为 | 为什么 | 正确做法 |
+|---|---------|--------|---------|
+| 14 | 质检不通过仍输出最终结果 | 错误结果可能被直接写入报告 | [SLIM] 质检结果一行确认；不通过→修正→重新质检 |
+| 15 | `--check-only` 模式下不加载 SAP 就做质检 | 无参照标准，质检无意义 | check-only 必须指定 `--sap` 参数，否则提示用户先提供 SAP |
+
+### 🚫 机器学习/预测模型禁忌 🆕
 |---------|---------|-----------|
 | SAP文件不存在 | 提示用户提供SAP文件 | 停止执行，要求先完成Stage 2 |
 | SAP格式不完整 | 调用validate_sap.py生成问题清单，提示用户修复 | 标记为"SAP不完整"，[MANDATORY] 退回Stage 2 |
