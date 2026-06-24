@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
   "author": "boangus",
   "license": "MIT",

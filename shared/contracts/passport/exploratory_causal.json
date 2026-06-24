@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/exploratory_causal/v1",
+  "stage": "exploratory_causal",
+  "description": "Material Passport for Stage 1.8 — Exploratory Causal Analysis. Tracks artifacts from data-driven causal discovery, confounding identification, and hypothesis generation.",
+
+  "passport_type": "exploratory_causal",
+  "stage_number": "1.8",
+
+  "required_artifacts": [
+    {
+      "artifact_id": "association_structure",
+      "name": "关联结构报告",
+      "description": "Correlation matrix, conditional independence tests, and cluster analysis of variable relationships.",
+      "required": true
+    },
+    {
+      "artifact_id": "causal_graph",
+      "name": "因果图 (DAG)",
+      "description": "Data-driven DAG generated via PC/FCI algorithm showing potential causal relationships.",
+      "required": true
+    },
+    {
+      "artifact_id": "confounding_analysis",
+      "name": "混杂分析报告",
+      "description": "Identification of potential confounders, mediators, and colliders based on conditional independence tests.",
+      "required": true
+    },
+    {
+      "artifact_id": "hypothesis_candidates",
+      "name": "假设候选列表",
+      "description": "Ranked list of research hypotheses with FINER feasibility assessment.",
+      "required": true
+    },
+    {
+      "artifact_id": "sensitivity_report",
+      "name": "敏感性分析报告",
+      "description": "Sensitivity of causal discovery results to different algorithm parameters and assumptions.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [
+    {
+      "artifact_id": "eda_visualizations",
+      "name": "EDA可视化",
+      "description": "Distribution plots, correlation heatmaps, and DAG visualization images."
+    },
+    {
+      "artifact_id": "literature_seeds",
+      "name": "文献种子",
+      "description": "Initial literature references supporting the discovered causal hypotheses."
+    }
+  ],
+
+  "quality_gates": [
+    {
+      "gate_id": "EC-01",
+      "name": "因果发现算法参数合理性",
+      "description": "PC/FCI algorithm parameters (alpha, max condition set size) are appropriate for sample size.",
+      "required": true
+    },
+    {
+      "gate_id": "EC-02",
+      "name": "假设可验证性",
+      "description": "All generated hypotheses are testable with the available data.",
+      "required": true
+    },
+    {
+      "gate_id": "EC-03",
+      "name": "探索-确证隔离",
+      "description": "If same data is used for exploration, confirmation analysis plan accounts for this (e.g., cross-validation, holdout).",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "analysis_plan",
+    "required_for_handoff": ["causal_graph", "hypothesis_candidates", "confounding_analysis"],
+    "handoff_bundle_file": "exploratory_causal_handoff.json"
+  }
+}

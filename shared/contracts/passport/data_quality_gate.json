@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/data_quality_gate/v1",
+  "stage": "data_quality_gate",
+  "description": "Material Passport for Gate 1.5 — Data Quality Gate. Tracks the 9-item blocking quality gate between Stage 1 and Stage 2.",
+
+  "passport_type": "data_quality_gate",
+  "stage_number": "1.5",
+
+  "required_artifacts": [
+    {
+      "artifact_id": "gate_1_5_report",
+      "name": "数据质量门闸报告",
+      "description": "Complete report of 9 data quality checks with pass/warn/fail status for each item.",
+      "required": true
+    },
+    {
+      "artifact_id": "data_quality_metrics",
+      "name": "数据质量指标",
+      "description": "Quantitative metrics: completeness rate, missing pattern summary, outlier counts, type consistency scores.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [],
+
+  "quality_gates": [
+    {
+      "gate_id": "G15-01",
+      "name": "数据完整性",
+      "description": "All expected records present; no duplicate IDs; file integrity verified.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-02",
+      "name": "变量类型一致性",
+      "description": "Variable types match data dictionary; no unexpected type coercions.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-03",
+      "name": "缺失机制评估",
+      "description": "Missing data mechanism (MCAR/MAR/MNAR) assessed for key variables.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-04",
+      "name": "异常值标记",
+      "description": "Statistical and domain-specific outliers identified and documented.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-05",
+      "name": "范围合理性",
+      "description": "All values within plausible ranges per data dictionary and clinical knowledge.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-06",
+      "name": "逻辑一致性",
+      "description": "Cross-variable logical checks pass (e.g., death date after enrollment date).",
+      "required": true
+    },
+    {
+      "gate_id": "G15-07",
+      "name": "清洗日志完整",
+      "description": "All data modifications documented in cleaning log with rationale.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-08",
+      "name": "盲态审核完成",
+      "description": "Blinding review completed and signed off before database lock.",
+      "required": true
+    },
+    {
+      "gate_id": "G15-09",
+      "name": "隐私合规",
+      "description": "PHI detection completed; all sensitive fields identified and handled per policy.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "analysis_plan",
+    "required_for_handoff": ["gate_1_5_report"],
+    "gate_status_required": "passed",
+    "handoff_bundle_file": "data_quality_gate_handoff.json"
+  }
+}

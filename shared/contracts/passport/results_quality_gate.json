@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/results_quality_gate/v1",
+  "stage": "results_quality_gate",
+  "description": "Material Passport for Gate 3.5 — Results Quality Gate. Tracks the 9-item blocking quality gate between Stage 3 and Stage 4.",
+
+  "passport_type": "results_quality_gate",
+  "stage_number": "3.5",
+
+  "required_artifacts": [
+    {
+      "artifact_id": "gate_3_5_report",
+      "name": "结果质量门闸报告",
+      "description": "Complete report of 9 results quality checks with pass/warn/fail status for each item.",
+      "required": true
+    },
+    {
+      "artifact_id": "numeric_validation_report",
+      "name": "数值验证报告",
+      "description": "Automated checks on all numeric outputs: range validity, decimal precision, consistency across tables.",
+      "required": true
+    },
+    {
+      "artifact_id": "reproducibility_check",
+      "name": "可复现性检查",
+      "description": "Verification that re-running analysis code produces identical results.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [],
+
+  "quality_gates": [
+    {
+      "gate_id": "G35-01",
+      "name": "SAP合规性",
+      "description": "All SAP-specified analyses executed; deviations documented with justification.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-02",
+      "name": "P值合理性",
+      "description": "All p-values in [0,1]; no p=0.000 (should be <0.001); consistency with test statistics.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-03",
+      "name": "置信区间一致性",
+      "description": "CIs consistent with point estimates and p-values; width plausible for sample size.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-04",
+      "name": "样本量一致性",
+      "description": "N in analysis matches N in data; subgroup Ns sum correctly; no unexplained attrition.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-05",
+      "name": "图表数据一致性",
+      "description": "Numbers in tables match numbers in figures; no conflicting results across outputs.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-06",
+      "name": "效应量合理性",
+      "description": "Effect sizes are within plausible ranges for the clinical domain.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-07",
+      "name": "语言一致性",
+      "description": "All code uses the same language (R or Python) as locked in SAP.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-08",
+      "name": "代码可复现",
+      "description": "Analysis code runs from clean state without errors; random seeds set.",
+      "required": true
+    },
+    {
+      "gate_id": "G35-09",
+      "name": "偏差日志完整",
+      "description": "All SAP deviations documented with impact assessment.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "report_generation",
+    "required_for_handoff": ["gate_3_5_report", "numeric_validation_report"],
+    "gate_status_required": "passed",
+    "handoff_bundle_file": "results_quality_gate_handoff.json"
+  }
+}

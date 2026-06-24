@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "msra/passport/sap_quality_gate/v1",
+  "stage": "sap_quality_gate",
+  "description": "Material Passport for Gate 2.5 — SAP Quality Gate. Tracks the 8-item blocking quality gate between Stage 2 and Stage 3.",
+
+  "passport_type": "sap_quality_gate",
+  "stage_number": "2.5",
+
+  "required_artifacts": [
+    {
+      "artifact_id": "gate_2_5_report",
+      "name": "SAP质量门闸报告",
+      "description": "Complete report of 8 SAP quality checks with pass/warn/fail status for each item.",
+      "required": true
+    },
+    {
+      "artifact_id": "sap_completeness_checklist",
+      "name": "SAP完整性检查清单",
+      "description": "Itemized checklist verifying SAP covers all endpoints, populations, methods, and TFLs.",
+      "required": true
+    }
+  ],
+
+  "optional_artifacts": [],
+
+  "quality_gates": [
+    {
+      "gate_id": "G25-01",
+      "name": "Estimands五要素完整",
+      "description": "All 5 ICH E9(R1) estimand elements defined: population, treatment, endpoint, intercurrent events, summary measure.",
+      "required": true
+    },
+    {
+      "gate_id": "G25-02",
+      "name": "主要终点定义明确",
+      "description": "Primary endpoint has operational definition, measurement method, and time window.",
+      "required": true
+    },
+    {
+      "gate_id": "G25-03",
+      "name": "分析方法适当性",
+      "description": "Statistical methods match data types, distribution assumptions, and study design.",
+      "required": true
+    },
+    {
+      "gate_id": "G25-04",
+      "name": "样本量论证充分",
+      "description": "Power analysis assumptions are justified; effect size is clinically meaningful.",
+      "required": true
+    },
+    {
+      "gate_id": "G25-05",
+      "name": "多重比较策略",
+      "description": "Multiplicity control strategy specified for all secondary endpoints.",
+      "required": true
+    },
+    {
+      "gate_id": "G25-06",
+      "name": "敏感性分析完整",
+      "description": "Pre-specified sensitivity analyses cover key assumptions and deviations.",
+      "required": true
+    },
+    {
+      "gate_id": "G25-07",
+      "name": "变量构造逻辑定义",
+      "description": "All derived variables have explicit construction rules (formula, conditions, handling of missing).",
+      "required": true
+    },
+    {
+      "gate_id": "G25-08",
+      "name": "用户确认SAP",
+      "description": "User has explicitly reviewed and approved the SAP document.",
+      "required": true
+    }
+  ],
+
+  "handoff_to_next_stage": {
+    "next_stage": "analysis_execution",
+    "required_for_handoff": ["gate_2_5_report"],
+    "gate_status_required": "passed",
+    "user_confirmation_required": ["sap_user_confirmed"],
+    "handoff_bundle_file": "sap_quality_gate_handoff.json"
+  }
+}
