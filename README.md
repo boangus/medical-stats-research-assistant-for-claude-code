@@ -197,10 +197,10 @@ medical-stats-research-assistant/
 ├── commands/          # 16 个命令定义
 ├── agents/            # 5 个 Agent 角色
 ├── shared/            # 共享资源（模板、指南、Schema）
-│   ├── statistics-methods/    # 统计方法指南（47 章）
-│   ├── reporting-guidelines/  # 报告规范清单（16 个）
+│   ├── statistics-methods/    # 统计方法指南（56 章）
+│   ├── reporting-guidelines/  # 报告规范清单（21 个）
 │   ├── risk-of-bias/          # 偏倚评估工具（5 个）
-│   └── journal-templates/     # 期刊模板（7 个）
+│   └── journal-templates/     # 期刊模板（15 个）
 ├── msra_modules/      # 4 个扩展模块
 ├── tests/             # 测试套件（319 tests）
 ├── docs/              # 文档（用户教程 + API 参考）
