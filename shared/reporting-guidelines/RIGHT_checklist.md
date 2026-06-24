@@ -2,7 +2,7 @@
 
 > **RIGHT**: Reporting Items for practice Guidelines in HealThcare
 > 适用于临床实践指南和卫生政策文件
-> 参考: Chen Y, et al. (2017) RIGHT
+> 参考: Chen Y, Yang K, et al. (2017) A Reporting Tool for Practice Guidelines in Health Care: The RIGHT Statement. Ann Intern Med. 166(2):128-132.
 > 更新日期: 2026-06-24
 
 ---

@@ -1,6 +1,7 @@
 # CLAIM AI 医学影像报告规范
 
 > **CLAIM**: Checklist for Artificial Intelligence in Medical Imaging
+> 参考: Mongan J, et al. (2020) Checklist for Artificial Intelligence in Medical Imaging (CLAIM). Radiology. 296(2):E131-E142.
 > 适用于 AI 在医学影像中的研究报告
 > 参考: Mongan J, et al. (2020) Radiology
 > 更新日期: 2026-06-24
