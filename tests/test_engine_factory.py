@@ -4,23 +4,35 @@ Tests for EngineFactory module.
 
 import pytest
 from shared.large_scale_processing.engine_factory import EngineFactory
-from shared.large_scale_processing.dask_engine import DaskEngine
 from shared.large_scale_processing.duckdb_engine import DuckDBEngine
+
+# Check if dask is available for conditional test skipping
+try:
+    from shared.large_scale_processing.dask_engine import DaskEngine, _DASK_AVAILABLE
+except ImportError:
+    _DASK_AVAILABLE = False
+
+dask_available = pytest.mark.skipif(
+    not _DASK_AVAILABLE, reason="dask not installed"
+)
 
 
 class TestEngineFactoryCreateEngine:
     """Test EngineFactory.create_engine method."""
 
+    @dask_available
     def test_create_dask_engine(self):
         """Test creating Dask engine."""
         engine = EngineFactory.create_engine("dask")
         assert isinstance(engine, DaskEngine)
 
+    @dask_available
     def test_create_dask_engine_uppercase(self):
         """Test creating Dask engine with uppercase."""
         engine = EngineFactory.create_engine("DASK")
         assert isinstance(engine, DaskEngine)
 
+    @dask_available
     def test_create_dask_engine_with_config(self):
         """Test creating Dask engine with config."""
         engine = EngineFactory.create_engine("dask", config={"test": "value"})
@@ -69,21 +81,31 @@ class TestEngineFactoryCreateForSize:
         # 500GB
         size = 500 * 1024 * 1024 * 1024
         engine = EngineFactory.create_for_size(size)
-        assert isinstance(engine, DaskEngine)
+        if _DASK_AVAILABLE:
+            assert isinstance(engine, DaskEngine)
+        else:
+            # Fallback to duckdb when dask unavailable
+            assert engine is not None
 
     def test_create_for_size_exactly_100gb(self):
         """Test auto-selection at exactly 100GB boundary."""
         # 100GB
         size = 100 * 1024 * 1024 * 1024
-        # At 100GB threshold, returns Dask
+        # At 100GB threshold, returns Dask if available
         engine = EngineFactory.create_for_size(size)
-        assert isinstance(engine, DaskEngine)
+        if _DASK_AVAILABLE:
+            assert isinstance(engine, DaskEngine)
+        else:
+            assert engine is not None
 
     def test_create_for_size_with_config(self):
         """Test auto-selection with config."""
         size = 500 * 1024 * 1024 * 1024  # 500GB
         engine = EngineFactory.create_for_size(size, config={"test": "value"})
-        assert isinstance(engine, DaskEngine)
+        if _DASK_AVAILABLE:
+            assert isinstance(engine, DaskEngine)
+        else:
+            assert engine is not None
 
 
 class TestEngineFactoryGetAvailableEngines:
@@ -95,9 +117,12 @@ class TestEngineFactoryGetAvailableEngines:
         assert isinstance(engines, list)
 
     def test_get_available_engines_contains_dask(self):
-        """Test that dask is in available engines."""
+        """Test that dask is in available engines when installed."""
         engines = EngineFactory.get_available_engines()
-        assert "dask" in engines
+        if _DASK_AVAILABLE:
+            assert "dask" in engines
+        else:
+            assert "dask" not in engines
 
     def test_get_available_engines_contains_polars(self):
         """Test that polars is in available engines when installed."""
@@ -111,18 +136,21 @@ class TestEngineFactoryGetAvailableEngines:
 class TestEngineFactoryIntegration:
     """Integration tests for EngineFactory."""
 
+    @dask_available
     def test_factory_produces_base_engine_instance(self):
         """Test that factory produces BaseEngine instances."""
         engine = EngineFactory.create_engine("dask")
         from shared.large_scale_processing import BaseEngine
         assert isinstance(engine, BaseEngine)
 
+    @dask_available
     def test_multiple_calls_return_independent_instances(self):
         """Test that multiple calls return independent instances."""
         engine1 = EngineFactory.create_engine("dask")
         engine2 = EngineFactory.create_engine("dask")
         assert engine1 is not engine2
 
+    @dask_available
     def test_engine_has_expected_interface(self):
         """Test that created engine has expected methods."""
         engine = EngineFactory.create_engine("dask")
@@ -140,11 +168,13 @@ class TestEngineFactoryIntegration:
 class TestEngineFactoryEdgeCases:
     """Edge case tests for EngineFactory."""
 
+    @dask_available
     def test_empty_config(self):
         """Test with empty config."""
         engine = EngineFactory.create_engine("dask", config={})
         assert isinstance(engine, DaskEngine)
 
+    @dask_available
     def test_none_config(self):
         """Test with None config."""
         engine = EngineFactory.create_engine("dask", config=None)

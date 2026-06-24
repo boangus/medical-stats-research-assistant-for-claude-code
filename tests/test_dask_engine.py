@@ -8,6 +8,8 @@ import pytest
 import tempfile
 import os
 
+dask = pytest.importorskip("dask", reason="dask not installed")
+
 from shared.large_scale_processing.dask_engine import DaskEngine
 
 

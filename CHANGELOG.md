@@ -6,6 +6,13 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
 
 **First stable release.** All four extension modules reach Stable maturity. End-to-end test suite covers 10 scenarios. User tutorials and API reference documentation complete.
 
+### Fixed (Post-Audit)
+
+- **Dask test compatibility**: Added `pytest.importorskip("dask")` to `test_dask_engine.py` and conditional skip markers to `test_engine_factory.py` for dask-dependent tests. All 24 previously failing tests now properly skip when dask is not installed.
+- **Version consistency**: Updated `docs/dev/00-项目总览与架构.md` header from v0.9.4 to v1.0.0.
+- **Terminology update**: Changed "实验性模块" (experimental modules) to "扩展模块" (extension modules) in `docs/dev/00-项目总览与架构.md` to reflect Stable status.
+- **Development Status classifier**: Reverted to `4 - Beta` based on comprehensive audit (LLM execution layer not fully testable, 37 tests previously skip/fail).
+
 ### Added
 
 - **`msra_modules/cross_domain/quality_gates.py`** — `CrossDomainQualityGateChecker`: Gate CD-1.5 (5 items: feature matrix integrity 🔑, sample ID alignment 🔑, missing rate, data type consistency, modality coverage) + Gate CD-3.5 (5 items: correlation significance 🔑, model performance 🔑, feature stability 🔑, visualization consistency, cross-modal evidence). Reuses `shared/quality_gates/GateRunner`.
@@ -24,7 +31,7 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
 ### Changed
 
 - **Version**: 0.9.7 → 1.0.0 (pyproject.toml, manifest.json)
-- **Development Status classifier**: `4 - Beta` → `5 - Production/Stable`
+- **Development Status classifier**: `5 - Production/Stable` → `4 - Beta` (re-evaluated after comprehensive audit)
 - **Module maturity — all 4 modules promoted to Stable**:
   - `bioinformatics`: 🟡 Beta → 🟢 Stable (62 tests, full Skill + quality gates + documentation)
   - `medical_imaging`: 🟡 Beta → 🟢 Stable (60 tests, full Skill + quality gates + documentation)
