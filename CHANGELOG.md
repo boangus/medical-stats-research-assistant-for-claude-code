@@ -2,6 +2,33 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.9.6] - 2026-06-24
+
+Medical Imaging module Phase 2: Alpha → Beta. Full SOP pipeline (PM → Architect → Engineer → QA).
+
+### Added
+- **`skills/imaging-analysis/SKILL.md`** — Skill entry point for `/msra-imaging`. Phase 0-4 (config → QC+preprocess → background analysis → review → integration). 4 IRON RULES, Gate IMG-1 references.
+- **`msra_modules/medical_imaging/quality_gates.py`** — `ImagingQualityGateChecker`: Gate IMG-1 (4 items: file readable 🔑, voxel spacing 🔑, ROI match 🔑, image quality). Reuses `shared/quality_gates/GateRunner`.
+- **`msra_modules/medical_imaging/feature_selection.py`** — `FeatureSelector`: 7 methods (variance_threshold, k_best, mutual_info, rfe, correlation_filter, auto_select, select). Based on sklearn.
+- **`msra_modules/medical_imaging/image_loader.py`** — Added `load_nifti()` (nibabel) and `load_nrrd()` (SimpleITK) utility functions.
+- **`msra_modules/medical_imaging/radiomics.py`** — Added `export_v1_schema()` for msra/imaging_features/v1 output (feature_matrix.csv + feature_metadata.csv).
+- **`manifest.json`** — Registered `/msra-imaging` command.
+- **`pyproject.toml`** — Added `medical_imaging` optional dependency group (nibabel, SimpleITK, pyradiomics, scikit-image).
+- **`tests/test_medical_imaging/`** — 60 test cases (46 passed, 14 skipped due to optional nibabel/SimpleITK):
+  - `test_image_loader.py` (10 tests)
+  - `test_radiomics.py` (9 tests)
+  - `test_feature_selection.py` (14 tests)
+  - `test_quality_gates.py` (16 tests)
+  - `test_integration.py` (4 tests)
+
+### Changed
+- **`msra_modules/medical_imaging/__init__.py`** — version 1.1.0 → 1.2.0, added exports: `FeatureSelector`, `ImagingQualityGateChecker`, `load_nifti`, `load_nrrd`
+- **`docs/dev/18-实验性模块设计.md`** — medical_imaging status updated to ✅ Beta
+- **`docs/dev/MSRA开发进度表.md`** — #59 medical_imaging 50% → 80%
+
+### Test Results
+- Total: 60 imaging tests (46 passed, 14 skipped — nibabel/SimpleITK not installed)
+
 ## [0.9.5] - 2026-06-24
 
 Bioinformatics module Phase 1: Alpha → Beta. Full SOP pipeline (PM → Architect → Engineer → QA).

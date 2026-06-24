@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
   "author": "boangus",
   "license": "MIT",
@@ -146,6 +146,17 @@
         "/msra-bio --data filtered_feature_bc_matrix/",
         "/msra-bio --mode de --method deseq2",
         "/msra-bio --mode enrichment --genes de_genes.csv"
+      ]
+    },
+    "/msra-imaging": {
+      "id": "msra-imaging",
+      "name": "Medical Imaging Analysis",
+      "entry_point": "skills/imaging-analysis/SKILL.md",
+      "description": "Radiomics feature extraction: DICOM/NIfTI loading, preprocessing, segmentation, feature extraction, feature selection.",
+      "usage": "/msra-imaging [--dicom path] [--nifti path] [--roi mask] [--mode radiomics|segmentation|full]",
+      "examples": [
+        "/msra-imaging --nifti scan.nii.gz --roi mask.nii.gz",
+        "/msra-imaging --dicom /path/to/dicom/ --mode radiomics"
       ]
     }
   },

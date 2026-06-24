@@ -200,3 +200,110 @@ def load_dicom_series(dicom_dir: str) -> Tuple[np.ndarray, Dict]:
     array = loader.to_numpy(image)
     metadata = loader.extract_metadata(image)
     return array, metadata
+
+
+def load_nifti(nifti_path: str) -> Tuple[np.ndarray, Dict]:
+    """便捷函数：加载NIfTI文件并返回numpy数组和元数据
+
+    使用 nibabel 加载 .nii 或 .nii.gz 文件。
+
+    Args:
+        nifti_path: NIfTI 文件路径
+
+    Returns:
+        (numpy_array, metadata_dict)
+
+    Raises:
+        ImportError: nibabel 未安装
+        FileNotFoundError: 文件不存在
+    """
+    try:
+        import nibabel as nib
+    except ImportError as e:
+        raise ImportError(
+            f"nibabel is required for NIfTI loading: {e}. "
+            "Install with: pip install nibabel"
+        )
+
+    path = Path(nifti_path)
+    if not path.exists():
+        raise FileNotFoundError(f"NIfTI file not found: {nifti_path}")
+
+    img = nib.load(str(path))
+    array = np.asarray(img.dataobj)
+
+    # 提取元数据
+    header = img.header
+    metadata: Dict = {
+        "size": img.shape,
+        "spacing": tuple(float(s) for s in header.get_zooms()),
+        "dtype": str(header.get_data_dtype()),
+        "dimensions": len(img.shape),
+        "affine": img.affine.tolist() if hasattr(img, "affine") else None,
+    }
+
+    # 提取额外的 NIfTI 头信息
+    if hasattr(header, "get_sform"):
+        sform = header.get_sform()
+        if sform is not None:
+            metadata["sform"] = sform.tolist()
+    if hasattr(header, "get_qform"):
+        qform = header.get_qform()
+        if qform is not None:
+            metadata["qform"] = qform.tolist()
+    if hasattr(header, "get_intent"):
+        metadata["intent"] = str(header.get_intent())
+
+    logger.info(
+        f"Loaded NIfTI: shape={array.shape}, spacing={metadata['spacing']}, "
+        f"dtype={metadata['dtype']}"
+    )
+    return array, metadata
+
+
+def load_nrrd(nrrd_path: str) -> Tuple[np.ndarray, Dict]:
+    """便捷函数：加载NRRD文件并返回numpy数组和元数据
+
+    使用 SimpleITK 加载 .nrrd 文件。
+
+    Args:
+        nrrd_path: NRRD 文件路径
+
+    Returns:
+        (numpy_array, metadata_dict)
+
+    Raises:
+        ImportError: SimpleITK 未安装
+        FileNotFoundError: 文件不存在
+    """
+    sitk = _get_sitk()
+
+    path = Path(nrrd_path)
+    if not path.exists():
+        raise FileNotFoundError(f"NRRD file not found: {nrrd_path}")
+
+    image = sitk.ReadImage(str(path))
+    array = sitk.GetArrayFromImage(image)
+
+    # 提取元数据
+    metadata: Dict = {
+        "size": image.GetSize(),
+        "spacing": image.GetSpacing(),
+        "origin": image.GetOrigin(),
+        "direction": image.GetDirection(),
+        "pixel_type": image.GetPixelIDTypeAsString(),
+        "dimensions": image.GetDimension(),
+    }
+
+    # 提取 NRRD 特有的元数据键
+    nrrd_keys = ["modality", "center", "patient", "study"]
+    for key in nrrd_keys:
+        value = image.GetMetaData(key, "")
+        if value:
+            metadata[key] = value
+
+    logger.info(
+        f"Loaded NRRD: size={image.GetSize()}, spacing={image.GetSpacing()}, "
+        f"pixel_type={image.GetPixelIDTypeAsString()}"
+    )
+    return array, metadata
