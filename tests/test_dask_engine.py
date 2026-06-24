@@ -2,11 +2,10 @@
 Tests for DaskEngine module.
 """
 
+
 import numpy as np
 import pandas as pd
 import pytest
-import tempfile
-import os
 
 dask = pytest.importorskip("dask", reason="dask not installed")
 

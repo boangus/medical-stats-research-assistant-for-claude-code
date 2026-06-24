@@ -11,13 +11,13 @@ regression_discontinuity_template.py — 断点回归分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +189,6 @@ def covariate_balance_test(
             continue
 
         # 简单的局部线性回归
-        from numpy.polynomial import polynomial as P
 
         left = subset[subset["_x_centered"] < 0]
         right = subset[subset["_x_centered"] >= 0]
@@ -508,7 +507,6 @@ def optimal_bandwidth(
 
         # 局部线性回归的残差方差
         if left.sum() > 10 and right.sum() > 10:
-            from numpy.polynomial import polynomial as P
             # 左侧
             X_l = np.column_stack([np.ones(left.sum()), x[left]])
             beta_l = np.linalg.lstsq(X_l, y[left], rcond=None)[0]

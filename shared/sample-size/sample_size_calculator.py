@@ -10,11 +10,11 @@ sample_size_calculator.py — 样本量计算模板（Python）
 版本: 0.1.0
 """
 
-from typing import Dict, Optional
+import logging
+from typing import Dict
 
 import numpy as np
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 

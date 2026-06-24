@@ -10,16 +10,14 @@ cox_template.py — Cox 比例风险回归模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from lifelines import CoxPHFitter, KaplanMeierFitter
 from lifelines.statistics import logrank_test, multivariate_logrank_test
-from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 

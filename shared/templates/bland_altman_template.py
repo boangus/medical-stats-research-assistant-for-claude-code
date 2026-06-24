@@ -10,13 +10,12 @@ bland_altman_template.py — Bland-Altman 图模板（Python）
 版本: 0.1.0
 """
 
-from typing import Dict, Optional, Tuple
+import logging
+from typing import Dict, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 

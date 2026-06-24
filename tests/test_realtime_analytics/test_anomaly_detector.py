@@ -2,17 +2,15 @@
 Tests for AnomalyDetector, DetectionResult, MultivariateDetector, and TrendDetector.
 """
 
-import time
 import numpy as np
-import pytest
+
 from msra_modules.realtime_analytics.anomaly_detector import (
-    AnomalyDetector,
-    AlertRule,
     AlertLevel,
-    Alert,
-    TrendDetector,
+    AlertRule,
+    AnomalyDetector,
     DetectionResult,
     MultivariateDetector,
+    TrendDetector,
 )
 
 

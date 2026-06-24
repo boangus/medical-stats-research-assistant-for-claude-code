@@ -29,10 +29,11 @@ effect_size_template.py — 效应量计算模板（Python）
 版本: 0.1.0
 """
 
-from typing import Dict, Optional, Tuple, Union
+import logging
+from typing import Dict
+
 import numpy as np
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 

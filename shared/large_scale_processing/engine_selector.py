@@ -57,10 +57,10 @@ class EngineSelector:
         """
         if file_size_bytes is not None:
             return EngineSelector._select_by_size(file_size_bytes)
-        
+
         if estimated_rows is not None:
             return EngineSelector._select_by_rows(estimated_rows)
-        
+
         # Default to Polars for unknown data characteristics
         return ProcessingEngine.POLARS
 
@@ -85,7 +85,7 @@ class EngineSelector:
         """
         # Rough estimate: ~1.1KB per row average for medical data (with overhead)
         estimated_size = int(estimated_rows * 1100)
-        
+
         # Use size-based selection with estimated size
         return EngineSelector._select_by_size(estimated_size)
 

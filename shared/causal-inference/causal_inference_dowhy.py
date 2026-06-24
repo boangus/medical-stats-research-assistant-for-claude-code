@@ -21,13 +21,12 @@ causal_inference_dowhy.py — 基于 DoWhy 的因果推断模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -223,7 +222,7 @@ def estimate_causal_effect_dowhy(
         logger.info(f"  95% CI: ({ci[0]:.4f}, {ci[1]:.4f})")
 
     # Step 4: 反驳检验 (Refutation)
-    logger.info(f"\n[Step 4] 反驳检验")
+    logger.info("\n[Step 4] 反驳检验")
     refutation_results = {}
 
     # 4a: 随机共同原因检验
@@ -335,7 +334,7 @@ def estimate_cate_econml(
     # 效应修饰变量的索引
     mod_idx = [features.index(m) for m in effect_modifiers]
 
-    logger.info(f"\n[EconML] 异质性处理效应 (CATE) 估计")
+    logger.info("\n[EconML] 异质性处理效应 (CATE) 估计")
     logger.info(f"  方法: {method}")
     logger.info(f"  效应修饰: {effect_modifiers}")
 
@@ -452,13 +451,13 @@ def e_value(estimate: float,
             extreme_ci = upper_ci
         result["e_value_ci_extreme"] = round(_e_val(_or_to_rr(extreme_ci)), 3)
 
-    logger.info(f"\n=== E-value 分析 ===")
+    logger.info("\n=== E-value 分析 ===")
     logger.info(f"  效应估计: {estimate:.4f}")
     logger.info(f"  E-value (点估计): {result['e_value_estimate']}")
     if 'e_value_ci_extreme' in result:
         logger.info(f"  E-value (CI 极端): {result['e_value_ci_extreme']}")
     logger.info(f"  解释: 需要 E-value ≥ {result['e_value_estimate']} 倍")
-    logger.info(f"        的未测量混杂才能推翻因果结论")
+    logger.info("        的未测量混杂才能推翻因果结论")
 
     return result
 
@@ -523,7 +522,7 @@ def full_causal_workflow(
     logger.info(f"  总样本: n={len(df)}")
 
     # --- Step 1: DAG ---
-    logger.info(f"\n[Step 1] 因果图 (DAG)")
+    logger.info("\n[Step 1] 因果图 (DAG)")
     logger.info(f"  暴露: {treatment}  →  结局: {outcome}")
     logger.info(f"  混杂调整集 ({len(confounders)}): {confounders}")
     if effect_modifiers:
@@ -533,7 +532,7 @@ def full_causal_workflow(
     results["causal_graph"] = graph
 
     # --- Step 2: DoWhy ---
-    logger.info(f"\n[Step 2] DoWhy 因果效应估计")
+    logger.info("\n[Step 2] DoWhy 因果效应估计")
 
     # 根据 outcome_type 选择估计方法
     if outcome_type == "binary":
@@ -598,7 +597,6 @@ def full_causal_workflow(
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-    from sklearn.linear_model import LogisticRegression
 
     # 模拟观察性数据（有混杂）
     np.random.seed(42)

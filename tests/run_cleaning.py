@@ -4,8 +4,9 @@ Schema: msra_test_data.csv (generate_test_data.py output)
 注意：此脚本生成清洗建议，不自动执行删除。
 实际清洗需用户确认后执行。
 """
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "tests/msra_test_data.csv"
@@ -21,7 +22,7 @@ billing_col = pd.to_numeric(df["BillingAmount"], errors="coerce")
 neg_mask = billing_col < 0
 n_neg = int(neg_mask.sum())
 neg_rows = df[neg_mask][["PatientID", "BillingAmount"]]
-print(f"\n[1] 负值计费检测")
+print("\n[1] 负值计费检测")
 print(f"  检出: {n_neg} 条")
 if n_neg > 0:
     for _, row in neg_rows.iterrows():
@@ -30,14 +31,14 @@ if n_neg > 0:
 # === 2. 检测不可能年龄 (schema: Age) ===
 age_col = pd.to_numeric(df["Age"], errors="coerce")
 impossible_age = df[(age_col < 0) | (age_col > 120)]
-print(f"\n[2] 不可能年龄检测")
+print("\n[2] 不可能年龄检测")
 print(f"  检出: {len(impossible_age)} 条")
 for _, row in impossible_age.iterrows():
     print(f"    {row['PatientID']}: Age={row['Age']}")
 
 # === 3. 检测逗号多值 (schema: BillingAmount) ===
 comma_billing = df[df["BillingAmount"].astype(str).str.contains(",", na=False)]
-print(f"\n[3] 逗号多值检测")
+print("\n[3] 逗号多值检测")
 print(f"  检出: {len(comma_billing)} 条")
 for _, row in comma_billing.iterrows():
     print(f"    {row['PatientID']}: BillingAmount={row['BillingAmount']}")
@@ -45,7 +46,7 @@ for _, row in comma_billing.iterrows():
 # === 4. 检测无效血型 (schema: BloodType) ===
 VALID_BLOOD = {"A+","A-","B+","B-","AB+","AB-","O+","O-"}
 invalid_bt = df[~df["BloodType"].isin(VALID_BLOOD)]
-print(f"\n[4] 无效血型检测")
+print("\n[4] 无效血型检测")
 print(f"  检出: {len(invalid_bt)} 条")
 for _, row in invalid_bt.iterrows():
     print(f"    {row['PatientID']}: BloodType={row['BloodType']}")
@@ -54,7 +55,7 @@ for _, row in invalid_bt.iterrows():
 df["admit_dt"] = pd.to_datetime(df["AdmissionDate"], errors="coerce")
 df["discharge_dt"] = pd.to_datetime(df["DischargeDate"], errors="coerce")
 date_err = df[df["discharge_dt"] < df["admit_dt"]]
-print(f"\n[5] 日期逻辑错误")
+print("\n[5] 日期逻辑错误")
 print(f"  出院早于入院: {len(date_err)} 条")
 for _, row in date_err.iterrows():
     print(f"    {row['PatientID']}: {row['AdmissionDate']} -> {row['DischargeDate']}")
@@ -73,7 +74,7 @@ if len(date_err) > 0:
     suggestions.append(f"标记 {len(date_err)} 条日期逻辑错误记录")
 
 print(f"\n{'=' * 56}")
-print(f"清洗建议（需用户确认后执行）")
+print("清洗建议（需用户确认后执行）")
 print(f"{'=' * 56}")
 if suggestions:
     for i, s in enumerate(suggestions, 1):

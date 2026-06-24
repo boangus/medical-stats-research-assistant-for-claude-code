@@ -23,15 +23,14 @@ Overlapping Weighting (OW) 是 IPTW 的替代方案，通过 overlap weight 使
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy import stats
 from sklearn.linear_model import LogisticRegression
-import logging
 
 logger = logging.getLogger(__name__)
 

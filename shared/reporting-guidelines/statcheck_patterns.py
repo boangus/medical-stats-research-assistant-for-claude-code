@@ -23,12 +23,12 @@ statcheck_patterns.py — NHST 报告一致性自动检查
 版本: 0.1.0
 """
 
+import logging
 import re
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
-import logging
 
 logger = logging.getLogger(__name__)
 

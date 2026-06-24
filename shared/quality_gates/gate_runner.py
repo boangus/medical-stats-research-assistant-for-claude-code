@@ -241,9 +241,7 @@ class GateRunner:
             子 Agent 任务描述 {task: SubAgentTask, prompt: str}
         """
         try:
-            from agents.implementations.hybrid_mode_bridge import (
-                HybridModeBridge, SubAgentType
-            )
+            from agents.implementations.hybrid_mode_bridge import HybridModeBridge, SubAgentType
         except ImportError:
             raise RuntimeError(
                 "HybridModeBridge not available. "

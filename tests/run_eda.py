@@ -1,9 +1,9 @@
 """MSRA Stage 2 Phase 1: Exploratory Data Analysis
 Schema: msra_test_data.csv (generate_test_data.py output)
 """
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import pandas as pd
 
 BASE = Path(__file__).resolve().parent.parent
 
@@ -38,11 +38,11 @@ for col in num_cols:
     print(f"    skewness={skew:.2f}, kurtosis={kurt:.2f}")
     # Normality indicator
     if abs(skew) > 1:
-        print(f"    -> 高度偏态 (|skew|>1), 建议非参数方法")
+        print("    -> 高度偏态 (|skew|>1), 建议非参数方法")
     elif abs(skew) > 0.5:
-        print(f"    -> 中度偏态, 参数/非参数均可")
+        print("    -> 中度偏态, 参数/非参数均可")
     else:
-        print(f"    -> 近似对称分布")
+        print("    -> 近似对称分布")
 
 # === 2. 分类变量频数 ===
 print("\n[2] 分类变量分布")

@@ -22,13 +22,13 @@ pipeline_auditor.py — 数据清洗审计追踪
 """
 
 import json
-from dataclasses import dataclass, field, asdict
+import logging
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -378,8 +378,8 @@ class PipelineAuditor:
             "",
             "## 流水线汇总",
             "",
-            f"| 指标 | 数值 |",
-            f"|------|------|",
+            "| 指标 | 数值 |",
+            "|------|------|",
             f"| 初始样本量 | {summary.initial_rows} |",
             f"| 最终样本量 | {summary.final_rows} |",
             f"| 移除样本量 | {summary.total_removed} |",
@@ -407,8 +407,8 @@ class PipelineAuditor:
                 "",
                 "## 分步审计日志",
                 "",
-                f"| 步骤 | 操作 | 描述 | 参数 | 操作前 | 操作后 | 移除 | 原因 |",
-                f"|------|------|------|------|--------|--------|------|------|",
+                "| 步骤 | 操作 | 描述 | 参数 | 操作前 | 操作后 | 移除 | 原因 |",
+                "|------|------|------|------|--------|--------|------|------|",
             ])
 
             for step in self._steps[1:]:  # 跳过 step 0 (initial)

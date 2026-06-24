@@ -31,14 +31,16 @@
 """
 
 import os
-import numpy as np
+
 import matplotlib
+import numpy as np
+
 matplotlib.use('Agg')  # 无头模式
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from pathlib import Path
-from typing import List, Optional, Tuple, Dict, Any
 import logging
+from pathlib import Path
+from typing import List, Tuple
+
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
@@ -355,7 +357,6 @@ def make_km_curve(time, event, group, group_labels=None,
         timepoints = np.linspace(0, max_time, n_timepoints)
 
         # 创建子图区域
-        from matplotlib.gridspec import GridSpec
         fig.add_axes  # placeholder
 
     return fig, ax
@@ -464,7 +465,7 @@ def make_roc_curve(y_true, y_score, auc_value=None, ci_lower=None,
     optimal_cutoff : float
         最优截断值
     """
-    from sklearn.metrics import roc_curve, auc
+    from sklearn.metrics import auc, roc_curve
 
     fpr, tpr, thresholds = roc_curve(y_true, y_score)
     if auc_value is None:

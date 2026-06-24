@@ -10,23 +10,18 @@ roc_template.py — ROC 曲线与诊断试验分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.metrics import (
     auc,
-    precision_recall_curve,
-    precision_score,
-    recall_score,
     roc_auc_score,
     roc_curve,
 )
-from sklearn.utils import resample
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -444,12 +439,12 @@ if __name__ == "__main__":
 
     # 1. ROC 分析
     roc_result = compute_roc(y_true, y_score)
-    logger.info(f"=== ROC 分析 ===")
+    logger.info("=== ROC 分析 ===")
     logger.info(f"AUC: {roc_result['auc']:.4f}")
 
     # 2. 最佳截断值
     best_th, metrics = get_best_threshold(y_true, y_score, method="youden")
-    logger.info(f"\n=== 最佳截断值 (Youden Index) ===")
+    logger.info("\n=== 最佳截断值 (Youden Index) ===")
     logger.info(f"Threshold: {best_th:.4f}")
     logger.info(f"Sensitivity: {metrics['sensitivity']:.3f}")
     logger.info(f"Specificity: {metrics['specificity']:.3f}")
@@ -459,20 +454,20 @@ if __name__ == "__main__":
 
     # 3. AUC 置信区间
     auc_result = auc_ci(y_true, y_score)
-    logger.info(f"\n=== AUC 置信区间 ===")
+    logger.info("\n=== AUC 置信区间 ===")
     logger.info(f"AUC = {auc_result['auc']:.3f} (95% CI: {auc_result['ci_lower']:.3f}, {auc_result['ci_upper']:.3f})")
 
     # 4. 模型比较（模拟两个模型）
     score2 = y_score + np.random.normal(0, 0.05, len(y_score))
     score2 = np.clip(score2, 0, 1)
     comp = compare_two_aucs(y_true, y_score, score2, method="delong")
-    logger.info(f"\n=== AUC 比较 ===")
+    logger.info("\n=== AUC 比较 ===")
     logger.info(f"Model 1 AUC: {comp['auc1']:.3f}, Model 2 AUC: {comp['auc2']:.3f}")
     logger.info(f"Difference: {comp['auc_diff']:.3f}, p = {comp['p_value']:.4f}")
 
     # 5. 校准曲线
     cal_df = calibration_curve(y_true, y_score)
-    logger.info(f"\n=== 校准曲线 ===")
+    logger.info("\n=== 校准曲线 ===")
     logger.info("cal_df.round(3).to_string(index=False)")
 
     logger.info("\n✅ ROC 诊断分析完成")

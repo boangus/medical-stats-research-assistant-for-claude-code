@@ -15,7 +15,7 @@ import logging
 from typing import Any, Dict, Optional, Type
 
 from .base_engine import BaseEngine
-from .engine_selector import EngineSelector, ProcessingEngine
+from .engine_selector import EngineSelector
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ class EngineFactory:
 
         # Try to load DaskEngine
         try:
-            from .dask_engine import DaskEngine, _DASK_AVAILABLE
+            from .dask_engine import _DASK_AVAILABLE, DaskEngine
             if _DASK_AVAILABLE:
                 registry["dask"] = DaskEngine
         except ImportError:

@@ -8,12 +8,11 @@ E2E-RT-02: Anomaly detection + alert
 """
 
 import sys
-import os
 import time
-import numpy as np
-import pandas as pd
-import pytest
 from pathlib import Path
+
+import numpy as np
+import pytest
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
@@ -103,8 +102,8 @@ class TestE2ERt01MonitoringPipeline:
     def test_gate_rt1_passes(self):
         """Test that Gate RT-1 returns PASS for valid simulator data."""
         from msra_modules.realtime_analytics import (
-            VitalSignsSimulator,
             RealtimeQualityGateChecker,
+            VitalSignsSimulator,
         )
         from shared.quality_gates.gate_runner import GateVerdict
 
@@ -186,7 +185,7 @@ class TestE2ERt02AnomalyDetection:
     @pytest.mark.integration
     def test_anomaly_detector_detects_tachycardia(self, e2e_vitals_dataframe_anomaly):
         """Test that AnomalyDetector detects tachycardia with default rules."""
-        from msra_modules.realtime_analytics import AnomalyDetector, AlertLevel
+        from msra_modules.realtime_analytics import AnomalyDetector
 
         detector = AnomalyDetector()
         detector.add_default_vital_signs_rules()
@@ -215,9 +214,9 @@ class TestE2ERt02AnomalyDetection:
     def test_alert_system_triggers_on_anomaly(self):
         """Test that AlertSystem triggers and records alerts."""
         from msra_modules.realtime_analytics import (
-            AlertSystem,
             Alert,
             AlertChannel,
+            AlertSystem,
         )
 
         alert_system = AlertSystem()

@@ -5,7 +5,6 @@ evaluate(), model type switching.
 """
 
 import numpy as np
-import pandas as pd
 import pytest
 
 from msra_modules.cross_domain import RealtimePredictionModel

@@ -10,18 +10,15 @@ reproducibility_check.py — 结果复现验证模板
 版本: 0.1.0
 """
 
-import importlib.util
 import json
 import os
 import subprocess
 import sys
 import time
-import traceback
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, Optional
 
 import numpy as np
 import pandas as pd
-
 
 # ============================================================================
 # 1. Python 脚本复现验证
@@ -228,7 +225,7 @@ with open(__RUN_OUTPUT_FILE__, "w") as _f:
         else:
             verdict = "❌ FAIL — Key results not reproducible"
 
-        logger.info(f"\n--- 结论 ---")
+        logger.info("\n--- 结论 ---")
         logger.info(f"  {verdict}")
         logger.info("\n" + "=" * 60)
 

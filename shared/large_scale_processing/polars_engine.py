@@ -5,8 +5,9 @@ Provides high-performance data processing using Polars with lazy evaluation
 and query optimization support.
 """
 
+from typing import Any, List, Union
+
 import polars as pl
-from typing import Any, List, Optional, Union
 
 from shared.large_scale_processing.base_engine import BaseEngine
 

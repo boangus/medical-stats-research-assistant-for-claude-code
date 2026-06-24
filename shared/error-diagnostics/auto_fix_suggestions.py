@@ -6,21 +6,19 @@ MSRA 自动修复建议生成器
 用于 Exec Runner 的自愈 Debug 流程。
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Any
 import logging
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
 
 class AutoFixSuggestions:
     """自动修复建议生成器"""
-    
+
     def __init__(self):
         """初始化修复建议生成器"""
         self.suggestions = self._load_suggestions()
-    
+
     def _load_suggestions(self) -> Dict[str, Any]:
         """加载修复建议库"""
         return {
@@ -136,7 +134,7 @@ df$integer_var <- as.integer(df$double_var)  # 优化数据类型
                 "risk": "数据子采样可能丢失信息"
             }
         }
-    
+
     def diagnose_and_suggest(self, error_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
         """
         根据错误类型和诊断结果生成修复建议
@@ -156,18 +154,18 @@ df$integer_var <- as.integer(df$double_var)  # 优化数据类型
                 "code_example": "",
                 "risk": "未知风险"
             }
-        
+
         suggestion = self.suggestions[error_type].copy()
-        
+
         # 根据details添加特定建议
         if "vif_value" in details and details["vif_value"] > 10:
             suggestion["diagnosis"] = f"VIF = {details['vif_value']:.2f} > 10"
-        
+
         if "missing_rate" in details and details["missing_rate"] > 0.3:
             suggestion["suggestions"].append(f"主要变量缺失率 {details['missing_rate']:.1%}，建议多重插补")
-        
+
         return suggestion
-    
+
     def generate_fix_code(self, error_type: str, context: Dict[str, Any]) -> str:
         """
         生成修复代码
@@ -181,22 +179,22 @@ df$integer_var <- as.integer(df$double_var)  # 优化数据类型
         """
         if error_type not in self.suggestions:
             return "# 无法生成修复代码，请手动检查"
-        
+
         suggestion = self.suggestions[error_type]
         code_example = suggestion.get("code_example", "")
-        
+
         # 根据context替换变量名
         if "dataframe_name" in context:
             code_example = code_example.replace("df", context["dataframe_name"])
-        
+
         if "outcome_var" in context:
             code_example = code_example.replace("outcome", context["outcome_var"])
-        
+
         if "predictor_var" in context:
             code_example = code_example.replace("predictor", context["predictor_var"])
-        
+
         return code_example
-    
+
     def assess_risk(self, error_type: str, fix_applied: bool) -> Dict[str, Any]:
         """
         评估修复风险
@@ -210,10 +208,10 @@ df$integer_var <- as.integer(df$double_var)  # 优化数据类型
         """
         if error_type not in self.suggestions:
             return {"risk_level": "unknown", "message": "未知错误类型"}
-        
+
         suggestion = self.suggestions[error_type]
         risk = suggestion.get("risk", "无特定风险")
-        
+
         return {
             "risk_level": "medium" if fix_applied else "low",
             "message": risk,
@@ -226,23 +224,23 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建修复建议生成器
     fix_generator = AutoFixSuggestions()
-    
+
     # 示例：多重共线性诊断
     diagnosis = fix_generator.diagnose_and_suggest(
         "multicollinearity",
         {"vif_value": 12.5}
     )
-    
+
     logger.info("诊断结果:")
     logger.info(f"  错误类型: {diagnosis['diagnosis']}")
     logger.info(f"  修复建议: {diagnosis['suggestions']}")
     logger.info(f"  风险提示: {diagnosis['risk']}")
-    
+
     # 生成修复代码
     fix_code = fix_generator.generate_fix_code(
         "multicollinearity",
         {"dataframe_name": "cleaned_data"}
     )
-    
+
     logger.info("\n修复代码:")
     logger.info("fix_code")

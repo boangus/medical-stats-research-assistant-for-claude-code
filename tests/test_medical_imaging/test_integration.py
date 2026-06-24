@@ -5,12 +5,13 @@ Integration Tests - 医学影像模块集成测试
 使用 numpy 合成数据和 nibabel 临时文件。
 """
 
+import os
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-import tempfile
-import os
-from pathlib import Path
 
 
 class TestFullPipelineIntegration:
@@ -49,10 +50,10 @@ class TestFullPipelineIntegration:
 
     def test_load_gate_extract_select_export(self):
         """测试完整流程：加载 → 门闸 → 特征提取 → 特征选择 → 导出"""
+        from msra_modules.medical_imaging.feature_selection import FeatureSelector
         from msra_modules.medical_imaging.image_loader import load_nifti
         from msra_modules.medical_imaging.quality_gates import ImagingQualityGateChecker
         from msra_modules.medical_imaging.radiomics import RadiomicsExtractor
-        from msra_modules.medical_imaging.feature_selection import FeatureSelector
 
         # Step 1: 加载影像
         image_array, metadata = load_nifti(self.image_path)
@@ -127,8 +128,8 @@ class TestFullPipelineIntegration:
 
     def test_feature_selection_methods(self):
         """测试多种特征选择方法的一致性"""
-        from msra_modules.medical_imaging.radiomics import RadiomicsExtractor
         from msra_modules.medical_imaging.feature_selection import FeatureSelector
+        from msra_modules.medical_imaging.radiomics import RadiomicsExtractor
 
         extractor = RadiomicsExtractor()
         features = extractor.extract_all(self.image_data, self.mask_data)

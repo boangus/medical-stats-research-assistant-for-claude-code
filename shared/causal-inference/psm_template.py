@@ -10,6 +10,7 @@ psm_template.py — 倾向性评分匹配模板（Python）
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Dict, List, Optional, Tuple
 
@@ -18,8 +19,6 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import NearestNeighbors
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -440,7 +439,6 @@ def full_psm_workflow(
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-    from sklearn.datasets import make_classification
 
     # 模拟观察性数据
     np.random.seed(42)

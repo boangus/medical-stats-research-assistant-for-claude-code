@@ -4,9 +4,10 @@ Creates a clinical data DataFrame with patient demographics and lab values.
 All data uses seed=42 for reproducibility.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 
 def generate_mock_clinical(

@@ -4,9 +4,10 @@ Creates binary classification labels (0/1) for prediction model training.
 All data uses seed=42 for reproducibility.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 
 def generate_mock_labels(

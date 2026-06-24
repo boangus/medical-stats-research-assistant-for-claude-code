@@ -2,7 +2,6 @@
 Tests for EngineSelector module.
 """
 
-import pytest
 from shared.large_scale_processing import EngineSelector, ProcessingEngine
 
 

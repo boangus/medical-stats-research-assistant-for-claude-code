@@ -11,17 +11,16 @@
 - custom mapping (YAML 加载)
 """
 
+import sys
 import warnings
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shared.variable_standardization.variable_standardizer import VariableStandardizer
-
 
 # ── Fixtures ──────────────────────────────────────────────────────
 

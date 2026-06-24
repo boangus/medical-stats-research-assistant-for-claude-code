@@ -5,17 +5,18 @@
 测试分析脚本执行前的模式选择功能。
 """
 
-import json
 import os
-import tempfile
-import pytest
-from pathlib import Path
 
 # 添加项目根目录到Python路径
 import sys
+import tempfile
+from pathlib import Path
+
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared.passport.passport import PassportManager, PassportError
+from shared.passport.passport import PassportError, PassportManager
 
 
 class TestScriptExecutionMode:

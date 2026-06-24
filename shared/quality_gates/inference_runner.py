@@ -22,12 +22,9 @@ Usage:
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Dict, List, Optional
-
 
 # 13项质量清单（与 exec_inference_agent.py 一致）
 QUALITY_CHECKLIST = [
@@ -242,9 +239,7 @@ class InferenceRunner:
             子 Agent 任务描述 {task: SubAgentTask, prompt: str}
         """
         try:
-            from agents.implementations.hybrid_mode_bridge import (
-                HybridModeBridge, SubAgentType
-            )
+            from agents.implementations.hybrid_mode_bridge import HybridModeBridge, SubAgentType
         except ImportError:
             raise RuntimeError(
                 "HybridModeBridge not available. "

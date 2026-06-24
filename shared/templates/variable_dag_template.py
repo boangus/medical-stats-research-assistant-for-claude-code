@@ -10,10 +10,10 @@ Usage:
     dag_path = generate_variable_dag(sap_path, output_dir="MSRA/reports/figures")
 """
 
+import logging
 import os
 import re
 from typing import Optional
-import logging
 
 logger = logging.getLogger(__name__)
 

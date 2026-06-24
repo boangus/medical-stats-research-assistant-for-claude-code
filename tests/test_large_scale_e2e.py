@@ -19,20 +19,16 @@
 import os
 import sys
 import time
-import tempfile
 from pathlib import Path
 
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from shared.large_scale_processing.engine_selector import (
-    EngineSelector, ProcessingEngine
-)
 from shared.large_scale_processing.engine_factory import EngineFactory
-
+from shared.large_scale_processing.engine_selector import EngineSelector, ProcessingEngine
 
 # ============================================================
 # Fixtures
@@ -253,7 +249,7 @@ class TestPolarsEngineE2E:
         assert t_filter < 5.0, f"Filter took {t_filter:.2f}s (>5s)"
 
         # Record metrics (visible with -v)
-        print(f"\n  Polars Performance (100K rows):")
+        print("\n  Polars Performance (100K rows):")
         print(f"    Read CSV: {t_read:.3f}s")
         print(f"    Filter:   {t_filter:.3f}s")
         print(f"    GroupBy:  {t_agg:.3f}s")
@@ -336,7 +332,7 @@ class TestDuckDBEngineE2E:
         assert t_read < 10.0, f"CSV read took {t_read:.2f}s (>10s)"
         assert t_filter < 5.0, f"Filter took {t_filter:.2f}s (>5s)"
 
-        print(f"\n  DuckDB Performance (100K rows):")
+        print("\n  DuckDB Performance (100K rows):")
         print(f"    Read CSV: {t_read:.3f}s")
         print(f"    Filter:   {t_filter:.3f}s")
         print(f"    GroupBy:  {t_agg:.3f}s")

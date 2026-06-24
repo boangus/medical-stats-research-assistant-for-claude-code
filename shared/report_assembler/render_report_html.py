@@ -43,12 +43,11 @@ JSON 骨架格式 (report_sections.json):
 import argparse
 import base64
 import json
-import os
+import logging
 import re
 import sys
-from pathlib import Path
 from html import escape
-import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -517,19 +516,19 @@ def generate_table_semantic_description(table_content: str) -> Dict:
         import sys
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent.parent))
-        
+
         from table_understanding import TableMasterExtractor
-        
+
         # 解析表格数据
         lines = [l.strip() for l in table_content.strip().split("\n") if l.strip()]
         if not lines:
             return {'error': '空表格'}
-        
+
         # 提取表头和数据行
         table_lines = [l for l in lines if l.startswith("|")]
         if not table_lines:
             return {'error': '无法解析表格'}
-        
+
         # 简单的表格解析
         headers = []
         rows = []
@@ -539,16 +538,16 @@ def generate_table_semantic_description(table_content: str) -> Dict:
                 headers = cells
             elif not all(c.replace('-', '').replace(':', '').strip() == '' for c in cells):
                 rows.append(cells)
-        
+
         table_data = {
             'headers': headers,
             'rows': rows
         }
-        
+
         # 使用TableMaster提取语义信息
         extractor = TableMasterExtractor(table_data)
         semantic_info = extractor.extract()
-        
+
         return {
             'table_structure': {
                 'headers': headers,
@@ -558,7 +557,7 @@ def generate_table_semantic_description(table_content: str) -> Dict:
             'semantic_info': semantic_info,
             'summary': f"表格包含{len(headers)}列{len(rows)}行数据"
         }
-        
+
     except Exception as e:
         return {'error': f"表格语义描述生成失败: {e}"}
 
@@ -584,13 +583,13 @@ def generate_chart_structured_description(chart_data: Dict) -> Dict:
         import sys
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent.parent))
-        
+
         from chart_understanding import ChartFDVGenerator
-        
+
         # 使用FDV生成结构化描述
         generator = ChartFDVGenerator(chart_data)
         fdv_description = generator.generate_description()
-        
+
         return {
             'chart_type': chart_data.get('type', 'unknown'),
             'fdv_description': fdv_description,
@@ -601,7 +600,7 @@ def generate_chart_structured_description(chart_data: Dict) -> Dict:
                 'has_sample_size': 'sample_size' in chart_data
             }
         }
-        
+
     except Exception as e:
         return {'error': f"图表结构化描述生成失败: {e}"}
 
@@ -626,11 +625,11 @@ def generate_table_chart_verification_report(skeleton: Dict) -> Dict:
         'overall_score': 0.0,
         'recommendations': []
     }
-    
+
     # 遍历所有章节
     for section in skeleton.get('sections', []):
         section_type = section.get('type', '')
-        
+
         # 检查表格
         if section_type == 'table':
             table_content = section.get('content', '')
@@ -641,7 +640,7 @@ def generate_table_chart_verification_report(skeleton: Dict) -> Dict:
                     'section_title': section.get('title', ''),
                     'description': table_desc
                 })
-        
+
         # 检查图表
         elif section_type == 'figure':
             figure_file = section.get('figure_file', '')
@@ -658,7 +657,7 @@ def generate_table_chart_verification_report(skeleton: Dict) -> Dict:
                     'section_title': section.get('title', ''),
                     'description': chart_desc
                 })
-        
+
         # 检查复合章节
         elif section_type == 'multi':
             for child in section.get('children', []):
@@ -688,7 +687,7 @@ def generate_table_chart_verification_report(skeleton: Dict) -> Dict:
                             'child_title': child.get('caption', ''),
                             'description': chart_desc
                         })
-    
+
     return report
 
 
@@ -718,7 +717,7 @@ def main():
     output_path.write_text(html, encoding="utf-8")
     logger.info(f"✅ HTML 报告已生成: {output_path.resolve()}")
     logger.info(f"   文件大小: {output_path.stat().st_size / 1024:.1f} KB")
-    
+
     # 生成表格和图表核查报告
     verification_report = generate_table_chart_verification_report(skeleton)
     verification_path = output_path.with_suffix('.verification.json')

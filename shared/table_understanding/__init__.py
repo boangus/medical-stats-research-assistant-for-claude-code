@@ -15,15 +15,15 @@
 """
 
 from .table_chain_verifier import TableChainVerifier
-from .table_tree_analyzer import TableTreeAnalyzer
 from .table_master_extractor import TableMasterExtractor
+from .table_tree_analyzer import TableTreeAnalyzer
 
 __version__ = "1.0.0"
 __author__ = "MSRA Team"
 
 __all__ = [
     'TableChainVerifier',
-    'TableTreeAnalyzer', 
+    'TableTreeAnalyzer',
     'TableMasterExtractor'
 ]
 

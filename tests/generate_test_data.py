@@ -2,7 +2,8 @@
 # 覆盖所有 SKILL 中提及的数据质量"坑"
 # 输出: tests/msra_test_data.csv
 
-import csv, random, string
+import csv
+import random
 from datetime import datetime, timedelta
 
 random.seed(42)

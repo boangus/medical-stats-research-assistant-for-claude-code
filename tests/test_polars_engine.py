@@ -4,8 +4,6 @@ Tests for PolarsEngine adapter.
 
 import os
 import sys
-import tempfile
-import shutil
 
 import numpy as np
 import pandas as pd

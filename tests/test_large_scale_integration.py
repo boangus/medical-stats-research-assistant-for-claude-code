@@ -7,8 +7,9 @@ including automatic engine selection.
 
 import os
 import tempfile
-import pytest
+
 import pandas as pd
+import pytest
 
 from shared.large_scale_processing import EngineFactory, EngineSelector, ProcessingEngine
 

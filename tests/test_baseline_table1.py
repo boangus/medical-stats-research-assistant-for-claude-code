@@ -7,11 +7,9 @@ import pytest
 
 from shared.templates.baseline_table1_engine import (
     BaselineTable1Engine,
-    VariableConfig,
     Table1Result,
-    RowResult,
+    VariableConfig,
 )
-
 
 # ── Fixtures ──
 

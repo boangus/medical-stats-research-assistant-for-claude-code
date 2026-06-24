@@ -5,7 +5,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 BASE = Path(__file__).resolve().parent.parent
@@ -255,7 +254,7 @@ subprocess.run([
 if table1_docx.exists():
     print(f"    [OK] 三线表已导出: {table1_docx}")
 else:
-    print(f"    [WARN] 三线表导出失败")
+    print("    [WARN] 三线表导出失败")
 
 # Table 2: Logistic regression results
 table2_md = (
@@ -285,12 +284,12 @@ subprocess.run([
 if table2_docx.exists():
     print(f"    [OK] 三线表已导出: {table2_docx}")
 else:
-    print(f"    [WARN] 三线表导出失败")
+    print("    [WARN] 三线表导出失败")
 
 
 # ---------- Phase 5: Write Markdown Report ----------
 print("\n  [Phase 5] 生成 Markdown 报告...")
-report_md = f"""# 医学统计研究报告
+report_md = """# 医学统计研究报告
 
 ## 1. 方法学
 
@@ -521,7 +520,7 @@ if result.returncode == 0:
     print(f"    [OK] HTML 图文报告已生成: {html_output}")
     print(f"       {result.stdout.strip()}")
 else:
-    print(f"    [FAIL] HTML 报告渲染失败:")
+    print("    [FAIL] HTML 报告渲染失败:")
     print(f"       stderr: {result.stderr.strip()}")
 
 
@@ -531,25 +530,25 @@ else:
 print(f"\n{'='*64}")
 print("MSRA Pipeline — 全流程完成 [OK]")
 print("=" * 64)
-print(f"\n  阶段流转:")
-print(f"  Stage 1  (数据准备)    -> [OK]")
-print(f"  Stage 1.5 (质量门闸1)  -> [OK] (7/7 pass)")
-print(f"  Stage 2  (分析计划)    -> [OK]")
-print(f"  Stage 3  (分析执行)    -> [OK]")
-print(f"  Stage 3.5 (质量门闸2)  -> [OK] (7/7 pass)")
-print(f"  Stage 4  (报告生成)    -> [OK]")
-print(f"\n  产物清单:")
-print(f"  - tests/msra_clean.csv              (清洗后数据)")
-print(f"  - tests/cleaning_log.md                    (清洗日志)")
-print(f"  - tests/database_lock_record.md            (锁定记录)")
-print(f"  - tests/validation_report_stage1.md        (验证报告)")
-print(f"  - tests/gate_report_stage1_5.md            (门闸报告1)")
-print(f"  - tests/eda_report.md                      (EDA报告)")
-print(f"  - tests/sap.md                             (分析计划)")
-print(f"  - reports/final_report.md                  (最终报告 — 纯文本版)")
-print(f"  - reports/final_report.html                (最终报告 — 图文HTML版) 🆕")
-print(f"  - reports/figures/forest_plot_logistic.png (森林图) 🆕")
-print(f"  - reports/figures/table1_baseline.png      (基线特征图) 🆕")
-print(f"  - reports/figures/billing_by_admission.png (计费分布图) 🆕")
-print(f"  - reports/tables/table1_baseline.docx      (三线表 — 基线特征) 🆕")
-print(f"  - reports/tables/table2_logistic_regression.docx (三线表 — 回归结果) 🆕")
+print("\n  阶段流转:")
+print("  Stage 1  (数据准备)    -> [OK]")
+print("  Stage 1.5 (质量门闸1)  -> [OK] (7/7 pass)")
+print("  Stage 2  (分析计划)    -> [OK]")
+print("  Stage 3  (分析执行)    -> [OK]")
+print("  Stage 3.5 (质量门闸2)  -> [OK] (7/7 pass)")
+print("  Stage 4  (报告生成)    -> [OK]")
+print("\n  产物清单:")
+print("  - tests/msra_clean.csv              (清洗后数据)")
+print("  - tests/cleaning_log.md                    (清洗日志)")
+print("  - tests/database_lock_record.md            (锁定记录)")
+print("  - tests/validation_report_stage1.md        (验证报告)")
+print("  - tests/gate_report_stage1_5.md            (门闸报告1)")
+print("  - tests/eda_report.md                      (EDA报告)")
+print("  - tests/sap.md                             (分析计划)")
+print("  - reports/final_report.md                  (最终报告 — 纯文本版)")
+print("  - reports/final_report.html                (最终报告 — 图文HTML版) 🆕")
+print("  - reports/figures/forest_plot_logistic.png (森林图) 🆕")
+print("  - reports/figures/table1_baseline.png      (基线特征图) 🆕")
+print("  - reports/figures/billing_by_admission.png (计费分布图) 🆕")
+print("  - reports/tables/table1_baseline.docx      (三线表 — 基线特征) 🆕")
+print("  - reports/tables/table2_logistic_regression.docx (三线表 — 回归结果) 🆕")

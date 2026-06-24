@@ -3,12 +3,13 @@ Tests for EngineFactory module.
 """
 
 import pytest
-from shared.large_scale_processing.engine_factory import EngineFactory
+
 from shared.large_scale_processing.duckdb_engine import DuckDBEngine
+from shared.large_scale_processing.engine_factory import EngineFactory
 
 # Check if dask is available for conditional test skipping
 try:
-    from shared.large_scale_processing.dask_engine import DaskEngine, _DASK_AVAILABLE
+    from shared.large_scale_processing.dask_engine import _DASK_AVAILABLE, DaskEngine
 except ImportError:
     _DASK_AVAILABLE = False
 

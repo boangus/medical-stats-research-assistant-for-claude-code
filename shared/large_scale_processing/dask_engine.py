@@ -11,7 +11,7 @@ module itself can be safely imported for type checking.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 from .base_engine import BaseEngine
 

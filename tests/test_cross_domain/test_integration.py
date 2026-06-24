@@ -6,16 +6,13 @@ end-to-end correlation analysis flow.
 
 import json
 import os
-import numpy as np
+
 import pandas as pd
-import pytest
 
 from msra_modules.cross_domain import (
-    RadiomicsDEGCorrelation,
-    RealtimePredictionModel,
-    MultiModalVisualizer,
     CrossDomainQualityGateChecker,
     DataAligner,
+    RadiomicsDEGCorrelation,
     export_v1_schema,
 )
 

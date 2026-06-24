@@ -3,8 +3,9 @@ Schema: msra_test_data.csv (generate_test_data.py output)
 
 注意：清洗为建议模式，门闸检查基于原始数据。
 """
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 BASE = Path(__file__).resolve().parent.parent
 

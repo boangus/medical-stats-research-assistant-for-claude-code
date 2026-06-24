@@ -10,11 +10,10 @@ Usage:
     report = mca.cross_site_consistency_check()
 """
 
-import os
-import json
-from typing import Optional, Dict, List, Any
-from pathlib import Path
 import logging
+import os
+from pathlib import Path
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +122,6 @@ class MultiCenterAnalyzer:
 
     def _check_type_consistency(self) -> Dict[str, Any]:
         """检查同名变量在不同中心的类型是否一致"""
-        import pandas as pd
 
         if len(self.sites) < 2:
             return {"consistent": True, "detail": "仅1个中心"}
@@ -165,8 +163,6 @@ class MultiCenterAnalyzer:
 
     def _compare_missing_rates(self) -> Dict[str, Any]:
         """比较各中心缺失率"""
-        import pandas as pd
-        import numpy as np
 
         if len(self.sites) < 2:
             return {"consistent": True, "detail": "仅1个中心"}
@@ -205,7 +201,6 @@ class MultiCenterAnalyzer:
 
     def _compare_baseline_distributions(self) -> Dict[str, Any]:
         """比较各中心基线特征分布差异"""
-        import pandas as pd
         import numpy as np
         from scipy import stats
 

@@ -13,7 +13,7 @@ Usage:
     print(formatter.ci(1.23, 1.05, 1.45))  # "HR=1.23, 95%CI: 1.05-1.45"
 """
 
-from .variable_standardizer import VariableStandardizer
 from .stat_formatter import StatFormatter
+from .variable_standardizer import VariableStandardizer
 
 __all__ = ["VariableStandardizer", "StatFormatter"]

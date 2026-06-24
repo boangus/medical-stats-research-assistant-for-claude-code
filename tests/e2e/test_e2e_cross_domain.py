@@ -14,19 +14,20 @@ E2E-CD-04: Complete fusion pipeline
     (all data -> all three scenario results generated + report output)
 """
 
-import sys
-import os
 import json
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 
@@ -126,8 +127,8 @@ class TestE2ECd01ImagingGeneCorrelation:
     ):
         """Test that Gate CD-3.5 returns PASS or CONDITIONAL for correlation results."""
         from msra_modules.cross_domain import (
-            RadiomicsDEGCorrelation,
             CrossDomainQualityGateChecker,
+            RadiomicsDEGCorrelation,
         )
         from shared.quality_gates.gate_runner import GateVerdict
 
@@ -232,8 +233,9 @@ class TestE2ECd02RealtimePredictionModel:
         self, e2e_historical_vitals, e2e_prediction_labels
     ):
         """Test that model evaluation produces valid metrics with AUROC >= 0.55."""
-        from msra_modules.cross_domain import RealtimePredictionModel
         from sklearn.model_selection import train_test_split
+
+        from msra_modules.cross_domain import RealtimePredictionModel
 
         # --- Arrange ---
         model = RealtimePredictionModel(model_type="logistic")
@@ -298,8 +300,8 @@ class TestE2ECd02RealtimePredictionModel:
     ):
         """Test that Gate CD-3.5 checks model performance correctly."""
         from msra_modules.cross_domain import (
-            RealtimePredictionModel,
             CrossDomainQualityGateChecker,
+            RealtimePredictionModel,
         )
         from shared.quality_gates.gate_runner import GateVerdict
 
@@ -480,8 +482,8 @@ class TestE2ECd03MultiModalVisualization:
     ):
         """Test that Gate CD-3.5 checks visualization consistency."""
         from msra_modules.cross_domain import (
-            MultiModalVisualizer,
             CrossDomainQualityGateChecker,
+            MultiModalVisualizer,
         )
         from shared.quality_gates.gate_runner import GateVerdict
 
@@ -532,9 +534,9 @@ class TestE2ECd04CompleteFusion:
     ):
         """Test that all three scenarios execute and produce outputs."""
         from msra_modules.cross_domain import (
+            MultiModalVisualizer,
             RadiomicsDEGCorrelation,
             RealtimePredictionModel,
-            MultiModalVisualizer,
             export_v1_schema,
         )
 

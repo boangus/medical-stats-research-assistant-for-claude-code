@@ -21,6 +21,7 @@ adaptive_interim_analysis_template.py — 适应性设计与期中分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -28,7 +29,6 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy.optimize import brentq
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -1701,7 +1701,7 @@ if __name__ == "__main__":
     decision1 = interim_decision(
         z_stat=1.5, look=1, design=design_of, n_obs=120, n_planned=300
     )
-    logger.info(f"第 1 次期中分析 (Z=1.5):")
+    logger.info("第 1 次期中分析 (Z=1.5):")
     logger.info(f"  决策: {decision1['decision']}")
     logger.info(f"  条件把握度: {decision1['conditional_power']:.2%}")
     logger.info(f"  建议: {decision1['recommendation']}")
@@ -1710,7 +1710,7 @@ if __name__ == "__main__":
     decision2 = interim_decision(
         z_stat=3.0, look=1, design=design_of
     )
-    logger.info(f"\n第 1 次期中分析 (Z=3.0):")
+    logger.info("\n第 1 次期中分析 (Z=3.0):")
     logger.info(f"  决策: {decision2['decision']}")
     logger.info(f"  建议: {decision2['recommendation']}")
 
@@ -1718,7 +1718,7 @@ if __name__ == "__main__":
     decision3 = interim_decision(
         z_stat=-0.5, look=1, design=design_of
     )
-    logger.info(f"\n第 1 次期中分析 (Z=-0.5):")
+    logger.info("\n第 1 次期中分析 (Z=-0.5):")
     logger.info(f"  决策: {decision3['decision']}")
     logger.info(f"  建议: {decision3['recommendation']}")
 
@@ -1745,7 +1745,7 @@ if __name__ == "__main__":
         n_obs=100, pooled_sd=12.5, effect_size=5.0,
         alpha=0.025, power=0.8,
     )
-    logger.info(f"\n  盲态样本量重新估计:")
+    logger.info("\n  盲态样本量重新估计:")
     logger.info(f"    合并SD={ssr['pooled_sd']}, 效应量={ssr['effect_size']}")
     logger.info(f"    标准化效应量(d)={ssr['standardized_effect']:.4f}")
     logger.info(f"    重新估计每组样本量: {ssr['n_per_group_reestimated']}")
@@ -1755,7 +1755,7 @@ if __name__ == "__main__":
     cpr = conditional_power_reestimation(
         z_interim=1.2, t_interim=0.5, design=design_of, target_cp=0.8
     )
-    logger.info(f"\n  条件把握度样本量重新估计 (Z=1.2, t=0.5):")
+    logger.info("\n  条件把握度样本量重新估计 (Z=1.2, t=0.5):")
     logger.info(f"    当前CP(观察效应): {cpr['cp_current']:.2%}")
     logger.info(f"    当前CP(设计效应): {cpr['cp_design']:.2%}")
     logger.info(f"    当前CP(H0): {cpr['cp_null']:.2%}")
@@ -1771,7 +1771,7 @@ if __name__ == "__main__":
     rpw = randomized_play_the_winner(
         n=100, p_success_a=0.3, p_success_b=0.6, random_seed=42
     )
-    logger.info(f"  随机化胜者分配 (RPW):")
+    logger.info("  随机化胜者分配 (RPW):")
     logger.info(f"    A组: n={rpw['n_a']}, 成功={rpw['success_a']} "
           f"({rpw['success_a']/max(rpw['n_a'],1):.1%})")
     logger.info(f"    B组: n={rpw['n_b']}, 成功={rpw['success_b']} "
@@ -1785,7 +1785,7 @@ if __name__ == "__main__":
         [0, 2, 0], [1, 0, 1],
     ])
     minim = minimization_randomization(factors, n_treatments=2, random_seed=42)
-    logger.info(f"\n  最小化随机化:")
+    logger.info("\n  最小化随机化:")
     logger.info(f"    分配序列: {minim['assignments']}")
     logger.info(f"    最终不平衡量: {minim['final_imbalance']:.1f}")
 
@@ -1796,7 +1796,7 @@ if __name__ == "__main__":
 
     # α 消耗函数
     as_corr = alpha_spending_correction(looks=3, alpha=0.025, spending_type="of")
-    logger.info(f"  α消耗函数校正 (3次分析, OF型):")
+    logger.info("  α消耗函数校正 (3次分析, OF型):")
     logger.info(f"    累积α: {as_corr['alpha_cumulative']}")
     logger.info(f"    增量α: {as_corr['alpha_incremental']}")
 

@@ -35,19 +35,16 @@ export_tables_docx.py — 三线表 Word 导出器
 
 import argparse
 import csv
-import io
+import logging
 import os
-import re
 import sys
 from pathlib import Path
 
 from docx import Document
-from docx.shared import Pt, Emu, Cm, RGBColor
-from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml.ns import qn, nsdecls
 from docx.oxml import parse_xml
-import logging
+from docx.oxml.ns import nsdecls, qn
+from docx.shared import Cm, Emu, Pt, RGBColor
 
 logger = logging.getLogger(__name__)
 

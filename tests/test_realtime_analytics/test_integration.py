@@ -4,23 +4,21 @@ Integration tests for realtime_analytics module.
 端到端测试: 模拟器 → 流处理 → 异常检测 → 告警 → 报告。
 """
 
-import time
 import tempfile
-import pytest
-import numpy as np
 from pathlib import Path
 
-from msra_modules.realtime_analytics.stream_processor import StreamProcessor
+import numpy as np
+
+from msra_modules.realtime_analytics.alert_system import Alert, AlertChannel, AlertSystem
 from msra_modules.realtime_analytics.anomaly_detector import (
-    AnomalyDetector,
-    AlertRule,
     AlertLevel,
+    AnomalyDetector,
     MultivariateDetector,
 )
-from msra_modules.realtime_analytics.alert_system import AlertSystem, Alert, AlertChannel
-from msra_modules.realtime_analytics.data_simulator import VitalSignsSimulator
 from msra_modules.realtime_analytics.dashboard import RealtimeDashboard, ReportGenerator
+from msra_modules.realtime_analytics.data_simulator import VitalSignsSimulator
 from msra_modules.realtime_analytics.quality_gates import RealtimeQualityGateChecker
+from msra_modules.realtime_analytics.stream_processor import StreamProcessor
 from shared.quality_gates.gate_runner import GateVerdict
 
 

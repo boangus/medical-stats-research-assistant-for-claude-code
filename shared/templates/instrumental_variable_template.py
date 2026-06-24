@@ -11,13 +11,13 @@ instrumental_variable_template.py — 工具变量分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -868,6 +868,6 @@ if __name__ == "__main__":
 
     logger.info(f"\n  OLS 系数: {full_results['ols_coefficient']:.4f}")
     logger.info(f"  IV 系数:  {full_results['iv_coefficient']:.4f}")
-    logger.info(f"  真实值:   2.0000")
+    logger.info("  真实值:   2.0000")
 
     logger.info("\n 工具变量分析模板示例完成")

@@ -5,13 +5,14 @@ SAP一致性检查器测试
 测试SAP预设方法与数据特征的一致性检查功能。
 """
 
+# 添加项目根目录到Python路径
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
 
-# 添加项目根目录到Python路径
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from shared.sap.sap_consistency_check import SAPConsistencyCheck

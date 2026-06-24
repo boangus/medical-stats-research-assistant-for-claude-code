@@ -5,9 +5,10 @@ Provides SQL-based OLAP processing using DuckDB's in-memory database.
 Optimized for complex analytical queries on datasets 10-100GB.
 """
 
+from typing import Any, List, Optional, Union
+
 import duckdb
 import pandas as pd
-from typing import Any, List, Optional, Union
 
 from .base_engine import BaseEngine
 

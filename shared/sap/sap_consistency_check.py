@@ -6,19 +6,19 @@ MSRA SAP一致性检查器
 用于 Exec Runner 的 Phase 7 假设检验流程。
 """
 
-import pandas as pd
-import numpy as np
-from scipy import stats
-from typing import Dict, List, Tuple, Any, Optional
-import warnings
 import logging
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 logger = logging.getLogger(__name__)
 
 
 class SAPConsistencyCheck:
     """SAP一致性检查器"""
-    
+
     def __init__(self, sap_config: Dict[str, Any]):
         """
         初始化SAP一致性检查器
@@ -28,7 +28,7 @@ class SAPConsistencyCheck:
         """
         self.sap_config = sap_config
         self.consistency_results = []
-        
+
     def check_normality(self, data: pd.DataFrame, variable: str, group_col: Optional[str] = None) -> Dict[str, Any]:
         """
         检查正态性假设与SAP方法的一致性
@@ -51,7 +51,7 @@ class SAPConsistencyCheck:
             "alternative_method": "",
             "code_suggestion": ""
         }
-        
+
         # 获取数据
         if group_col:
             groups = data[group_col].unique()
@@ -74,15 +74,15 @@ class SAPConsistencyCheck:
                     "p_value": p_value,
                     "normal": p_value > 0.05
                 }
-        
+
         # 检查一致性
         is_normal = all(
-            chars.get("normal", True) 
+            chars.get("normal", True)
             for chars in result["data_characteristics"].values()
         )
-        
+
         sap_method = self.sap_config.get("normality_test", "shapiro-wilk")
-        
+
         if is_normal:
             if "parametric" in self.sap_config.get("main_analysis", "").lower():
                 result["consistency"] = True
@@ -100,9 +100,9 @@ class SAPConsistencyCheck:
                 result["mismatch_details"] = "数据不满足正态性，但SAP预设参数方法"
                 result["alternative_method"] = "建议使用非参数检验"
                 result["code_suggestion"] = self._generate_nonparametric_code(variable, group_col)
-        
+
         return result
-    
+
     def check_homogeneity(self, data: pd.DataFrame, variable: str, group_col: str) -> Dict[str, Any]:
         """
         检查方差齐性假设与SAP方法的一致性
@@ -126,16 +126,16 @@ class SAPConsistencyCheck:
             "alternative_method": "",
             "code_suggestion": ""
         }
-        
+
         # 按组获取数据
         groups = data[group_col].unique()
         group_data_list = []
-        
+
         for group in groups:
             group_data = data[data[group_col] == group][variable].dropna()
             if len(group_data) > 0:
                 group_data_list.append(group_data)
-        
+
         # Levene检验
         if len(group_data_list) >= 2:
             stat, p_value = stats.levene(*group_data_list)
@@ -144,10 +144,10 @@ class SAPConsistencyCheck:
                 "p_value": p_value,
                 "homogeneous": p_value > 0.05
             }
-        
+
         # 检查一致性
         is_homogeneous = result["data_characteristics"].get("homogeneous", True)
-        
+
         if is_homogeneous:
             if "equal_var" in self.sap_config and self.sap_config["equal_var"]:
                 result["consistency"] = True
@@ -165,9 +165,9 @@ class SAPConsistencyCheck:
                 result["mismatch_details"] = "数据不满足方差齐性，但SAP预设等方差方法"
                 result["alternative_method"] = "建议使用Welch校正"
                 result["code_suggestion"] = self._generate_welch_code(variable, group_col)
-        
+
         return result
-    
+
     def check_multicollinearity(self, data: pd.DataFrame, outcome: str, predictors: List[str]) -> Dict[str, Any]:
         """
         检查多重共线性与SAP模型的一致性
@@ -190,24 +190,24 @@ class SAPConsistencyCheck:
             "alternative_method": "",
             "code_suggestion": ""
         }
-        
+
         # 准备数据
         X = data[predictors].dropna()
         if len(X) < len(predictors) + 1:
             result["data_characteristics"] = {"error": "样本量不足"}
             return result
-        
+
         # 计算VIF
         vif_values = {}
         for i, predictor in enumerate(predictors):
             # 简化的VIF计算
             y = X[predictor]
             X_other = X.drop(columns=[predictor])
-            
+
             if len(X_other.columns) > 0:
                 # 添加常数项
                 X_other_with_const = np.column_stack([np.ones(len(X_other)), X_other.values])
-                
+
                 # 计算R²
                 corr_matrix = np.corrcoef(X_other.values.T)
                 r_sq_vals = 1 - 1 / np.diag(np.linalg.inv(corr_matrix)) if len(X_other.columns) > 1 else np.array([0.0])
@@ -216,13 +216,13 @@ class SAPConsistencyCheck:
                 # VIF = 1 / (1 - R²)
                 vif = 1 / (1 - r_squared) if r_squared < 1 else float('inf')
                 vif_values[predictor] = vif
-        
+
         result["data_characteristics"]["vif_values"] = vif_values
         result["data_characteristics"]["max_vif"] = max(vif_values.values()) if vif_values else 0
-        
+
         # 检查一致性
         max_vif = result["data_characteristics"]["max_vif"]
-        
+
         if max_vif < 5:
             result["consistency"] = True
             result["mismatch_details"] = "无严重共线性，SAP模型合适"
@@ -234,9 +234,9 @@ class SAPConsistencyCheck:
             result["mismatch_details"] = f"严重共线性 (VIF={max_vif:.2f})，SAP模型可能不稳定"
             result["alternative_method"] = "建议删除高共线变量或使用正则化方法"
             result["code_suggestion"] = self._generate_collinearity_fix_code(vif_values, predictors)
-        
+
         return result
-    
+
     def check_sample_size(self, actual_n: int, planned_n: int) -> Dict[str, Any]:
         """
         检查样本量与SAP计划的一致性
@@ -258,9 +258,9 @@ class SAPConsistencyCheck:
             "alternative_method": "",
             "power_impact": ""
         }
-        
+
         ratio = result["ratio"]
-        
+
         if ratio >= 0.9:
             result["consistency"] = True
             result["mismatch_details"] = "样本量充足，满足SAP计划"
@@ -274,9 +274,9 @@ class SAPConsistencyCheck:
             result["mismatch_details"] = f"样本量不足 ({ratio:.1%})，无法满足SAP计划"
             result["alternative_method"] = "建议转为探索性分析"
             result["power_impact"] = "检验效能不足，可能无法检测到真实效应"
-        
+
         return result
-    
+
     def generate_consistency_report(self) -> Dict[str, Any]:
         """
         生成一致性检查报告
@@ -294,7 +294,7 @@ class SAPConsistencyCheck:
             "details": self.consistency_results,
             "recommendations": []
         }
-        
+
         # 生成建议 + SAP修正触发条件（Optimization #7）
         amendment_triggers = []
         for result in self.consistency_results:
@@ -405,7 +405,7 @@ wilcox.test({variable} ~ {group_col}, data = df)
 # 单样本非参数检验
 wilcox.test(df${variable}, mu = 0)
 """
-    
+
     def _generate_welch_code(self, variable: str, group_col: str) -> str:
         """生成Welch校正代码"""
         return f"""
@@ -416,11 +416,11 @@ t.test({variable} ~ {group_col}, data = df, var.equal = FALSE)
 library(onewaytests)
 bf.test({variable} ~ {group_col}, data = df)
 """
-    
+
     def _generate_collinearity_fix_code(self, vif_values: Dict[str, float], predictors: List[str]) -> str:
         """生成共线性修复代码"""
         high_vif_vars = [var for var, vif in vif_values.items() if vif > 10]
-        
+
         if high_vif_vars:
             return f"""
 # 删除高共线变量
@@ -450,10 +450,10 @@ if __name__ == "__main__":
         "equal_var": True,
         "sample_size": 100
     }
-    
+
     # 创建一致性检查器
     checker = SAPConsistencyCheck(sap_config)
-    
+
     # 示例数据
     np.random.seed(42)
     data = pd.DataFrame({
@@ -461,28 +461,28 @@ if __name__ == "__main__":
         "group": np.random.choice(["A", "B"], 100),
         "age": np.random.normal(50, 10, 100)
     })
-    
+
     # 执行检查
     normality_result = checker.check_normality(data, "outcome", "group")
     homogeneity_result = checker.check_homogeneity(data, "outcome", "group")
     sample_size_result = checker.check_sample_size(100, 100)
-    
+
     # 打印结果
     logger.info("正态性检查:")
     logger.info(f"  一致性: {normality_result['consistency']}")
     logger.info(f"  详情: {normality_result['mismatch_details']}")
-    
+
     logger.info("\n方差齐性检查:")
     logger.info(f"  一致性: {homogeneity_result['consistency']}")
     logger.info(f"  详情: {homogeneity_result['mismatch_details']}")
-    
+
     logger.info("\n样本量检查:")
     logger.info(f"  一致性: {sample_size_result['consistency']}")
     logger.info(f"  详情: {sample_size_result['mismatch_details']}")
-    
+
     # 生成报告
     checker.consistency_results = [normality_result, homogeneity_result, sample_size_result]
     report = checker.generate_consistency_report()
-    
+
     logger.info(f"\n总体一致性: {report['summary']['overall_consistent']}")
     logger.info(f"不一致检查项: {report['summary']['inconsistent']}")

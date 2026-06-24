@@ -4,15 +4,14 @@ Tests for BatchCorrector - 批次校正测试
 使用合成 AnnData mock 数据测试批次检测和校正功能。
 """
 
-import numpy as np
-import pandas as pd
-import pytest
-from unittest.mock import patch, MagicMock
-
-
 # 导入被测模块
 import sys
 from pathlib import Path
+from unittest.mock import patch
+
+import numpy as np
+import pandas as pd
+import pytest
 
 _project_root = Path(__file__).resolve().parent.parent.parent
 if str(_project_root) not in sys.path:

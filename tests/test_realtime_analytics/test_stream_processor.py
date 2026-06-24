@@ -2,13 +2,12 @@
 Tests for StreamProcessor and SlidingWindowStats.
 """
 
-import time
-import numpy as np
 import pytest
+
 from msra_modules.realtime_analytics.stream_processor import (
-    StreamProcessor,
     SlidingWindowStats,
     StreamEvent,
+    StreamProcessor,
 )
 
 

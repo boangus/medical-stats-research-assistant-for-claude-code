@@ -6,7 +6,7 @@ Provides common interface for all processing engines:
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Union
+from typing import Any, List, Union
 
 
 class BaseEngine(ABC):

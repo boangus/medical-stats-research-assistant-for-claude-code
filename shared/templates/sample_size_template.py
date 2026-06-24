@@ -14,6 +14,7 @@ sample_size_template.py — 样本量计算与报告生成模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -21,7 +22,6 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 

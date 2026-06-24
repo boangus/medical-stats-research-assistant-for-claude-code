@@ -7,7 +7,6 @@ MSRA 脱敏策略实现
 """
 
 import hashlib
-import re
 import secrets
 from typing import Optional
 

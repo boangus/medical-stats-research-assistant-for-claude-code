@@ -6,15 +6,12 @@ import os
 import pandas as pd
 import pytest
 
-from shared.privacy.sensitivity_detector import (
-    SensitivityDetector,
-    PIIFinding,
-    ScanResult,
-    PIIDecision,
-    DecisionLog,
-)
 from shared.privacy.masking_strategies import MaskingStrategies
-
+from shared.privacy.sensitivity_detector import (
+    DecisionLog,
+    PIIDecision,
+    SensitivityDetector,
+)
 
 # ── Fixtures ──
 

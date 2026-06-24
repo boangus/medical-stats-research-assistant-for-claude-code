@@ -4,11 +4,11 @@ Radiomics Tests - 影像组学特征提取测试
 测试 RadiomicsExtractor 的各项特征提取功能。
 """
 
-import numpy as np
-import pytest
-import tempfile
 import os
+import tempfile
 from pathlib import Path
+
+import numpy as np
 
 
 class TestRadiomicsExtractor:

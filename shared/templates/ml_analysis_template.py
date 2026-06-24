@@ -25,8 +25,9 @@ ml_analysis_template.py — 机器学习分析模板（Python）
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -35,14 +36,12 @@ from sklearn.calibration import calibration_curve
 from sklearn.metrics import (
     accuracy_score,
     brier_score_loss,
-    classification_report,
     f1_score,
     precision_score,
     recall_score,
     roc_auc_score,
     roc_curve,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 

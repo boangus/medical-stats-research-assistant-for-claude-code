@@ -11,13 +11,13 @@ bayesian_analysis_template.py — 贝叶斯统计分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -86,8 +86,8 @@ def bayesian_linear_regression(
     >>> result = bayesian_linear_regression(df, 'y', ['x1', 'x2'], draws=1000)
     >>> print(result['summary'])
     """
-    import pymc as pm
     import arviz as az
+    import pymc as pm
 
     # 默认弱信息先验
     if priors is None:
@@ -212,8 +212,8 @@ def bayesian_logistic_regression(
     >>> result = bayesian_logistic_regression(df, 'outcome', ['age', 'treatment'])
     >>> print(result['summary'])
     """
-    import pymc as pm
     import arviz as az
+    import pymc as pm
 
     if priors is None:
         priors = {
@@ -320,8 +320,8 @@ def bayesian_weibull_survival(
     --------
     >>> result = bayesian_weibull_survival(df, 'time', 'event', ['age', 'treatment'])
     """
-    import pymc as pm
     import arviz as az
+    import pymc as pm
 
     data = df[[duration_col, event_col] + predictors].dropna()
     T = data[duration_col].values

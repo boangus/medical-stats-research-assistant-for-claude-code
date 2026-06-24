@@ -5,10 +5,10 @@ single modality, no data exception, save_path.
 """
 
 import os
-import numpy as np
-import pandas as pd
-import pytest
+
 import matplotlib
+import pytest
+
 matplotlib.use('Agg')  # 非交互式后端
 
 from msra_modules.cross_domain import MultiModalVisualizer

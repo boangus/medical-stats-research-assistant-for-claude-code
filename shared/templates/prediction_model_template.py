@@ -27,8 +27,9 @@ prediction_model_template.py — 临床预测模型完整模板（Python）
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -37,12 +38,9 @@ from sklearn.calibration import calibration_curve
 from sklearn.metrics import (
     accuracy_score,
     brier_score_loss,
-    classification_report,
     f1_score,
     roc_auc_score,
-    roc_curve,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -161,9 +159,8 @@ def develop_models(
     Dict
         包含训练好的模型和评估结果
     """
-    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+    from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
     from sklearn.linear_model import LogisticRegression
-    from sklearn.svm import SVC
 
     if models is None:
         models = {

@@ -10,28 +10,25 @@ Tests for shared.quality_gates — 质量门闸独立模块
 - 门闸报告序列化/反序列化
 """
 
-import json
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Ensure project root is on sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shared.quality_gates import (
+    CheckItem,
+    CheckItemResult,
+    DataQualityCheckItems,
     GateRunner,
-    GateResult,
     GateType,
     GateVerdict,
-    RunMode,
-    CheckItemResult,
-    CheckItem,
-    CheckItemCollection,
-    DataQualityCheckItems,
-    SapQualityCheckItems,
     ResultsQualityCheckItems,
+    RunMode,
+    SapQualityCheckItems,
 )
-
 
 # ============================================================
 # CheckItemCollection Tests

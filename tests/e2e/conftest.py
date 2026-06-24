@@ -5,11 +5,11 @@ Provides large-scale mock data generators for end-to-end testing.
 """
 
 import sys
-import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
 
 # Ensure project root is on sys.path
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -18,24 +18,23 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 # Use non-interactive matplotlib backend
 import matplotlib
+
 matplotlib.use("Agg")
 
 # Import fixture generators
+from tests.e2e.fixtures.generate_mock_clinical import generate_mock_clinical
 from tests.e2e.fixtures.generate_mock_counts import (
     generate_mock_counts,
     generate_sample_info,
+)
+from tests.e2e.fixtures.generate_mock_labels import (
+    generate_mock_labels,
 )
 from tests.e2e.fixtures.generate_mock_nifti import generate_mock_nifti
 from tests.e2e.fixtures.generate_mock_vitals import (
     generate_mock_vitals,
     generate_mock_vitals_dataframe,
 )
-from tests.e2e.fixtures.generate_mock_clinical import generate_mock_clinical
-from tests.e2e.fixtures.generate_mock_labels import (
-    generate_mock_labels,
-    generate_mock_labels_from_vitals,
-)
-
 
 # ===== Seed control =====
 

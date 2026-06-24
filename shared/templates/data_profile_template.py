@@ -9,9 +9,9 @@ Usage:
     md = generate_data_profile(df, output_dir="MSRA/data-prep")
 """
 
+import logging
 import os
 from typing import Optional
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +32,8 @@ def generate_data_profile(
     Returns:
         Markdown 格式数据画像字符串
     """
-    import pandas as pd
     import numpy as np
+    import pandas as pd
 
     rows, cols = df.shape
     mem_mb = df.memory_usage(deep=True).sum() / (1024 * 1024)
@@ -136,8 +136,8 @@ def generate_data_profile(
     # 1. 数据规模
     lines.append("## 1. 数据规模")
     lines.append("")
-    lines.append(f"| 指标 | 值 |")
-    lines.append(f"|------|-----|")
+    lines.append("| 指标 | 值 |")
+    lines.append("|------|-----|")
     lines.append(f"| 行数（样本量） | {rows:,} |")
     lines.append(f"| 列数（变量数） | {cols} |")
     lines.append(f"| 内存占用 | {mem_mb:.2f} MB |")
@@ -194,8 +194,8 @@ def generate_data_profile(
     if time_info:
         lines.append("## 6. 时间跨度")
         lines.append("")
-        lines.append(f"| 列 | 最早日期 | 最晚日期 | 跨度(天) |")
-        lines.append(f"|-----|---------|---------|---------|")
+        lines.append("| 列 | 最早日期 | 最晚日期 | 跨度(天) |")
+        lines.append("|-----|---------|---------|---------|")
         lines.append(f"| {time_info['column']} | {time_info['earliest']} | {time_info['latest']} | {time_info['span_days']} |")
         lines.append("")
 
@@ -264,6 +264,7 @@ def get_checkpoint_level(df) -> str:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     import sys
+
     import pandas as pd
 
     if len(sys.argv) < 2:

@@ -10,10 +10,10 @@ Author: MSRA Team
 Version: 1.0.0
 """
 
-import pytest
 import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import AsyncMock, Mock
+
+import pytest
 
 # ========================================
 # Test Fixtures
@@ -114,7 +114,7 @@ class TestInterfaces:
 
     def test_conflict_report_creation(self):
         """测试冲突报告创建"""
-        from agents.core.interfaces import ConflictReport, ConflictLevel, ConflictType
+        from agents.core.interfaces import ConflictLevel, ConflictReport, ConflictType
 
         conflict = ConflictReport.create(
             source_agent="agent_a",
@@ -132,7 +132,7 @@ class TestInterfaces:
 
     def test_task_creation(self):
         """测试任务创建"""
-        from agents.core.interfaces import Task, TaskType, TaskPriority
+        from agents.core.interfaces import Task, TaskPriority, TaskType
 
         task = Task(
             task_id="task_001",
@@ -216,7 +216,7 @@ class TestTaskQueue:
     @pytest.mark.asyncio
     async def test_enqueue_and_dequeue(self, task_queue):
         """测试任务入队出队"""
-        from agents.core.interfaces import Task, TaskType, TaskPriority
+        from agents.core.interfaces import Task, TaskPriority, TaskType
 
         task = Task(
             task_id="task_001",
@@ -237,7 +237,7 @@ class TestTaskQueue:
     @pytest.mark.asyncio
     async def test_priority_ordering(self, task_queue):
         """测试优先级排序"""
-        from agents.core.interfaces import Task, TaskType, TaskPriority
+        from agents.core.interfaces import Task, TaskPriority, TaskType
 
         # 按非优先级顺序入队
         priorities = [TaskPriority.LOW, TaskPriority.CRITICAL, TaskPriority.NORMAL]
@@ -259,7 +259,7 @@ class TestTaskQueue:
     @pytest.mark.asyncio
     async def test_task_completion(self, task_queue):
         """测试任务完成"""
-        from agents.core.interfaces import Task, TaskType, TaskPriority, TaskStatus
+        from agents.core.interfaces import Task, TaskPriority, TaskStatus, TaskType
 
         task = Task(
             task_id="task_001",
@@ -327,7 +327,7 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_lru_eviction(self):
         """测试LRU淘汰"""
-        from agents.core.cache import MemoryCache, LRUStrategy
+        from agents.core.cache import LRUStrategy, MemoryCache
 
         cache = MemoryCache(max_size=3, strategy=LRUStrategy())
 
@@ -371,7 +371,7 @@ class TestConflictResolution:
     @pytest.mark.asyncio
     async def test_auto_resolve(self, conflict_resolver):
         """测试自动解决"""
-        from agents.core.interfaces import ConflictReport, ConflictLevel, ConflictType
+        from agents.core.interfaces import ConflictLevel, ConflictReport, ConflictType
 
         conflict = ConflictReport.create(
             source_agent="agent_a",
@@ -391,7 +391,7 @@ class TestConflictResolution:
     @pytest.mark.asyncio
     async def test_voting_resolve(self, conflict_resolver):
         """测试投票解决"""
-        from agents.core.interfaces import ConflictReport, ConflictLevel, ConflictType
+        from agents.core.interfaces import ConflictLevel, ConflictReport, ConflictType
 
         # 注册投票者
         mock_voter = Mock()
@@ -421,7 +421,7 @@ class TestConflictResolution:
     @pytest.mark.asyncio
     async def test_conflict_level_strategy_mapping(self, conflict_resolver):
         """测试冲突级别策略映射"""
-        from agents.core.interfaces import ConflictReport, ConflictLevel, ConflictType
+        from agents.core.interfaces import ConflictLevel, ConflictReport, ConflictType
 
         # CRITICAL级别应该使用USER_DECISION
         conflict = ConflictReport.create(
@@ -478,7 +478,6 @@ class TestServiceRegistry:
     @pytest.mark.asyncio
     async def test_unregister_agent(self, registry):
         """测试Agent注销"""
-        from agents.core.interfaces import AgentCapability
 
         mock_agent = Mock()
         mock_agent.agent_id = "agent_001"
@@ -521,7 +520,6 @@ class TestServiceRegistry:
     @pytest.mark.asyncio
     async def test_heartbeat(self, registry):
         """测试心跳"""
-        from agents.core.interfaces import AgentCapability
 
         mock_agent = Mock()
         mock_agent.agent_id = "agent_001"
@@ -645,11 +643,8 @@ class TestIntegration:
     async def test_agent_workflow(self):
         """测试Agent工作流"""
         from agents.core import (
-            create_agent_framework,
             AgentMessage,
-            Task,
-            TaskType,
-            TaskPriority,
+            create_agent_framework,
         )
 
         # 创建框架

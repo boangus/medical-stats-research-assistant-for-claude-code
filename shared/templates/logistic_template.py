@@ -10,10 +10,10 @@ logistic_template.py — Logistic 回归分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -21,12 +21,10 @@ from sklearn.metrics import (
     auc,
     classification_report,
     confusion_matrix,
-    roc_auc_score,
     roc_curve,
 )
 from statsmodels.formula.api import logit
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -463,7 +461,7 @@ if __name__ == "__main__":
     logger.info(f"LRT p-value: {res['lrt_pvalue']:.4f}")
     logger.info("\n=== OR 表 ===")
     logger.info("%s %s %s %s %s %s", res["summary"][["Variable", "OR", "OR_Lower_95", "OR_Upper_95", "p_value", "Signif"]].to_string(index=False))
-    logger.info(f"\n=== 模型评估 ===")
+    logger.info("\n=== 模型评估 ===")
     logger.info(f"AUC: {res['evaluation']['auc']:.3f}")
     logger.info(f"Sensitivity: {res['evaluation']['sensitivity']:.3f}")
     logger.info(f"Specificity: {res['evaluation']['specificity']:.3f}")

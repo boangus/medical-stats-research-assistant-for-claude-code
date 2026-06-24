@@ -1,7 +1,6 @@
 """
 test_deidentification.py — deidentification.py 单元测试
 """
-import numpy as np
 import pandas as pd
 import pytest
 

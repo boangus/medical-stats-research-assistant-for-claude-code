@@ -2,10 +2,11 @@
 test_msra_handoff_bundle.py — MSRA Handoff Bundle 生成器测试
 """
 import os
+
 import pytest
 
-from shared.passport.passport import PassportManager, PassportError
 from scripts.generate_msra_handoff_bundle import generate_handoff_bundle
+from shared.passport.passport import PassportManager
 
 
 @pytest.fixture

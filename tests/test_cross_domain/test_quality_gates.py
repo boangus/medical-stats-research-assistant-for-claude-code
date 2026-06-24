@@ -4,9 +4,6 @@ Tests: CD-1.5 PASS, CD-1.5 BLOCKED, CD-3.5 PASS, CD-3.5 CONDITIONAL,
 CD-3.5 BLOCKED, scenario switching, key item failure.
 """
 
-import numpy as np
-import pandas as pd
-import pytest
 
 from msra_modules.cross_domain import CrossDomainQualityGateChecker
 from shared.quality_gates.gate_runner import GateResult, GateVerdict

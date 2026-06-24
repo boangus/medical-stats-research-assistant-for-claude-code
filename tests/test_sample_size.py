@@ -2,7 +2,6 @@
 test_sample_size.py — sample_size_calculator.py 单元测试
 """
 import importlib
-import pytest
 
 _mod = importlib.import_module("shared.sample-size.sample_size_calculator")
 calc_sample_size_t = _mod.calc_sample_size_t

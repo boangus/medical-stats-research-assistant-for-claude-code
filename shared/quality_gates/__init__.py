@@ -13,19 +13,21 @@ Usage:
     print(result.verdict)  # PASS / CONDITIONAL / BLOCKED
 """
 
-from .gate_runner import GateRunner, GateResult, GateType, GateVerdict, RunMode, CheckItemResult
 from .check_items import (
     CheckItem,
     CheckItemCollection,
     DataQualityCheckItems,
-    SapQualityCheckItems,
     ResultsQualityCheckItems,
+    SapQualityCheckItems,
+)
+from .gate_runner import CheckItemResult, GateResult, GateRunner, GateType, GateVerdict, RunMode
+from .inference_runner import (
+    QUALITY_CHECKLIST,
+    InferenceReport,
+    InferenceRunner,
 )
 from .inference_runner import (
-    InferenceRunner,
-    InferenceReport,
     ChecklistResult as InferenceChecklistResult,
-    QUALITY_CHECKLIST,
 )
 
 __all__ = [

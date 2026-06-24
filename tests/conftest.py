@@ -2,10 +2,9 @@
 conftest.py — pytest 公共 fixtures
 """
 import os
-import sys
-import json
-import tempfile
 import shutil
+import sys
+import tempfile
 
 import numpy as np
 import pandas as pd

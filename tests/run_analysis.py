@@ -5,10 +5,11 @@ Schema: msra_test_data.csv (generate_test_data.py output)
 - ANOVA (BillingAmount ~ AdmissionType)
 - Logistic Regression (Outcome ~ Age + Gender + MedicalCondition + AdmissionType)
 """
-import pandas as pd
-import numpy as np
-from scipy import stats
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 BASE = Path(__file__).resolve().parent.parent
 
@@ -115,7 +116,7 @@ try:
     print(f"  AIC: {model_logit.aic:.2f}")
     print(f"  BIC: {model_logit.bic:.2f}")
 
-    print(f"\n  系数表:")
+    print("\n  系数表:")
     print(f"  {'变量':<40} {'OR':>8} {'95%CI':<16} {'p':>8}")
     print(f"  {'-'*72}")
     for name, coef in model_logit.params.items():

@@ -12,12 +12,12 @@ Usage:
     resume_point = pm.get_resume_point()
 """
 
-import json
 import hashlib
+import json
+import logging
 import os
 from datetime import datetime, timezone
 from typing import Optional
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -770,7 +770,7 @@ if __name__ == "__main__":
         logger.info(f"\n产物 ({len(d.get('artifacts', []))} 个):")
         for a in d.get("artifacts", []):
             logger.info(f"  [{a['status']:>10}] {a['id']} ({a['stage']})")
-        logger.info(f"\n门闸:")
+        logger.info("\n门闸:")
         for g, r in d.get("gates", {}).items():
             logger.info(f"  {g}: {r['status']} ({r['passed_items']}/{r['total_items']})")
         logger.info(f"\n检查点: {d.get('checkpoints', {})}")
@@ -787,7 +787,7 @@ if __name__ == "__main__":
     elif cmd == "check" and len(sys.argv) >= 4:
         ok, missing = pm.verify_prerequisites(sys.argv[3])
         if ok:
-            logger.info(f"✅ 前置条件全部满足")
+            logger.info("✅ 前置条件全部满足")
         else:
             logger.info(f"❌ 缺失: {', '.join(missing)}")
 

@@ -2,11 +2,8 @@
 Tests for RealtimeQualityGateChecker (Gate RT-1).
 """
 
-import time
-import numpy as np
-import pytest
-from msra_modules.realtime_analytics.quality_gates import RealtimeQualityGateChecker
 from msra_modules.realtime_analytics.data_simulator import VitalSignsSimulator
+from msra_modules.realtime_analytics.quality_gates import RealtimeQualityGateChecker
 from shared.quality_gates.gate_runner import GateVerdict
 
 

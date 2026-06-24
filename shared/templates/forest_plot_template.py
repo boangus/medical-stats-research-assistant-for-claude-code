@@ -10,12 +10,11 @@ forest_plot_template.py — 森林图可视化模板（Python）
 版本: 0.1.0
 """
 
-from typing import Dict, List, Optional, Tuple
+import logging
+from typing import List, Optional, Tuple
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import logging
 
 logger = logging.getLogger(__name__)
 

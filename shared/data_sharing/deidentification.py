@@ -6,23 +6,23 @@ MSRA 数据去标识化工具
 用于数据共享包生成。
 """
 
-import re
 import hashlib
-import secrets
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Any, Optional
-from pathlib import Path
-import json
-from datetime import datetime, timedelta
 import logging
+import re
+import secrets
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
 
 class DataDeidentifier:
     """数据去标识化工具"""
-    
+
     def __init__(self):
         """初始化去标识化工具"""
         # 直接标识符模式
@@ -55,7 +55,7 @@ class DataDeidentifier:
                 r"门诊号", r"病案号"
             ]
         }
-        
+
         # 间接标识符模式（HIPAA Safe Harbor 18 类）
         self.indirect_identifiers = {
             "birth_date": [
@@ -112,7 +112,7 @@ class DataDeidentifier:
                 r"面部", r"face.*image"
             ]
         }
-        
+
         # 去标识化策略
         self.strategies = {
             "suppress": "删除标识符列",
@@ -121,7 +121,7 @@ class DataDeidentifier:
             "noise": "添加随机噪声",
             "pseudonymize": "假名替换（可逆）"
         }
-    
+
     def identify_identifiers(self, df: pd.DataFrame) -> Dict[str, Any]:
         """
         识别数据中的标识符
@@ -137,11 +137,11 @@ class DataDeidentifier:
             "indirect_identifiers": [],
             "potential_identifiers": []
         }
-        
+
         # 检查列名
         for col in df.columns:
             col_lower = col.lower()
-            
+
             # 检查直接标识符
             for id_type, patterns in self.direct_identifiers.items():
                 for pattern in patterns:
@@ -152,7 +152,7 @@ class DataDeidentifier:
                             "pattern": pattern
                         })
                         break
-            
+
             # 检查间接标识符
             for id_type, patterns in self.indirect_identifiers.items():
                 for pattern in patterns:
@@ -163,7 +163,7 @@ class DataDeidentifier:
                             "pattern": pattern
                         })
                         break
-        
+
         # 检查可能的高基数列（如唯一ID）
         for col in df.columns:
             if df[col].dtype == 'object':
@@ -174,10 +174,10 @@ class DataDeidentifier:
                         "unique_ratio": unique_ratio,
                         "unique_count": df[col].nunique()
                     })
-        
+
         return results
-    
-    def deidentify_data(self, df: pd.DataFrame, 
+
+    def deidentify_data(self, df: pd.DataFrame,
                         strategy: str = "suppress",
                         columns_to_process: List[str] = None,
                         **kwargs) -> Tuple[pd.DataFrame, Dict[str, Any]]:
@@ -200,21 +200,21 @@ class DataDeidentifier:
             "original_values": {},
             "deidentified_values": {}
         }
-        
+
         # 识别标识符
         identifiers = self.identify_identifiers(df)
-        
+
         # 确定要处理的列
         if columns_to_process is None:
-            columns_to_process = [id_info["column"] for id_info in 
-                                identifiers["direct_identifiers"] + 
+            columns_to_process = [id_info["column"] for id_info in
+                                identifiers["direct_identifiers"] +
                                 identifiers["indirect_identifiers"]]
-        
+
         # 对每列应用去标识化策略
         for col in columns_to_process:
             if col not in df.columns:
                 continue
-            
+
             if strategy == "suppress":
                 df_deidentified, col_report = self._suppress_column(df_deidentified, col)
             elif strategy == "hash":
@@ -225,13 +225,13 @@ class DataDeidentifier:
                 df_deidentified, col_report = self._add_noise_column(df_deidentified, col, **kwargs)
             else:
                 continue
-            
+
             report["columns_processed"].append(col)
             report["original_values"][col] = col_report.get("original_summary", "")
             report["deidentified_values"][col] = col_report.get("deidentified_summary", "")
-        
+
         return df_deidentified, report
-    
+
     def _suppress_column(self, df: pd.DataFrame, col: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """删除列"""
         report = {
@@ -239,11 +239,11 @@ class DataDeidentifier:
             "original_summary": f"列 '{col}' 包含 {df[col].nunique()} 个唯一值",
             "deidentified_summary": f"列 '{col}' 已删除"
         }
-        
+
         df = df.drop(columns=[col])
-        
+
         return df, report
-    
+
     def _hash_column(self, df: pd.DataFrame, col: str,
                      salt: str = None) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """哈希替换列"""
@@ -256,22 +256,22 @@ class DataDeidentifier:
                 UserWarning, stacklevel=2
             )
         original_values = df[col].dropna().unique()[:5]  # 记录前5个原始值
-        
+
         # 哈希替换
         df[col] = df[col].apply(
-            lambda x: hashlib.sha256(f"{salt}{x}".encode()).hexdigest()[:16] 
+            lambda x: hashlib.sha256(f"{salt}{x}".encode()).hexdigest()[:16]
             if pd.notna(x) else x
         )
-        
+
         report = {
             "strategy": "hash",
             "salt": salt,
             "original_summary": f"原始值示例: {list(original_values)}",
             "deidentified_summary": f"已哈希替换 {len(original_values)}+ 个值"
         }
-        
+
         return df, report
-    
+
     def _generalize_column(self, df: pd.DataFrame, col: str,
                           bins: List[int] = None) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """泛化列（HIPAA Safe Harbor: 年龄 >89 聚合为 '90+'）"""
@@ -293,37 +293,37 @@ class DataDeidentifier:
             else:
                 # 数值型泛化
                 df[col] = pd.cut(df[col], bins=bins, right=False)
-        
+
         report = {
             "strategy": "generalize",
             "bins": bins,
             "original_summary": f"原始值示例: {list(original_values)}",
             "deidentified_summary": f"已泛化为 {len(bins)-1} 个组"
         }
-        
+
         return df, report
-    
-    def _add_noise_column(self, df: pd.DataFrame, col: str, 
+
+    def _add_noise_column(self, df: pd.DataFrame, col: str,
                          noise_level: float = 0.1) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """添加随机噪声"""
         original_values = df[col].dropna().unique()[:5]
-        
+
         if df[col].dtype in ['int64', 'float64']:
             # 数值型添加噪声
             std = df[col].std()
             noise = np.random.normal(0, std * noise_level, len(df))
             df[col] = df[col] + noise
-        
+
         report = {
             "strategy": "noise",
             "noise_level": noise_level,
             "original_summary": f"原始值示例: {list(original_values)}",
             "deidentified_summary": f"已添加 {noise_level*100}% 水平噪声"
         }
-        
+
         return df, report
-    
-    def generate_deidentification_report(self, 
+
+    def generate_deidentification_report(self,
                                         original_df: pd.DataFrame,
                                         deidentified_df: pd.DataFrame,
                                         report: Dict[str, Any]) -> str:
@@ -353,12 +353,12 @@ class DataDeidentifier:
 
 ### 处理的列
 """
-        
+
         for col in report['columns_processed']:
             report_content += f"\n#### {col}\n"
             report_content += f"- **原始值摘要**: {report['original_values'].get(col, 'N/A')}\n"
             report_content += f"- **去标识化后**: {report['deidentified_values'].get(col, 'N/A')}\n"
-        
+
         report_content += f"""
 ## 3. 数据对比
 
@@ -378,10 +378,10 @@ class DataDeidentifier:
 
 *报告生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
 """
-        
+
         return report_content
-    
-    def save_deidentified_data(self, df: pd.DataFrame, 
+
+    def save_deidentified_data(self, df: pd.DataFrame,
                               output_path: str,
                               format: str = "csv") -> str:
         """
@@ -397,7 +397,7 @@ class DataDeidentifier:
         """
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         if format == "csv":
             file_path = output_path.with_suffix('.csv')
             df.to_csv(file_path, index=False, encoding='utf-8-sig')
@@ -409,7 +409,7 @@ class DataDeidentifier:
             df.to_json(file_path, orient='records', force_ascii=False, indent=2)
         else:
             raise ValueError(f"不支持的格式: {format}")
-        
+
         return str(file_path)
 
 
@@ -418,52 +418,52 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # 创建去标识化工具
     deidentifier = DataDeidentifier()
-    
+
     # 示例数据
     data = {
         "姓名": ["张三", "李四", "王五", "赵六", "钱七"],
-        "身份证号": ["110101199001011234", "110101199001021234", 
-                   "110101199001031234", "110101199001041234", 
+        "身份证号": ["110101199001011234", "110101199001021234",
+                   "110101199001031234", "110101199001041234",
                    "110101199001051234"],
         "年龄": [25, 30, 35, 40, 45],
         "性别": ["男", "女", "男", "女", "男"],
         "诊断": ["糖尿病", "高血压", "冠心病", "哮喘", "肺炎"]
     }
-    
+
     df = pd.DataFrame(data)
-    
+
     # 识别标识符
     identifiers = deidentifier.identify_identifiers(df)
     logger.info("识别到的标识符:")
     logger.info(f"  直接标识符: {len(identifiers['direct_identifiers'])} 个")
     logger.info(f"  间接标识符: {len(identifiers['indirect_identifiers'])} 个")
     logger.info(f"  潜在标识符: {len(identifiers['potential_identifiers'])} 个")
-    
+
     # 去标识化（哈希策略）
     df_deidentified, report = deidentifier.deidentify_data(
-        df, 
+        df,
         strategy="hash",
         columns_to_process=["姓名", "身份证号"]
     )
-    
-    logger.info(f"\n去标识化完成:")
+
+    logger.info("\n去标识化完成:")
     logger.info(f"  处理列数: {len(report['columns_processed'])}")
     logger.info(f"  处理列: {report['columns_processed']}")
-    
+
     # 保存去标识化后的数据
     output_path = deidentifier.save_deidentified_data(
-        df_deidentified, 
+        df_deidentified,
         "deidentified_data.csv"
     )
     logger.info(f"\n去标识化数据已保存: {output_path}")
-    
+
     # 生成报告
     report_content = deidentifier.generate_deidentification_report(
         df, df_deidentified, report
     )
-    
+
     report_path = "deidentification_report.md"
     with open(report_path, 'w', encoding='utf-8') as f:
         f.write(report_content)
-    
+
     logger.info(f"去标识化报告已保存: {report_path}")

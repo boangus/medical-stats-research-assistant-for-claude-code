@@ -1,18 +1,17 @@
 """
 test_passport.py — passport.py 单元测试
 """
-import json
 import os
 
 import pytest
 
 from shared.passport.passport import (
-    PassportManager,
-    PassportError,
-    STAGE_ORDER,
-    STAGE_PREREQUISITES,
     OPTIONAL_ARTIFACTS,
     SAP_AMENDMENT_MAX,
+    STAGE_ORDER,
+    STAGE_PREREQUISITES,
+    PassportError,
+    PassportManager,
 )
 
 

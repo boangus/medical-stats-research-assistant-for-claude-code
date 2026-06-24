@@ -14,22 +14,21 @@ gee_template.py — GEE 广义估计方程分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from scipy import stats
-from statsmodels.genmod.generalized_estimating_equations import GEEResults
-from statsmodels.genmod.families import Binomial, Gaussian, Poisson
 from statsmodels.genmod.cov_struct import (
-    Exchangeable,
     AR1,
+    Exchangeable,
     Independence,
 )
-import logging
+from statsmodels.genmod.families import Binomial, Gaussian, Poisson
+from statsmodels.genmod.generalized_estimating_equations import GEEResults
 
 logger = logging.getLogger(__name__)
 
@@ -225,7 +224,7 @@ def gee_summary(model: GEEResults, alpha: float = 0.05) -> pd.DataFrame:
     cov_struct = getattr(model, "_gee_cov_struct", "unknown")
     groups_col = getattr(model, "_gee_groups", "unknown")
     n_groups = model.group.ngroups if hasattr(model, "group") else "N/A"
-    logger.info(f"=== GEE 模型摘要 ===")
+    logger.info("=== GEE 模型摘要 ===")
     logger.info(f"分布族: {family} | 协方差结构: {cov_struct}")
     logger.info(f"效应量: {effect_name} | 聚类数: {n_groups}")
     logger.info("")

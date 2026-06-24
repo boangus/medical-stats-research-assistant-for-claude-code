@@ -2,7 +2,6 @@
 test_statcheck.py — statcheck_patterns.py 单元测试
 """
 import importlib
-import pytest
 
 # 目录名含连字符，需用 importlib 导入
 _mod = importlib.import_module("shared.reporting-guidelines.statcheck_patterns")

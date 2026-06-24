@@ -17,14 +17,13 @@ synthetic_control_template.py — 合成控制法分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 from scipy.optimize import minimize
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +185,7 @@ def build_synthetic_control(
     logger.info(f"  非零权重数: {len(weights_df)}")
     logger.info(f"  干预前 MSPE: {mspe_pre:.6f}")
     logger.info(f"  干预后 MSPE: {mspe_post:.6f}")
-    logger.info(f"\n  权重分布:")
+    logger.info("\n  权重分布:")
     logger.info("weights_df.to_string(index=False)")
 
     return result
@@ -732,7 +731,7 @@ def leave_one_out_sensitivity(
             loo_eff = estimate_treatment_effect(loo_sc)
             loo_effects[excluded] = loo_eff["average_effect"]
             loo_mspe_pre[excluded] = loo_sc["mspe_pre"]
-        except Exception as e:
+        except Exception:
             loo_effects[excluded] = np.nan
             loo_mspe_pre[excluded] = np.nan
 
@@ -1082,5 +1081,5 @@ if __name__ == "__main__":
     logger.info(loo["loo_df"].to_string(index=False))
 
     logger.info("\n 合成控制法模板示例完成")
-    logger.info(f"  真实效应: 8.0")
+    logger.info("  真实效应: 8.0")
     logger.info(f"  估计效应: {effect['average_effect']:.4f}")

@@ -21,8 +21,9 @@
 """
 
 import re
+from typing import Any, Dict, List, Optional, Tuple
+
 import pandas as pd
-from typing import Dict, List, Tuple, Optional, Any, Callable
 
 # ── 正则模式库 ──────────────────────────────────────────────
 

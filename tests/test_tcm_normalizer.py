@@ -1,12 +1,10 @@
 """
 test_tcm_normalizer.py — tcm_normalizer.py 单元测试
 """
-import json
 import os
 
 import pandas as pd
 import pytest
-
 
 # 跳过如果映射文件不存在
 MAPPING_PATH = os.path.join(

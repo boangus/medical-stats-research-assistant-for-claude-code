@@ -6,8 +6,9 @@ Uses nibabel for NIfTI output; falls back to numpy arrays if nibabel unavailable
 All data uses seed=42 for reproducibility.
 """
 
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 
 def generate_mock_nifti(

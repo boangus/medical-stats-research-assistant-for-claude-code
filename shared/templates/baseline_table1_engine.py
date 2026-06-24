@@ -21,13 +21,11 @@ MSRA Table 1 基线特征表引擎
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Tuple, Any
-import warnings
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 # ── 数据结构 ──
 
@@ -637,7 +635,6 @@ class BaselineTable1Engine:
 # ── CLI ──
 
 if __name__ == "__main__":
-    import sys
 
     # 示例用法
     np.random.seed(42)

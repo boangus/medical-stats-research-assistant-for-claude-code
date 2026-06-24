@@ -4,15 +4,14 @@ Tests for PathwayEnrichment - 通路富集分析测试
 使用 mock 数据和 mock gseapy 调用，不需要真实 API。
 """
 
-import numpy as np
-import pandas as pd
-import pytest
-from unittest.mock import patch, MagicMock
-
-
 # 导入被测模块
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import numpy as np
+import pandas as pd
+import pytest
 
 _project_root = Path(__file__).resolve().parent.parent.parent
 if str(_project_root) not in sys.path:

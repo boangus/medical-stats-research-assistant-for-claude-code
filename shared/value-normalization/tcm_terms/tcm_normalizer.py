@@ -22,8 +22,9 @@ TCM 术语规范化检测器 (TCM Term Normalizer)
 import json
 import os
 import re
+from typing import Dict, List, Optional, Tuple
+
 import pandas as pd
-from typing import Dict, List, Tuple, Optional
 
 
 class TCMTermNormalizer:
@@ -230,8 +231,8 @@ class TCMTermNormalizer:
 
         for col, variants in results.items():
             lines.append(f"### 列：{col}\n")
-            lines.append(f"| 原始值 | 出现次数 | 建议标准化值 | 匹配类型 |")
-            lines.append(f"|--------|---------|-------------|---------|")
+            lines.append("| 原始值 | 出现次数 | 建议标准化值 | 匹配类型 |")
+            lines.append("|--------|---------|-------------|---------|")
 
             for v in variants:
                 confidence_mark = {
@@ -295,7 +296,7 @@ class TCMTermNormalizer:
                         "strategy": "merge",
                         "records_affected": original_count,
                         "confidence": v["confidence"],
-                        "reason": f"GB/T 16751.2 术语规范化"
+                        "reason": "GB/T 16751.2 术语规范化"
                     })
 
                 elif strategy == "record":

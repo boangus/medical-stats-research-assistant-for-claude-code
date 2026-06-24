@@ -4,12 +4,12 @@ Imaging Quality Gates Tests - 影像质量门闸测试
 测试 ImagingQualityGateChecker 的 Gate IMG-1 全部 4 项检查。
 """
 
+import os
+import tempfile
+from unittest.mock import patch
+
 import numpy as np
 import pytest
-import tempfile
-import os
-from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 
 class TestImagingQualityGateChecker:
@@ -250,7 +250,10 @@ class TestGateResultSerialization:
     def test_gate_result_to_dict(self):
         """测试 GateResult 转字典"""
         from shared.quality_gates.gate_runner import (
-            GateResult, GateType, GateVerdict, CheckItemResult,
+            CheckItemResult,
+            GateResult,
+            GateType,
+            GateVerdict,
         )
 
         check_results = [

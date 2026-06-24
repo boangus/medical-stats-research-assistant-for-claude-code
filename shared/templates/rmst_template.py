@@ -29,10 +29,11 @@ RMST 是生存曲线下面积，代表在指定时间点内患者期望存活的
 版本: 0.1.0
 """
 
-from typing import Dict, Optional, Tuple
+import logging
+from typing import Dict, Tuple
+
 import numpy as np
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -324,8 +325,8 @@ def format_rmst_report(results: Dict) -> str:
     lines.append("")
 
     lines.append("## RMST 结果\n")
-    lines.append(f"| 指标 | 值 |")
-    lines.append(f"|------|-----|")
+    lines.append("| 指标 | 值 |")
+    lines.append("|------|-----|")
     lines.append(f"| 组 1 RMST | {results['rmst_group1']:.4f} |")
     lines.append(f"| 组 2 RMST | {results['rmst_group2']:.4f} |")
     lines.append(f"| RMST 差值 | {results['difference']:.4f} |")
@@ -345,7 +346,7 @@ def format_rmst_report(results: Dict) -> str:
     else:
         lines.append(f"- 组 2 患者在 τ={results['tau']:.1f} 时间内平均多存活 {abs(diff):.2f} 个时间单位")
 
-    lines.append(f"- RMST 差值直接可解释为时间差，无需比例风险假定")
+    lines.append("- RMST 差值直接可解释为时间差，无需比例风险假定")
     lines.append("")
 
     return "\n".join(lines)

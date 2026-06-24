@@ -7,11 +7,11 @@ Template Manager - 统一模板管理接口
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
-from typing import Dict, Optional, List, Any, Callable
-from enum import Enum
 import logging
+import os
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -305,6 +305,7 @@ class TemplateManager:
     ) -> Any:
         """执行R交叉验证（生成代码）"""
         import tempfile
+
         import pandas as pd
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:

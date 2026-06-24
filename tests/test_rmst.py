@@ -2,13 +2,12 @@
 test_rmst.py — rmst_template.py 单元测试
 """
 import numpy as np
-import pytest
 
 from shared.templates.rmst_template import (
+    format_rmst_report,
     kaplan_meier_rmst,
     rmst_difference,
     rmst_ratio,
-    format_rmst_report,
 )
 
 

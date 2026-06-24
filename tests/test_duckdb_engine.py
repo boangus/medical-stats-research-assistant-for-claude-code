@@ -6,12 +6,10 @@ Comprehensive tests covering all BaseEngine interface methods.
 
 import os
 import sys
-import tempfile
-import shutil
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:

@@ -5,13 +5,12 @@ Image Loader Tests - 影像加载器测试
 使用 mock 隔离 SimpleITK/nibabel 依赖。
 """
 
+import os
+import tempfile
+from unittest.mock import MagicMock, patch
+
 import numpy as np
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
-import tempfile
-import os
-
 
 # ===== DICOMLoader 测试 =====
 

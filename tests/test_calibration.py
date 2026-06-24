@@ -1,20 +1,16 @@
 """
 test_calibration.py — calibration_runner.py 单元测试
 """
-import json
 import os
 
-import numpy as np
 import pandas as pd
 import pytest
 
 from shared.calibration.calibration_runner import (
+    CalibrationDatabase,
     CalibrationEngine,
     CalibrationResult,
-    CalibrationDatabase,
-    CalibrationEntry,
     format_calibration_report,
-    save_calibration_report,
 )
 
 

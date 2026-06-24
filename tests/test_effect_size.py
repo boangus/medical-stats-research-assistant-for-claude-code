@@ -5,19 +5,19 @@ import numpy as np
 import pytest
 
 from shared.templates.effect_size_template import (
+    cliffs_delta,
     cohens_d,
-    hedges_g,
-    eta_squared,
-    omega_squared,
     cohens_f_from_eta2,
     cramers_v,
-    risk_ratio,
-    odds_ratio,
-    rank_biserial_r,
-    cliffs_delta,
+    eta_squared,
+    hedges_g,
     interpret_effect_size,
-    nnt_from_risk_diff,
     nnt_from_or,
+    nnt_from_risk_diff,
+    odds_ratio,
+    omega_squared,
+    rank_biserial_r,
+    risk_ratio,
 )
 
 

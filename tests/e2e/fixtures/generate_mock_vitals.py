@@ -5,9 +5,10 @@ blood pressure, SpO2, temperature, respiratory rate).
 All data uses seed=42 for reproducibility.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 
 def generate_mock_vitals(

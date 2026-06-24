@@ -5,15 +5,14 @@ Tests for BioQualityGateChecker - 生信质量门闸测试
 测试正常路径和异常路径。
 """
 
-import numpy as np
-import pandas as pd
-import pytest
-from unittest.mock import patch, MagicMock
-
-
 # 导入被测模块
 import sys
 from pathlib import Path
+from unittest.mock import patch
+
+import numpy as np
+import pandas as pd
+import pytest
 
 _project_root = Path(__file__).resolve().parent.parent.parent
 if str(_project_root) not in sys.path:
@@ -21,10 +20,10 @@ if str(_project_root) not in sys.path:
 
 from msra_modules.bioinformatics.quality_gates import BioQualityGateChecker
 from shared.quality_gates.gate_runner import (
-    GateType,
-    GateResult,
-    GateVerdict,
     CheckItemResult,
+    GateResult,
+    GateType,
+    GateVerdict,
 )
 
 

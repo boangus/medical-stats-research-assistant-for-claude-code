@@ -4,10 +4,11 @@ MSRA Modules Tests - 三领域模块测试
 运行方式: pytest tests/test_msra_modules/ -v
 """
 
-import pytest
-import numpy as np
 import sys
 from pathlib import Path
+
+import numpy as np
+import pytest
 
 # 添加项目根目录到路径
 project_root = Path(__file__).parent.parent.parent
@@ -20,8 +21,12 @@ class TestMedicalImagingModule:
     def test_module_import(self):
         """测试模块导入"""
         from msra_modules.medical_imaging import (
-            DICOMLoader, ImagePreprocessor, SegmentationPipeline,
-            RadiomicsExtractor, ImagingVisualizer, ImageRegistration
+            DICOMLoader,
+            ImagePreprocessor,
+            ImageRegistration,
+            ImagingVisualizer,
+            RadiomicsExtractor,
+            SegmentationPipeline,
         )
         assert DICOMLoader is not None
         assert ImagePreprocessor is not None
@@ -96,9 +101,13 @@ class TestBioinformaticsModule:
     def test_module_import(self):
         """测试模块导入"""
         from msra_modules.bioinformatics import (
-            ScRNASeqLoader, SingleCellQC, DifferentialExpression,
-            CellBenderDenoiser, BioVisualizer, DimensionalityReduction,
-            TrajectoryAnalysis
+            BioVisualizer,
+            CellBenderDenoiser,
+            DifferentialExpression,
+            DimensionalityReduction,
+            ScRNASeqLoader,
+            SingleCellQC,
+            TrajectoryAnalysis,
         )
         assert ScRNASeqLoader is not None
         assert SingleCellQC is not None
@@ -143,9 +152,14 @@ class TestRealtimeAnalyticsModule:
     def test_module_import(self):
         """测试模块导入"""
         from msra_modules.realtime_analytics import (
-            StreamProcessor, SlidingWindowStats, AnomalyDetector,
-            AlertRule, VitalSignsSimulator, AlertSystem,
-            RealtimeDashboard, ReportGenerator
+            AlertRule,
+            AlertSystem,
+            AnomalyDetector,
+            RealtimeDashboard,
+            ReportGenerator,
+            SlidingWindowStats,
+            StreamProcessor,
+            VitalSignsSimulator,
         )
         assert StreamProcessor is not None
         assert SlidingWindowStats is not None
@@ -158,8 +172,8 @@ class TestRealtimeAnalyticsModule:
 
     def test_sliding_window_stats(self):
         """测试滑动窗口统计"""
+
         from msra_modules.realtime_analytics import SlidingWindowStats
-        import time
 
         window = SlidingWindowStats(window_size=10)
 
@@ -174,7 +188,7 @@ class TestRealtimeAnalyticsModule:
 
     def test_anomaly_detector_rules(self):
         """测试异常检测规则"""
-        from msra_modules.realtime_analytics import AnomalyDetector, AlertRule, AlertLevel
+        from msra_modules.realtime_analytics import AlertLevel, AlertRule, AnomalyDetector
 
         detector = AnomalyDetector()
 
@@ -235,7 +249,7 @@ class TestRealtimeAnalyticsModule:
 
     def test_alert_system(self):
         """测试警报系统"""
-        from msra_modules.realtime_analytics import AlertSystem, Alert
+        from msra_modules.realtime_analytics import Alert, AlertSystem
 
         system = AlertSystem()
 
@@ -285,8 +299,9 @@ class TestRealtimeAnalyticsModule:
 
     def test_report_generator(self):
         """测试报告生成器"""
-        from msra_modules.realtime_analytics import ReportGenerator
         import tempfile
+
+        from msra_modules.realtime_analytics import ReportGenerator
 
         with tempfile.TemporaryDirectory() as tmpdir:
             generator = ReportGenerator(output_dir=tmpdir)
@@ -307,7 +322,9 @@ class TestCrossDomainModule:
     def test_module_import(self):
         """测试模块导入"""
         from msra_modules.cross_domain import (
-            RadiomicsDEGCorrelation, RealtimePredictionModel, MultiModalVisualizer
+            MultiModalVisualizer,
+            RadiomicsDEGCorrelation,
+            RealtimePredictionModel,
         )
         assert RadiomicsDEGCorrelation is not None
         assert RealtimePredictionModel is not None
@@ -315,8 +332,9 @@ class TestCrossDomainModule:
 
     def test_radiomics_deg_correlation(self):
         """测试影像组学-DEG关联"""
-        from msra_modules.cross_domain import RadiomicsDEGCorrelation
         import pandas as pd
+
+        from msra_modules.cross_domain import RadiomicsDEGCorrelation
 
         correlator = RadiomicsDEGCorrelation(correlation_method="pearson")
 
@@ -340,8 +358,9 @@ class TestCrossDomainModule:
 
     def test_realtime_prediction_model(self):
         """测试实时预测模型"""
-        from msra_modules.cross_domain import RealtimePredictionModel
         import pandas as pd
+
+        from msra_modules.cross_domain import RealtimePredictionModel
 
         model = RealtimePredictionModel(model_type="logistic")
 
@@ -384,7 +403,7 @@ class TestCrossModuleIntegration:
 
     def test_all_modules_importable(self):
         """测试所有模块可导入"""
-        from msra_modules import medical_imaging, bioinformatics, realtime_analytics
+        from msra_modules import bioinformatics, medical_imaging, realtime_analytics
         assert medical_imaging is not None
         assert bioinformatics is not None
         assert realtime_analytics is not None
@@ -396,10 +415,10 @@ class TestCrossModuleIntegration:
 
     def test_module_versions(self):
         """测试模块版本"""
-        from msra_modules.medical_imaging import __version__ as img_ver
         from msra_modules.bioinformatics import __version__ as bio_ver
-        from msra_modules.realtime_analytics import __version__ as rt_ver
         from msra_modules.cross_domain import __version__ as cross_ver
+        from msra_modules.medical_imaging import __version__ as img_ver
+        from msra_modules.realtime_analytics import __version__ as rt_ver
 
         assert img_ver >= "1.0.0"
         assert bio_ver >= "1.0.0"

@@ -5,28 +5,26 @@ Integration Tests - 端到端集成测试
 数据加载 → QC → 质量门闸 → 差异表达 → 质量门闸
 """
 
+# 导入被测模块
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-from unittest.mock import patch, MagicMock
-from pathlib import Path
-
-
-# 导入被测模块
-import sys
 
 _project_root = Path(__file__).resolve().parent.parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
 from msra_modules.bioinformatics import (
-    ScRNASeqLoader,
-    SingleCellQC,
+    BatchCorrector,
+    BioQualityGateChecker,
     DifferentialExpression,
     DimensionalityReduction,
     PathwayEnrichment,
-    BatchCorrector,
-    BioQualityGateChecker,
+    ScRNASeqLoader,
+    SingleCellQC,
 )
 from shared.quality_gates.gate_runner import GateResult, GateVerdict
 

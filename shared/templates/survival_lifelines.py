@@ -23,13 +23,13 @@ survival_lifelines.py — 基于 lifelines 的生存分析模板
 版本: 0.1.0
 """
 
+import logging
 import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -292,7 +292,7 @@ def cox_regression(
     logger.info(f"  C-index (Harrell's C): {c_index:.3f}")
     logger.info(f"  事件数: {model_data[event_col].sum()}")
     logger.info(f"  样本数: {len(model_data)}")
-    logger.info(f"\n  系数表 (HR, 95% CI, p-value):")
+    logger.info("\n  系数表 (HR, 95% CI, p-value):")
     logger.info("result_summary.to_string()")
 
     return {
@@ -335,7 +335,6 @@ def proportional_hazard_test(
     -------
     Dict
     """
-    from lifelines import CoxPHFitter
 
     model = cph_result["model"]
 
@@ -518,7 +517,6 @@ def survival_report(
 
     流程: KM → Log-rank → Cox → PH 检验 → 结果汇总
     """
-    from lifelines.utils import median_survival_times
 
     results = {}
 
@@ -547,7 +545,7 @@ def survival_report(
     results["km"] = km
 
     if group_col is not None:
-        logger.info(f"\n[KM] 中位生存时间:")
+        logger.info("\n[KM] 中位生存时间:")
         logger.info(km["summary"].to_string(index=False))
 
     # --- Step 2: Log-rank (如有分组) ---

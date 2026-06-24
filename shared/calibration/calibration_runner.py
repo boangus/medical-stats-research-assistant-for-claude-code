@@ -10,15 +10,15 @@ calibration_runner.py — 度量校准引擎（Python） — ⚠️ 实验性功
 版本: 0.1.0
 """
 
-import os
 import json
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple
+import logging
+import os
+from dataclasses import asdict, dataclass, field
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -233,10 +233,10 @@ def format_calibration_report(result: CalibrationResult) -> str:
     lines.append("═" * 60)
     lines.append("")
     lines.append(f"  校准条目数: {result.n_total}")
-    lines.append(f"  显著性水平: α = 0.05")
+    lines.append("  显著性水平: α = 0.05")
     lines.append("")
     lines.append("  ┌─────────────── 混淆矩阵 ───────────────┐")
-    lines.append(f"  │                  Gold: Sig  Gold: Non  │")
+    lines.append("  │                  Gold: Sig  Gold: Non  │")
     lines.append(f"  │  MSRA: Sig       TP={result.tp:<3}     FP={result.fp:<3}    │")
     lines.append(f"  │  MSRA: Non-Sig   FN={result.fn:<3}     TN={result.tn:<3}    │")
     lines.append("  └─────────────────────────────────────────┘")

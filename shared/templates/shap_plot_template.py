@@ -23,13 +23,13 @@ shap_plot_template.py — SHAP 可视化模板（Python）
   - 临床预测模型的可解释性报告
 """
 
+import logging
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import logging
 
 logger = logging.getLogger(__name__)
 

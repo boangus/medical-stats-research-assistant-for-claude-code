@@ -5,18 +5,18 @@ SAP 用户确认流程测试
 测试统计分析计划生成后的强制用户确认功能。
 """
 
-import json
 import os
-import tempfile
-import pytest
-from pathlib import Path
-from datetime import datetime
 
 # 添加项目根目录到Python路径
 import sys
+import tempfile
+from pathlib import Path
+
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared.passport.passport import PassportManager, PassportError
+from shared.passport.passport import PassportManager
 from shared.sap.validate_sap import SAPValidator
 
 

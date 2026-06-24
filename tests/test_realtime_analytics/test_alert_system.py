@@ -2,15 +2,14 @@
 Tests for AlertSystem.
 """
 
-import time
 import json
 import tempfile
-import pytest
 from pathlib import Path
+
 from msra_modules.realtime_analytics.alert_system import (
-    AlertSystem,
     Alert,
     AlertChannel,
+    AlertSystem,
 )
 
 

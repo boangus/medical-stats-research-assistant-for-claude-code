@@ -8,11 +8,11 @@ E2E-BIO-02: Pathway enrichment analysis
 """
 
 import sys
-import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
@@ -22,8 +22,8 @@ if str(_PROJECT_ROOT) not in sys.path:
 def _check_scanpy_available():
     """Check if scanpy is available."""
     try:
-        import scanpy
         import anndata
+        import scanpy
         return True
     except ImportError:
         return False
@@ -49,10 +49,9 @@ class TestE2EBio01DifferentialExpression:
     @pytest.mark.skipif(not HAS_SCANPY, reason="scanpy/anndata not installed")
     def test_de_pipeline_produces_results(self, e2e_anndata):
         """Test that DE analysis pipeline produces a non-empty DE table."""
-        import scanpy as sc
         from msra_modules.bioinformatics import (
-            DimensionalityReduction,
             DifferentialExpression,
+            DimensionalityReduction,
         )
 
         # --- Arrange ---
@@ -78,8 +77,8 @@ class TestE2EBio01DifferentialExpression:
     def test_de_filtered_genes_have_valid_stats(self, e2e_anndata):
         """Test that filtered DE genes have valid p-values and log2FC."""
         from msra_modules.bioinformatics import (
-            DimensionalityReduction,
             DifferentialExpression,
+            DimensionalityReduction,
         )
 
         adata = e2e_anndata
@@ -112,8 +111,8 @@ class TestE2EBio01DifferentialExpression:
     def test_de_table_has_volcano_data(self, e2e_anndata):
         """Test that DE table contains data needed for a volcano plot."""
         from msra_modules.bioinformatics import (
-            DimensionalityReduction,
             DifferentialExpression,
+            DimensionalityReduction,
         )
 
         adata = e2e_anndata
@@ -136,9 +135,10 @@ class TestE2EBio01DifferentialExpression:
     def test_de_pipeline_reproducibility(self, e2e_counts_matrix, e2e_sample_info):
         """Test that the same input produces the same output (seed=42)."""
         import anndata as ad
+
         from msra_modules.bioinformatics import (
-            DimensionalityReduction,
             DifferentialExpression,
+            DimensionalityReduction,
         )
 
         def run_pipeline():
@@ -195,8 +195,8 @@ class TestE2EBio02PathwayEnrichment:
     def test_enrichment_produces_results(self, e2e_anndata):
         """Test that enrichment analysis produces a non-empty result table."""
         from msra_modules.bioinformatics import (
-            DimensionalityReduction,
             DifferentialExpression,
+            DimensionalityReduction,
             PathwayEnrichment,
         )
 
