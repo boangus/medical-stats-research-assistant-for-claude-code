@@ -161,7 +161,7 @@ class TestGateBio15:
         """测试样本信息一致性 - 失败"""
         adata = create_mock_adata(n_cells=100, n_genes=500)
         sample_info = pd.DataFrame(
-            {"batch": ["batch_0"] * 50},
+            {"batch": ["batch_0"] * 50 + ["batch_1"] * 50},
             index=[f"cell_{i}" for i in range(50)] + [f"missing_{i}" for i in range(50)]
         )
 
