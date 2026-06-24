@@ -9,9 +9,13 @@ All notable changes to MSRA (Medical Statistics Research Assistant) will be docu
 ### Fixed (Post-Audit)
 
 - **Dask test compatibility**: Added `pytest.importorskip("dask")` to `test_dask_engine.py` and conditional skip markers to `test_engine_factory.py` for dask-dependent tests. All 24 previously failing tests now properly skip when dask is not installed.
-- **Version consistency**: Updated `docs/dev/00-项目总览与架构.md` header from v0.9.4 to v1.0.0.
+- **Version consistency**: Updated `docs/dev/00-项目总览与架构.md` header from v0.9.4 to v1.0.0. Batch updated version headers in 25 dev docs.
 - **Terminology update**: Changed "实验性模块" (experimental modules) to "扩展模块" (extension modules) in `docs/dev/00-项目总览与架构.md` to reflect Stable status.
 - **Development Status classifier**: Reverted to `4 - Beta` based on comprehensive audit (LLM execution layer not fully testable, 37 tests previously skip/fail).
+- **Ruff lint fixes**: Fixed 1570 lint issues (78.6% reduction) including unused imports, sorted imports, f-string placeholders, trailing whitespace.
+- **CI improvements**: Removed deprecated W503 rule, removed `--exit-zero` from ruff lint, added pytest-cov coverage report.
+- **New command**: Added `/msra-status` command to display Pipeline progress, gate status, and artifact inventory.
+- **Troubleshooting guide**: Added `docs/troubleshooting.md` covering installation, dependencies, R packages, testing, pipeline, and performance issues.
 
 ### Added
 

@@ -182,6 +182,18 @@
         "/msra-rt --source simulator --metrics hr,spo2 --duration 60",
         "/msra-rt --source csv --data vitals.csv"
       ]
+    },
+    "/msra-status": {
+      "id": "msra-status",
+      "name": "MSRA Status",
+      "entry_point": "commands/msra-status.md",
+      "description": "显示 Pipeline 进度、门闸状态、产物清单",
+      "usage": "/msra-status [--verbose] [--json]",
+      "examples": [
+        "/msra-status",
+        "/msra-status --verbose",
+        "/msra-status --json"
+      ]
     }
   },
   "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research", "academic-writing", "paper-review"],

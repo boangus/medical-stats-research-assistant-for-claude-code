@@ -144,7 +144,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          python -m pytest tests/ -v --tb=short -x
+          python -m pytest tests/ -v --tb=short -x --cov=shared --cov-report=term-missing
 
       - name: Python end-to-end test
         run: |
@@ -196,7 +196,7 @@ jobs:
 
       - name: Ruff lint
         run: |
-          ruff check shared/ tests/ --select E,F,W --ignore E501,E741,W503 --exit-zero 2>&1 || echo "Ruff completed with warnings"
+          ruff check shared/ tests/ --select E,F,W --ignore E501,E741 2>&1 || echo "Ruff completed with warnings"
 
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
