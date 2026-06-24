@@ -21,6 +21,12 @@ from .check_items import (
     SapQualityCheckItems,
     ResultsQualityCheckItems,
 )
+from .inference_runner import (
+    InferenceRunner,
+    InferenceReport,
+    ChecklistResult as InferenceChecklistResult,
+    QUALITY_CHECKLIST,
+)
 
 __all__ = [
     "GateRunner",
@@ -34,4 +40,8 @@ __all__ = [
     "DataQualityCheckItems",
     "SapQualityCheckItems",
     "ResultsQualityCheckItems",
+    "InferenceRunner",
+    "InferenceReport",
+    "InferenceChecklistResult",
+    "QUALITY_CHECKLIST",
 ]

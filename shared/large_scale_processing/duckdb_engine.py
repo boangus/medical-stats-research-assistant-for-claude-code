@@ -67,14 +67,15 @@ class DuckDBEngine(BaseEngine):
             **kwargs: Additional arguments (e.g., header, delimiter)
 
         Returns:
-            DuckDB relation object
+            pandas DataFrame
         """
-        table_name = kwargs.pop("table_name", "read_csv_table")
         sep = kwargs.pop("sep", ",")
         header = kwargs.pop("header", True)
 
-        rel = self._conn.read_csv(file_path, header=header, sep=sep, **kwargs)
-        return rel
+        result = self._conn.execute(
+            f"SELECT * FROM read_csv('{file_path}', header={header}, sep='{sep}')"
+        ).fetch_df()
+        return result
 
     def read_parquet(self, file_path: str, **kwargs) -> Any:
         """
@@ -85,10 +86,12 @@ class DuckDBEngine(BaseEngine):
             **kwargs: Additional engine-specific arguments
 
         Returns:
-            DuckDB relation object
+            pandas DataFrame
         """
-        rel = self._conn.read_parquet(file_path, **kwargs)
-        return rel
+        result = self._conn.execute(
+            f"SELECT * FROM read_parquet('{file_path}')"
+        ).fetch_df()
+        return result
 
     def filter(
         self,
@@ -100,14 +103,14 @@ class DuckDBEngine(BaseEngine):
         Filter rows using SQL WHERE clause.
 
         Args:
-            df: Input DataFrame (DuckDB relation, pandas DataFrame, or dict)
+            df: Input DataFrame (pandas DataFrame or dict)
             condition: Filter condition as SQL WHERE clause string
             **kwargs: Additional engine-specific arguments
 
         Returns:
             Filtered pandas DataFrame
         """
-        table_name = kwargs.pop("table_name", "filter_table")
+        table_name = kwargs.pop("table_name", f"filter_table_{id(df)}")
         if isinstance(df, dict):
             df = pd.DataFrame(df)
         if isinstance(df, pd.DataFrame):
@@ -115,8 +118,9 @@ class DuckDBEngine(BaseEngine):
             result = self._conn.execute(
                 f"SELECT * FROM {table_name} WHERE {condition}"
             ).fetch_df()
+            self._conn.unregister(table_name)
             return result
-        # For DuckDB relations
+        # DuckDB relation with filter method
         if hasattr(df, "filter"):
             result = df.filter(condition)
             if hasattr(result, "fetch_df"):
@@ -135,7 +139,7 @@ class DuckDBEngine(BaseEngine):
         Group by columns and aggregate.
 
         Args:
-            df: Input DataFrame (pandas DataFrame, dict, or DuckDB relation)
+            df: Input DataFrame (pandas DataFrame, dict)
             group_cols: Columns to group by
             agg_funcs: Aggregation function(s) - can be string, list, or dict
             **kwargs: Additional engine-specific arguments
@@ -143,7 +147,7 @@ class DuckDBEngine(BaseEngine):
         Returns:
             Aggregated pandas DataFrame
         """
-        table_name = kwargs.pop("table_name", "agg_table")
+        table_name = kwargs.pop("table_name", f"agg_table_{id(df)}")
 
         if isinstance(df, dict):
             df = pd.DataFrame(df)
@@ -153,12 +157,20 @@ class DuckDBEngine(BaseEngine):
         group_cols_str = ", ".join(group_cols)
 
         if isinstance(agg_funcs, str):
-            query = f"SELECT {group_cols_str}, {agg_funcs} FROM {table_name} GROUP BY {group_cols_str}"
-            return self._conn.execute(query).fetch_df()
+            # If it looks like a raw SQL expression (contains parentheses), use directly
+            if "(" in agg_funcs:
+                query = f"SELECT {group_cols_str}, {agg_funcs} FROM {table_name} GROUP BY {group_cols_str}"
+            else:
+                query = f"SELECT {group_cols_str}, {agg_funcs}(*) as {agg_funcs}_result FROM {table_name} GROUP BY {group_cols_str}"
+            result = self._conn.execute(query).fetch_df()
         elif isinstance(agg_funcs, list):
-            agg_str = ", ".join(agg_funcs)
+            # If items look like raw SQL expressions, use directly
+            if any("(" in f for f in agg_funcs):
+                agg_str = ", ".join(agg_funcs)
+            else:
+                agg_str = ", ".join(f"{func}(*) as {func}_result" for func in agg_funcs)
             query = f"SELECT {group_cols_str}, {agg_str} FROM {table_name} GROUP BY {group_cols_str}"
-            return self._conn.execute(query).fetch_df()
+            result = self._conn.execute(query).fetch_df()
         elif isinstance(agg_funcs, dict):
             agg_parts = []
             for col, funcs in agg_funcs.items():
@@ -169,9 +181,16 @@ class DuckDBEngine(BaseEngine):
                         agg_parts.append(f"{func}({col}) as {col}_{func}")
             agg_str = ", ".join(agg_parts)
             query = f"SELECT {group_cols_str}, {agg_str} FROM {table_name} GROUP BY {group_cols_str}"
-            return self._conn.execute(query).fetch_df()
+            result = self._conn.execute(query).fetch_df()
+        else:
+            result = df.groupby(group_cols).agg(agg_funcs)
 
-        return df.groupby(group_cols).agg(agg_funcs)
+        if isinstance(df, pd.DataFrame):
+            try:
+                self._conn.unregister(table_name)
+            except Exception:
+                pass
+        return result
 
     def join(
         self,
@@ -185,8 +204,8 @@ class DuckDBEngine(BaseEngine):
         Join two DataFrames using SQL.
 
         Args:
-            left: Left DataFrame (pandas DataFrame, dict, or DuckDB relation)
-            right: Right DataFrame (pandas DataFrame, dict, or DuckDB relation)
+            left: Left DataFrame (pandas DataFrame or dict)
+            right: Right DataFrame (pandas DataFrame or dict)
             on: Join key column
             how: Join type (inner, left, right, outer)
             **kwargs: Additional engine-specific arguments
@@ -194,8 +213,10 @@ class DuckDBEngine(BaseEngine):
         Returns:
             Joined pandas DataFrame
         """
-        left_name = kwargs.pop("left_name", "left_table")
-        right_name = kwargs.pop("right_name", "right_table")
+        import random
+        suffix = random.randint(10000, 99999)
+        left_name = kwargs.pop("left_name", f"left_table_{suffix}")
+        right_name = kwargs.pop("right_name", f"right_table_{suffix}")
 
         if isinstance(left, dict):
             left = pd.DataFrame(left)
@@ -211,7 +232,16 @@ class DuckDBEngine(BaseEngine):
             how_upper = "INNER"
 
         query = f"SELECT * FROM {left_name} {how_upper} JOIN {right_name} ON {left_name}.{on} = {right_name}.{on}"
-        return self._conn.execute(query).fetch_df()
+        result = self._conn.execute(query).fetch_df()
+
+        # Cleanup
+        try:
+            self._conn.unregister(left_name)
+            self._conn.unregister(right_name)
+        except Exception:
+            pass
+
+        return result
 
     def execute_sql(self, query: str, data: Any = None, **kwargs) -> Any:
         """

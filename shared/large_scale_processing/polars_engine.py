@@ -160,6 +160,8 @@ class PolarsEngine(BaseEngine):
             Aggregated Polars DataFrame
         """
         # Map aggregation function names to Polars functions
+        # Use group_by (Polars >= 1.0 API)
+        group_fn = df.group_by if hasattr(df, "group_by") else df.groupby
         agg_map = {
             "mean": "mean",
             "sum": "sum",
@@ -180,7 +182,7 @@ class PolarsEngine(BaseEngine):
                     exprs.append(pl.col(col).count().alias(f"{col}_{func_name}"))
                 else:
                     exprs.append(getattr(pl.col(col), func_name)())
-            return df.group_by(group_cols).agg(*exprs)
+            return group_fn(group_cols).agg(exprs)
 
         elif isinstance(agg_funcs, dict):
             # Dict format: {"column": "function"}
@@ -191,7 +193,7 @@ class PolarsEngine(BaseEngine):
                     exprs.append(pl.col(col).count().alias(f"{col}_{func_name}"))
                 else:
                     exprs.append(getattr(pl.col(col), func_name)())
-            return df.group_by(group_cols).agg(*exprs)
+            return group_fn(group_cols).agg(exprs)
 
         elif isinstance(agg_funcs, list):
             # List of function names - apply to all non-group columns
@@ -204,7 +206,7 @@ class PolarsEngine(BaseEngine):
                         exprs.append(pl.col(col).count().alias(f"{col}_{func_name}"))
                     else:
                         exprs.append(getattr(pl.col(col), func_name)().alias(f"{col}_{func_name}"))
-            return df.group_by(group_cols).agg(*exprs)
+            return group_fn(group_cols).agg(exprs)
 
         return df
 
