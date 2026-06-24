@@ -1,6 +1,6 @@
 {
   "name": "medical-stats-research-assistant",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper",
   "author": "boangus",
   "license": "MIT",
@@ -157,6 +157,17 @@
       "examples": [
         "/msra-imaging --nifti scan.nii.gz --roi mask.nii.gz",
         "/msra-imaging --dicom /path/to/dicom/ --mode radiomics"
+      ]
+    },
+    "/msra-rt": {
+      "id": "msra-rt",
+      "name": "Realtime Analytics",
+      "entry_point": "skills/realtime-monitor/SKILL.md",
+      "description": "Real-time vital signs monitoring: stream processing, anomaly detection, alerting, dashboard reporting.",
+      "usage": "/msra-rt [--source simulator|redis|csv] [--metrics hr,bp,spo2] [--duration 300]",
+      "examples": [
+        "/msra-rt --source simulator --metrics hr,spo2 --duration 60",
+        "/msra-rt --source csv --data vitals.csv"
       ]
     }
   },

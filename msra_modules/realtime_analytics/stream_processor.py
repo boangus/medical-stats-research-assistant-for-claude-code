@@ -4,11 +4,12 @@ Stream Processor - 流处理器
 RT-001: Faust环境集成
 RT-002: Kafka消费者wrapper
 RT-004: 滑动窗口统计
+RT-007: 事件处理与聚合
 """
 
 import numpy as np
 import time
-from typing import Optional, Dict, Callable, List, Any
+from typing import Optional, Dict, Callable, List, Any, Union
 from collections import deque
 from dataclasses import dataclass, field
 import logging
@@ -217,6 +218,101 @@ class StreamProcessor:
         """停止处理"""
         self._running = False
         logger.info("Stream processor stopped")
+
+    def get_all_metrics(self) -> List[str]:
+        """获取所有已注册的指标名
+
+        Returns:
+            指标名列表
+        """
+        return list(self._windows.keys())
+
+    def aggregate(self, metric: str, func: str = "mean") -> float:
+        """对窗口数据进行聚合计算
+
+        Args:
+            metric: 指标名称
+            func: 聚合函数名 ('mean', 'std', 'min', 'max', 'median', 'sum', 'count')
+
+        Returns:
+            聚合结果
+
+        Raises:
+            ValueError: 指标不存在或聚合函数不支持
+        """
+        if metric not in self._windows:
+            raise ValueError(f"Metric '{metric}' not found. Available: {self.get_all_metrics()}")
+
+        window = self._windows[metric]
+        if not window._data:
+            raise ValueError(f"No data in window for metric '{metric}'")
+
+        data = np.array(window._data)
+
+        agg_funcs = {
+            "mean": lambda d: float(np.mean(d)),
+            "std": lambda d: float(np.std(d)),
+            "min": lambda d: float(np.min(d)),
+            "max": lambda d: float(np.max(d)),
+            "median": lambda d: float(np.median(d)),
+            "sum": lambda d: float(np.sum(d)),
+            "count": lambda d: float(len(d)),
+            "p25": lambda d: float(np.percentile(d, 25)),
+            "p75": lambda d: float(np.percentile(d, 75)),
+        }
+
+        if func not in agg_funcs:
+            raise ValueError(
+                f"Unsupported aggregation function '{func}'. "
+                f"Supported: {list(agg_funcs.keys())}"
+            )
+
+        return agg_funcs[func](data)
+
+    def process_event(self, event: Dict[str, Any]) -> Dict[str, Any]:
+        """统一事件处理入口
+
+        接受字典格式的事件数据，提取指标和值，处理并返回结果。
+
+        Args:
+            event: 事件字典，必须包含:
+                - metric (str): 指标名称
+                - value (float): 指标值
+                可选包含:
+                - timestamp (float): 时间戳
+                - metadata (Dict): 额外元数据
+
+        Returns:
+            处理结果字典，包含:
+                - metric: 指标名称
+                - value: 处理的值
+                - timestamp: 时间戳
+                - stats: 当前窗口统计
+                - handlers_called: 已调用的处理器数量
+        """
+        metric = event.get("metric")
+        value = event.get("value")
+
+        if metric is None:
+            raise ValueError("Event must contain 'metric' field")
+        if value is None:
+            raise ValueError("Event must contain 'value' field")
+
+        timestamp = event.get("timestamp", time.time())
+
+        # 添加数据点
+        self.add_data_point(metric, float(value), timestamp)
+
+        # 获取统计
+        stats = self.get_metric_stats(metric)
+
+        return {
+            "metric": metric,
+            "value": float(value),
+            "timestamp": timestamp,
+            "stats": stats,
+            "handlers_called": len(self._handlers),
+        }
 
     def create_faust_app(self, app_name: str = "msra-stream"):
         """创建Faust应用

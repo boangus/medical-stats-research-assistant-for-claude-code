@@ -1,6 +1,6 @@
-# MSRA v0.9.6 开发进度表
+# MSRA v0.9.7 开发进度表
 
-> **更新日期**: 2026-06-24 | **版本**: v0.9.6 (Medical Imaging 模块 Beta)
+> **更新日期**: 2026-06-24 | **版本**: v0.9.7 (全部实验性模块 Beta)
 
 ---
 
@@ -114,7 +114,7 @@
 |---|------|------|------|--------|------|
 | 59 | 医学影像处理 | `msra_modules/medical_imaging/` | ✅ Beta | 80% | ✅ Phase 2 完成：Skill入口+NIfTI/NRRD加载+特征选择+质量门闸+v1 Schema导出+/msra-imaging注册+单元测试 |
 | 60 | 生物信息学 | `msra_modules/bioinformatics/` | 🟡 Beta | 100% | ✅ Phase 1 完成：Skill + 引擎 + 质量门闸 + 62测试全通过 + /msra-bio 注册 |
-| 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | 🔶 | 10→待定 | Skill入口待开发，Python引擎骨架已有 |
+| 61 | 实时数据分析 | `msra_modules/realtime_analytics/` | 🟡 Beta | 100% | ✅ Phase 3 完成：Skill入口+引擎补全+Gate RT-1+多变量检测+单元测试+集成测试+manifest注册 |
 | 62 | 跨领域集成 | `msra_modules/cross_domain/` | 🔶 | 10→待定 | 依赖前三者成熟后开发 |
 
 ---
@@ -177,7 +177,8 @@
 | **v0.9.4** ✅ | 评估与集成 | T8-T9 完成，大规模数据验证 + 性能基准 |
 | **v0.9.5** ✅ | 实验性模块 Phase 1 | bioinformatics Beta（Skill + 引擎 + 质量门闸 + 62测试） |
 | **v0.9.6** ✅ | 实验性模块 Phase 2 | medical_imaging Beta（Skill + 引擎 + 质量门闸 + 60测试） |
-| **v1.0.0** | 正式发布 | 全功能稳定，实验性模块初步可用 |
+| **v0.9.7** ✅ | 实验性模块 Phase 3 | realtime_analytics Beta（Skill + 引擎 + 质量门闸 + 102测试） |
+| **v1.0.0** | 正式发布 | 全功能稳定，实验性模块全部 Beta |
 
 ---
 

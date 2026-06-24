@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "medical-stats-research-assistant"
-version = "0.9.6"
+version = "0.9.7"
 description = "Medical Statistics Research Assistant — unified pipeline: raw data → statistical report → (optional) submittable paper"
 readme = "README.md"
 license = {text = "MIT"}
@@ -107,6 +107,11 @@ medical_imaging = [
     "SimpleITK>=2.3",
     "pyradiomics>=3.1",
     "scikit-image>=0.20",
+]
+realtime_analytics = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
 ]
 
 [project.urls]

@@ -2,6 +2,32 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
+## [0.9.7] - 2026-06-24
+
+Realtime Analytics module Phase 3: Alpha → Beta. Full SOP pipeline (PM → Architect → Engineer → QA).
+
+### Added
+- **`skills/realtime-monitor/SKILL.md`** — Skill entry point for `/msra-rt`. Phase 0-4 (config → stream+QC → background processing → review → report). 4 IRON RULES, Gate RT-1 references.
+- **`msra_modules/realtime_analytics/quality_gates.py`** — `RealtimeQualityGateChecker`: Gate RT-1 (3 items: data source available 🔑, timestamp continuity 🔑, detection sensitivity). Reuses `shared/quality_gates/GateRunner`.
+- **`msra_modules/realtime_analytics/anomaly_detector.py`** — Added `DetectionResult` dataclass + `MultivariateDetector` class (Isolation Forest via sklearn). Resolves naming conflict with `alert_system.Alert`.
+- **`msra_modules/realtime_analytics/stream_processor.py`** — Added `aggregate()`, `get_all_metrics()`, `process_event()` methods.
+- **`manifest.json`** — Registered `/msra-rt` command.
+- **`pyproject.toml`** — Added `realtime_analytics` optional dependency group (numpy, scipy, scikit-learn).
+- **`tests/test_realtime_analytics/`** — 102 test cases (all passed):
+  - `test_stream_processor.py` (26 tests)
+  - `test_anomaly_detector.py` (20 tests)
+  - `test_alert_system.py` (11 tests)
+  - `test_quality_gates.py` (22 tests)
+  - `test_integration.py` (9 tests)
+
+### Changed
+- **`msra_modules/realtime_analytics/__init__.py`** — version 1.1.0 → 1.2.0, added exports: `DetectionResult`, `MultivariateDetector`, `RealtimeQualityGateChecker`
+- **`docs/dev/18-实验性模块设计.md`** — realtime_analytics status updated to Beta
+- **`docs/dev/MSRA开发进度表.md`** — #61 realtime_analytics 10% → 100%
+
+### Test Results
+- Total: 102 realtime analytics tests (102 passed, 0 failed)
+
 ## [0.9.6] - 2026-06-24
 
 Medical Imaging module Phase 2: Alpha → Beta. Full SOP pipeline (PM → Architect → Engineer → QA).

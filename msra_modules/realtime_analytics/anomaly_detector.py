@@ -3,16 +3,43 @@ Anomaly Detector - 异常检测器
 
 RT-005: 异常检测规则引擎
 RT-006: 实时趋势检测
+RT-005b: 多变量异常检测 (Isolation Forest)
 """
 
 import numpy as np
 from collections import deque
-from typing import Optional, Dict, List, Callable
+from typing import Optional, Dict, List, Callable, Union
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class DetectionResult:
+    """异常检测结果
+
+    用于多变量异常检测方法（如 Isolation Forest）的输出。
+    与 alert_system.py 中的 Alert 类区分，避免命名冲突。
+    """
+    index: int  # 数据点在原始数据中的索引
+    is_anomaly: bool  # 是否为异常
+    score: float  # 异常分数（越低越异常，Isolation Forest 的 decision_function）
+    features: Dict[str, float] = field(default_factory=dict)  # 特征值
+    method: str = ""  # 检测方法名称
+    timestamp: Optional[float] = None  # 时间戳
+
+    def to_dict(self) -> Dict:
+        """转换为字典"""
+        return {
+            "index": self.index,
+            "is_anomaly": self.is_anomaly,
+            "score": self.score,
+            "features": self.features,
+            "method": self.method,
+            "timestamp": self.timestamp,
+        }
 
 
 class AlertLevel(Enum):
@@ -313,3 +340,114 @@ class TrendDetector:
         self._cusum_pos = 0.0
         self._cusum_neg = 0.0
         self._history.clear()
+
+
+class MultivariateDetector:
+    """多变量异常检测器
+
+    基于 Isolation Forest 算法进行多变量异常检测。
+    适用于同时分析多个生命体征指标的异常模式。
+
+    Usage:
+        detector = MultivariateDetector(contamination=0.05)
+        results = detector.detect(data_array, feature_names=["hr", "spo2", "bp"])
+        anomalies = [r for r in results if r.is_anomaly]
+    """
+
+    def __init__(self, contamination: float = 0.05, random_state: int = 42):
+        """初始化多变量异常检测器
+
+        Args:
+            contamination: 预期异常比例，默认 0.05 (5%)
+            random_state: 随机种子，保证可复现性
+        """
+        self.contamination = contamination
+        self.random_state = random_state
+        self._model = None
+        self._is_fitted = False
+        self._feature_names: List[str] = []
+
+    def fit(self, data: np.ndarray, feature_names: Optional[List[str]] = None):
+        """训练 Isolation Forest 模型
+
+        Args:
+            data: 形状为 (n_samples, n_features) 的数据矩阵
+            feature_names: 特征名称列表
+        """
+        try:
+            from sklearn.ensemble import IsolationForest
+        except ImportError:
+            raise ImportError(
+                "scikit-learn is required for multivariate anomaly detection. "
+                "Install with: pip install scikit-learn"
+            )
+
+        if data.ndim != 2:
+            raise ValueError(f"Expected 2D array, got {data.ndim}D")
+
+        self._feature_names = feature_names or [f"feature_{i}" for i in range(data.shape[1])]
+
+        self._model = IsolationForest(
+            contamination=self.contamination,
+            random_state=self.random_state,
+            n_estimators=100,
+        )
+        self._model.fit(data)
+        self._is_fitted = True
+        logger.info(f"MultivariateDetector fitted on {data.shape[0]} samples, {data.shape[1]} features")
+
+    def detect(
+        self,
+        data: np.ndarray,
+        feature_names: Optional[List[str]] = None,
+        timestamps: Optional[List[float]] = None,
+    ) -> List[DetectionResult]:
+        """执行多变量异常检测
+
+        Args:
+            data: 形状为 (n_samples, n_features) 的数据矩阵
+            feature_names: 特征名称列表
+            timestamps: 时间戳列表
+
+        Returns:
+            检测结果列表
+        """
+        if data.ndim == 1:
+            data = data.reshape(-1, 1)
+
+        names = feature_names or self._feature_names or [f"feature_{i}" for i in range(data.shape[1])]
+
+        # 自动训练（如果尚未训练）
+        if not self._is_fitted:
+            self.fit(data, names)
+
+        # 预测
+        predictions = self._model.predict(data)  # 1=normal, -1=anomaly
+        scores = self._model.decision_function(data)  # 越低越异常
+
+        results = []
+        for i in range(len(data)):
+            features = {names[j]: float(data[i, j]) for j in range(len(names))}
+            result = DetectionResult(
+                index=i,
+                is_anomaly=(predictions[i] == -1),
+                score=float(scores[i]),
+                features=features,
+                method="isolation_forest",
+                timestamp=timestamps[i] if timestamps and i < len(timestamps) else None,
+            )
+            results.append(result)
+
+        n_anomalies = sum(1 for r in results if r.is_anomaly)
+        logger.info(
+            f"Multivariate detection: {n_anomalies}/{len(results)} anomalies "
+            f"({n_anomalies/len(results)*100:.1f}%)"
+        )
+
+        return results
+
+    def reset(self):
+        """重置检测器"""
+        self._model = None
+        self._is_fitted = False
+        self._feature_names = []
