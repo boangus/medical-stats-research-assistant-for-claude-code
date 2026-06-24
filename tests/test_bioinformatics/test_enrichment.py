@@ -240,13 +240,13 @@ class TestPathwayEnrichmentUtils:
         """测试 KEGG 库名解析"""
         enricher = PathwayEnrichment(organism="human")
         lib_name = enricher._resolve_kegg_library()
-        assert "KEGG" in lib_name
+        assert lib_name == "KEGG_2021_Human"
 
     def test_resolve_kegg_library_mouse(self):
         """测试小鼠 KEGG 库名"""
         enricher = PathwayEnrichment(organism="mouse")
         lib_name = enricher._resolve_kegg_library()
-        assert "KEGG" in lib_name
+        assert lib_name == "KEGG_2019_Mouse"
 
 
 if __name__ == "__main__":

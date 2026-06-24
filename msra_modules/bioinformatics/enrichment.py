@@ -46,7 +46,12 @@ class PathwayEnrichment:
         "yeast": "sce",
     }
 
-    _ORGANISM_ENRICHR_SUFFIX: Dict[str, str] = {
+    _ORGANISM_ENRICHR_KEGG: Dict[str, str] = {
+        "human": "KEGG_2021_Human",
+        "mouse": "KEGG_2019_Mouse",
+    }
+
+    _ORGANISM_ENRICHR_GO: Dict[str, str] = {
         "human": "2023",
         "mouse": "2023",
     }
@@ -99,17 +104,18 @@ class PathwayEnrichment:
             raise ValueError(
                 f"Invalid ontology '{ontology}'. Must be one of: BP, MF, CC"
             )
-        suffix = self._ORGANISM_ENRICHR_SUFFIX.get(self.organism, "2023")
+        suffix = self._ORGANISM_ENRICHR_GO.get(self.organism, "2023")
         return self._GO_LIBRARY_TEMPLATES[ontology].format(year=suffix)
 
     def _resolve_kegg_library(self) -> str:
         """解析 KEGG 基因集库名称
 
         Returns:
-            完整的 Enrichr KEGG 基因集库名称
+            完整的 Enrichr KEGG 基因集库名称 (如 KEGG_2021_Human)
         """
-        suffix = self._ORGANISM_ENRICHR_SUFFIX.get(self.organism, "2023")
-        return f"KEGG_{suffix}"
+        return self._ORGANISM_ENRICHR_KEGG.get(
+            self.organism, "KEGG_2021_Human"
+        )
 
     def run_enrichr(
         self,
