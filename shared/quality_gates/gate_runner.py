@@ -38,7 +38,7 @@ class GateVerdict(str, Enum):
 class RunMode(str, Enum):
     """执行模式"""
     SKILL = "skill"    # LLM 按检查清单执行
-    AGENT = "agent"    # 独立 QC Inspector Agent 执行
+    AGENT = "agent"    # 独立 QC Inspector Agent 执行（通过 HybridModeBridge）
 
 
 @dataclass
@@ -146,18 +146,22 @@ class GateRunner:
     """
     门闸执行器
 
-    统一接口，支持两种模式：
+    支持三种模式：
     - Skill模式：生成检查清单prompt供LLM执行
-    - Agent模式：通过HybridModeBridge启动QC Inspector子Agent
+    - Agent模式：通过HybridModeBridge启动QC Inspector子Agent（可后台并行）
+    - 预填模式：传入已有的check_results直接判定
 
     Usage:
         runner = GateRunner(study_id="MSRA-2026-001")
 
-        # Skill模式（默认）
-        prompt = runner.generate_checklist(GateType.DATA_QUALITY, artifacts={"cleaned_data": "/path/to/data.csv"})
+        # Skill模式（默认）— 生成prompt供LLM执行
+        prompt = runner.generate_checklist(GateType.DATA_QUALITY, artifacts={...})
 
-        # Agent模式
-        result = runner.run_gate(GateType.DATA_QUALITY, artifacts={...}, mode=RunMode.AGENT)
+        # Agent模式 — 构造子Agent任务，可后台并行执行
+        task_info = runner.build_agent_task(GateType.DATA_QUALITY, artifacts={...}, output_path="/tmp/report.md")
+
+        # 预填模式 — 传入LLM已完成的检查结果，直接判定
+        result = runner.run_gate(GateType.DATA_QUALITY, artifacts={}, mode=RunMode.SKILL, check_results=[...])
     """
 
     def __init__(self, study_id: str, project_root: Optional[str] = None):
@@ -215,6 +219,58 @@ class GateRunner:
 请参照 `{gate_def.report_template}` 执行逐项检查，输出完整的门闸报告。
 """
         return prompt
+
+    def build_agent_task(
+        self,
+        gate_type: GateType,
+        artifacts: Dict[str, str],
+        output_path: str,
+    ) -> Dict[str, Any]:
+        """
+        构造子 Agent 任务（Agent模式用）
+
+        通过 HybridModeBridge 构造可独立执行的 QC Inspector 子 Agent 任务。
+        Gate 检查可与下一阶段准备并行执行。
+
+        Args:
+            gate_type: 门闸类型
+            artifacts: 产物路径映射 {artifact_id: file_path}
+            output_path: 门闸报告输出路径
+
+        Returns:
+            子 Agent 任务描述 {task: SubAgentTask, prompt: str}
+        """
+        try:
+            from agents.implementations.hybrid_mode_bridge import (
+                HybridModeBridge, SubAgentType
+            )
+        except ImportError:
+            raise RuntimeError(
+                "HybridModeBridge not available. "
+                "Ensure agents/ package is installed."
+            )
+
+        gate_def = self.get_gate_definition(gate_type)
+        bridge = HybridModeBridge()
+
+        # 构造包含检查清单的完整上下文
+        checklist_prompt = self.generate_checklist(gate_type, artifacts)
+        context = {
+            "gate_type": gate_type.value,
+            "gate_name": gate_def.name,
+            "study_id": self.study_id,
+            "checklist": checklist_prompt,
+        }
+
+        task = bridge.build_subagent_task(
+            agent_type=SubAgentType.QC_INSPECTOR,
+            input_files=artifacts,
+            output_path=output_path,
+            context=context,
+            run_in_background=True,  # Gate 检查默认后台并行
+        )
+
+        return {"task": task, "prompt": task.prompt}
 
     def run_gate(
         self,

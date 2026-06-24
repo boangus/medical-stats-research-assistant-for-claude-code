@@ -40,7 +40,26 @@ prompt = runner.generate_checklist(
 # prompt 可直接发送给LLM执行检查
 ```
 
-### Agent模式
+### Agent模式（QC Inspector子Agent化）
+
+```python
+from shared.quality_gates import GateRunner, GateType
+
+runner = GateRunner(study_id="MSRA-2026-001")
+
+# 构造子Agent任务（通过HybridModeBridge）
+task_info = runner.build_agent_task(
+    GateType.DATA_QUALITY,
+    artifacts={"cleaned_data": "MSRA/data/cleaned.csv"},
+    output_path="MSRA/reports/gate_1_5_report.md",
+)
+
+# task_info["task"] 为 SubAgentTask，可传递给 Agent 工具执行
+# task_info["prompt"] 为完整的子Agent prompt
+# run_in_background=True，Gate检查可与下一阶段准备并行
+```
+
+### 预填模式（LLM完成检查后判定）
 
 ```python
 from shared.quality_gates import GateRunner, GateType, RunMode, CheckItemResult
