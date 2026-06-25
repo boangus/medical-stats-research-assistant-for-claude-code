@@ -4,6 +4,8 @@ Tests for EngineFactory module.
 
 import pytest
 
+pytest.importorskip("duckdb", reason="duckdb is an optional scale-layer dependency")
+
 from shared.large_scale_processing.duckdb_engine import DuckDBEngine
 from shared.large_scale_processing.engine_factory import EngineFactory
 
