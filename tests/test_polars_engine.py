@@ -7,8 +7,9 @@ import sys
 
 import numpy as np
 import pandas as pd
-import polars as pl
 import pytest
+
+pl = pytest.importorskip("polars", reason="polars is an optional scale-layer dependency")
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
