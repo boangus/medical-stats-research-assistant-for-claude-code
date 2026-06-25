@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+duckdb = pytest.importorskip("duckdb", reason="duckdb is an optional scale-layer dependency")
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
