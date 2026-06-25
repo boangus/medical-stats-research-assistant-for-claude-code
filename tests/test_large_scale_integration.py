@@ -13,7 +13,21 @@ import pytest
 
 from shared.large_scale_processing import EngineFactory, EngineSelector, ProcessingEngine
 
+# Guard optional scale-layer engines
+try:
+    import polars  # noqa: F401
+    _has_polars = True
+except ImportError:
+    _has_polars = False
 
+try:
+    import duckdb  # noqa: F401
+    _has_duckdb = True
+except ImportError:
+    _has_duckdb = False
+
+
+@pytest.mark.skipif(not _has_polars, reason="polars not installed")
 class TestCSVWorkflow:
     """End-to-end CSV processing workflow tests."""
 
@@ -116,6 +130,7 @@ class TestCSVWorkflow:
         assert len(pandas_result) == 2
 
 
+@pytest.mark.skipif(not _has_polars, reason="polars not installed")
 class TestParquetWorkflow:
     """End-to-end Parquet processing workflow tests."""
 
@@ -208,6 +223,7 @@ class TestParquetWorkflow:
         assert len(pandas_df) == len(df)
 
 
+@pytest.mark.skipif(not (_has_polars and _has_duckdb), reason="requires both polars and duckdb")
 class TestAutomaticEngineSelection:
     """Tests for automatic engine selection based on data characteristics."""
 
@@ -310,6 +326,7 @@ class TestAutomaticEngineSelection:
         assert "use_case" in info
 
 
+@pytest.mark.skipif(not (_has_polars and _has_duckdb), reason="requires both polars and duckdb")
 class TestEngineInterface:
     """Tests to verify all engines implement the expected interface."""
 
