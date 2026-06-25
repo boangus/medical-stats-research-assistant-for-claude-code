@@ -1,5 +1,5 @@
 ---
-version: "1.0.2"
+version: "1.0.0"
 name: MSRA Analysis Execution
 description: 按批准SAP执行分析（验证样本量→构造变量→推断分析→自愈修复→质检→审计），输出代码、结果表、图表、偏差日志与审计日志。
 data_access_level: verified_only

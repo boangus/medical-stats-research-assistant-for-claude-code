@@ -1,5 +1,5 @@
 ---
-version: "0.3.2"
+version: "1.0.0"
 name: MSRA Pipeline
 description: |
   医学统计分析流水线编排器。从任意阶段切入，自动识别当前位置，

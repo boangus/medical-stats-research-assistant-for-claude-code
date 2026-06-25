@@ -1,5 +1,5 @@
 ---
-version: "0.9.2"
+version: "1.0.0"
 name: MSRA Exploratory Causal Analysis
 description: |
   数据驱动的探索性因果分析，从清洗后数据中发现潜在因果关系、识别混杂结构

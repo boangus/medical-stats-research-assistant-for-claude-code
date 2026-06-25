@@ -1,6 +1,6 @@
 ---
 name: MSRA Peer Review
-version: "0.9.3"
+version: "1.0.0"
 description: |
   医学期刊同行评审，模拟 5 位独立审稿人（主编 + 方法学审稿人 + 临床专家 + 统计审稿人 + 伦理审查员）。检查 CONSORT/STROBE/PRISMA 合规性。6 种模式：完整评审、快速评估、方法学聚焦、复审验证、报告规范检查、伦理合规审查。触发: peer review / 审稿 / 评审 / manuscript review / 审稿人 / journal review / ICMJE / 报告规范
 data_access_level: verified_only

@@ -1,5 +1,5 @@
 ---
-version: "0.9.4"
+version: "1.0.0"
 name: MSRA Analysis Planning
 description: |
   按研究类型（RCT/观察性/诊断试验）制定统计分析计划。先深度 EDA 了解数据特征后  再与用户探讨统计方法，制定详细的 SAP，并进行独立审查和变量构造定义。触发: 分析计划 / 统计方法 / SAP / 制定计划 / 方法选择 / RCT / 观察性/ diagnosis / 诊断试验 / 队列研究 / 混杂控制 / 协变量调整/ 样本量计划/ 估计目标 / 审查SAP / 方法探讨 / 深度EDA / analysis plan / study design / sample size / SAP review / estimands / covariate adjustment

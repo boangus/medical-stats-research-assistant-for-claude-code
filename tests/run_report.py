@@ -9,7 +9,7 @@ import pandas as pd
 
 BASE = Path(__file__).resolve().parent.parent
 FIGURES_DIR = BASE / "reports" / "figures"
-ASSEMBLER = BASE / "shared" / "report-assembler" / "render_report_html.py"
+ASSEMBLER = BASE / "shared" / "report_assembler" / "render_report_html.py"
 
 # ==============================
 # Stage 3.5: Results Quality Gate (动态检查)
@@ -245,7 +245,7 @@ table1_docx = TABLES_DIR / "table1_baseline.docx"
 assert ASSEMBLER.parent.exists()
 subprocess.run([
     sys.executable,
-    str(BASE / "shared/report-assembler/export_tables_docx.py"),
+    str(BASE / "shared/report_assembler/export_tables_docx.py"),
     "--input-md", table1_md,
     "--output", str(table1_docx),
     "--title", "表1 基线特征",
@@ -275,7 +275,7 @@ table2_md = (
 table2_docx = TABLES_DIR / "table2_logistic_regression.docx"
 subprocess.run([
     sys.executable,
-    str(BASE / "shared/report-assembler/export_tables_docx.py"),
+    str(BASE / "shared/report_assembler/export_tables_docx.py"),
     "--input-md", table2_md,
     "--output", str(table2_docx),
     "--title", "表2 Logistic回归结果",

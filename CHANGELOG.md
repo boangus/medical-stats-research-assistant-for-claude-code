@@ -2,7 +2,7 @@
 
 All notable changes to MSRA (Medical Statistics Research Assistant) will be documented in this file.
 
-## [1.0.0] - 2026-06-26
+## [1.0.0] - 2026-06-25
 
 **First stable release.** All four extension modules reach Stable maturity. End-to-end test suite covers 10 scenarios. User tutorials and API reference documentation complete.
 

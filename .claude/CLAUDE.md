@@ -1,7 +1,7 @@
-# MSRA Unified Pipeline — Routing Discipline v0.9.2
+# MSRA Unified Pipeline — Routing Discipline v1.0.0
 
 > 本文件定义统一项目的路由规则和跨 skill 数据传递规范。
-> 版本: v0.9.2 (MSRA 统一流水线)
+> 版本: v1.0.0 (MSRA 统一流水线)
 
 ---
 

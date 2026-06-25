@@ -1,5 +1,5 @@
 ---
-version: "0.9.2"
+version: "1.0.0"
 name: MSRA Calibration
 description: |
   度量校准：用金标准分析结果对比 MSRA 输出，量化方法选择准确率、

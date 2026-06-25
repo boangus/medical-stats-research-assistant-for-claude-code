@@ -1,6 +1,6 @@
 ---
 name: "MSRA Systematic Survey"
-version: "0.9.3"
+version: "1.0.0"
 description: |
   医学系统综述文献检索，聚焦 PubMed/Embase/Cochrane 检索策略制定、PRISMA 流程执行、GRADE 证据评级、领域检索报告生成。
   触发: systematic survey / 系统综述 / 文献检索 / 检索策略 / PRISMA / meta-analysis / GRADE / PICO / 偏倚风险 / RoB / 荟萃分析 / 网络meta / 证据评级 / 文献全景 / literature search / search strategy / domain survey
