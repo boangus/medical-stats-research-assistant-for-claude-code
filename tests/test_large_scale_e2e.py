@@ -30,6 +30,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from shared.large_scale_processing.engine_factory import EngineFactory
 from shared.large_scale_processing.engine_selector import EngineSelector, ProcessingEngine
 
+# Guard optional scale-layer engines — skip gracefully if not installed
+try:
+    import polars as _polars_mod
+    _has_polars = True
+except ImportError:
+    _has_polars = False
+
+try:
+    import duckdb as _duckdb_mod
+    _has_duckdb = True
+except ImportError:
+    _has_duckdb = False
+
 # ============================================================
 # Fixtures
 # ============================================================
@@ -166,6 +179,7 @@ class TestEngineSelector:
 # ============================================================
 
 
+@pytest.mark.skipif(not _has_polars, reason="polars not installed")
 class TestPolarsEngineE2E:
     """Polars 引擎端到端验证"""
 
@@ -260,6 +274,7 @@ class TestPolarsEngineE2E:
 # ============================================================
 
 
+@pytest.mark.skipif(not _has_duckdb, reason="duckdb not installed")
 class TestDuckDBEngineE2E:
     """DuckDB 引擎端到端验证"""
 
@@ -343,6 +358,7 @@ class TestDuckDBEngineE2E:
 # ============================================================
 
 
+@pytest.mark.skipif(not (_has_polars and _has_duckdb), reason="requires both polars and duckdb")
 class TestCrossEngineConsistency:
     """跨引擎结果一致性验证"""
 
