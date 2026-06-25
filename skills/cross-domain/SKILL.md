@@ -392,4 +392,11 @@ result = export_v1_schema(
 
 ---
 
+## 扩展模块门闸（shared 框架）
+
+> 模块质量门闸定义参见：[shared/quality_gates/gate-cross.md](../../shared/quality_gates/gate-cross.md)
+> 4 项检查，关键项为 1（多模态对齐）、2（融合模型验证）
+
+---
+
 **文档结束**

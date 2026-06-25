@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/manuscript_draft/v1",
   "stage": "manuscript_draft",
   "description": "Material Passport for Stage 5 — Manuscript Draft (Paper Track). Tracks all artifacts produced during academic manuscript writing, from title through references.",

@@ -58,7 +58,7 @@ fix(integration): resolve compatibility check false positives
 The compatibility checker was incorrectly flagging installed packages.
 Fixed by improving pip list parsing logic.
 
-Tests: resources/external/tests/test_compatibility.py
+Tests: agents/extensions/tests/test_compatibility.py
 ```
 
 ```
@@ -102,23 +102,23 @@ Examples:
 1. **Update Registry**
    ```bash
    # Add to github_projects.json or academic_literature.json
-   git add resources/external/registry/
+   git add agents/extensions/registry/
    git commit -m "feat(registry): add <resource-name> to <category>"
    ```
 
 2. **Run Tests**
    ```bash
-   pytest resources/external/tests/ -v
+   pytest agents/extensions/tests/ -v
    ```
 
 3. **Run Optimization Cycle**
    ```bash
-   python -m resources.external.optimization.optimization_scheduler --run
+   python -m agents.extensions.optimization.optimization_scheduler --run
    ```
 
 4. **Generate Report**
    ```bash
-   python -m resources.external.optimization.optimization_scheduler --report
+   python -m agents.extensions.optimization.optimization_scheduler --report
    ```
 
 5. **Commit All Changes**

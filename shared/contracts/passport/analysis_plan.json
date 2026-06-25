@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/analysis_plan/v1",
   "stage": "analysis_plan",
   "description": "Material Passport for Stage 2 — Analysis Plan. Tracks all artifacts produced during SAP development and statistical methodology planning.",

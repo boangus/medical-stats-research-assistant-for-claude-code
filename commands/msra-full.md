@@ -3,6 +3,10 @@ description: MSRA full academic pipeline — research → write → review → r
 model: opus
 ---
 
-Trigger the `pipeline` orchestrator. Loads the skill and executes the complete academic research workflow (10-stage orchestration: systematic-survey → medical-paper → integrity → peer-review → revision → re-review → final integrity → finalize).
+# MSRA Full
 
-Skill entry: `skills/pipeline/SKILL.md`.
+路由到 `skills/pipeline/SKILL.md`，执行完整学术研究流程。
+
+无参数。Pipeline 编排器自动检测入口并依次调度：systematic-survey → medical-paper → integrity → peer-review → revision → re-review → final integrity → finalize。
+
+业务逻辑与阶段调度规则均在 `skills/pipeline/SKILL.md` 中定义。

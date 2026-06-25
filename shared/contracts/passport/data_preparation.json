@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/data_preparation/v1",
   "stage": "data_preparation",
   "description": "Material Passport for Stage 1 — Data Preparation. Tracks all artifacts produced during data cleaning, transformation, and validation.",

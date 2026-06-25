@@ -1,7 +1,7 @@
 """
 Tests for Compatibility Checker Module
 
-运行方式: pytest resources/external/tests/test_compatibility.py -v
+运行方式: pytest agents/extensions/tests/test_compatibility.py -v
 """
 
 import pytest
@@ -13,7 +13,7 @@ from unittest.mock import patch, MagicMock
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from resources.external.integration.compatibility_checker import (
+from agents.extensions.integration.compatibility_checker import (
     CompatibilityChecker,
     CompatibilityResult
 )

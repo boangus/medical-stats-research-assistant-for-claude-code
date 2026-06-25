@@ -5,7 +5,7 @@
 ## 目录结构
 
 ```
-resources/external/
+agents/extensions/
 ├── README.md                           # 本文件 - 资源目录总览
 ├── registry/                           # 资源注册表
 │   ├── github_projects.json            # GitHub开源项目注册
@@ -46,22 +46,22 @@ resources/external/
 
 ### 2. 检查集成状态
 
-运行 `python -m resources.external.integration.check_status` 查看各资源的集成状态。
+运行 `python -m agents.extensions.integration.check_status` 查看各资源的集成状态。
 
 ### 3. 运行优化扫描
 
 ```bash
 # 全面扫描
-python -m resources.external.optimization.full_scan
+python -m agents.extensions.optimization.full_scan
 
 # 快速检查更新
-python -m resources.external.optimization.quick_check
+python -m agents.extensions.optimization.quick_check
 ```
 
 ### 4. 运行测试
 
 ```bash
-pytest resources/external/tests/ -v
+pytest agents/extensions/tests/ -v
 ```
 
 ## 维护规范

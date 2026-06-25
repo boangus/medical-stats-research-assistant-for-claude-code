@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "medical_review/reviewer_methodology_focus/v1",
   "mode": "reviewer_methodology_focus",
   "stage": "methodology_peer_review",

@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/report_generation/v1",
   "stage": "report_generation",
   "description": "Material Passport for Stage 4 — Report Generation. Tracks all artifacts produced during statistical report compilation, TFL generation, and CONSORT/STROBE compliance.",

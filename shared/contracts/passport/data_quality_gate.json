@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/data_quality_gate/v1",
   "stage": "data_quality_gate",
   "description": "Material Passport for Gate 1.5 — Data Quality Gate. Tracks the 9-item blocking quality gate between Stage 1 and Stage 2.",

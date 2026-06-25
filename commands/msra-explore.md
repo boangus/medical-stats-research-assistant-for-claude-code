@@ -4,12 +4,15 @@ argument-hint: "[file] [--mode causal-discovery|confounding-analysis|exploratory
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Load and execute the skill at `skills/exploratory-causal/SKILL.md` (MSRA Exploratory Causal Analysis).
+# MSRA Explore
 
-User input: $ARGUMENTS
+路由到 `skills/exploratory-causal/SKILL.md`，传入用户参数 `$ARGUMENTS`。
 
-Follow the SKILL.md instructions exactly:
-- **Guard check**: Verify Stage 1.5 data quality gate has passed (cleaned data available).
-- Run the exploratory causal analysis workflow (5 phases).
-- Present findings as **exploratory** (hypothesis-generating, not confirmatory).
-- Output a research direction report that feeds into Stage 2 (analysis-plan).
+## 参数解析
+
+- `<file>` — 清洗后数据文件
+- `--mode <mode>` — 分析模式：
+  - `causal-discovery` / `confounding-analysis` / `exploratory-eda`
+  - `hypothesis-generation` / `sensitivity-pre` / `direction-advisory`
+
+5 阶段探索性因果分析工作流、Guard check（Stage 1.5 门闸验证）、研究方向的报告生成均在 `skills/exploratory-causal/SKILL.md` 中定义。

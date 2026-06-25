@@ -1,7 +1,7 @@
 """
 Tests for Update Tracker Module
 
-运行方式: pytest resources/external/tests/test_update_tracker.py -v
+运行方式: pytest agents/extensions/tests/test_update_tracker.py -v
 """
 
 import pytest
@@ -13,7 +13,7 @@ from unittest.mock import patch, MagicMock
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from resources.external.integration.update_tracker import (
+from agents.extensions.integration.update_tracker import (
     UpdateTracker,
     UpdateInfo
 )

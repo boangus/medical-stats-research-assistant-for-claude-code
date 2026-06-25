@@ -82,7 +82,7 @@ class OptimizationScheduler:
             OptimizationTask(
                 name="resource_registry_check",
                 description="Check resource registry integrity",
-                script_path="resources/external/integration/resource_loader.py",
+                script_path="agents/extensions/integration/resource_loader.py",
                 frequency="weekly",
                 last_run=None,
                 last_status="pending",
@@ -92,7 +92,7 @@ class OptimizationScheduler:
             OptimizationTask(
                 name="compatibility_check",
                 description="Check all integrated resources compatibility",
-                script_path="resources/external/integration/compatibility_checker.py",
+                script_path="agents/extensions/integration/compatibility_checker.py",
                 frequency="weekly",
                 last_run=None,
                 last_status="pending",
@@ -102,7 +102,7 @@ class OptimizationScheduler:
             OptimizationTask(
                 name="update_scan",
                 description="Scan for resource updates",
-                script_path="resources/external/integration/update_tracker.py",
+                script_path="agents/extensions/integration/update_tracker.py",
                 frequency="monthly",
                 last_run=None,
                 last_status="pending",

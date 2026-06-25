@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/exploratory_causal/v1",
   "stage": "exploratory_causal",
   "description": "Material Passport for Stage 1.8 — Exploratory Causal Analysis. Tracks artifacts from data-driven causal discovery, confounding identification, and hypothesis generation.",

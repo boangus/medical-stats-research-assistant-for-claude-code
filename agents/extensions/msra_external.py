@@ -15,7 +15,7 @@ sys.path.insert(0, str(project_root))
 
 def cmd_status(args):
     """显示资源状态"""
-    from resources.external.integration.resource_loader import ResourceRegistry
+    from agents.extensions.integration.resource_loader import ResourceRegistry
 
     registry = ResourceRegistry()
     stats = registry.get_statistics()
@@ -43,7 +43,7 @@ def cmd_status(args):
 
 def cmd_check(args):
     """运行兼容性检查"""
-    from resources.external.integration.compatibility_checker import CompatibilityChecker
+    from agents.extensions.integration.compatibility_checker import CompatibilityChecker
 
     checker = CompatibilityChecker()
 
@@ -65,7 +65,7 @@ def cmd_check(args):
 
 def cmd_update(args):
     """检查更新"""
-    from resources.external.integration.update_tracker import UpdateTracker
+    from agents.extensions.integration.update_tracker import UpdateTracker
 
     tracker = UpdateTracker()
 
@@ -86,7 +86,7 @@ def cmd_update(args):
 
 def cmd_optimize(args):
     """运行优化循环"""
-    from resources.external.optimization.optimization_scheduler import OptimizationScheduler
+    from agents.extensions.optimization.optimization_scheduler import OptimizationScheduler
 
     scheduler = OptimizationScheduler()
 
@@ -102,8 +102,8 @@ def cmd_optimize(args):
 
 def cmd_report(args):
     """生成报告"""
-    from resources.external.optimization.optimization_scheduler import OptimizationScheduler
-    from resources.external.integration.resource_loader import ResourceRegistry
+    from agents.extensions.optimization.optimization_scheduler import OptimizationScheduler
+    from agents.extensions.integration.resource_loader import ResourceRegistry
 
     if args.type == "status":
         registry = ResourceRegistry()
@@ -112,7 +112,7 @@ def cmd_report(args):
         scheduler = OptimizationScheduler()
         print(scheduler.generate_optimization_report())
     elif args.type == "updates":
-        from resources.external.integration.update_tracker import UpdateTracker
+        from agents.extensions.integration.update_tracker import UpdateTracker
         tracker = UpdateTracker()
         results = tracker.check_registry_updates()
         print(tracker.generate_update_report(results))

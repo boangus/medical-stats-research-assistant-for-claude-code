@@ -3,7 +3,7 @@
     {
       "name": "resource_registry_check",
       "description": "Check resource registry integrity and validity",
-      "script_path": "resources/external/integration/resource_loader.py",
+      "script_path": "agents/extensions/integration/resource_loader.py",
       "frequency": "weekly",
       "last_run": null,
       "last_status": "pending",
@@ -13,7 +13,7 @@
     {
       "name": "compatibility_check",
       "description": "Check all integrated resources compatibility with MSRA",
-      "script_path": "resources/external/integration/compatibility_checker.py",
+      "script_path": "agents/extensions/integration/compatibility_checker.py",
       "frequency": "weekly",
       "last_run": null,
       "last_status": "pending",
@@ -23,7 +23,7 @@
     {
       "name": "update_scan",
       "description": "Scan for updates in registered resources",
-      "script_path": "resources/external/integration/update_tracker.py",
+      "script_path": "agents/extensions/integration/update_tracker.py",
       "frequency": "monthly",
       "last_run": null,
       "last_status": "pending",

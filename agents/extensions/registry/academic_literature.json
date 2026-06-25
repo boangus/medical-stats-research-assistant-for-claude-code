@@ -317,7 +317,7 @@
         {
           "topic": "Single-cell Multi-omics Integration",
           "description": "Integrating transcriptomics, epigenomics, and proteomics at single-cell resolution",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Stuart et al. (2019) - Comprehensive integration of single-cell data (Cell)",
             "Argelaguet et al. (2020) - Multi-omics factor analysis (Nature Genetics)"
@@ -327,7 +327,7 @@
         {
           "topic": "AI-driven Protein Structure Prediction",
           "description": "Deep learning methods for protein structure and function prediction",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Jumper et al. (2021) - AlphaFold (Nature)",
             "Abramson et al. (2024) - AlphaFold 3 for molecular biology (Nature)"
@@ -337,7 +337,7 @@
         {
           "topic": "Spatial Transcriptomics",
           "description": "Methods for preserving spatial information in transcriptomic analysis",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Stahl et al. (2016) - Spatial transcriptomics (Science)",
             "Palla et al. (2022) - Squidpy for spatial omics (Nature Methods)"
@@ -357,7 +357,7 @@
         {
           "topic": "Single-cell RNA-seq Analysis",
           "description": "Computational methods for scRNA-seq data analysis",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Luecken & Theis (2019) - Current best practices in scRNA-seq (Molecular Systems Biology)",
             "Korsunsky et al. (2019) - Fast, sensitive, and scalable (Nature Methods)"
@@ -372,7 +372,7 @@
         {
           "topic": "Deep Learning Medical Image Diagnosis",
           "description": "CNN and transformer-based methods for medical image analysis",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "McKinney et al. (2020) - International evaluation of AI (Nature Medicine)",
             "Muehlematter et al. (2021) - Medical image classification (Lancet Digital Health)"
@@ -382,7 +382,7 @@
         {
           "topic": "Federated Learning in Medical Imaging",
           "description": "Privacy-preserving distributed learning across institutions",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Kaissis et al. (2021) - Secure AI for medical data (Nature Machine Intelligence)",
             "Rieke et al. (2020) - The future of digital health (Nature)"
@@ -392,7 +392,7 @@
         {
           "topic": "Explainable AI in Medical Imaging",
           "description": "Interpretable deep learning for clinical decision support",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Rudin (2019) - Stop explaining black box ML (Nature Machine Intelligence)",
             "Lundberg et al. (2020) - Explainable AI for healthcare (Nature Medicine)"
@@ -402,7 +402,7 @@
         {
           "topic": "Radiomics and Deep Learning Fusion",
           "description": "Combining hand-crafted radiomic features with deep learning",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Lambin et al. (2012) - Radiomics (Nature Reviews Clinical Oncology)",
             "Parekh & Jacobs (2022) - Radiomics and deep learning (Radiology AI)"
@@ -412,7 +412,7 @@
         {
           "topic": "Real-time Intraoperative Image Navigation",
           "description": "AI-guided surgical navigation and real-time imaging",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Cohen et al. (2020) - Real-time surgical guidance (Nature Biomedical Engineering)",
             "Szpala et al. (2021) - Intraoperative MRI guidance (Neurosurgery)"
@@ -427,7 +427,7 @@
         {
           "topic": "Medical IoT Stream Processing",
           "description": "Real-time analysis of continuous patient monitoring data",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Bhide et al. (2021) - IoT in healthcare (IEEE Reviews in Biomedical Engineering)",
             "Rashid et al. (2022) - Streaming analytics for patient monitoring (JMIR)"
@@ -437,7 +437,7 @@
         {
           "topic": "Continuous Patient Monitoring Analytics",
           "description": "Streaming analysis for vital signs and bedside monitoring",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Charitos et al. (2021) - Bedside monitoring (Yearbook of Medical Informatics)",
             "Christensen et al. (2020) - Real-time clinical decision support (JMIR)"
@@ -447,7 +447,7 @@
         {
           "topic": "Clinical Decision Support Systems",
           "description": "AI-driven real-time clinical recommendations",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Sutton et al. (2020) - Clinical decision support systems (BMJ)",
             "Bates et al. (2021) - Improving clinical decision support (NEJM)"
@@ -457,7 +457,7 @@
         {
           "topic": "Wearable Device Analytics",
           "description": "Analysis of continuous data from wearable sensors",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Dunn et al. (2021) - Apple Heart Study (NEJM)",
             "Rogowski et al. (2024) - Wearable ECG screening (Lancet)"
@@ -467,7 +467,7 @@
         {
           "topic": "Real-time Disease Outbreak Surveillance",
           "description": "Streaming data analysis for early disease detection",
-          "msra_reference": "resources/external/registry",
+          "msra_reference": "agents/extensions/registry",
           "key_references": [
             "Brockmann & Helbing (2013) - Global mobility (Science)",
             "McGough et al. (2024) - Real-time epidemic tracking (Nature Communications)"

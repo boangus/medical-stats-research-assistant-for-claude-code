@@ -1,7 +1,7 @@
 """
 Integration Tests for External Resources Module
 
-运行方式: pytest resources/external/tests/test_integration.py -v
+运行方式: pytest agents/extensions/tests/test_integration.py -v
 """
 
 import pytest
@@ -91,17 +91,17 @@ class TestExternalResourcesWorkflow:
 
     def test_module_imports(self):
         """测试模块导入"""
-        from resources.external.integration import resource_loader
-        from resources.external.integration import compatibility_checker
-        from resources.external.integration import update_tracker
+        from agents.extensions.integration import resource_loader
+        from agents.extensions.integration import compatibility_checker
+        from agents.extensions.integration import update_tracker
         assert resource_loader is not None
         assert compatibility_checker is not None
         assert update_tracker is not None
 
     def test_end_to_end_resource_check(self):
         """端到端资源检查测试"""
-        from resources.external.integration.resource_loader import ResourceRegistry
-        from resources.external.integration.compatibility_checker import CompatibilityChecker
+        from agents.extensions.integration.resource_loader import ResourceRegistry
+        from agents.extensions.integration.compatibility_checker import CompatibilityChecker
 
         # 初始化组件
         registry = ResourceRegistry()

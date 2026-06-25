@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/calibration_result/v1",
   "stage": "calibration",
   "description": "Material Passport for Calibration —度量校准. Tracks calibration metrics, cross-validation results, model performance evaluations, and style calibration outputs used across the pipeline.",

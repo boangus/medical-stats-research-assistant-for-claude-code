@@ -4,12 +4,14 @@ argument-hint: "[data] [--study RCT|observational|diagnostic] [--quick]"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Load and execute the skill at `skills/analysis-plan/SKILL.md` (MSRA Analysis Planning).
+# MSRA Plan
 
-User input: $ARGUMENTS
+路由到 `skills/analysis-plan/SKILL.md`，传入用户参数 `$ARGUMENTS`。
 
-Follow the SKILL.md instructions exactly. As the Method Consultant you define
-estimands (ICH E9(R1)), discuss method selection with the user, draft the SAP,
-and run the plan review. Branch by study type (RCT → ITT/PP + ANCOVA;
-observational → DAG + PSM/IPTW; diagnostic → AUC + gold-standard bias).
-Honor the IRON RULES in the skill.
+## 参数解析
+
+- `<data>` — 清洗后数据文件
+- `--study <type>` — 研究类型（RCT/observational/diagnostic）
+- `--quick` — 快速模式
+
+估计目标定义（ICH E9(R1)）、方法选择决策树、SAP 制定与审查、研究类型分支逻辑均在 `skills/analysis-plan/SKILL.md` 中定义。

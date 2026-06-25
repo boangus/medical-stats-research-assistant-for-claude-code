@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "medical_review/reviewer_full/v1",
   "mode": "reviewer_full",
   "stage": "medical_peer_review",

@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "./shared/contracts/audit/audit_sidecar.schema.json",
+  "version": "1.0.0",
   "title": "Clinical Analysis Audit Metadata",
   "description": "Sidecar metadata for a clinical analysis audit run. Captures study identity, protocol/SAP versions, data snapshot timing, analysis population, and software environment. Paired with audit_jsonl.schema.json events and audit_verdict.schema.json outcomes to form the complete audit trail.",
   "type": "object",

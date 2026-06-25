@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "./shared/contracts/audit/audit_jsonl.schema.json",
+  "version": "1.0.0",
   "title": "Clinical Analysis Audit Log Event",
   "description": "Schema for one entry in the clinical analysis audit trail. Each JSONL line records a discrete analysis action — method invocation, assumption check, result generation, or deviation — forming a tamper-evident chain for regulatory compliance (ICH E6(R2) Section 5.18.4).",
   "type": "object",

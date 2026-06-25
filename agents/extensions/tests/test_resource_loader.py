@@ -1,7 +1,7 @@
 """
 Tests for External Resource Registry Module
 
-运行方式: pytest resources/external/tests/ -v
+运行方式: pytest agents/extensions/tests/ -v
 """
 
 import pytest
@@ -13,7 +13,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from resources.external.integration.resource_loader import (
+from agents.extensions.integration.resource_loader import (
     ResourceRegistry,
     GitHubProject,
     AcademicLiterature

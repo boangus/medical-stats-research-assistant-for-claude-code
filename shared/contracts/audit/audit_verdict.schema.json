@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "./shared/contracts/audit/audit_verdict.schema.json",
+  "version": "1.0.0",
   "title": "Clinical Analysis Quality Verdict",
   "description": "Quality judgment on a clinical analysis run. Summarizes checklist-based evaluation of statistical methodology, SAP compliance, assumption verification, and reporting adequacy. Verdicts gate downstream usage: PASS allows results to propagate to the clinical study report; CONDITIONAL requires remediation before use; FAIL blocks all downstream consumption.",
   "type": "object",

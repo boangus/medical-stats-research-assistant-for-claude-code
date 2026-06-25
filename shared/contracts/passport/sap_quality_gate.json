@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/sap_quality_gate/v1",
   "stage": "sap_quality_gate",
   "description": "Material Passport for Gate 2.5 — SAP Quality Gate. Tracks the 8-item blocking quality gate between Stage 2 and Stage 3.",

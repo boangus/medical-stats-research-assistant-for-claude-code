@@ -4,12 +4,14 @@ argument-hint: "[gold_standard.csv] [--status] [--update results.csv]"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Load and execute the skill at `skills/calibration/SKILL.md` (MSRA Calibration).
+# MSRA Calibrate
 
-User input: $ARGUMENTS
+路由到 `skills/calibration/SKILL.md`，传入用户参数 `$ARGUMENTS`。
 
-Follow the SKILL.md instructions exactly. This is the experimental calibration
-mode: compare pipeline outputs against a user-supplied gold standard, update the
-calibration database (`calibration_db.json`) with cumulative TPR/FPR per method
-type, and expose calibration confidence to the Stage 3.5 results quality gate.
-Honor the IRON RULES in the skill.
+## 参数解析
+
+- `<gold_standard.csv>` — 金标准数据文件，触发校准
+- `--status` — 查看当前校准状态
+- `--update <results.csv>` — 增量更新校准数据库
+
+校准协议、TPR/FPR 累积逻辑、门闸联动规则均在 `skills/calibration/SKILL.md` 中定义。

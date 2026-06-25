@@ -174,7 +174,7 @@ def cmd_push(args):
 
 def cmd_cycle(args):
     """运行完整的优化循环并提交"""
-    from resources.external.optimization.optimization_scheduler import OptimizationScheduler
+    from agents.extensions.optimization.optimization_scheduler import OptimizationScheduler
 
     print("\n" + "=" * 60)
     print("Running Optimization Cycle")

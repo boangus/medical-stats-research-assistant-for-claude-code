@@ -4,7 +4,7 @@
 
 **输入**: SAP + 变量构造定义 + 锁定数据
 **输出**: 验证报告 + 执行状态摘要
-**检查点**: 🔴 MANDATORY-EXEC-00
+**检查点**: 🔴 MANDATORY-EXEC-01
 
 ### Gate 0: SAP 合法性检查
 
@@ -67,10 +67,10 @@ def validate_dataset(lockfile_path):
     return lock_status
 ```
 
-### 检查点: MANDATORY-EXEC-00
+### 检查点: MANDATORY-EXEC-01
 
 ```markdown
---- MANDATORY-EXEC-00: SAP 验证 ---
+--- MANDATORY-EXEC-01: SAP 验证 ---
 
 SAP 验证结果:
 - [必需章节]: {section_check}

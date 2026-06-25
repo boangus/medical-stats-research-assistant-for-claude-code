@@ -3,70 +3,28 @@ description: MSRA Modules — manage experimental modules (medical imaging, bioi
 argument-hint: "list|info <module>|check <module>"
 ---
 
-Manage experimental modules in MSRA. These modules provide additional capabilities beyond the core pipeline.
+# MSRA Modules
 
-## Available Modules
+管理 MSRA 扩展模块，传入用户参数 `$ARGUMENTS`。
 
-| Module | Description | Status |
-|--------|-------------|--------|
-| medical_imaging | Medical image processing (DICOM, segmentation, classification) | experimental |
-| bioinformatics | Bioinformatics analysis (scRNA-seq, differential expression) | experimental |
-| realtime_analytics | Real-time data processing (stream analysis, anomaly detection) | experimental |
-| cross_domain | Cross-domain integration (radiomics-DEG correlation, realtime prediction, multi-modal visualization) | experimental |
+## 参数解析
 
-## Usage
+- `list` — 列出所有模块
+- `info <module>` — 查看模块详情
+- `check <module>` — 检查模块依赖
 
-```
-/msra-modules list                 # List all modules
-/msra-modules info medical_imaging # View module details
-/msra-modules check bioinformatics # Check dependencies
-/msra-modules info cross_domain    # View cross-domain module details
-/msra-modules check cross_domain   # Check cross-domain dependencies
-```
+## 可用模块
 
-## Dispatch
+| 模块 | 说明 | 入口命令 |
+|------|------|---------|
+| medical_imaging | 医学影像处理（DICOM/分割/分类） | `/msra-imaging` |
+| bioinformatics | 生物信息分析（scRNA-seq/DE） | `/msra-bio` |
+| realtime_analytics | 实时数据处理（流分析/异常检测） | `/msra-rt` |
+| cross_domain | 跨域融合（radiomics-DEG/实时预测/多模态可视化） | `/msra-cross` |
 
-Parse the command from `$ARGUMENTS`. If no arguments, list all modules.
+## 调度
 
-For `list`: Call `msra_modules.list_modules()` and display the results.
+- `list` → 调用 `msra_modules.list_modules()`
+- `info <module>` / `check <module>` → 调用 `msra_modules.check_module_dependencies(module)`
 
-For `info <module>`: Call `msra_modules.check_module_dependencies(module)` and display detailed information.
-
-For `check <module>`: Call `msra_modules.check_module_dependencies(module)` and return exit code based on dependency status.
-
-## Module Details
-
-### cross_domain
-
-Cross-domain multi-modal fusion analysis module. Integrates outputs from medical_imaging, bioinformatics, and realtime_analytics modules.
-
-**Entry command**: `/msra-cross`
-
-**Scenarios**:
-- `correlation`: Radiomics-DEG correlation analysis
-- `prediction`: Realtime prediction model training
-- `visualization`: Multi-modal linked visualization
-- `full`: Complete fusion workflow (all scenarios)
-
-**Quality Gates**:
-- Gate CD-1.5: Data alignment gate (3 items, 2 key)
-- Gate CD-3.5: Fusion results gate (3 items, 2 key)
-
-**Output Schema**: `msra/cross_domain_result/v1`
-
-**Dependencies**: scipy, scikit-learn, matplotlib (core dependencies, no extra installs needed)
-
-## Note
-
-Experimental modules require additional dependencies. Install with:
-```bash
-pip install "medical-stats-research-assistant[imaging]"
-pip install "medical-stats-research-assistant[bioinformatics]"
-pip install "medical-stats-research-assistant[realtime]"
-pip install "medical-stats-research-assistant[cross_domain]"
-```
-
-For full installation:
-```bash
-pip install "medical-stats-research-assistant[experimental]"
-```
+模块详细规格、门闸定义、依赖清单均在各模块 `skills/*/SKILL.md` 中定义。

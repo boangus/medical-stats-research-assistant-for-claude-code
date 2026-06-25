@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
   "contract_id": "msra/passport/analysis_execution/v1",
   "stage": "analysis_execution",
   "description": "Material Passport for Stage 3 — Analysis Execution. Tracks all artifacts produced during statistical analysis, assumption verification, and result generation.",
