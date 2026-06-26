@@ -27,8 +27,8 @@
       "properties": {
         "study_id": {
           "type": "string",
-          "pattern": "^NCT\\d{8}$",
-          "description": "ClinicalTrials.gov identifier"
+          "pattern": "^(NCT\\d{8}|ChiCTR-\\d{4}-\\d{6}|ISRCTN\\d{8,}|EUCTR\\d{4}-\\d{6}-\\d{2}|UTN[U12]\\d{11}|[A-Z]{2,4}\\d{2}-\\d{4}-\\d{4})$",
+          "description": "Clinical trial registration ID (supports: NCT, ChiCTR, ISRCTN, EUCTR, UTN, and other WHO ICTRP formats)"
         },
         "study_title": {
           "type": "string",
