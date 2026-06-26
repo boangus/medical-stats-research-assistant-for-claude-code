@@ -33,6 +33,28 @@ If downstream work is needed, return control to the caller with a recommendation
 4. **Evidence-driven** 9every section must have assigned evidence from the literature report
 5. **Flexibility** 9adapt standard patterns to the paper's specific needs
 
+## IMRaD Section Proportions (v1.0.0)
+
+> 以下为推荐比例，可根据文章类型和期刊要求微调。字数分配必须遵循期刊限制。
+
+| 章节 | 推荐比例 | NEJM (3000词) | Lancet (4000词) | JAMA (3500词) | 说明 |
+|------|---------|--------------|----------------|--------------|------|
+| **Introduction** | 15-20% | 450-600 | 600-800 | 525-700 | 背景→缺口→目的，3-4段 |
+| **Methods** | 25-30% | 750-900 | 1000-1200 | 875-1050 | 研究设计+统计方法，可最长 |
+| **Results** | 30-35% | 900-1050 | 1200-1400 | 1050-1225 | 核心价值，按终点逻辑组织 |
+| **Discussion** | 20-25% | 600-750 | 800-1000 | 700-875 | 解读→比较→局限→意义 |
+
+**特殊情况调整**:
+- **综述文章**: Discussion可增至30-35%，Methods可减至15-20%
+- **Brief Communication**: 各节等比缩减，Introduction可减至10%
+- **病例报告**: 无标准IMRaD，使用Case Presentation(40%)+Discussion(40%)+Introduction(20%)
+- **Meta分析**: Methods可增至30-35%（含PRISMA流程描述），Results可增至35%
+
+**校验规则**:
+- 任何章节超出推荐比例±10%时，向用户发出警告
+- 总字数超出期刊限制时，自动建议缩减最长章节
+- 摘要字数单独校验，不计入正文
+
 ## Structure Selection
 
 Reference: `references/medical_paper_structure_patterns.md`

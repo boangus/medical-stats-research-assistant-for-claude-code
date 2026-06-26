@@ -56,6 +56,33 @@ Both abstracts follow the same structured format:
 | English | 150-300 words | 5-7 keywords |
 | Traditional Chinese | 300-500 characters | 5-7 keywords |
 
+### 期刊摘要字数限制（硬性校验）
+
+> ⚠️ **强制校验规则**: 生成摘要后必须校验字数，超出限制时自动警告并建议缩减策略。
+
+| 期刊 | 摘要类型 | 英文词数限制 | 中文字符限制 | 特殊要求 |
+|------|---------|------------|------------|---------|
+| NEJM | 结构化(Background/Methods/Results/Conclusions) | ≤250词 | — | 需What's New Box(40词) |
+| Lancet | 结构化(Background/Methods/Findings/Interpretation) | ≤300词 | — | 需Research in Context Box |
+| JAMA | 结构化(Importance/Objective/Design/Results/Conclusions) | ≤350词 | — | 需Key Points Box |
+| BMJ | 结构化(Objective/Design/Setting/Participants/Main Outcome) | ≤300词 | — | 结构更详细 |
+| Annals | 非结构化 | ≤250词 | — | 单段落 |
+| PLOS Medicine | 结构化 + Author Summary | ≤300词 | — | 需通俗Author Summary |
+| Lancet子刊 | 结构化 | ≤200-300词 | — | 视具体子刊而定 |
+| 中华医学会 | 结构化(目的/方法/结果/结论) | — | ≤400字 | 附英文摘要 |
+
+**校验流程**:
+1. 生成摘要后，使用 `wc -w`（英文）或字符计数（中文）校验字数
+2. 如超出期刊限制 → 警告: "摘要词数[N]超出[期刊]限制[上限]，建议缩减[具体建议]"
+3. 如低于下限(150词) → 警告: "摘要词数[N]过少，建议补充[具体建议]"
+4. 校验结果记录在 Phase 5b 输出中
+
+**缩减策略**:
+- 合并Background和Purpose为1句话
+- Methods中省略统计软件名称（移至正文）
+- Results中仅保留主要终点，省略次要终点
+- Conclusions中省略背景重述
+
 ## Writing Process
 
 ### Step 1: Extract Key Points
