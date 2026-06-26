@@ -173,11 +173,116 @@ df %>%
 
 ---
 
-## 五、常见陷阱与注意事项
+## 五、正态性判断：三重检验框架（v2.0）
+
+> ⚠️ **重要统计学争议**：单纯依赖 Shapiro-Wilk 的 p>0.05 阈值判断正态性在统计学界存在广泛争议。大样本时 Shapiro-Wilk 过于敏感（微小偏离即 p<0.05），小样本时 power 不足。MSRA 推荐"三重判断"策略。
+
+### 5.1 三重判断策略
+
+```
+┌── 第一重：视觉检查（Q-Q图）────┐
+│  点沿对角线分布 → 基本正态      │
+│  尾部偏离 → 偏态/重尾           │
+│  S形 → 双峰                     │
+└────────────┬─────────────────┘
+             ↓
+┌── 第二重：偏度/峰度度量 ────┐
+│  |Skewness| < 2 且 |Kurtosis| < 7 → 正态可接受
+│  超出任一阈值 → 非正态              │
+└────────────┬─────────────────┘
+             ↓
+┌── 第三重：Shapiro-Wilk 检验（辅助）────┐
+│  n < 50: SW可靠，可直接使用p值判断      │
+│  50 ≤ n ≤ 3000: SW+效应量综合判断       │
+│  n > 3000: SW过于敏感，仅作参考         │
+└───────────────────────────────────────┘
+```
+
+### 5.2 基于样本量的判断规则
+
+| 样本量 | 第一重（Q-Q图） | 第二重（偏度/峰度） | 第三重（Shapiro-Wilk） | 最终判断 |
+|--------|----------------|--------------------|--------------------|---------|
+| n < 20 | 必须 | 建议 | **主要依据** (SW可靠) | 以SW为主+Q-Q图 |
+| 20 ≤ n < 50 | 必须 | 必须 | **主要依据** | 以SW为主+偏度/峰度 |
+| 50 ≤ n ≤ 3000 | 必须 | 必须 | 辅助参考 | **偏度/峰度为主**+SW+Q-Q |
+| n > 3000 | 必须 | 必须 | 仅记录(p值必<0.05) | **偏度/峰度+Q-Q图** |
+
+### 5.3 效应量标准
+
+| 指标 | 正态可接受 | 边界 | 非正态 |
+|------|-----------|------|--------|
+| \|Skewness\| | < 1.0 | 1.0 - 2.0 | > 2.0 |
+| \|Kurtosis\| | < 3.0 | 3.0 - 7.0 | > 7.0 |
+
+> 参考：Kline (2015) "Principles and Practice of Structural Equation Modeling" 建议 |Skewness|<3, |Kurtosis|<10；更严格标准采用 |S|<2, |K|<7。
+
+### 5.4 R 实现：三重判断函数
+
+```r
+# MSRA 正态性三重判断函数
+normality_triage <- function(x, var_name = "variable") {
+  x <- x[!is.na(x)]
+  n <- length(x)
+
+  # 第一重：Q-Q图（保存为文件）
+  qq_path <- paste0("qq_plot_", var_name, ".png")
+  png(qq_path, width = 600, height = 600)
+  qqnorm(x, main = paste("Q-Q Plot:", var_name))
+  qqline(x, col = "red", lwd = 2)
+  dev.off()
+
+  # 第二重：偏度/峰度
+  skew <- mean((x - mean(x))^3) / sd(x)^3
+  kurt <- mean((x - mean(x))^4) / sd(x)^4 - 3  # excess kurtosis
+  normal_skew <- abs(skew) < 2
+  normal_kurt <- abs(kurt) < 7
+
+  # 第三重：Shapiro-Wilk（带样本量判断）
+  if (n >= 3 && n <= 5000) {
+    sw_p <- shapiro.test(x)$p.value
+    sw_reliable <- TRUE
+  } else if (n > 5000) {
+    sw_p <- NA
+    sw_reliable <- FALSE
+  } else {
+    sw_p <- NA
+    sw_reliable <- FALSE
+  }
+
+  # 综合判断
+  if (n < 50 && sw_reliable) {
+    # 小样本：以SW为主
+    is_normal <- sw_p > 0.05
+    method <- "Shapiro-Wilk (小样本可靠)"
+  } else {
+    # 大样本：以偏度/峰度为主
+    is_normal <- normal_skew && normal_kurt
+    method <- "偏度/峰度 (大样本策略)"
+  }
+
+  list(
+    n = n,
+    skewness = round(skew, 3),
+    kurtosis = round(kurt, 3),
+    sw_p = if (!is.na(sw_p)) round(sw_p, 4) else NA,
+    sw_reliable = sw_reliable,
+    normal_skew = normal_skew,
+    normal_kurt = normal_kurt,
+    is_normal = is_normal,
+    method = method,
+    qq_plot = qq_path
+  )
+}
+```
+
+---
+
+## 六、常见陷阱与注意事项
 
 1. **多重比较**：多次检验需校正 p 值（Bonferroni / Holm / FDR）
 2. **小样本**：n < 30 优先考虑非参数方法
 3. **有序分类变量**：不应当作连续变量处理
-4. **正态性检验在大样本下的局限**：n > 500 时 Shapiro-Wilk 过于敏感，建议结合 Q-Q 图
+4. **正态性检验争议**：不要仅依赖 p>0.05 判断正态性，使用三重判断策略（§5）
 5. **效应量报告**：p 值不反映效应大小，始终报告 Cohen's d / r / η²
 6. **Fisher 精确检验的局限**：2×2 表以外建议使用模拟 p 值 (`simulate.p.value=TRUE`)
+7. **Q-Q图解读**：小样本(n<30)Q-Q图波动大，需结合检验结果；大样本(n>1000)Q-Q图敏感度高

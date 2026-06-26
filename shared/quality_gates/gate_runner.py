@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -276,6 +276,7 @@ class GateRunner:
         artifacts: Dict[str, str],
         mode: RunMode = RunMode.SKILL,
         check_results: Optional[List[CheckItemResult]] = None,
+        metrics_sink: Optional[Callable] = None,
     ) -> GateResult:
         """
         执行门闸检查
@@ -330,7 +331,7 @@ class GateRunner:
                 level = "关键" if cr.is_key else "一般"
                 risks.append(f"[{level}] {cr.name}: {cr.notes or cr.evidence}")
 
-        return GateResult(
+        result = GateResult(
             gate_type=gate_type,
             study_id=self.study_id,
             verdict=verdict,
@@ -342,6 +343,33 @@ class GateRunner:
             risks=risks,
             mode=mode,
         )
+
+        # Emit metrics to sink if provided
+        if metrics_sink is not None:
+            try:
+                from shared.quality_gates.metrics_store import QualityMetric
+                metrics = [
+                    QualityMetric(
+                        metric_name="gate_pass_rate",
+                        value=result.pass_rate,
+                        study_id=self.study_id,
+                        gate_type=gate_type.value,
+                        phase_id=gate_def.stage_number,
+                        metadata={"verdict": verdict.value},
+                    ),
+                    QualityMetric(
+                        metric_name="gate_failed_items",
+                        value=float(failed),
+                        study_id=self.study_id,
+                        gate_type=gate_type.value,
+                        phase_id=gate_def.stage_number,
+                    ),
+                ]
+                metrics_sink(metrics)
+            except Exception as e:
+                logger.warning("Failed to emit metrics: %s", e)
+
+        return result
 
     def load_gate_report(self, report_path: str) -> GateResult:
         """
