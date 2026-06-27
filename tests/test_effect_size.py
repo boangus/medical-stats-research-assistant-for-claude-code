@@ -144,6 +144,48 @@ class TestOmegaSquared:
         result = omega_squared([g, g, g])
         assert result == 0.0
 
+    def test_two_groups(self):
+        """两组ANOVA: 有明显差异→ω²>0.5, 无差异→ω²≈0"""
+        # 两组有明显差异: N(0,1) vs N(2,1), n=50
+        # SS_between大, MS_within小 → ω²应大于0.5
+        np.random.seed(42)
+        g_high1 = np.random.normal(0, 1, 50)
+        g_high2 = np.random.normal(2.0, 1, 50)
+        w2_high = omega_squared([g_high1, g_high2])
+        assert w2_high > 0.5, f"Large separation should yield omega² > 0.5, got {w2_high}"
+
+        # 两组无差异: N(0,1) vs N(0,1), n=50
+        # ω²应接近0 (公式 max(0,...) 保底)
+        np.random.seed(42)
+        g_null1 = np.random.normal(0, 1, 50)
+        g_null2 = np.random.normal(0, 1, 50)
+        w2_null = omega_squared([g_null1, g_null2])
+        assert w2_null < 0.05, f"No difference should yield omega² ≈ 0, got {w2_null}"
+
+    def test_many_groups(self):
+        """5组ANOVA: 验证公式在k>3时仍然正确"""
+        # 5组: N(0,1), N(3,1), N(6,1), N(9,1), N(12,1), 每组n=30
+        # 极大差异 → ω²应接近1.0
+        np.random.seed(42)
+        groups = [np.random.normal(i * 3, 1, 30) for i in range(5)]
+        w2 = omega_squared(groups)
+
+        # 手动验证公式:
+        # k=5, n=150
+        # grand_mean ≈ 6.0
+        # SS_between = 30 * ((0-6)^2 + (3-6)^2 + (6-6)^2 + (9-6)^2 + (12-6)^2)
+        #            = 30 * (36+9+0+9+36) = 30*90 = 2700
+        # SS_within ≈ 150-5 = 145 (每组方差≈30)
+        # MS_within ≈ 145/145 ≈ 1.0
+        # ω² = (2700 - 4*1.0) / (2700+145 + 1.0) ≈ 2696/2846 ≈ 0.947
+        assert w2 > 0.9, f"5 strongly separated groups should yield omega² > 0.9, got {w2}"
+
+        # 5组无差异: 全部N(0,1)
+        np.random.seed(42)
+        groups_null = [np.random.normal(0, 1, 30) for i in range(5)]
+        w2_null = omega_squared(groups_null)
+        assert w2_null < 0.05, f"5 identical groups should yield omega² ≈ 0, got {w2_null}"
+
 
 class TestCohensF:
     """Cohen's f 测试"""
@@ -264,3 +306,33 @@ class TestNNT:
             nnt_from_or(0.5, 0.0)
         with pytest.raises(ValueError):
             nnt_from_or(0.5, 1.0)
+
+    def test_nnt_from_or_boundary(self):
+        """边界条件: OR极值和CER极值下NNT计算正确"""
+        # OR极小(0.01), CER=0.5 → EER接近0, NNT很小
+        # odds_cer = 0.5/0.5 = 1.0, odds_eer = 1.0*0.01 = 0.01
+        # EER = 0.01/1.01 ≈ 0.0099, ARR = |0.0099 - 0.5| = 0.4901
+        # NNT = 1/0.4901 ≈ 2.04
+        nnt = nnt_from_or(0.01, 0.5)
+        assert 2.0 < nnt < 2.1, f"OR=0.01, CER=0.5: expected NNT ~2.04, got {nnt}"
+
+        # OR极大(100), CER=0.5 → EER接近1, NNT同样很小
+        # odds_cer = 1.0, odds_eer = 100.0
+        # EER = 100/101 ≈ 0.9901, ARR = 0.9901 - 0.5 = 0.4901
+        # NNT = 1/0.4901 ≈ 2.04
+        nnt = nnt_from_or(100.0, 0.5)
+        assert 2.0 < nnt < 2.1, f"OR=100, CER=0.5: expected NNT ~2.04, got {nnt}"
+
+        # CER接近0(0.01), OR=2.0 → 正常计算
+        # odds_cer = 0.01/0.99 ≈ 0.01010, odds_eer = 0.01010*2 = 0.02020
+        # EER = 0.02020/1.02020 ≈ 0.01980, ARR = 0.01980 - 0.01 = 0.00980
+        # NNT = 1/0.00980 ≈ 102
+        nnt = nnt_from_or(2.0, 0.01)
+        assert 100 < nnt < 105, f"OR=2.0, CER=0.01: expected NNT ~102, got {nnt}"
+
+        # CER接近1(0.99), OR=2.0 → 正常计算
+        # odds_cer = 0.99/0.01 = 99, odds_eer = 99*2 = 198
+        # EER = 198/199 ≈ 0.99497, ARR = 0.99497 - 0.99 = 0.00497
+        # NNT = 1/0.00497 ≈ 201
+        nnt = nnt_from_or(2.0, 0.99)
+        assert 199 < nnt < 203, f"OR=2.0, CER=0.99: expected NNT ~201, got {nnt}"
