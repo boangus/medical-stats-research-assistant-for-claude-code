@@ -111,6 +111,39 @@ class TestOmegaSquared:
         # ω² 通常 ≤ η²
         assert omega2 <= eta2 + 0.01
 
+    def test_known_values(self):
+        """D037修复验证: omega_squared公式正确性"""
+        # 手动计算验证: 3组, 每组5个样本
+        g1 = np.array([1, 2, 3, 4, 5])
+        g2 = np.array([6, 7, 8, 9, 10])
+        g3 = np.array([11, 12, 13, 14, 15])
+
+        # 手工计算
+        all_data = np.concatenate([g1, g2, g3])
+        grand_mean = np.mean(all_data)  # 8.0
+        k = 3
+        n = 15
+
+        ss_between = 5 * (3 - 8)**2 + 5 * (8 - 8)**2 + 5 * (13 - 8)**2  # 125 + 0 + 125 = 250
+        ss_within = 2 * 5  # 每组方差和 = 10, 3组 = 30... 实际: sum((g-mean(g))^2)
+        # g1: (1-3)^2+(2-3)^2+(3-3)^2+(4-3)^2+(5-3)^2 = 4+1+0+1+4 = 10
+        # g2: 同理 = 10, g3: 同理 = 10, ss_within = 30
+        ss_within = 30
+        ss_total = 250 + 30  # 280
+        ms_within = 30 / (15 - 3)  # 2.5
+
+        expected = (250 - 2 * 2.5) / (280 + 2.5)  # 245 / 282.5 ≈ 0.867
+
+        result = omega_squared([g1, g2, g3])
+        assert abs(result - expected) < 0.001, f"Expected {expected:.4f}, got {result:.4f}"
+
+    def test_negative_returns_zero(self):
+        """当效应极小时ω²应返回0(max(0, ...))"""
+        # 所有组相同 → SS_between = 0 → ω²可能为负 → 应返回0
+        g = np.array([1, 2, 3, 4, 5])
+        result = omega_squared([g, g, g])
+        assert result == 0.0
+
 
 class TestCohensF:
     """Cohen's f 测试"""
@@ -208,3 +241,26 @@ class TestNNT:
         nnt = nnt_from_or(2.0, 0.2)
         assert nnt > 0
         assert isinstance(nnt, float)
+
+    def test_nnt_from_or_known_values(self):
+        """D002修复验证: OR→ARR转换使用正确公式"""
+        # OR=0.5, CER=20%: EER = (0.2/0.8 * 0.5) / (1 + 0.2/0.8 * 0.5) = 0.125/1.125 ≈ 11.1%
+        # ARR = 11.1% - 20% = -8.9%, NNT = 1/0.089 ≈ 11.2
+        nnt = nnt_from_or(0.5, 0.20)
+        assert abs(nnt - 11.2) < 0.5, f"Expected ~11.2, got {nnt}"
+
+        # OR=2.0, CER=20%: EER = (0.2/0.8 * 2) / (1 + 0.2/0.8 * 2) = 0.5/1.5 ≈ 33.3%
+        # ARR = 33.3% - 20% = 13.3%, NNT = 1/0.133 ≈ 7.5
+        nnt = nnt_from_or(2.0, 0.20)
+        assert abs(nnt - 7.5) < 0.5, f"Expected ~7.5, got {nnt}"
+
+        # OR=1.0 应返回 inf (无效果)
+        nnt = nnt_from_or(1.0, 0.20)
+        assert nnt == float('inf')
+
+    def test_nnt_from_or_invalid_cer(self):
+        """D002: CER超出范围应抛出异常"""
+        with pytest.raises(ValueError):
+            nnt_from_or(0.5, 0.0)
+        with pytest.raises(ValueError):
+            nnt_from_or(0.5, 1.0)

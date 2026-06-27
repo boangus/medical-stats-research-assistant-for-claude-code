@@ -142,10 +142,12 @@ def omega_squared(
 
     ss_between = sum(len(g) * (np.mean(g) - grand_mean) ** 2 for g in groups)
     ss_within = sum(np.sum((g - np.mean(g)) ** 2) for g in groups)
+    ss_total = ss_between + ss_within  # 真实的总平方和
     ms_within = ss_within / (n - k)
 
+    # ω² = (SS_between - df_between × MS_within) / (SS_total + MS_within)
     numerator = ss_between - (k - 1) * ms_within
-    denominator = ss_total = ss_between + ss_within + ms_within
+    denominator = ss_total + ms_within
 
     return max(0, numerator / denominator) if denominator > 0 else 0.0
 
@@ -405,22 +407,40 @@ def nnt_from_or(
 ) -> float:
     """从 OR 和对照组事件率计算 NNT
 
+    使用正确的 OR → 概率转换公式:
+        odds_cer = CER / (1 - CER)
+        odds_eer = odds_cer * OR
+        EER = odds_eer / (1 + odds_eer)
+        ARR = EER - CER
+        NNT = 1 / |ARR|
+
     Parameters
     ----------
     or_val : float
-        比值比
+        比值比 (odds ratio)
     control_event_rate : float
-        对照组事件率 (CER)
+        对照组事件率 (CER), 范围 0-1
 
     Returns
     -------
     float
         NNT 值
+
+    Examples
+    --------
+    >>> nnt_from_or(0.5, 0.20)  # OR=0.5, CER=20%
+    11.2  # 正确: EER≈11.1%, ARR≈8.9%, NNT≈11.2
     """
     cer = control_event_rate
-    # OR → ARR
-    cer_or = cer * or_val
-    arr = cer_or - cer
+    if cer <= 0 or cer >= 1:
+        raise ValueError(f"CER must be between 0 and 1, got {cer}")
+
+    # 正确的 OR → 概率转换
+    odds_cer = cer / (1 - cer)
+    odds_eer = odds_cer * or_val
+    eer = odds_eer / (1 + odds_eer)
+    arr = eer - cer
+
     if arr == 0:
         return float('inf')
     return abs(1 / arr)
