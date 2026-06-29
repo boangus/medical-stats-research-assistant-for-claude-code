@@ -9,6 +9,7 @@ from .exceptions import (
     SDTMParseError,
     SDTMValidationError,
 )
+from .sdtm import SDTMReader
 
 __version__ = "0.1.0"
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "SDTMParseError",
     "SDTMValidationError",
     "ADaMNotFoundError",
+    "SDTMReader",
 ]
