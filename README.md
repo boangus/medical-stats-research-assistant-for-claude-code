@@ -6,25 +6,25 @@
 <h3 align="center">从原始数据到可投稿论文 — 一条命令，完整流水线</h3>
 
 <p align="center">
-  <a href="https://github.com/boangus/medical-stats-research-assistant-for-claude-code/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/version-v1.0.0-blue" alt="Version"></a>
-  <a href="https://github.com/boangus/medical-stats-research-assistant-for-claude-code/actions"><img src="https://img.shields.io/badge/tests-319%20passed-brightgreen" alt="Tests"></a>
+  <a href="https://github.com/boangus/medical-stats-research-assistant-for-claude-code/releases/tag/v1.1.0"><img src="https://img.shields.io/badge/version-v1.1.0-blue" alt="Version"></a>
+  <a href="https://github.com/boangus/medical-stats-research-assistant-for-claude-code/actions"><img src="https://img.shields.io/badge/tests-1152%20passed-brightgreen" alt="Tests"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT%20%2B%20CC--BY--NC--SA-lightgrey" alt="License"></a>
   <a href="https://github.com/boangus/medical-stats-research-assistant-for-claude-code"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20Mac%20%7C%20Linux-blueviolet" alt="Platform"></a>
 </p>
 
 <p align="center">
-  <b>Claude Code 插件</b> · <b>13 个 Skill</b> · <b>16 个命令</b> · <b>5 个质量门闸</b> · <b>4 个扩展模块</b>
+  <b>Claude Code 插件</b> · <b>14 个 Skill</b> · <b>17 个命令</b> · <b>5 个质量门闸</b> · <b>4 个扩展模块</b> · <b>数据互操作（FHIR/CDISC/OMOP）</b>
 </p>
 
 ---
 
 ## 为什么选择 MSRA？
 
-🔬 **完整流水线，一条命令** — 数据准备 → 统计分析 → 报告生成 → 论文写作 → 同行评审，16 个斜杠命令覆盖全链路。输入 `/msra`，从原始数据走到可投稿论文。
+🔬 **完整流水线，一条命令** — 数据准备 → 统计分析 → 报告生成 → 论文写作 → 同行评审，17 个斜杠命令覆盖全链路。输入 `/msra`，从原始数据走到可投稿论文。
 
 🛡️ **质量门闸，阻断式检查** — 5 道质量关卡（数据/SAP/结果/审前/最终），每道都有清单式检查，不通过就退回修订。分析可重复，偏差有记录。
 
-🧬 **超越统计，多模态覆盖** — 4 个扩展模块（生物信息学、医学影像、实时分析、跨领域融合），从单细胞测序到放射组学。R + Python 双语言，319 个测试全通过。
+🧬 **超越统计，多模态覆盖** — 4 个扩展模块（生物信息学、医学影像、实时分析、跨领域融合），从单细胞测序到放射组学。R + Python 双语言，1152 个测试全通过。
 
 🔒 **本地处理，数据不出本机** — 所有分析在本地完成，不上传任何数据。内置 HIPAA Safe Harbor 标识符检测。
 
@@ -185,7 +185,7 @@ chmod +x install.sh
 - **Pipeline 驱动** — 编排器只负责检测、调度、追踪，不做实质性分析。从任意阶段切入，自动识别当前进度。
 - **人机回环** — 清洗策略需批准，方法共同探讨，SAP 独立审查。任何偏差都有记录。
 - **可重复性** — 每步生成可重复代码，严格按 SAP 执行，产物通过 Material Passport 追踪。
-- **自包含性** — 9 个 Skill 全部内置，资源本地存储，Windows/Mac/Linux 跨平台。
+- **自包含性** — 14 个 Skill 全部内置，资源本地存储，Windows/Mac/Linux 跨平台。
 
 ---
 
@@ -193,16 +193,19 @@ chmod +x install.sh
 
 ```
 medical-stats-research-assistant/
-├── skills/            # 13 个内置 Skill
-├── commands/          # 16 个命令定义
+├── skills/            # 14 个内置 Skill
+├── commands/          # 17 个命令定义
 ├── agents/            # 5 个 Agent 角色
-├── shared/            # 共享资源（模板、指南、Schema）
+├── shared/            # 共享资源（模板、指南、Schema、互操作模块）
 │   ├── statistics-methods/    # 统计方法指南（56 章）
 │   ├── reporting-guidelines/  # 报告规范清单（21 个）
 │   ├── risk-of-bias/          # 偏倚评估工具（5 个）
-│   └── journal-templates/     # 期刊模板（15 个）
-├── msra_modules/      # 4 个扩展模块
-├── tests/             # 测试套件（319 tests）
+│   ├── journal-templates/     # 期刊模板（15 个）
+│   ├── terminology/           # ICD-10-CM 编码引擎（离线字典+模糊匹配）
+│   ├── metadata_catalog/      # 变量级血缘+循环检测
+│   └── report_assembler/      # 数据血缘 Mermaid 可视化
+├── msra_modules/      # 4 个扩展模块 + 数据互操作栈（fhir/cdisc/omop/ehr/etl/fhir_server）
+├── tests/             # 测试套件（1152 tests）
 ├── docs/              # 文档（用户教程 + API 参考）
 ├── install.ps1        # Windows 安装脚本
 └── install.sh         # Mac/Linux 安装脚本

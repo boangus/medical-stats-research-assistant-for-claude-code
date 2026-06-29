@@ -194,6 +194,18 @@
         "/msra-status --verbose",
         "/msra-status --json"
       ]
+    },
+    "/msra-method": {
+      "id": "msra-method-selector",
+      "name": "Statistical Method Selector",
+      "entry_point": "skills/stat-method-selector/SKILL.md",
+      "description": "Help users choose the most appropriate statistical method via a decision tree built on 53 published methodological papers (112 leaf methods, 15 goals). Supports questionnaire-style and natural-language input.",
+      "usage": "/msra-method [描述] [--mode questionnaire|nl]",
+      "examples": [
+        "/msra-method 我想比较两组连续变量的差异",
+        "/msra-method --mode questionnaire",
+        "/msra-method 生存分析 三组 不同分布"
+      ]
     }
   },
   "tags": ["medical-statistics", "biostatistics", "pipeline", "clinical-research", "academic-writing", "paper-review"],

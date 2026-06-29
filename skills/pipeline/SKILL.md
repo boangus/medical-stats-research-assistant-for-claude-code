@@ -1,12 +1,13 @@
 ---
-version: "1.0.0"
+version: "1.1.0"
 name: MSRA Pipeline
 description: |
   医学统计分析流水线编排器。从任意阶段切入，自动识别当前位置，
   引导完成后续所有流程。纯调度架构——不做实质性工作，只负责检测、
   选择、调度、转换和追踪。
-  输出: 7阶段完整流水线 + 3个阻断式门闸 + 最终报告(figures/*.png + tables/*.docx + HTML+MD)。
-  触发: /msra / 流水线 / pipeline / 数据分析流程 / 统计流程 / 完整流程 / 从头开始 / 数据清洗 / 统计分析 / 分析报告 / 结果解读 / 统计咨询 / orchestrator / 编排 / 调度 / 质量门闸
+  v1.1.0 新增: Phase 0 数据互操作层（FHIR/OMOP/OpenMRS/OpenEHR/SDTM-XPT/ETL 接入 + ICD-10 编码 + 元数据目录 + 数据血缘 Mermaid 可视化）。
+  输出: 8阶段完整流水线 (Phase 0 互操作 + Stage 1-4 + Stage 5-6) + 3个阻断式门闸 + 最终报告(figures/*.png + tables/*.docx + HTML+MD)。
+  触发: /msra / 流水线 / pipeline / 数据分析流程 / 统计流程 / 完整流程 / 从头开始 / 数据清洗 / 统计分析 / 分析报告 / 结果解读 / 统计咨询 / orchestrator / 编排 / 调度 / 质量门闸 / FHIR / OMOP / OpenMRS / OpenEHR / SDTM / XPT / ETL / 外部数据源接入 / ICD-10
 data_access_level: redacted
 task_type: open-ended
 depends_on: [data-prep, analysis-plan, analysis-exec, report]
@@ -24,6 +25,20 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 ## 1. Pipeline Stages
 
 ```
+外部数据源 (FHIR/OMOP/OpenMRS/OpenEHR/SDTM-XPT/ETL)
+   │
+   ▼
+┌──────────────────────────────────────────────────────────────┐
+│  Phase 0: DATA INTEROP  (/msra-data, 互操作层入口)              │
+│  FHIR Bundle 解析 → OMOP 表映射 → EHR 连接器 (OpenMRS/OpenEHR)  │
+│  → SDTM XPT 读取 → ETL 批量导入 → ICD-10 编码                  │
+│  → metadata_catalog 变量注册 → 数据血缘 Mermaid 可视化          │
+│  产物 (OPTIONAL_ARTIFACTS): fhir_bundle_parsed /                │
+│      omop_tables_exported / sdtm_domains_parsed /              │
+│      ehr_records_extracted / metadata_catalog_registered        │
+│  Passport: stage_0_interop (非阻断，仅追踪存在性)               │
+└────────────────────────────┬─────────────────────────────────┘
+                             ▼
 原始数据 → 研究类型识别（RCT / 观察性）
    │
    ▼
@@ -86,6 +101,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 | 用户信号 | 检测规则 | 入口阶段 | 前置条件 |
 |---------|---------|---------|---------|
+| "FHIR"/"OMOP"/"OpenMRS"/"OpenEHR"/"SDTM"/"XPT"/"ETL"/"外部数据源" | 互操作关键词匹配 | **Phase 0** | 无 |
 | "我有原始数据" / 提供数据文件 | 有数据文件路径 | **Stage 1** | 无 |
 | "数据已经清洗好了" / 提供清洗后数据 | 声明已清洗 | **Stage 2** | 需确认 Stage 1.5 门闸通过 |
 | "我想讨论统计方法" / "该用什么方法" | 方法咨询意图 | **Stage 2** | 需确认 Stage 1.5 门闸通过 |
@@ -377,6 +393,10 @@ Pipeline Orchestrator
 | `/msra --calibrate-status` | 查看当前校准状态 ⚠️ 实验性 | - |
 | `/msra --calibrate-update <results.csv>` | 增量更新校准 ⚠️ 实验性 | - |
 | `/msra --resume` | 从上次中断处恢复（读取 Passport） | 智能检测 |
+| `/msra-method` | 统计方法选择决策树（112 叶子方法，53 篇文献依据） | 互操作/独立 |
+| `/msra-data --source fhir <endpoint>` | FHIR Bundle 解析 → 本地 CSV | Phase 0 |
+| `/msra-data --source omop <db>` | OMOP 表映射 → 本地 CSV | Phase 0 |
+| `/msra-data --source sdtm <xpt>` | SDTM XPT 读取 → 本地 CSV | Phase 0 |
 
 ---
 

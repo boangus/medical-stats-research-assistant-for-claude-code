@@ -8,7 +8,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Any, Dict, List, Optional
+import json
 
 
 class VariableType(str, Enum):
@@ -71,10 +73,6 @@ class MetadataEntry:
             "notes": self.notes,
         }
 
-
-import json
-from dataclasses import dataclass, field
-from pathlib import Path
 
 from .exceptions import (
     InvalidLineageError,

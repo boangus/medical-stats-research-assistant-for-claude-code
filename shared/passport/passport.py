@@ -37,12 +37,13 @@ DEFAULT_ARTIFACT_TEMPLATE = {
 }
 
 STAGE_ORDER = [
-    "stage_1", "stage_1.5", "stage_2", "stage_2.5",
+    "stage_0_interop", "stage_1", "stage_1.5", "stage_2", "stage_2.5",
     "stage_3", "stage_3.5", "stage_3.7", "stage_4",
     "stage_5_0_intake", "stage_5_paper",
 ]
 
 STAGE_PREREQUISITES = {
+    "stage_0_interop": [],  # 🆕 Sprint A/C: 互操作层入口（FHIR/OMOP/SDTM/EHR 接入），无前置
     "stage_1":      [],  # 入口阶段无需前置
     "stage_1.5":    ["cleaned_data", "cleaning_log", "variable_list", "blinding_review", "db_lock_record"],
     "stage_2":      ["cleaned_data", "db_lock_record", "gate_stage_1.5"],  # 🔒 db_lock_record: 先质检后锁库强制
@@ -70,6 +71,7 @@ MID_ENTRY_ARTIFACTS = {
 # - sap_amendment: SAP 修正记录（优化#7，累积追踪，最多3次）
 # - multi_dataset_mode / cross_site_consistency: 多数据集支持（优化#8）
 OPTIONAL_ARTIFACTS = {
+    "stage_0_interop": ["fhir_bundle_parsed", "omop_tables_exported", "sdtm_domains_parsed", "ehr_records_extracted", "metadata_catalog_registered"],  # 🆕 Sprint A/C: 数据互操作产物（FHIR/OMOP/SDTM/EHR/元数据目录），非阻断仅追踪
     "stage_1":      ["data_profile"],  # 优化#1: 数据画像（Quick Profile）
     "stage_2":      ["literature_seeds"],  # 优化#2: 文献种子（Lit-Seeding）
     "stage_3":      ["sap_amendment"],  # 优化#7: SAP 修正记录（累积，最多3次）

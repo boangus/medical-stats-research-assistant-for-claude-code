@@ -138,7 +138,9 @@ class TestStageConstants:
         assert "stage_5_0_intake" in STAGE_ORDER
         assert "stage_5_paper" in STAGE_ORDER
         assert "stage_3.7" in STAGE_ORDER  # 🆕 Sprint A
-        assert len(STAGE_ORDER) == 10  # 🆕 Sprint A: 增加 stage_3.7
+        assert "stage_0_interop" in STAGE_ORDER  # 🆕 Sprint A/C: 数据互操作层
+        assert STAGE_ORDER.index("stage_0_interop") == 0  # 互操作层在最前
+        assert len(STAGE_ORDER) == 11  # 🆕 Sprint A/C: stage_3.7 + stage_0_interop
 
     def test_stage_order_sequence(self):
         """🆕 Sprint A: stage_3.7 位于 stage_3.5 和 stage_4 之间"""
@@ -146,6 +148,23 @@ class TestStageConstants:
         idx_37 = STAGE_ORDER.index("stage_3.7")
         idx_4 = STAGE_ORDER.index("stage_4")
         assert idx_35 < idx_37 < idx_4
+
+    def test_stage_0_interop_sequence(self):
+        """🆕 Sprint A/C: stage_0_interop 位于 stage_1 之前"""
+        assert STAGE_ORDER.index("stage_0_interop") < STAGE_ORDER.index("stage_1")
+
+    def test_stage_0_interop_prerequisites(self):
+        """🆕 Sprint A/C: stage_0_interop 无前置（入口阶段）"""
+        assert STAGE_PREREQUISITES["stage_0_interop"] == []
+
+    def test_stage_0_interop_optional_artifacts(self):
+        """🆕 Sprint A/C: stage_0_interop 可选产物"""
+        artifacts = OPTIONAL_ARTIFACTS["stage_0_interop"]
+        assert "fhir_bundle_parsed" in artifacts
+        assert "omop_tables_exported" in artifacts
+        assert "sdtm_domains_parsed" in artifacts
+        assert "ehr_records_extracted" in artifacts
+        assert "metadata_catalog_registered" in artifacts
 
     def test_prerequisites(self):
         assert STAGE_PREREQUISITES["stage_1"] == []
