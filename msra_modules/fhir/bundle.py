@@ -45,10 +45,12 @@ class FHIRBundle:
     Attributes:
         bundle_type: Bundle 类型（searchset/batch/transaction/...）
         entries: Bundle entry 列表（每个 entry 含 resource + fullUrl）
+        total: 搜索结果总数（仅 searchset，FHIR R4 标准字段，可选）
     """
 
     bundle_type: str
     entries: List[Dict[str, Any]] = field(default_factory=list)
+    total: Optional[int] = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "FHIRBundle":
@@ -77,7 +79,15 @@ class FHIRBundle:
         # 过滤掉没有 resource 的 entry
         valid_entries = [e for e in entries if isinstance(e, dict) and "resource" in e]
 
-        return cls(bundle_type=bundle_type, entries=valid_entries)
+        # total 是 FHIR R4 searchset 的可选字段
+        total = data.get("total")
+        if total is not None and not isinstance(total, int):
+            try:
+                total = int(total)
+            except (TypeError, ValueError):
+                total = None
+
+        return cls(bundle_type=bundle_type, entries=valid_entries, total=total)
 
     @classmethod
     def from_json(cls, json_str: str) -> "FHIRBundle":
