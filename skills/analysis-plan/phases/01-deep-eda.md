@@ -1,7 +1,7 @@
 # Phase 1: 深度 EDA（方法选择用）
 
-> 参考：shared/statistics-methods/methods_catalog.md EDA 方法速查
-> 参考：shared/statistics-methods/chapters/ch12-missing-data.md 缺失数据模式分析 (统计指南)
+> 参考：resources/statistics-methods/methods_catalog.md EDA 方法速查
+> 参考：resources/statistics-methods/chapters/ch12-missing-data.md 缺失数据模式分析 (统计指南)
 > **Stage 1 EDA（数据质量）的区别**: Stage 1 EDA 用于在锁定前发现数据质量问题；此EDA 在锁定后执行，使用最终清洗数据为方法选择服务
 
 在讨论统计方法之前，先对锁定后的最终数据集进行全面 EDA。结果直接决定方法选择。
@@ -46,7 +46,7 @@
 ## Step 1.5: 文献种子检索（可选，SLIM）
 
 > 目的：为统计计划提供方法选择的实证依据。这不是完整文献综述，而是快速检查3-5 篇核心参考文献。
-> 参考：shared/statistics-methods/lit_seeding_guide.md 文献种子检索策略指南
+> 参考：resources/statistics-methods/lit_seeding_guide.md 文献种子检索策略指南
 
 **输入**：研究问题 + 研究类型
 

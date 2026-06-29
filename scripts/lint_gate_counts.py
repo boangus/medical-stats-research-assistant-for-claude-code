@@ -202,7 +202,7 @@ def check_pipeline_flowchart(
 
 def main() -> int:
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    gates_dir = os.path.join(repo_root, "shared", "quality_gates")
+    gates_dir = os.path.join(repo_root, "src", "shared", "quality_gates")
     default_pipeline = os.path.join(repo_root, "skills", "pipeline", "SKILL.md")
 
     # Allow optional pipeline path arg for ad-hoc testing

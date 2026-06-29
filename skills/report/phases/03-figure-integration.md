@@ -2,15 +2,15 @@
 
 > 来源：从 SKILL.md L520-680 抽取。
 > 优先复用 analysis-exec Phase 5 已生成的发表级图表；仅当 analysis-exec 未生成所需图表时，才在本阶段补充生成。
-> 自动加载 shared/templates/ 中的 R/Python 模板，传入分析数据执行并保存。
-> **发表级标准**：遵循 shared/chart-styles/publication_figure_standards.md
-> **首选模板**：shared/templates/publication_figure_template.py（含 nature-figure 标准 rcParams、调色板、辅助函数）
-> **变量命名**：遵循 shared/chart-styles/variable_naming_conventions.md（规范显示名+单位）
+> 自动加载 src/shared/templates/ 中的 R/Python 模板，传入分析数据执行并保存。
+> **发表级标准**：遵循 resources/chart-styles/publication_figure_standards.md
+> **首选模板**：src/shared/templates/publication_figure_template.py（含 nature-figure 标准 rcParams、调色板、辅助函数）
+> **变量命名**：遵循 resources/chart-styles/variable_naming_conventions.md（规范显示名+单位）
 > **P值格式**：遵循 statistical_constraints.md P-R01~R07（P<0.001 展示为 "P < 0.001"）
 
 **Step 3.1: 分析类型 → 图类型映射**
 
-> 完整图表类型清单见：shared/references/academic_figure_table_types.md
+> 完整图表类型清单见：resources/references/academic_figure_table_types.md
 
 根据分析结果自动确定需要哪些图表：
 
@@ -39,13 +39,13 @@
 
 **Step 3.2: 加载模板**
 
-从 `shared/templates/` 读取对应模板文件。优先使用 Python 模板（环境一致性高）。
+从 `src/shared/templates/` 读取对应模板文件。优先使用 Python 模板（环境一致性高）。
 如果该图表仅有 R 模板（如校准曲线），直接使用 R。
 
 ```
 模板选择规则:
-  1. 首选 Python 模板 (shared/templates/*.py)
-  2. 若 Python 模板不存在，使用 R 模板 (shared/templates/*.R)
+  1. 首选 Python 模板 (src/shared/templates/*.py)
+  2. 若 Python 模板不存在，使用 R 模板 (src/shared/templates/*.R)
   3. 若 Python 模板存在但执行失败 → 降级到 R 模板重试（最多1次）
      → 若 R 模板也失败 → 输出: "[ERROR] 全部模板执行失败。请检查环境和依赖后重试"
      → 打印具体错误信息
@@ -79,7 +79,7 @@ result = subprocess.run(
 
 # 或直接调用 publication_figure_template.py 中的函数
 import sys
-sys.path.insert(0, "shared/templates")
+sys.path.insert(0, "src/shared/templates")
 from publication_figure_template import (
     apply_publication_style, make_forest_plot, export_figure, format_p_value
 )
@@ -105,21 +105,21 @@ result <- system2(
 **Step 3.4: 调用模板生成图表**
 
 ```bash
-# Python 森林图 — 完整 API 见 shared/templates/forest_plot_template.py
-python shared/templates/forest_plot_template.py \
+# Python 森林图 — 完整 API 见 src/shared/templates/forest_plot_template.py
+python src/shared/templates/forest_plot_template.py \
   --data results/forest_data.csv \
   --output reports/figures/figure1_forest.png \
   --title "图1 多因素Logistic回归森林图" \
   --dpi 300
 
-# R KM 曲线 — 完整 API 见 shared/templates/survival_ggsurvfit.R
-Rscript shared/templates/survival_ggsurvfit.R \
+# R KM 曲线 — 完整 API 见 src/shared/templates/survival_ggsurvfit.R
+Rscript src/shared/templates/survival_ggsurvfit.R \
   --data results/survival_data.csv \
   --output reports/figures/figure2_km_curve.png \
   --title "图2 Kaplan-Meier生存曲线"
 
-# Python ROC 曲线 — 完整 API 见 shared/templates/roc_template.py
-python shared/templates/roc_template.py \
+# Python ROC 曲线 — 完整 API 见 src/shared/templates/roc_template.py
+python src/shared/templates/roc_template.py \
   --y-true results/y_test.csv \
   --y-score results/y_pred.csv \
   --output reports/figures/figure3_roc.png \
@@ -127,10 +127,10 @@ python shared/templates/roc_template.py \
 ```
 
 > 完整代码示例（含自定义样式、中文字体、参数详解）见各模板文件：
-> - `shared/templates/forest_plot_template.py`
-> - `shared/templates/survival_ggsurvfit.R`
-> - `shared/templates/roc_template.py`
-> - `shared/templates/bland_altman_template.py`
+> - `src/shared/templates/forest_plot_template.py`
+> - `src/shared/templates/survival_ggsurvfit.R`
+> - `src/shared/templates/roc_template.py`
+> - `src/shared/templates/bland_altman_template.py`
 
 **Step 3.5: 异常处理**
 

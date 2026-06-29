@@ -19,7 +19,7 @@ class TestEnhancedDeliverables:
 
     def test_academic_figure_table_types_document_exists(self):
         """测试学术图表类型文档是否存在"""
-        doc_path = Path(__file__).parent.parent / "shared" / "references" / "academic_figure_table_types.md"
+        doc_path = Path(__file__).parent.parent / "resources" / "references" / "academic_figure_table_types.md"
         assert doc_path.exists(), "学术图表类型文档不存在"
 
         # 检查文档内容
@@ -63,7 +63,7 @@ class TestEnhancedDeliverables:
             "后验分布", "先验敏感性", "轨迹图",
         ]
 
-        doc_path = Path(__file__).parent.parent / "shared" / "references" / "academic_figure_table_types.md"
+        doc_path = Path(__file__).parent.parent / "resources" / "references" / "academic_figure_table_types.md"
         with open(doc_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
@@ -79,7 +79,7 @@ class TestEnhancedDeliverables:
             "AE汇总表", "SAE详情表", "实验室异常表",
         ]
 
-        doc_path = Path(__file__).parent.parent / "shared" / "references" / "academic_figure_table_types.md"
+        doc_path = Path(__file__).parent.parent / "resources" / "references" / "academic_figure_table_types.md"
         with open(doc_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
@@ -123,7 +123,7 @@ class TestEnhancedDeliverables:
             "局限性讨论",
         ]
 
-        doc_path = Path(__file__).parent.parent / "shared" / "references" / "academic_figure_table_types.md"
+        doc_path = Path(__file__).parent.parent / "resources" / "references" / "academic_figure_table_types.md"
         with open(doc_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
@@ -141,7 +141,7 @@ class TestEnhancedDeliverables:
 
     def test_template_files_existence(self):
         """测试模板文件是否存在"""
-        template_dir = Path(__file__).parent.parent / "shared" / "templates"
+        template_dir = Path(__file__).parent.parent / "src" / "shared" / "templates"
 
         # 关键模板文件
         key_templates = [
@@ -207,7 +207,7 @@ class TestEnhancedDeliverables:
             "ICMJE",
         ]
 
-        doc_path = Path(__file__).parent.parent / "shared" / "references" / "academic_figure_table_types.md"
+        doc_path = Path(__file__).parent.parent / "resources" / "references" / "academic_figure_table_types.md"
         with open(doc_path, 'r', encoding='utf-8') as f:
             content = f.read()
 

@@ -39,7 +39,7 @@
 ## 参考资源
 - `references/ethics_review_standards.md` — 伦理审查标准 + ICMJE 伦理要求
 - `references/icmje_recommendations.md` — ICMJE 推荐标准（伦理相关章节）
-- `shared/references/irb_terminology_glossary.md` — 医学研究伦理术语表
+- `resources/references/irb_terminology_glossary.md` — 医学研究伦理术语表
 
 ## 约束
 - 遵循 IR4：缺少 IRB / 知情同意 / 利益冲突声明中任何一项 = CRITICAL 级别

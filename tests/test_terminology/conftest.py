@@ -15,6 +15,7 @@ def sample_data_path() -> Path:
     """样本 ICD-10-CM CSV 路径"""
     return (
         _project_root
+        / "src"
         / "shared"
         / "terminology"
         / "data"

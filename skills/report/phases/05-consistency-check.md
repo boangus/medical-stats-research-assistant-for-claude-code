@@ -7,7 +7,7 @@
 
 **Step 5a: 统计一致性校验 (statcheck)** 🆕
 
-> 参考：shared/reporting-guidelines/statcheck_rules.md — NHST 结果一致性自动校验规则
+> 参考：src/shared/reporting-guidelines/statcheck_rules.md — NHST 结果一致性自动校验规则
 
 从 Phase 1（结果解读）、Phase 2（表格）、Phase 4（方法学）抽取所有 NHST 结果（t/F/χ²/r/z + df + 报告 p），独立重算 p 值并比对：
 
@@ -16,20 +16,20 @@
 3. **判定**: 绝对误差 <0.001 → ✅；0.001–0.01 → ⚠️ 边界；≥0.01 → ❌；跨 0.05 阈值 → ❌❌ 严重
 4. **降级**: scipy 不可用时降级为格式抽取+明显矛盾检测（如 `p<.001` 但 stat 极小）
 
-> 详细正则模式、重算公式、误报缓解见 `shared/reporting-guidelines/statcheck_rules.md`。
+> 详细正则模式、重算公式、误报缓解见 `src/shared/reporting-guidelines/statcheck_rules.md`。
 
 **Step 5b: 统计反模式检查**（保留）
 
-> 参考：shared/anti-patterns/medical_stats_anti_patterns.md（D1/D2/D3/M1-M6）
+> 参考：resources/anti-patterns/medical_stats_anti_patterns.md（D1/D2/D3/M1-M6）
 
 **Step 5c: quality_checklist 统计维度**（保留统计相关维度）
 
-> 参考：shared/reporting-guidelines/quality_checklist.md
+> 参考：src/shared/reporting-guidelines/quality_checklist.md
 > 仅检查：统计方法维度 + 结果报告维度（其余维度移至 Paper Track）
 
 **Step 5d: 统计约束合规检查** 🆕
 
-> 参考：shared/statistics-methods/statistical_constraints.md — 统计约束规则全文
+> 参考：resources/statistics-methods/statistical_constraints.md — 统计约束规则全文
 > 注：此检查由 analysis-exec Phase 4（质量检查）覆盖，本阶段仅做 report 层面的交叉验证。
 
 检查项：
@@ -44,7 +44,7 @@
 
 **Step 5e: 图表发表级质量检查** 🆕
 
-> 参考：shared/chart-styles/publication_figure_standards.md — 发表级图表标准
+> 参考：resources/chart-styles/publication_figure_standards.md — 发表级图表标准
 > 注：此检查由 analysis-exec Phase 4（质量检查）覆盖，本阶段仅做 report 层面的交叉验证。
 
 检查项：
@@ -90,7 +90,7 @@
 
 **交付物清单**：
 
-> 完整图表类型清单见：shared/references/academic_figure_table_types.md
+> 完整图表类型清单见：resources/references/academic_figure_table_types.md
 
 **表格交付物**：
 

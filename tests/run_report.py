@@ -9,7 +9,7 @@ import pandas as pd
 
 BASE = Path(__file__).resolve().parent.parent
 FIGURES_DIR = BASE / "reports" / "figures"
-ASSEMBLER = BASE / "shared" / "report_assembler" / "render_report_html.py"
+ASSEMBLER = BASE / "src" / "shared" / "report_assembler" / "render_report_html.py"
 
 # ==============================
 # Stage 3.5: Results Quality Gate (动态检查)
@@ -114,7 +114,7 @@ forest_data = pd.DataFrame({
 forest_png = FIGURES_DIR / "forest_plot_logistic.png"
 try:
     # Import and run the forest plot template
-    sys.path.insert(0, str(BASE / "shared" / "templates"))
+    sys.path.insert(0, str(BASE / "src" / "shared" / "templates"))
     from forest_plot_template import create_forest_plot
 
     fig = create_forest_plot(

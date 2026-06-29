@@ -39,8 +39,8 @@
 ```
 ## 参考资源
 - `references/guideline_mapping.md` — 研究类型与报告规范清单映射表
-- `shared/reporting-guidelines/` — CONSORT / STROBE / PRISMA / STARD / TRIPOD+AI / CARE
-- `shared/risk-of-bias/` — RoB 2 / ROBINS-I / NOS / ROBIS 偏倚评估工具
+- `src/shared/reporting-guidelines/` — CONSORT / STROBE / PRISMA / STARD / TRIPOD+AI / CARE
+- `resources/risk-of-bias/` — RoB 2 / ROBINS-I / NOS / ROBIS 偏倚评估工具
 
 ## 约束
 - 遵循 IR2：必须加载对应研究类型的报告规范清单，逐项检查

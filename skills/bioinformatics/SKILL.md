@@ -30,7 +30,7 @@ tags: [bioinformatics, single-cell, RNA-seq, differential-expression, pathway-en
 > - 差异表达结果**必须**经过多重比较校正（padj），禁止仅使用原始 p 值
 > - Phase 2 子 Agent 任务**必须**可独立重跑，不依赖 Phase 1 的中间状态
 > - 通路富集**必须**注明物种和基因集库版本
-> - 参考：shared/quality_gates/ 的门闸框架，执行 Bio-1.5 和 Bio-3.5 阻断检查
+> - 参考：src/shared/quality_gates/ 的门闸框架，执行 Bio-1.5 和 Bio-3.5 阻断检查
 
 ## 架构集成图
 
@@ -81,7 +81,7 @@ tags: [bioinformatics, single-cell, RNA-seq, differential-expression, pathway-en
 1. 数据质量门闸 (Phase 1) 必须先于重计算 (Phase 2)
 2. Phase 2 的子 Agent 任务可独立重跑，不依赖 Phase 1 的中间状态
 3. 分析结果门闸 (Phase 3) 在重计算之后、用户确认之前执行
-4. 质量门闸复用 shared/quality_gates/ 框架
+4. 质量门闸复用 src/shared/quality_gates/ 框架
 
 ## 快速开始
 
@@ -284,5 +284,5 @@ Phase 4: 整合与报告 [ADAPTIVE] → 输入:用户确认 → 输出:报告 + 
 
 ## 扩展模块门闸（shared 框架）
 
-> 模块质量门闸定义参见：[shared/quality_gates/gate-bio.md](../../shared/quality_gates/gate-bio.md)
+> 模块质量门闸定义参见：[src/shared/quality_gates/gate-bio.md](../../src/shared/quality_gates/gate-bio.md)
 > 4 项检查，关键项为 1（数据完整性）、2（DE 结果验证）

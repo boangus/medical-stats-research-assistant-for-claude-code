@@ -124,7 +124,7 @@
 
 > **IRON RULE**: 协变量选择必须执行完整流程，不得跳步。52个变量的数据集
 > 应推荐 10-20 个协变量（取决于 EPV 约束），而非仅 3-4 个。
-> 参考：shared/sap/variable_selection_guide.md §5 DAG 引导的变量筛选路径
+> 参考：src/shared/sap/variable_selection_guide.md §5 DAG 引导的变量筛选路径
 
 **执行流程**（按顺序）：
 
@@ -177,7 +177,7 @@ CIE 确认混杂: [N]个（效应改变>10%）
 EPV 检查: 事件数/协变量数 = [比值] (需≥10，否则减少协变量或使用Firth校正)
 ```
 
-> 参考：shared/sap/sap_standard.md §7.5 变量选择推荐
+> 参考：src/shared/sap/sap_standard.md §7.5 变量选择推荐
 
 ### Step 1.5.5: 数据挖掘场景分析思路推荐
 

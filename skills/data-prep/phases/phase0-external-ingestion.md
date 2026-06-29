@@ -81,5 +81,5 @@ if result.success:
 **与后续 Phase 的衔接**：
 - 输出 CSV 进入 Phase 0.5（多数据集模式检测）
 - Phase 1 自动检测来源（CDISC / OMOP）并启用相应合规检查
-- Phase 1 ICD-10 编码可调用 `shared/terminology/ICD10Engine` 校验诊断码
-- Phase 7 元数据血缘可调用 `shared/metadata_catalog/MetadataRegistry` + `shared/report_assembler/LineageMermaid`
+- Phase 1 ICD-10 编码可调用 `src/shared/terminology/ICD10Engine` 校验诊断码
+- Phase 7 元数据血缘可调用 `src/shared/metadata_catalog/MetadataRegistry` + `src/shared/report_assembler/LineageMermaid`

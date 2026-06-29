@@ -61,7 +61,7 @@ tags: [medical-statistics, causal-inference, exploratory-analysis, DAG, confound
 > - 探索性分析必须在确证性分析之前完成，不能用同一数据同时做探索和确证（防 p-hacking）
 > - 所有探索性发现必须标注为"探索性"，与预定义分析明确区分
 > - 如果用户已知暴露/结局：**不要强行执行探索**——引导输入后直接跳转 Stage 2
-> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
+> - 参考：resources/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
 ---
 
 ## 因果推断框架 (Bradford Hill + Pearl SCM)
@@ -200,7 +200,7 @@ Phase 1 → 2 → 3 → 4 → 5
 ### Phase 1: 数据概览与变量分布
 
 > 目的：在执行因果发现之前，先理解数据结构和变量角色
-> 参考：shared/causal-inference/causal_inference_workflow.md §1.1-1.2
+> 参考：src/shared/causal-inference/causal_inference_workflow.md §1.1-1.2
 
 **输入**：清洗后数据（Stage 1 输出）
 **输出**：`variable_classification.md`
@@ -235,7 +235,7 @@ Phase 1 → 2 → 3 → 4 → 5
 ### Phase 2: 关联结构探索
 
 > 目的：在执行因果发现之前，先了解变量间的关联结构
-> 参考：shared/statistics-methods/chapters/ch35-propensity-scores.md → 变量间关联评估
+> 参考：resources/statistics-methods/chapters/ch35-propensity-scores.md → 变量间关联评估
 **输入**：变量分类表 + 清洗后数据
 **输出**：`association_network.md`
 
@@ -290,8 +290,8 @@ Phase 1 → 2 → 3 → 4 → 5
 ### Phase 3: 因果结构发现
 
 > 目的：使用因果发现算法从数据中学习候选DAG
-> 参考：shared/causal-inference/causal_inference_workflow.md §1.2-1.4
-> 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A3/A6）
+> 参考：src/shared/causal-inference/causal_inference_workflow.md §1.2-1.4
+> 参考：resources/anti-patterns/medical_stats_anti_patterns.md（A3/A6）
 **输入**：关联结构探索结果 + 变量分类表
 **输出**：`candidate_dag.dot` + `confounding_assessment.md`
 
@@ -360,7 +360,7 @@ Phase 1 → 2 → 3 → 4 → 5
 
 #### Step 3.4: E-value 预评估
 > 目的：评估未测量混杂对潜在因果效应的影响
-> 参考：shared/statistics-methods/chapters/ch28-e-value.md
+> 参考：resources/statistics-methods/chapters/ch28-e-value.md
 
 **E-value 定义**：使观察到的关联完全由未测量混杂解释所需的最小混杂强度。
 
@@ -404,7 +404,7 @@ Phase 1 → 2 → 3 → 4 → 5
 ### Phase 4: 假设提炼与优先级排序
 
 > 目的：从候选DAG 中提取可检验的因果假设，并按优先级排序
-> 参考：shared/causal-inference/causal_inference_workflow.md §1.1
+> 参考：src/shared/causal-inference/causal_inference_workflow.md §1.1
 
 **输入**：候选DAG + 混杂评估
 
@@ -475,7 +475,7 @@ Phase 1 → 2 → 3 → 4 → 5
 ### Phase 5: 研究方向报告
 
 > 目的：综合探索性分析结果，生成研究方向建议报告，为 Stage 2 SAP 制定提供输入
-> 参考：shared/causal-inference/causal_inference_workflow.md §1.3-1.4
+> 参考：src/shared/causal-inference/causal_inference_workflow.md §1.3-1.4
 
 **输入**：假设清单 + 候选DAG + 混杂评估
 
@@ -610,7 +610,7 @@ Phase 5 研究方向 → MANDATORY-EC-03 → PASS → 产物输出 → Stage 2
 ## 反例与黑名单
 
 > **以下行为必须避免**。违反任何一条将导致探索性分析结论不可靠或误导确证性分析。
-> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
+> 完整医学统计反模式目录参见：resources/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
 
 ### 因果发现禁忌
 
@@ -683,16 +683,16 @@ Phase 5 研究方向 → MANDATORY-EC-03 → PASS → 产物输出 → Stage 2
 
 | 资源 | 路径 | 用途 |
 |------|------|------|
-| 因果推断工作流 | `shared/causal-inference/causal_inference_workflow.md` | DAG 构建、混杂识别、PSM 工作流 |
-| DoWhy 因果推断 | `shared/causal-inference/causal_inference_dowhy.py` | Python 因果推断代码模板 |
-| E-value 敏感性分析 | `shared/statistics-methods/chapters/ch28-e-value.md` | E-value 计算和解读 |
-| 倾向性评分方法 | `shared/statistics-methods/chapters/ch35-propensity-scores.md` | PSM/IPTW 方法细节 |
-| 诊断偏倚 | `shared/statistics-methods/chapters/ch29-indication-bias.md` | 处方偏倚识别 |
-| 中介分析 | `shared/statistics-methods/chapters/ch30-mediation-analysis.md` | 中介效应分解 |
-| 目标试验模拟 | `shared/statistics-methods/chapters/ch44-target-trial-emulation.md` | 从观察性数据模拟 RCT |
-| 孟德尔随机化 | `shared/statistics-methods/chapters/ch45-mendelian-randomization.md` | 遗传工具变量方法 |
-| 医学统计反模式 | `shared/anti-patterns/medical_stats_anti_patterns.md` | A3/A4/A6 因果推断反模式 |
-| 协变量调整 | `shared/statistics-methods/chapters/ch33-covariate-adjustment.md` | 调整策略选择 |
+| 因果推断工作流 | `src/shared/causal-inference/causal_inference_workflow.md` | DAG 构建、混杂识别、PSM 工作流 |
+| DoWhy 因果推断 | `src/shared/causal-inference/causal_inference_dowhy.py` | Python 因果推断代码模板 |
+| E-value 敏感性分析 | `resources/statistics-methods/chapters/ch28-e-value.md` | E-value 计算和解读 |
+| 倾向性评分方法 | `resources/statistics-methods/chapters/ch35-propensity-scores.md` | PSM/IPTW 方法细节 |
+| 诊断偏倚 | `resources/statistics-methods/chapters/ch29-indication-bias.md` | 处方偏倚识别 |
+| 中介分析 | `resources/statistics-methods/chapters/ch30-mediation-analysis.md` | 中介效应分解 |
+| 目标试验模拟 | `resources/statistics-methods/chapters/ch44-target-trial-emulation.md` | 从观察性数据模拟 RCT |
+| 孟德尔随机化 | `resources/statistics-methods/chapters/ch45-mendelian-randomization.md` | 遗传工具变量方法 |
+| 医学统计反模式 | `resources/anti-patterns/medical_stats_anti_patterns.md` | A3/A4/A6 因果推断反模式 |
+| 协变量调整 | `resources/statistics-methods/chapters/ch33-covariate-adjustment.md` | 调整策略选择 |
 
 ---
 

@@ -32,7 +32,7 @@
 
 > 由 Pipeline Orchestrator 在 Stage 1.5 触发。此阶段仅执行 9 项阻断检查，**不修改任何数据或清洗脚本**。
 > 完整检查清单见 Pipeline §3 Stage 1.5；此处定义本 Skill 的前置产物、输入映射和输出格式。
-> 参考：shared/reproducibility/pipeline_auditor.py — 数据清洗审计追踪（优先使用）；shared/reporting-guidelines/quality_checklist.md — 清洗完整性检查
+> 参考：src/shared/reproducibility/pipeline_auditor.py — 数据清洗审计追踪（优先使用）；src/shared/reporting-guidelines/quality_checklist.md — 清洗完整性检查
 
 **前置产物**（Phases 1-5 输出，门闸检查消费）：
 
@@ -105,7 +105,7 @@
 ## 反例与黑名单
 
 > **以下行为必须避免**。违反任何一条将导致数据质量不可靠或分析结果有偏。
-> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（C1）
+> 完整医学统计反模式目录参见：resources/anti-patterns/medical_stats_anti_patterns.md（C1）
 
 ### 🚫 验证禁忌
 

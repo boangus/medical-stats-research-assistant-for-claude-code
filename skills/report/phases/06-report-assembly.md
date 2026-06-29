@@ -1,7 +1,7 @@
 # Phase 6: 报告组装 (HTML 图文报告)
 
 > 来源：从 SKILL.md L881-950 抽取。
-> 参考：shared/report_assembler/render_report_html.py — HTML 报告渲染器
+> 参考：src/shared/report_assembler/render_report_html.py — HTML 报告渲染器
 
 将 Phase 1–5 的产物组装为一份单文件自包含的 HTML 图文报告。
 
@@ -36,8 +36,8 @@ JSON 骨架格式（`report_sections.json`）：
 **Step 6.2: 调用渲染器生成 HTML**
 
 ```bash
-# 完整 API 见 shared/report_assembler/render_report_html.py
-python shared/report_assembler/render_report_html.py \
+# 完整 API 见 src/shared/report_assembler/render_report_html.py
+python src/shared/report_assembler/render_report_html.py \
   --title "报告标题" \
   --sections reports/report_sections.json \
   --figures reports/figures/ \

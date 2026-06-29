@@ -38,8 +38,8 @@
 
 ## 参考资源
 - `references/review_criteria_framework.md` — 按论文类型的结构化评审标准
-- `shared/reporting-guidelines/` — CONSORT / STROBE 等报告规范
-- `shared/risk-of-bias/` — 偏倚评估工具（评估外部效度时参考）
+- `src/shared/reporting-guidelines/` — CONSORT / STROBE 等报告规范
+- `resources/risk-of-bias/` — 偏倚评估工具（评估外部效度时参考）
 
 ## 约束
 - 遵循 IR3：统计方法审查独立于临床意义评估；p 值不等于临床意义

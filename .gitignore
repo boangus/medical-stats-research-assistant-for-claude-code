@@ -55,8 +55,8 @@ config.local.yaml
 .env
 
 # 复现验证
-shared/reproducibility/runs/
-shared/reproducibility/_test_output/
+src/shared/reproducibility/runs/
+src/shared/reproducibility/_test_output/
 
 # Skill优化评估
 .darwin-results/
@@ -99,7 +99,7 @@ docs/MSRA开发进度表.md
 .uploads/
 
 # 大型数据处理（测试数据和基准输出）
-shared/large-scale-processing/test_data/
+src/shared/large_scale_processing/test_data/
 scripts/benchmark_output/
 *.parquet  # 大型二进制文件不进版本控制
 *.xlsx

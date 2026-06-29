@@ -33,15 +33,15 @@ tags: [medical-statistics, clinical-trial, analysis-execution, code-generation, 
 > - P值<0.001统一展示为 P < 0.001，禁止 P = 0.000（P-R01）
 > - 统计原则违反时必须暂停并让用户抉择处理方案（S-R01~R08）
 > - 结果图表必须达到发表级标准（publication_figure_standards.md）
-> - 参考：shared/protocol_adherence/protocol_adherence_framework.md — 方案遵循与变更管理完整框架
-> - 参考：shared/protocol_adherence/method_consistency_rules.md — 加权一致性规则+图表规范+变量名确认流程
-> - 参考：shared/protocol_adherence/progress_tracker_template.md — 进度跟踪表模板
-> - 参考：shared/variable_naming_standards.md — 学术变量命名与统计格式标准
-> - 参考：shared/variable_standardization/ — 自动化变量标准化模块
-> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A1/A3/B1/E1/E2/F1-F4/M1-M6）
-> - 参考：shared/statistics-methods/statistical_constraints.md — 统计约束规则全文
-> - 参考：shared/references/psychometric_terminology_glossary.md — 医学统计术语表
-> - 参考：shared/reproducibility/reproducibility_guide.md — 复现验证准备与标准
+> - 参考：resources/protocol_adherence/protocol_adherence_framework.md — 方案遵循与变更管理完整框架
+> - 参考：resources/protocol_adherence/method_consistency_rules.md — 加权一致性规则+图表规范+变量名确认流程
+> - 参考：resources/protocol_adherence/progress_tracker_template.md — 进度跟踪表模板
+> - 参考：resources/shared/variable_naming_standards.md — 学术变量命名与统计格式标准
+> - 参考：src/shared/variable_standardization/ — 自动化变量标准化模块
+> - 参考：resources/anti-patterns/medical_stats_anti_patterns.md（A1/A3/B1/E1/E2/F1-F4/M1-M6）
+> - 参考：resources/statistics-methods/statistical_constraints.md — 统计约束规则全文
+> - 参考：resources/references/psychometric_terminology_glossary.md — 医学统计术语表
+> - 参考：src/shared/reproducibility/reproducibility_guide.md — 复现验证准备与标准
 
 ## 架构集成图
 
@@ -237,7 +237,7 @@ Phase 4-6: 质检 + 输出 + 审计 → 输出:13项产物
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：[shared/anti-patterns/medical_stats_anti_patterns.md](../../shared/anti-patterns/medical_stats_anti_patterns.md)（A1/A3/B1/E1/E2/F1-F4/M1-M6）
+> 完整医学统计反模式目录参见：[resources/anti-patterns/medical_stats_anti_patterns.md](../../resources/anti-patterns/medical_stats_anti_patterns.md)（A1/A3/B1/E1/E2/F1-F4/M1-M6）
 
 ---
 

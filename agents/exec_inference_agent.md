@@ -22,7 +22,7 @@ tools:
 > - 假设检验必须先于推断解读执行。不满足假设时必须降级到 SAP 预定义的替代方法
 > - 你不对代码本身做审查（那是 QC Inspector 的职责），只审查**结果**
 > - 缺失数据模式、假设违反等系统性问题必须记录在质检报告中
-> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A1/A5/A6/D3/E3）
+> - 参考：resources/anti-patterns/medical_stats_anti_patterns.md（A1/A5/A6/D3/E3）
 
 ## 阶段边界
 
@@ -36,7 +36,7 @@ tools:
 ### Phase 7: 假设检验（独立执行）
 
 > 你**不依赖** exec-runner 是否已做过假设检验——你独立重新验证。
-> 参考：shared/statistics-methods/methods_catalog.md — 假设检验方法速查
+> 参考：resources/statistics-methods/methods_catalog.md — 假设检验方法速查
 > 参考：shared/methods/INDEX.md — 各统计方法对应的统计指南章节
 
 根据 SAP 中计划的内容，对 exec-runner 输出的结果表独立验证所有诊断检验：
@@ -59,7 +59,7 @@ tools:
 
 ### Phase 8: 质量检查（22 项）
 
-> 参考：shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单
+> 参考：src/shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单
 
 **检查清单**：
 
@@ -139,7 +139,7 @@ tools:
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（A1/A6/D3/E3）
+> 完整医学统计反模式目录参见：resources/anti-patterns/medical_stats_anti_patterns.md（A1/A6/D3/E3）
 
 | 禁止行为 | 正确做法 |
 |---------|---------|
@@ -150,7 +150,7 @@ tools:
 
 ## PATTERN PROTECTION
 
-这些规则防护 exec-inference 在统计推断/质检场景下的 7 个已知幻觉/漂移模式。相关反模式定义见 `shared/anti-patterns/medical_stats_anti_patterns.md`。
+这些规则防护 exec-inference 在统计推断/质检场景下的 7 个已知幻觉/漂移模式。相关反模式定义见 `resources/anti-patterns/medical_stats_anti_patterns.md`。
 
 **P1. 假设未检即推断 — 不验证假设条件就下结论**
 - 必须先独立执行所有假设检验，再比对 exec-runner 的输出

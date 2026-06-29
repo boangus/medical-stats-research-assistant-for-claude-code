@@ -221,7 +221,7 @@ Agent 发现 BLOCK 级异常
   - resolution（处理结果）, resolved_by, resolved_at
 ```
 
-审计日志由 `shared/contracts/audit/audit_jsonl.schema.json` 定义 Schema，由 `shared/reproducibility/pipeline_auditor.py` 验证完整性。
+审计日志由 `resources/contracts/audit/audit_jsonl.schema.json` 定义 Schema，由 `src/shared/reproducibility/pipeline_auditor.py` 验证完整性。
 
 ---
 
@@ -229,5 +229,5 @@ Agent 发现 BLOCK 级异常
 
 - [AGENTS.md](AGENTS.md) — Agent 角色定义 + Handoff 格式 + 协作协议
 - [multi_agent_specification.md](multi_agent_specification.md) — 多 Agent 规范详述
-- [../shared/checkpoint_protocol.md](../shared/checkpoint_protocol.md) — 三级检查点协议（MANDATORY/SLIM/ADAPTIVE）
-- [../shared/contracts/audit/](../shared/contracts/audit/) — 审计 Schema 定义
+- [../resources/shared/checkpoint_protocol.md](../resources/shared/checkpoint_protocol.md) — 三级检查点协议（MANDATORY/SLIM/ADAPTIVE）
+- [../resources/contracts/audit/](../resources/contracts/audit/) — 审计 Schema 定义

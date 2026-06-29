@@ -6,7 +6,7 @@
 > **Checkpoint**: CP-4（🔴 STOP，硬阻断，Step 2.1+2.2+2.3 全部完成后触发）
 >
 > 依据：ICH E9(R1) Estimands and Sensitivity Analysis in Clinical Trials
-> 参考：shared/statistics-methods/methods_catalog.md 伴发事件处理策略
+> 参考：resources/statistics-methods/methods_catalog.md 伴发事件处理策略
 >
 > **设计原则**：Phase 2 包含 3 个顺序子步骤，全部完成后合并为单一 MANDATORY 确认点。
 > 子步骤之间自动流转，不单独暂停；仅在全部完成后一次性展示给用户确认。
@@ -59,8 +59,8 @@ Step 2.1: Estimands 定义（五要素 + 伴发事件策略）
 
 > **规范方法选择源**: `skills/stat-method-selector/decision-tree.json`（15-goal, 112-method 决策树，基于53篇方法学论文构建）
 > **方法学文献依据**: `skills/stat-method-selector/references.md`（53篇文献结构化摘要 + 效应量解释标准）
-> **本地速查**: `shared/statistics-methods/stat_test_decision_tree.md`（统计检验决策树，含 R 代码速查）
-> **方法索引**: `shared/statistics-methods/INDEX.md`（48章统计指南章节索引）
+> **本地速查**: `resources/statistics-methods/stat_test_decision_tree.md`（统计检验决策树，含 R 代码速查）
+> **方法索引**: `resources/statistics-methods/INDEX.md`（48章统计指南章节索引）
 
 基于 Step 2.1 Estimands、清洗后的数据特征和研究问题，选择统计方法。
 
@@ -87,7 +87,7 @@ Step 2.1: Estimands 定义（五要素 + 伴发事件策略）
 | `reliability` | 一致性/信度 | 诊断试验 / 评估 |
 | `bayesian` | 贝叶斯分析 | 任意 |
 
-> 触发词映射详情见 `shared/statistics-methods/method_selector_mapping.md`
+> 触发词映射详情见 `resources/statistics-methods/method_selector_mapping.md`
 
 **Step B: 多维度决策路径**
 
@@ -149,7 +149,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 - 方法推荐时标注"基于文献种子 N 的方法选择"
 - 样本量计算参考同类研究的效应量
 - 如果用户提供的效应量与文献种子差异大，触发 ADAPTIVE checkpoint 提醒
-> 参考：shared/sample-size/ — 样本量计算器 (Python/R)，支持 RCT/观察性/诊断试验多种设计
+> 参考：src/shared/sample-size/ — 样本量计算器 (Python/R)，支持 RCT/观察性/诊断试验多种设计
 - 数据结构（独立/配对/重复测量/聚类）
 - 样本量
 - 缺失数据模式
@@ -157,7 +157,7 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 **3. 方法推荐决策树（CANONICAL — 完整维度版本）**
 
 > **规范源**: `skills/stat-method-selector/decision-tree.json`（15-goal, 112-method, 53篇文献支撑）
-> **映射表**: `shared/statistics-methods/method_selector_mapping.md`（决策树方法→MSRA章节→R/Python实现）
+> **映射表**: `resources/statistics-methods/method_selector_mapping.md`（决策树方法→MSRA章节→R/Python实现）
 > **文献依据**: `skills/stat-method-selector/references.md` 每次推荐必须引用
 
 ```
@@ -293,9 +293,9 @@ Estimands: [治疗条件] | [人群] | [终点] | [伴发事件策略] | [汇总
 **4. 观察性研究高级方法选择**
 
 > **当研究类型为观察性研究时**，在基础方法选择后，必须额外讨论以下高级因果推断方法。
-> 参考：shared/statistics-methods/chapters/ch35-propensity-scores.md 倾向性评分方法
-> 参考：shared/statistics-methods/chapters/ch28-e-value.md E-value 敏感性分析（与阴性对照NCO 互补关系见章节MSRA 延伸）
-> 参考：shared/causal-inference/causal_inference_workflow.md §3.3.5 阴性对照分析（NCO 证伪检查 + COCA 校正）
+> 参考：resources/statistics-methods/chapters/ch35-propensity-scores.md 倾向性评分方法
+> 参考：resources/statistics-methods/chapters/ch28-e-value.md E-value 敏感性分析（与阴性对照NCO 互补关系见章节MSRA 延伸）
+> 参考：src/shared/causal-inference/causal_inference_workflow.md §3.3.5 阴性对照分析（NCO 证伪检查 + COCA 校正）
 
 | 方法 | 适用场景 | 默认参数（无需确认） |
 |------|---------|---------------------|

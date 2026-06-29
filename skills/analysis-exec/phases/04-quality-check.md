@@ -1,6 +1,6 @@
 # Phase 4: 质量检查
 
-> 参考：shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单；shared/reproducibility/reproducibility_check.py — 复现验证脚本
+> 参考：src/shared/reporting-guidelines/quality_checklist.md — 8 维度质量检查清单；src/shared/reproducibility/reproducibility_check.py — 复现验证脚本
 
 分析完成后，自动执行质量检查：
 

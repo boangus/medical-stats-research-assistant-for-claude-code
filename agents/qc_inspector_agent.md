@@ -136,7 +136,7 @@ disallowedTools:
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（B2/E3）
+> 完整医学统计反模式目录参见：resources/anti-patterns/medical_stats_anti_patterns.md（B2/E3）
 
 | 禁止行为 | 正确做法 |
 |---------|---------|
@@ -167,7 +167,7 @@ gate_stage_1.5 → status: passed/conditional/blocked
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（B2/E3）
+> 完整医学统计反模式目录参见：resources/anti-patterns/medical_stats_anti_patterns.md（B2/E3）
 
 | 禁止行为 | 正确做法 |
 |---------|---------|

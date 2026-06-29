@@ -1,6 +1,6 @@
 ### Phase 1: 数据画像与验证（自动执行）
 
-> 参考：shared/reporting-guidelines/quality_checklist.md — 数据质量检查清单
+> 参考：src/shared/reporting-guidelines/quality_checklist.md — 数据质量检查清单
 
 ---
 
@@ -18,7 +18,7 @@
 - 生成时间: {timestamp}
 ```
 
-**执行内容**（使用 `shared/templates/data_profile_template.py`）：
+**执行内容**（使用 `src/shared/templates/data_profile_template.py`）：
 
 1. **数据规模**：行数 × 列数、内存占用（MB）
 2. **变量类型分布**：连续 / 分类 / 日期 / 文本 各多少个（饼图式文字描述）

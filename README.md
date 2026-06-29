@@ -196,17 +196,33 @@ medical-stats-research-assistant/
 ├── skills/            # 14 个内置 Skill
 ├── commands/          # 17 个命令定义
 ├── agents/            # 5 个 Agent 角色
-├── shared/            # 共享资源（模板、指南、Schema、互操作模块）
+├── src/shared/        # Python 包（可执行代码）
+│   ├── passport/              # Material Passport 产物追踪
+│   ├── terminology/           # ICD-10-CM 编码引擎（离线字典+模糊匹配）
+│   ├── metadata_catalog/      # 变量级血缘+循环检测
+│   ├── report_assembler/      # 数据血缘 Mermaid 可视化
+│   ├── quality_gates/         # 5 道质量门闸
+│   ├── templates/             # R/Python 代码模板
+│   ├── sap/                   # SAP 标准与验证
+│   ├── calibration/           # 度量校准框架
+│   └── ...                    # 11 个其他 Python 包
+├── resources/         # 内容资源（文档、清单、Schema）
 │   ├── statistics-methods/    # 统计方法指南（56 章）
 │   ├── reporting-guidelines/  # 报告规范清单（21 个）
 │   ├── risk-of-bias/          # 偏倚评估工具（5 个）
 │   ├── journal-templates/     # 期刊模板（15 个）
-│   ├── terminology/           # ICD-10-CM 编码引擎（离线字典+模糊匹配）
-│   ├── metadata_catalog/      # 变量级血缘+循环检测
-│   └── report_assembler/      # 数据血缘 Mermaid 可视化
+│   ├── contracts/             # 合约模板
+│   ├── references/            # 参考文档
+│   └── ...                    # 4 个其他内容目录
 ├── msra_modules/      # 4 个扩展模块 + 数据互操作栈（fhir/cdisc/omop/ehr/etl/fhir_server）
-├── tests/             # 测试套件（1152 tests）
-├── docs/              # 文档（用户教程 + API 参考）
+├── tests/             # 测试套件（1155 tests）
+├── evals/             # 评估套件（pipeline-gold / method-selection / end-to-end）
+├── examples/          # 示例工作流与样例数据
+├── scripts/           # 构建/评估/部署脚本
+├── docs/              # 文档
+│   ├── user_guide/            # 用户教程（安装、跨领域、大规模处理、故障排除）
+│   ├── api/                   # API 参考
+│   └── prd/                   # 产品需求文档
 ├── install.ps1        # Windows 安装脚本
 └── install.sh         # Mac/Linux 安装脚本
 ```

@@ -144,4 +144,4 @@ Both values exist because `commitment_type` already carries an `other` escape ha
 Per Kong et al. 2026 搂7.4.3, ICLR 2025 [21] documents a measurable commitment-fulfillment gap: persuasive rebuttal text + matrix saying "Verified: Y" can still hide that the actual experiment was not run. The commitment ledger forces per-promise lifecycle traceability 鈥?extracted promises, classified outcomes, mandated rationale 鈥?closing the gap at the artifact level instead of relying on reviewer vigilance.
 
 ---
-**See also:** `revision_recovery_example.md`, `shared/handoff_schemas.md` Schema 11, `peer-review/references/re_review_mode_protocol.md` step 5.
+**See also:** `revision_recovery_example.md`, `resources/shared/handoff_schemas.md` Schema 11, `peer-review/references/re_review_mode_protocol.md` step 5.

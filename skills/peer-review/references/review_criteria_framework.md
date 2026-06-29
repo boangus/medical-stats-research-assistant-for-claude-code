@@ -16,7 +16,7 @@
 - **不良事件**: SAE/AE 完整报告、因果关系评估
 
 ### 优先检查报告规范
-- **CONSORT 2025** → 见 `shared/reporting-guidelines/consort/`
+- **CONSORT 2025** → 见 `src/shared/reporting-guidelines/consort/`
 - 流程图完整性（随机→分配→随访→分析）
 - 必须报告 CONSORT 清单项完成情况
 
@@ -33,7 +33,7 @@
 - **敏感性分析**: 排除特定人群/改变定义后的稳健性
 
 ### 优先检查报告规范
-- **STROBE** → 见 `shared/reporting-guidelines/strobe/`
+- **STROBE** → 见 `src/shared/reporting-guidelines/strobe/`
 - 队列/病例对照/横断面各有专门清单项
 
 ---
@@ -49,7 +49,7 @@
 - **亚组分析**: 不同人群/不同阈值下的性能差异
 
 ### 优先检查报告规范
-- **STARD 2015** → 见 `shared/reporting-guidelines/stard/`
+- **STARD 2015** → 见 `src/shared/reporting-guidelines/stard/`
 
 ---
 
@@ -65,7 +65,7 @@
 - **定量合成**: 异质性检验 (I², Q 检验)、模型选择（固定/随机）、发表偏倚
 
 ### 优先检查报告规范
-- **PRISMA 2020** → 见 `shared/reporting-guidelines/prisma/`
+- **PRISMA 2020** → 见 `src/shared/reporting-guidelines/prisma/`
 - PRISMA-S（检索报告）、PRISMA-IPD（个体患者数据）视适用性使用
 
 ---
@@ -81,7 +81,7 @@
 - **AI 透明度**: ML 模型的可解释性、训练数据描述
 
 ### 优先检查报告规范
-- **TRIPOD+AI** → 见 `shared/reporting-guidelines/tripod/`
+- **TRIPOD+AI** → 见 `src/shared/reporting-guidelines/tripod/`
 
 ---
 
@@ -96,7 +96,7 @@
 - **教育意义**: 病例对临床实践的启示
 
 ### 优先检查报告规范
-- **CARE** → 见 `shared/reporting-guidelines/care/`
+- **CARE** → 见 `src/shared/reporting-guidelines/care/`
 
 ---
 
@@ -114,9 +114,9 @@
 
 ## 引用
 
-- CONSORT: `shared/reporting-guidelines/consort/`
-- STROBE: `shared/reporting-guidelines/strobe/`
-- PRISMA: `shared/reporting-guidelines/prisma/`
-- STARD: `shared/reporting-guidelines/stard/`
-- TRIPOD+AI: `shared/reporting-guidelines/tripod/`
-- CARE: `shared/reporting-guidelines/care/`
+- CONSORT: `src/shared/reporting-guidelines/consort/`
+- STROBE: `src/shared/reporting-guidelines/strobe/`
+- PRISMA: `src/shared/reporting-guidelines/prisma/`
+- STARD: `src/shared/reporting-guidelines/stard/`
+- TRIPOD+AI: `src/shared/reporting-guidelines/tripod/`
+- CARE: `src/shared/reporting-guidelines/care/`

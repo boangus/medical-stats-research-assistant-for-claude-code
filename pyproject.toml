@@ -158,13 +158,15 @@ Changelog = "https://github.com/boangus/medical-stats-research-assistant-for-cla
 # msra = "msra_modules.cli:main"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src", "."]
 include = ["msra_modules*", "shared*"]
 
 [tool.setuptools.package-dir]
-"" = "."
+"" = "src"
+msra_modules = "."
 
 [tool.pytest.ini_options]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"

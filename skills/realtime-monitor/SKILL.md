@@ -77,7 +77,7 @@ tags: [realtime, monitoring, vital-signs, anomaly-detection, alerting, streaming
 1. 数据流连接验证 (Phase 1) 必须先于实时监控 (Phase 2)
 2. Phase 2 的子 Agent 任务可独立重跑，不依赖 Phase 1 的中间状态
 3. 异常检测灵敏度校准 (Phase 3) 在监控结束后、用户确认之前执行
-4. 质量门闸复用 shared/quality_gates/ 框架
+4. 质量门闸复用 src/shared/quality_gates/ 框架
 
 ## 快速开始
 
@@ -262,5 +262,5 @@ Phase 4: 整合与报告 [ADAPTIVE] → 输入:用户确认 → 输出:监控报
 
 ## 扩展模块门闸（shared 框架）
 
-> 模块质量门闸定义参见：[shared/quality_gates/gate-rt.md](../../shared/quality_gates/gate-rt.md)
+> 模块质量门闸定义参见：[src/shared/quality_gates/gate-rt.md](../../src/shared/quality_gates/gate-rt.md)
 > 4 项检查，关键项为 1（数据流连续性）、2（异常检测准确率）

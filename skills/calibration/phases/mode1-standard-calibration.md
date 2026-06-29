@@ -13,7 +13,7 @@ Phase 1: 加载与验证
   │ 🔴 [MANDATORY] 格式错误 → 🛑STOP 报告具体缺失字段
   ▼
 Phase 2: 执行对比
-  │ 调用 shared/calibration/calibration_runner.py (或 .R)
+  │ 调用 src/shared/calibration/calibration_runner.py (或 .R)
   │ 四维对比:
   │   1. 方法选择: gold_method vs msra_method
   │   2. 数值偏差: gold_estimate vs msra_estimate → MAE/RMSE/MAPE
@@ -48,7 +48,7 @@ Phase 4: 更新校准数据库
 
 可选字段: `dataset`, `sample_size`, `covariates`, `notes`
 
-示例见: [gold_standard_example.csv](../../../shared/calibration/gold_standard_example.csv)
+示例见: [gold_standard_example.csv](../../../src/shared/calibration/gold_standard_example.csv)
 
 ### Phase 1-4 异常处理
 
@@ -72,7 +72,7 @@ Phase 4: 更新校准数据库
 from shared.calibration.calibration_runner import CalibrationRunner
 
 runner = CalibrationRunner(
-    gold_csv="shared/calibration/gold_standard_example.csv",
+    gold_csv="src/shared/calibration/gold_standard_example.csv",
     msra_results="MSRA/analysis_results.json",  # MSRA 输出路径
     output_dir="MSRA/calibration/"
 )
@@ -87,15 +87,15 @@ print(f"方法匹配率: {report.method_match_rate:.1%}")
 print(f"MAPE: {report.numeric_deviation['MAPE']:.1%}")
 
 # 更新校准数据库
-runner.update_database("shared/calibration/calibration_db.json")
+runner.update_database("src/shared/calibration/calibration_db.json")
 ```
 
 **R 调用**：
 ```r
-source("shared/calibration/calibration_runner.R")
+source("src/shared/calibration/calibration_runner.R")
 
 result <- run_calibration(
-  gold_csv = "shared/calibration/gold_standard_example.csv",
+  gold_csv = "src/shared/calibration/gold_standard_example.csv",
   msra_json = "MSRA/analysis_results.json",
   output_dir = "MSRA/calibration/"
 )

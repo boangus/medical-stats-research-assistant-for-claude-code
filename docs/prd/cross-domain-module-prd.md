@@ -82,8 +82,8 @@ flowchart TD
 |----|------|------|--------|
 | P0-1 | **SKILL.md 创建** | `skills/cross-domain/SKILL.md`，定义 Phase 0-4 完整流程、角色、Iron Rules、质量门闸引用 | SKILL.md 文件 |
 | P0-2 | **命令注册** | `manifest.json` 中新增 `/msra-cross` 命令，指向 `skills/cross-domain/SKILL.md` | manifest.json 更新 |
-| P0-3 | **Gate CD-1.5 实现** | 数据对齐门闸：样本对齐 🔑、模态完整性 🔑、数据类型匹配。复用 `shared/quality_gates/GateRunner` | `msra_modules/cross_domain/quality_gates.py` |
-| P0-4 | **Gate CD-3.5 实现** | 融合结果门闸：关联显著性 🔑、模型性能 🔑、可视化一致性。复用 `shared/quality_gates/GateRunner` | 同上文件 |
+| P0-3 | **Gate CD-1.5 实现** | 数据对齐门闸：样本对齐 🔑、模态完整性 🔑、数据类型匹配。复用 `src/shared/quality_gates/GateRunner` | `msra_modules/cross_domain/quality_gates.py` |
+| P0-4 | **Gate CD-3.5 实现** | 融合结果门闸：关联显著性 🔑、模型性能 🔑、可视化一致性。复用 `src/shared/quality_gates/GateRunner` | 同上文件 |
 | P0-5 | **单元测试** | 为 `RadiomicsDEGCorrelation`、`RealtimePredictionModel`、`MultiModalVisualizer` 各编写 ≥ 5 个测试用例；为 Gate CD-1.5/3.5 各编写 ≥ 3 个测试用例。覆盖率 ≥ 50% | `tests/test_cross_domain/` |
 | P0-6 | **__init__.py 更新** | 新增导出 `CrossDomainQualityGateChecker`，版本号确认或更新 | `msra_modules/cross_domain/__init__.py` |
 | P0-7 | **SKILL.md Phase 定义** | Phase 0（交互配置）→ Phase 1（数据对齐 + Gate CD-1.5）→ Phase 2（后台融合分析）→ Phase 3（结果审查 + Gate CD-3.5）→ Phase 4（整合/报告） | SKILL.md 内容 |
@@ -326,7 +326,7 @@ class CrossDomainQualityGateChecker:
 
 | 文件 | 状态 | 新增类/函数 | 说明 |
 |------|------|------------|------|
-| `quality_gates.py` | 🆕 新建 | `CrossDomainQualityGateChecker` | Gate CD-1.5 + Gate CD-3.5 实现，复用 `shared/quality_gates/GateRunner` |
+| `quality_gates.py` | 🆕 新建 | `CrossDomainQualityGateChecker` | Gate CD-1.5 + Gate CD-3.5 实现，复用 `src/shared/quality_gates/GateRunner` |
 | `integration.py` | 📝 补全 | `DataAligner`（P1） | 多策略数据对齐：inner/outer/time-based |
 | `integration.py` | 📝 补全 | `export_v1_schema()` | `msra/cross_domain_result/v1` Schema 导出 |
 | `__init__.py` | 📝 更新 | 新增导出 `CrossDomainQualityGateChecker` | 版本号确认为 1.0.0 |
@@ -441,7 +441,7 @@ First stable release of MSRA.
 - **`msra_modules/cross_domain/quality_gates.py`** — `CrossDomainQualityGateChecker`:
   Gate CD-1.5 (3 items: sample alignment 🔑, modality completeness 🔑, data type match)
   + Gate CD-3.5 (3 items: correlation significance 🔑, model performance 🔑, visualization consistency).
-  Reuses `shared/quality_gates/GateRunner`.
+  Reuses `src/shared/quality_gates/GateRunner`.
 - **`manifest.json`** — Registered `/msra-cross` command. Version bumped to 1.0.0.
 - **`pyproject.toml`** — Added `cross_domain` optional dependency group.
 - **`tests/test_cross_domain/`** — N test cases (all passed):
@@ -571,7 +571,7 @@ all = [
 | Q1 | cross_domain 模块的子 Agent 调度是复用现有 `HybridModeBridge` 还是新建专用调度器？ | P0-1, P0-7, P1-1 | **建议复用 HybridModeBridge**，新增 `CROSS_DOMAIN_ANALYSIS` 子类型，与 bio/imaging/rt 模块保持一致 |
 | Q2 | Gate CD-1.5 中"样本对齐"的最低样本数阈值：关联分析 3 个是否太少？是否应设为 5 或 10？ | P0-3 | **关联分析默认 3**（与现有 `RadiomicsDEGCorrelation` 一致），预测模型默认 10，用户可在 Phase 0 覆盖 |
 | Q3 | 数据对齐策略（P1-2 `DataAligner`）：inner join 会导致样本数锐减，是否默认 outer join + 插补？ | P1-2 | **默认 inner join**（严格匹配，避免插补引入偏差），outer join 作为可选项由用户显式指定 |
-| Q4 | `msra/cross_domain_result/v1` Schema 的具体字段定义需要与 `shared/contracts/` 中已有 Schema 格式一致，是否需要新建 contracts 文件？ | P1-3 | **建议新建** `shared/contracts/cross_domain_result_schema.md`，参照 `msra/imaging_features/v1` 格式 |
+| Q4 | `msra/cross_domain_result/v1` Schema 的具体字段定义需要与 `resources/contracts/` 中已有 Schema 格式一致，是否需要新建 contracts 文件？ | P1-3 | **建议新建** `resources/contracts/cross_domain_result_schema.md`，参照 `msra/imaging_features/v1` 格式 |
 | Q5 | bioinformatics/medical_imaging 模块的 skip 测试（因可选依赖未安装）：v1.0.0 发布时是否要求全部安装并 0 skip？ | §4.5 Stable 判定 | **建议 v1.0.0 发布时安装全部可选依赖并确保 0 skip**，CI 中增加 `pip install ...[experimental]` 步骤 |
 | Q6 | cross_domain 模块是否需要独立的 SKILL.md frontmatter 定义（如 `layer: functional`）？ | P0-1 | **建议与其他实验性模块一致**：`layer: functional`, `depends_on: [pipeline]`, `optional_dependencies: [msra_modules.cross_domain]` |
 | Q7 | E2E 测试中模拟数据的随机种子是否固定？是否需要提供多种随机种子验证鲁棒性？ | §3.3, §3.4 | **固定随机种子 (seed=42)** 确保可复现；CI 中可额外运行 seed=123 验证鲁棒性 |

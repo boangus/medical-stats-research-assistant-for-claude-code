@@ -5,13 +5,13 @@
 > **下游**: Phase 4 计划审查
 > **Checkpoint**: CP-5（🟡 CHECKPOINT，SAP 文档生成后触发）
 
-> 参考：shared/statistics-methods/methods_catalog.md 统计方法选择依据
-> 参考：shared/statistics-methods/chapters/ch18-multiple-comparisons-methods.md 多重比较校正 (统计指南)
-> 参考：shared/statistics-methods/chapters/ch19-gatekeeping-strategies.md 关口策略 (统计指南)
-> 参考：shared/sap/sap_standard.md — SAP标准格式定义
-> 参考：shared/sap/variable_selection_guide.md 变量选择与方法推荐指南
-> 参考：shared/reporting-guidelines/SPIRIT_checklist.md **SPIRIT 2025 试验协议 34 项清单**（RCT 协议完整性）
-> 参考：shared/risk-of-bias/ — **偏倚评估工具**（RoB 2/ROBINS-I V2/PROBAST+AI/QUADAS-2/GRADE）用于 SAP 中预设偏倚评估计划
+> 参考：resources/statistics-methods/methods_catalog.md 统计方法选择依据
+> 参考：resources/statistics-methods/chapters/ch18-multiple-comparisons-methods.md 多重比较校正 (统计指南)
+> 参考：resources/statistics-methods/chapters/ch19-gatekeeping-strategies.md 关口策略 (统计指南)
+> 参考：src/shared/sap/sap_standard.md — SAP标准格式定义
+> 参考：src/shared/sap/variable_selection_guide.md 变量选择与方法推荐指南
+> 参考：src/shared/reporting-guidelines/SPIRIT_checklist.md **SPIRIT 2025 试验协议 34 项清单**（RCT 协议完整性）
+> 参考：resources/risk-of-bias/ — **偏倚评估工具**（RoB 2/ROBINS-I V2/PROBAST+AI/QUADAS-2/GRADE）用于 SAP 中预设偏倚评估计划
 
 确认方法后，**严格按照SAP标准格式**生成正式的统计分析计划文档。SAP必须包含:
 1. 变量选择推荐（强制纳入/可选纳入/不纳入）
@@ -137,7 +137,7 @@
   4. leave-one-out 敏感性分析计划：逐一排除各中心，评估结论稳健性
 - **输出**：SAP 中增加"中心效应处理策略"章节
 - **Checkpoint**: [SLIM] 展示策略选择后继续，用户可调整
-- **参考**: shared/statistics-methods/chapters/ch34-treatment-effects-in-multicenter-rcts.md
+- **参考**: resources/statistics-methods/chapters/ch34-treatment-effects-in-multicenter-rcts.md
 - **Anti-pattern**: 不得在未评估异质性的情况下直接选择随机效应模型
 
 ---

@@ -113,7 +113,7 @@ profile is byte-identical to before this feature existed.
 
 When the PCR **does** carry a `Format Profile` path, the profile is a scholar-declared
 layout the renderer follows. It validates against
-`shared/contracts/submission/format_profile.schema.json`.
+`resources/contracts/submission/format_profile.schema.json`.
 
 ### Read it 9fail closed BEFORE formatting (design §5b)
 
@@ -391,7 +391,7 @@ When refusing under rule 11, the formatter echoes the `reason` token (e.g. `reas
 
 When emitting converted **final outputs** (LaTeX / DOCX / PDF / clean-markdown deliverables), strip every MSRA HTML-comment marker 9`<!--ref:...-->`, `<!--anchor:...-->`, `<!--block:...-->` 9from the converted artifact. One rule for all marker kinds: markers are audit metadata, not manuscript content, and must not leak into a submission (do not rely on Pandoc happening to drop raw HTML comments 9strip explicitly so the rule holds across all five output formats).
 
-Ordering is load-bearing: stripping happens ONLY AFTER every marker-dependent gate above has run against the working draft 9the Cite-Time Provenance Hard Gate, the v3.10 stamp gates, and (in patch-mode revision rounds, `references/medical_revision_patch_protocol.md`) the apply script's own self-checks. The **working draft and the `phase6_*/` provenance artifacts keep their markers untouched** 9`<!--block:-->` markers are the anchor layer the next revision round's manifest is generated from; stripping them there would destroy patch mode. Word counts already exclude markers regardless (`shared/references/word_count_conventions.md` § HTML-comment markers), so stripping does not change any reported count.
+Ordering is load-bearing: stripping happens ONLY AFTER every marker-dependent gate above has run against the working draft 9the Cite-Time Provenance Hard Gate, the v3.10 stamp gates, and (in patch-mode revision rounds, `references/medical_revision_patch_protocol.md`) the apply script's own self-checks. The **working draft and the `phase6_*/` provenance artifacts keep their markers untouched** 9`<!--block:-->` markers are the anchor layer the next revision round's manifest is generated from; stripping them there would destroy patch mode. Word counts already exclude markers regardless (`resources/references/word_count_conventions.md` § HTML-comment markers), so stripping does not change any reported count.
 
 ## Citation Version-Family Advisory (Kong #258)
 

@@ -41,9 +41,9 @@
 
 **解读框架**：
 
-> 参考：shared/statistics-methods/methods_catalog.md — 效应量解读和统计方法描述
-> 参考：shared/statistics-methods/chapters/ch07-minimal-clinically-important-difference.md — MCID临床意义解读 (统计指南第7章)
-> 参考：shared/statistics-methods/chapters/ch17-number-needed-to-treat.md — NNT解读 (统计指南第17章)
+> 参考：resources/statistics-methods/methods_catalog.md — 效应量解读和统计方法描述
+> 参考：resources/statistics-methods/chapters/ch07-minimal-clinically-important-difference.md — MCID临床意义解读 (统计指南第7章)
+> 参考：resources/statistics-methods/chapters/ch17-number-needed-to-treat.md — NNT解读 (统计指南第17章)
 
 **1. 统计显著性 vs 临床意义**
 - p值是否达到统计显著性？

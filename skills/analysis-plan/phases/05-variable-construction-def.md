@@ -5,7 +5,7 @@
 > **下游**: Stage 2.5 SAP 质量门闸 → analysis-exec
 > **Checkpoints**: CP-7（🔴 STOP，硬阻断，变量构造定义完成）+ CP-8（🟡 CHECKPOINT，DAG 预览）
 
-> 参考：shared/templates/variable_spec_template.md 变量构造规格书模板
+> 参考：src/shared/templates/variable_spec_template.md 变量构造规格书模板
 
 SAP 审查通过后，SAP 中明确定义所有分析变量的构造逻辑。此定义将作为Stage 3 构造执行的依据。
 
@@ -45,7 +45,7 @@ SAP 审查通过后，SAP 中明确定义所有分析变量的构造逻辑。此
 
 **输入**：SAP Section 7.6 变量构造定义表
 
-**执行内容**（使用 `shared/templates/variable_dag_template.py`）：
+**执行内容**（使用 `src/shared/templates/variable_dag_template.py`）：
 
 1. 解析变量构造定义表，提取每个衍生变量的源变量
 2. 生成有向无环图（DAG）：

@@ -28,7 +28,7 @@
 #### Step 2.5: 值规范化（ADAPTIVE，仅检测到变体时触发）🆕
 
 > 检测并处理非标准值表示，包括中医术语变体和数值格式变体。
-> 参考: shared/value-normalization/README.md
+> 参考: src/shared/value-normalization/README.md
 
 在 Phase 2 清洗策略获得批准后、Phase 3 执行清洗前，
 自动扫描所有列是否存在非标准值表示。
@@ -79,8 +79,8 @@ Step 2.5 与清洗策略讨论的关系：**平行但不重叠**。
 > 极速模式下使用默认策略（TCM: merge, 数值: threshold）自动处理。
 
 **2.5d 执行规范化**:
-- 调用 `shared/value-normalization/tcm_terms/tcm_normalizer.apply()` 执行术语规范化
-- 调用 `shared/value-normalization/numeric_variants/numeric_normalizer.apply()` 执行数值格式化
+- 调用 `src/shared/value-normalization/tcm_terms/tcm_normalizer.apply()` 执行术语规范化
+- 调用 `src/shared/value-normalization/numeric_variants/numeric_normalizer.apply()` 执行数值格式化
 - 规范化日志记录每项变更：原值、规范化值、处理策略、影响记录数、国标代码（如有）
 
 **2.5e 输出**:

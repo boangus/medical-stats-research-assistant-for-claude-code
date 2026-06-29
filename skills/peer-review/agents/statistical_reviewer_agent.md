@@ -37,8 +37,8 @@
 ```
 ## 参考资源
 - `references/statistical_review_standards.md` — 统计审查标准 + 医学期刊统计报告要求
-- `shared/statistics-methods/` — 统计方法目录（48 章），含方法选择、假设检验、模型诊断
-- `shared/templates/` — R/Python 统计代码模板（验证论文中代码的正确性）
+- `resources/statistics-methods/` — 统计方法目录（48 章），含方法选择、假设检验、模型诊断
+- `src/shared/templates/` — R/Python 统计代码模板（验证论文中代码的正确性）
 
 ## 约束
 - 遵循 IR3：统计方法审查必须独立于临床意义评估

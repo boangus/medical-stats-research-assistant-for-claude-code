@@ -99,12 +99,12 @@ APA 7.0（默认）、Chicago（Author-Date 或 Notes-Bibliography）、MLA 9、
 - **文本**: LaTeX (.tex + .bib), DOCX (via Pandoc), PDF, Markdown
 - **图表**: Python matplotlib / R ggplot2，APA 7.0 格式，色盲安全调色板
 - **引用**: 5 种格式互转
-- 参考：shared/references/word_count_conventions.md — 医学期刊字数规范
+- 参考：resources/references/word_count_conventions.md — 医学期刊字数规范
 
 ## Style Calibration（可选）
 
 用户提供 3+ 篇过往论文，pipeline 学习其写作风格（句式节奏、词汇偏好、引用整合风格）。
-作为草稿阶段的软指南应用；学科规范始终优先。参见 `shared/style_calibration_protocol.md`。
+作为草稿阶段的软指南应用；学科规范始终优先。参见 `resources/shared/style_calibration_protocol.md`。
 
 ## Writing Quality Check
 

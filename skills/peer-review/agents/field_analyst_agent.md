@@ -40,7 +40,7 @@
 ## 参考资源
 - `references/guideline_mapping.md` — 研究类型与报告规范清单映射表
 - `references/review_criteria_framework.md` — 按论文类型的结构化评审标准
-- `shared/reporting-guidelines/` — 报告规范清单（用于识别研究类型对应的规范）
+- `src/shared/reporting-guidelines/` — 报告规范清单（用于识别研究类型对应的规范）
 
 ## 约束
 - Phase 1 领域分析是后续 5 位审稿人独立评审的基础

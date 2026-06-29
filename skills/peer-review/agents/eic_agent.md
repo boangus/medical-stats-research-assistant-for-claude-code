@@ -38,7 +38,7 @@
 - `references/editorial_decision_standards.md` — Accept/Minor/Major/Reject 判定标准
 - `references/review_criteria_framework.md` — 按论文类型的结构化评审标准
 - `references/icmje_recommendations.md` — ICMJE 推荐标准
-- `shared/reporting-guidelines/` — CONSORT / STROBE / PRISMA 报告规范清单
+- `src/shared/reporting-guidelines/` — CONSORT / STROBE / PRISMA 报告规范清单
 
 ## 约束
 - 遵循 IR5：Phase 2 独立评审，不引用其他审稿人意见

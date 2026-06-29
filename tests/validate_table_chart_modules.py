@@ -22,7 +22,7 @@ def validate_table_understanding():
 
     try:
         # 使用绝对路径导入
-        table_understanding_path = project_root / 'shared' / 'table-understanding'
+        table_understanding_path = project_root / 'src' / 'shared' / 'table_understanding'
         sys.path.insert(0, str(table_understanding_path))
         from table_chain_verifier import TableChainVerifier
         from table_master_extractor import TableMasterExtractor
@@ -85,7 +85,7 @@ def validate_chart_understanding():
 
     try:
         # 使用绝对路径导入
-        chart_understanding_path = project_root / 'shared' / 'chart-understanding'
+        chart_understanding_path = project_root / 'src' / 'shared' / 'chart_understanding'
         sys.path.insert(0, str(chart_understanding_path))
         from chart_fdv_generator import ChartFDVGenerator
 
@@ -181,7 +181,7 @@ def validate_compliance_checker():
 
     try:
         # 使用绝对路径导入
-        report_assembler_path = project_root / 'shared' / 'report-assembler'
+        report_assembler_path = project_root / 'src' / 'shared' / 'report_assembler'
         sys.path.insert(0, str(report_assembler_path))
         from compliance_checker import (
             check_chart_quality_automated,

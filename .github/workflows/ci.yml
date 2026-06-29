@@ -115,16 +115,16 @@ jobs:
           python -c "
           import sys, os
           templates = [
-              'shared/templates/logistic_template',
-              'shared/templates/cox_template',
-              'shared/templates/roc_template',
-              'shared/templates/forest_plot_template',
-              'shared/templates/prediction_model_template',
-              'shared/templates/ml_analysis_template',
-              'shared/templates/shap_plot_template',
-              'shared/templates/gee_template',
-              'shared/templates/effect_size_template',
-              'shared/reporting-guidelines/statcheck_patterns',
+              'src/shared/templates/logistic_template',
+              'src/shared/templates/cox_template',
+              'src/shared/templates/roc_template',
+              'src/shared/templates/forest_plot_template',
+              'src/shared/templates/prediction_model_template',
+              'src/shared/templates/ml_analysis_template',
+              'src/shared/templates/shap_plot_template',
+              'src/shared/templates/gee_template',
+              'src/shared/templates/effect_size_template',
+              'src/shared/reporting-guidelines/statcheck_patterns',
           ]
           errors = []
           for t in templates:
@@ -207,8 +207,8 @@ jobs:
         run: |
           Rscript -e '
           errors <- c()
-          r_files <- list.files("shared/templates", pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
-          r_files <- c(r_files, list.files("shared/calibration", pattern = "\\.R$", full.names = TRUE))
+          r_files <- list.files("src/shared/templates", pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+          r_files <- c(r_files, list.files("src/shared/calibration", pattern = "\\.R$", full.names = TRUE))
           for (f in r_files) {
             result <- tryCatch({
               parse(file = f)
@@ -235,7 +235,7 @@ jobs:
         run: |
           python -c "
           import pandas as pd
-          df = pd.read_csv('shared/calibration/gold_standard_example.csv')
+          df = pd.read_csv('src/shared/calibration/gold_standard_example.csv')
           required_cols = ['analysis_id', 'gold_method', 'gold_estimate', 'gold_significant']
           for col in required_cols:
             assert col in df.columns, f'Missing column: {col}'

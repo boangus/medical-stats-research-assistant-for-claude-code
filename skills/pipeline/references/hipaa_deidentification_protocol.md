@@ -42,7 +42,7 @@ license: CC-BY-NC-SA-4.0
 ## 2. 去标识化流程
 
 ### 2.1 自动检测
-- 使用 `shared/data_sharing/deidentification.py` 自动检测
+- 使用 `src/shared/data_sharing/deidentification.py` 自动检测
 - 正则表达式匹配：身份证号、电话号码、邮箱、地址
 - 模式匹配：姓名、病历号、社保号
 

@@ -21,4 +21,4 @@ allowed-tools: Read, Bash, Grep, Glob
 4. 汇总质量门闸（Stage 1.5/2.5/3.5）状态
 5. 输出格式化报告
 
-门闸检查项定义参见 `shared/quality_gates/gate-*.md`。
+门闸检查项定义参见 `src/shared/quality_gates/gate-*.md`。

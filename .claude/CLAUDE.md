@@ -91,11 +91,11 @@ Step 3: 判断 Paper Track 分叉 (Stage 4 Checkpoint)
 
 ### 4.2 Stage 5 内部 Handoff (Stage 5.1 → 5.9)
 
-所有跨 skill 产物遵循 `shared/handoff_schemas.md` 的 9 个 Schema。
+所有跨 skill 产物遵循 `resources/shared/handoff_schemas.md` 的 9 个 Schema。
 
 ### 4.3 Material Passport
 
-统一使用 `shared/passport/passport.py` 管理产物生命周期。
+统一使用 `src/shared/passport/passport.py` 管理产物生命周期。
 - Stage 1-4: 由 MSRA Pipeline 管理
 - Stage 5.0-5.9: 由 pipeline 管理
 - `track` 字段区分 `report_only` 和 `full_paper`
@@ -118,21 +118,21 @@ Step 3: 判断 Paper Track 分叉 (Stage 4 Checkpoint)
 ## 6. Shared 资源索引
 
 ### 数据分析专用
-- `shared/reporting-guidelines/` — 16 个临床报告规范
-- `shared/statistics-methods/` — 统计方法目录 (47 章)
-- `shared/sap/` — SAP 标准与验证
-- `shared/calibration/` — 度量校准框架
-- `shared/templates/` — R/Python 代码模板
+- `src/shared/reporting-guidelines/` — 16 个临床报告规范
+- `resources/statistics-methods/` — 统计方法目录 (47 章)
+- `src/shared/sap/` — SAP 标准与验证
+- `src/shared/calibration/` — 度量校准框架
+- `src/shared/templates/` — R/Python 代码模板
 
 ### 学术写作专用
-- `shared/handoff_schemas.md` — 跨 skill 数据契约 (12 Schema)
-- `shared/contracts/` — 合约模板 (4 个子目录: audit, evaluator, passport, reviewer)
-- `shared/prisma_trAIce_protocol.md` — PRISMA-trAIce
-- `shared/raise_framework.md` — RAISE 框架
-- `shared/style_calibration_protocol.md` — 写作风格校准
+- `resources/shared/handoff_schemas.md` — 跨 skill 数据契约 (12 Schema)
+- `resources/contracts/` — 合约模板 (4 个子目录: audit, evaluator, passport, reviewer)
+- `resources/shared/prisma_trAIce_protocol.md` — PRISMA-trAIce
+- `resources/shared/raise_framework.md` — RAISE 框架
+- `resources/shared/style_calibration_protocol.md` — 写作风格校准
 
 ### 共用
-- `shared/passport/` — Material Passport
-- `shared/references/` — 参考文档
-- `shared/anti-patterns/` — 反模式目录
-- `shared/reproducibility
+- `src/shared/passport/` — Material Passport
+- `resources/references/` — 参考文档
+- `resources/anti-patterns/` — 反模式目录
+- `src/shared/reproducibility

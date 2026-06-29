@@ -28,7 +28,7 @@ tags: [medical-statistics, clinical-trial, calibration, quality-assurance]
 > - 校准数据必须来自独立来源（已发表论文、专家审查结果、用户纠正），不得使用 MSRA 自身输出作为金标准
 > - 假阳性(FP)和假阴性(FN)同等重要，不得只报告其中一个
 > - 校准报告必须包含改进建议，不能只报数字不给方向
-> - 参考: shared/anti-patterns/medical_stats_anti_patterns.md
+> - 参考: resources/anti-patterns/medical_stats_anti_patterns.md
 
 ## 校准模式选择流程图
 
@@ -173,19 +173,19 @@ tags: [medical-statistics, clinical-trial, calibration, quality-assurance]
 | #6 复现验证 | `phases/mode6-replicate.md` | 5-Phase R1-R5 工作流 + 差异判定 + 异常处理 |
 | #7 公平性校准 | `phases/mode7-fairness.md` | 5 维度偏见检测 + MSF/ESF/CC 指标 + Pipeline 联动 |
 
-**shared/calibration/ 文件**（共享协议与模板）：
+**src/shared/calibration/ 文件**（共享协议与模板）：
 
 | 文件 | 说明 |
 |------|------|
-| `shared/calibration/calibration_protocol.md` | 与 Pipeline 集成 + QC Inspector 反馈 + 门闸动态阈值 + Anti-Pattern 验证 |
-| `shared/calibration/calibration_report_template.md` | 校准报告 Markdown 模板 + 工具引用 + 校准指标公式表 |
-| `shared/calibration/self_validation.md` | 校准系统自校验（3 项自检：已知答案/完全错误/随机基线） |
-| `shared/calibration/data_accumulation.md` | 真实校准数据积累机制 + 纠正触发条件 + 质量控制 |
-| `shared/calibration/gate_linkage_rules.md` | 门闸联动详细规则 + 伪代码 + 分方法类型判定 |
+| `src/shared/calibration/calibration_protocol.md` | 与 Pipeline 集成 + QC Inspector 反馈 + 门闸动态阈值 + Anti-Pattern 验证 |
+| `src/shared/calibration/calibration_report_template.md` | 校准报告 Markdown 模板 + 工具引用 + 校准指标公式表 |
+| `src/shared/calibration/self_validation.md` | 校准系统自校验（3 项自检：已知答案/完全错误/随机基线） |
+| `src/shared/calibration/data_accumulation.md` | 真实校准数据积累机制 + 纠正触发条件 + 质量控制 |
+| `src/shared/calibration/gate_linkage_rules.md` | 门闸联动详细规则 + 伪代码 + 分方法类型判定 |
 
 ## 反例与黑名单
 
-> 校准反例与黑名单（金标准禁忌 #1-4 + 校准执行禁忌 #5-7 + 门闸联动禁忌 #8-9 + 外部基准禁忌 + 公平性禁忌）见各模式 phases 文件的"禁忌"小节，以及 [shared/anti-patterns/medical_stats_anti_patterns.md](../../shared/anti-patterns/medical_stats_anti_patterns.md)。
+> 校准反例与黑名单（金标准禁忌 #1-4 + 校准执行禁忌 #5-7 + 门闸联动禁忌 #8-9 + 外部基准禁忌 + 公平性禁忌）见各模式 phases 文件的"禁忌"小节，以及 [resources/anti-patterns/medical_stats_anti_patterns.md](../../resources/anti-patterns/medical_stats_anti_patterns.md)。
 
 ## 检查点量化标准
 

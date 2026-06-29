@@ -1,7 +1,7 @@
 # Phase 2: 描述性统计（含依从性与安全性分析）
 
-> 参考：shared/statistics-methods/methods_catalog.md — 描述性统计方法速查
-> 参考：shared/statistics-methods/chapters/ch06-sample-size-calculations.md — 样本量计算原则 (统计指南第6章)
+> 参考：resources/statistics-methods/methods_catalog.md — 描述性统计方法速查
+> 参考：resources/statistics-methods/chapters/ch06-sample-size-calculations.md — 样本量计算原则 (统计指南第6章)
 > **与深度 EDA（Stage 2）的区别**：深度 EDA 为方法选择服务，此处 Table 1 和描述性统计为报告输出服务。
 
 在推断性分析之前，先生成出版级描述性统计：

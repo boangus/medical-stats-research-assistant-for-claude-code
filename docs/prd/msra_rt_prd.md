@@ -48,7 +48,7 @@
 |----|------|------|
 | P0-1 | **SKILL.md 编写** | 创建 `skills/realtime-monitor/SKILL.md`，包含 Phase 0-4 完整定义、角色定义、铁律、架构集成图 |
 | P0-2 | **命令注册** | 在 `manifest.json` 中注册 `/msra-rt` 命令，指向 `skills/realtime-monitor/SKILL.md` |
-| P0-3 | **Gate RT-1 质量门闸实现** | 实现 `shared/quality_gates/` 中的 RT-1 门闸（3项检查：数据流连接、时间戳连续性、异常检测灵敏度） |
+| P0-3 | **Gate RT-1 质量门闸实现** | 实现 `src/shared/quality_gates/` 中的 RT-1 门闸（3项检查：数据流连接、时间戳连续性、异常检测灵敏度） |
 | P0-4 | **StreamProcessor 核心补全** | 补全 `add_data_point` 的事件总线机制、窗口过期清理的自动调度、多指标并发处理 |
 | P0-5 | **AnomalyDetector 多变量检测** | 补全设计文档中定义的 Isolation Forest、DBSCAN 算法（当前仅有规则引擎 + TrendDetector） |
 | P0-6 | **单元测试** | 为 stream_processor、anomaly_detector、alert_system、dashboard、data_simulator 编写单元测试，覆盖率 ≥ 50% |
@@ -186,7 +186,7 @@ Gate RT-1 第3项检查: 异常检测灵敏度校准
 |------|------|
 | `skills/realtime-monitor/SKILL.md` | Skill 定义（Phase 0-4 + 门闸 + 铁律） |
 | `manifest.json` 更新 | 新增 `/msra-rt` 命令条目 |
-| `shared/quality_gates/rt_gates.py` | Gate RT-1 实现 |
+| `src/shared/quality_gates/rt_gates.py` | Gate RT-1 实现 |
 | `tests/test_stream_processor.py` | 流处理器测试 |
 | `tests/test_anomaly_detector.py` | 异常检测器测试 |
 | `tests/test_alert_system.py` | 告警系统测试 |

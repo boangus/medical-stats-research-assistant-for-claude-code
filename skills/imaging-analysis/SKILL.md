@@ -28,7 +28,7 @@ tags: [medical-imaging, radiomics, dicom, nifti, segmentation, feature-extractio
 > - 影像预处理参数**必须**在 Phase 0 由用户确认，不可使用静默默认值
 > - 特征提取结果**必须**经过质量验证，禁止输出未检查的原始特征
 > - Phase 2 子 Agent 任务**必须**可独立重跑，不依赖 Phase 1 的中间状态
-> - 参考：shared/quality_gates/ 的门闸框架，执行 Gate IMG-1 阻断检查
+> - 参考：src/shared/quality_gates/ 的门闸框架，执行 Gate IMG-1 阻断检查
 
 ## 架构集成图
 
@@ -76,7 +76,7 @@ tags: [medical-imaging, radiomics, dicom, nifti, segmentation, feature-extractio
 **架构设计原则**:
 1. 数据质量门闸 (Phase 1) 必须先于重计算 (Phase 2)
 2. Phase 2 的子 Agent 任务可独立重跑，不依赖 Phase 1 的中间状态
-3. 质量门闸复用 shared/quality_gates/ 框架
+3. 质量门闸复用 src/shared/quality_gates/ 框架
 4. 特征选择独立于特征提取，遵循单一职责原则
 
 ## 快速开始
@@ -251,5 +251,5 @@ Phase 4: 整合与报告 [ADAPTIVE] → 输入:用户确认 → 输出:报告 + 
 
 ## 扩展模块门闸（shared 框架）
 
-> 模块质量门闸定义参见：[shared/quality_gates/gate-img.md](../../shared/quality_gates/gate-img.md)
+> 模块质量门闸定义参见：[src/shared/quality_gates/gate-img.md](../../src/shared/quality_gates/gate-img.md)
 > 4 项检查，关键项为 1（DICOM 完整性）、2（分割质量）

@@ -22,7 +22,7 @@ tools:
 > **IRON RULES**:
 > - 严格按照 SAP 执行。任何偏离 SAP 的行为都必须记录偏差并征得用户同意
 > - 代码生成前先重读 SAP 对应章节方法部分，确保方法选择一致
-> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（B1/E1/E2）
+> - 参考：resources/anti-patterns/medical_stats_anti_patterns.md（B1/E1/E2）
 
 ## 阶段边界
 
@@ -106,7 +106,7 @@ AE/SAE 汇总、实验室检查、生命体征
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：shared/anti-patterns/medical_stats_anti_patterns.md（A3/B1/E1/E2）
+> 完整医学统计反模式目录参见：resources/anti-patterns/medical_stats_anti_patterns.md（A3/B1/E1/E2）
 
 | 禁止行为 | 正确做法 |
 |---------|---------|
@@ -118,7 +118,7 @@ AE/SAE 汇总、实验室检查、生命体征
 
 ## PATTERN PROTECTION
 
-这些规则防护 exec-runner 在医学统计代码生成场景下的 7 个已知幻觉/漂移模式。相关反模式定义见 `shared/anti-patterns/medical_stats_anti_patterns.md`。
+这些规则防护 exec-runner 在医学统计代码生成场景下的 7 个已知幻觉/漂移模式。相关反模式定义见 `resources/anti-patterns/medical_stats_anti_patterns.md`。
 
 **P1. SAP 方法遗忘 — 代码生成时不重读 SAP**
 - 生成代码前必须先重读 SAP 对应方法章节

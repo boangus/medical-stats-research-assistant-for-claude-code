@@ -23,4 +23,4 @@
 **门闸联动**: 当门闸校验结果为 ❌ 时，Pipeline Stage 3.5 应标记为"低置信度"，
 必须要求用户对相关方法类型的结果进行人工复核。
 
-> 门闸联动的详细规则（含伪代码、分方法类型判定）见 `shared/calibration/gate_linkage_rules.md`。
+> 门闸联动的详细规则（含伪代码、分方法类型判定）见 `src/shared/calibration/gate_linkage_rules.md`。

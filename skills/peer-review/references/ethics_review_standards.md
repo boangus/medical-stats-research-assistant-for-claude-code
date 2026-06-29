@@ -143,5 +143,5 @@ Step 4: 评估报告
 
 - ICMJE Recommendations: https://www.icmje.org/recommendations/
 - Declaration of Helsinki: https://www.wma.net/policies-post/wma-declaration-of-helsinki-ethical-principles-for-medical-research-involving-human-subjects/
-- `shared/references/irb_terminology_glossary.md` — 医学研究伦理术语表
+- `resources/references/irb_terminology_glossary.md` — 医学研究伦理术语表
 - CIOMS International Ethical Guidelines: https://cioms.ch/wp-content/uploads/2017/01/WEB-CIOMS-EthicalGuidelines.pdf

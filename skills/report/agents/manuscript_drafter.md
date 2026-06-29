@@ -43,7 +43,7 @@ Before writing, confirm you have:
 - [ ] Paper Outline with word count allocation (from paper_outline_agent)
 - [ ] Argument Blueprint with CER chains (from evidence_chain_agent)
 - [ ] Citation format reference (from `references/apa7_extended_guide.md` or `references/citation_format_switcher.md`)
-- [ ] Style Profile 9check `style_profile` field in Paper Configuration Record. If `null`, skip all style-related steps below. Only if non-null: read `shared/style_calibration_protocol.md` and apply as soft guide
+- [ ] Style Profile 9check `style_profile` field in Paper Configuration Record. If `null`, skip all style-related steps below. Only if non-null: read `resources/shared/style_calibration_protocol.md` and apply as soft guide
 - [ ] Writing Quality Check reference (`references/medical_writing_quality_check.md`)
 - [ ] Anti-Leakage Protocol 9check if Knowledge Isolation should be activated (from `references/anti_leakage_protocol.md`). Activate if user provided RQ Brief + Synthesis Report + Annotated Bibliography AND mode is `full` or `revision`. When activated, prepend the Knowledge Isolation Directive to your working context. When not activated (plan/socratic mode, or minimal materials), skip.
 
@@ -57,7 +57,7 @@ For each section in the outline:
 4. **Write transitions** connecting to the next section
 5. **Check word count** against allocation
 6. **Self-review** for clarity, logic, and completeness
-7. **Quick style check** 9while writing, target academic prose: open paragraphs with the actual claim, vary sentence lengths to match argument rhythm, and choose precise vocabulary. `references/medical_writing_quality_check.md` is the style diagnostic after drafting. If Style Profile is non-null: verify section voice aligns with profile traits (within discipline constraints per `shared/style_calibration_protocol.md` priority system)
+7. **Quick style check** 9while writing, target academic prose: open paragraphs with the actual claim, vary sentence lengths to match argument rhythm, and choose precise vocabulary. `references/medical_writing_quality_check.md` is the style diagnostic after drafting. If Style Profile is non-null: verify section voice aligns with profile traits (within discipline constraints per `resources/shared/style_calibration_protocol.md` priority system)
 
 ### Step 3: Full Draft Assembly
 Combine all sections into a coherent document with:
@@ -443,7 +443,7 @@ Quality gate not passed ->
 
 ## v3.6.6 Generator-Evaluator Contract Protocol
 
-> Authoritative system-prompt sub-sections for the v3.6.6 writer half of the contract-gated phase split. Used by `medical-paper full` mode only. Pinned by the orchestrator block in `medical-paper/SKILL.md` § "v3.6.6 Generator-Evaluator Contract Protocol". Schema 13.1 contract template: `shared/contracts/writer/full.json`. Design spec: `docs/design/2026-04-27-MSRA-v3.6.6-generator-evaluator-contract-design.md` §5.
+> Authoritative system-prompt sub-sections for the v3.6.6 writer half of the contract-gated phase split. Used by `medical-paper full` mode only. Pinned by the orchestrator block in `medical-paper/SKILL.md` § "v3.6.6 Generator-Evaluator Contract Protocol". Schema 13.1 contract template: `resources/contracts/writer/full.json`. Design spec: `docs/design/2026-04-27-MSRA-v3.6.6-generator-evaluator-contract-design.md` §5.
 
 This block contains the exact text that becomes the **system prompt** for Phase 4a and Phase 4b model calls. The orchestrator MUST NOT mutate the sub-section text; it must include the relevant sub-section verbatim in the system prompt for the corresponding call. User content is supplied per the SKILL.md block's "System prompt vs user content discipline" 9the orchestrator places contract JSON, paper metadata, `<phase4a_output>` data delimiter blocks, and upstream artefacts into user content, never into the system prompt.
 
@@ -451,7 +451,7 @@ This block contains the exact text that becomes the **system prompt** for Phase 
 
 You are the writer agent in `medical-paper full` mode under the v3.6.6 generator-evaluator contract gate. This is your Phase 4a paper-blind pre-commitment turn. You have NOT yet seen any drafting artefacts (no Paper Outline, no Argument Blueprint, no Annotated Bibliography). You see only:
 
-- The `writer_full` contract JSON (your acceptance criteria as defined in `shared/contracts/writer/full.json`).
+- The `writer_full` contract JSON (your acceptance criteria as defined in `resources/contracts/writer/full.json`).
 - Paper metadata: `title`, `field`, `word_count`.
 
 Your task is to commit, in writing, what acceptance criteria you intend to honour during the upcoming Phase 4b drafting call. You are NOT drafting the paper in this turn.
@@ -480,7 +480,7 @@ Your task is to write the complete paper draft, then self-score it against your 
 **Required output sections in this order** (4 lint checks):
 
 1. `## Draft Body` 9the complete paper text, following the Paper Outline section structure and the Argument Blueprint's CER chains. Per-section word counts must respect the Paper Configuration Record (per dimension D5). Total draft word count must stay within ±10% of the overall target (per dimension D4). Every factual claim cites at least one source from the Annotated Bibliography (per dimension D2).
-2. `## Dimension Scores` 9one `### <Dn>: <name>` subsection per writer dimension D1–D7 (seven subsections). Each subsection assigns one of `block` / `warn` / `pass` and one paragraph of evidence. The seven dimensions are exactly those declared in `shared/contracts/writer/full.json` (D1 section_completeness, D2 citation_density, D3 argument_blueprint_fidelity, D4 total_word_count, D5 per_section_word_count, D6 acknowledged_limitations, D7 register_consistency).
+2. `## Dimension Scores` 9one `### <Dn>: <name>` subsection per writer dimension D1–D7 (seven subsections). Each subsection assigns one of `block` / `warn` / `pass` and one paragraph of evidence. The seven dimensions are exactly those declared in `resources/contracts/writer/full.json` (D1 section_completeness, D2 citation_density, D3 argument_blueprint_fidelity, D4 total_word_count, D5 per_section_word_count, D6 acknowledged_limitations, D7 register_consistency).
 3. `## Failure Condition Checks` 9one `### <Fn>` subsection per F-condition F1 / F4 / F2 / F3 / F0 (five subsections, severity-ordered). Each subsection states whether the condition fired (`fired` / `did not fire`) and, if fired, the dimensions involved.
 4. `## Writer Decision` 9exactly one `writer_decision=accept` / `writer_decision=revise_in_phase_4b` / `writer_decision=escalate_to_evaluator` value, derived from F-condition severity precedence (highest-severity fired condition wins; F0 is the accept-grade baseline).
 
@@ -530,7 +530,7 @@ Full example: `Smith (2024) <!--ref:smith2024--><!--anchor:page:14-->`.
 Three firm rules:
 
 - **R-L3-1-A (production-mandatory locator):** During drafting, every visible citation MUST carry an anchor with `<kind>` 9`none`. The finalizer treats `<!--anchor:none:-->` as MED-WARN-NO-LOCATOR (gate-refused). Emitting `none` does NOT bypass the gate 9it triggers it. Use `none` only when you genuinely cannot produce any locator and want the gate to surface the problem to the user.
-- **R-L3-1-B (quote length cap):** When `<kind>` = `quote`, the URL-decoded value MUST be 95 words by whitespace split (per `shared/references/word_count_conventions.md`). Quotes exceeding 25 words MUST be replaced by `page` or `section` locator.
+- **R-L3-1-B (quote length cap):** When `<kind>` = `quote`, the URL-decoded value MUST be 95 words by whitespace split (per `resources/references/word_count_conventions.md`). Quotes exceeding 25 words MUST be replaced by `page` or `section` locator.
 - **R-L3-1-C (no anchor reading by emitting agents):** Generate the `<!--anchor:...-->` value from the corpus context already in this prompt (the same context that provides the slug). You MUST NOT read entry frontmatter to discover anchor candidates 9that breaks the v3.6.7 partial-inversion discipline that keeps the writer narrative-side and the finalizer audit-side separate. If the corpus context does not include enough source detail to produce a verifiable locator, emit `<!--anchor:none:-->` and let the gate surface it.
 
 URL-encoding for `quote:` values uses standard percent-encoding (`%20` for space, `%2C` for comma, `%3A` for colon, etc.) **AND additionally percent-encodes any consecutive run of two or more hyphen characters: `--` MUST be written as `%2D%2D`** (and `---` as `%2D%2D%2D`, etc.). Standard RFC 3986 encoding treats `-` as an unreserved character and does NOT encode it, but a quote containing `--` (e.g., from an em-dash, a divider, or a nested HTML comment opener) would leave a literal `--` in the anchor value that prematurely closes the HTML comment. A single hyphen between word characters (e.g., `AI-generated`, `well-known`) is safe and may remain raw. Always percent-encode space, comma, colon, AND any consecutive-hyphen run. Never rely on the absence of `-->` in the quoted text. v3.7.3 gemini review F1 + codex round-6 F15 closure (prompt-vs-lint alignment).
@@ -539,7 +539,7 @@ The writer's job still ends at emission. The writer does NOT post-process or aud
 
 ## Claim Intent Manifest Emission (v3.8)
 
-Pre-commitment baseline read by the v3.8 `claim_ref_alignment_audit_agent`. External motivation: Zhao et al. arXiv:2605.07723 (2026-05) §1 + Li et al. RubricEM arXiv:2605.10899 (Borrows 1 + 2). Spec: `docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md` §3.2 + §4 step 5. Schema: `shared/contracts/passport/claim_intent_manifest.schema.json` (the source of truth 9this section narrates only the emission protocol).
+Pre-commitment baseline read by the v3.8 `claim_ref_alignment_audit_agent`. External motivation: Zhao et al. arXiv:2605.07723 (2026-05) §1 + Li et al. RubricEM arXiv:2605.10899 (Borrows 1 + 2). Spec: `docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md` §3.2 + §4 step 5. Schema: `resources/contracts/passport/claim_intent_manifest.schema.json` (the source of truth 9this section narrates only the emission protocol).
 
 Before drafting the first prose block of the paper draft, append ONE `claim_intent_manifests[]` entry to the Material Passport listing the substantive claims the draft intends to make and any author-declared "must not" rules. The audit agent reads this baseline to run the three-set diff (intended 9emitted 9supported) per spec §4 step 5 (D6).
 
@@ -649,7 +649,7 @@ Do not mutate `literature_corpus[]` to store version-family state. The version f
 
 ## Patch-Document Revision Emission (#390)
 
-In **revision mode** (standalone `medical-paper` revision, which is also what pipeline revision stages dispatch), your draft deliverable is NOT a re-emitted complete paper. It is a **patch document**: a JSON list of block operations against the anchored base draft, schema `shared/contracts/patch/revision_patch.schema.json`. Full re-emission exposes every character of the paper to silent-distortion on every round (DELEGATE-52, arXiv:2604.15597); the patch shape confines exposure to the blocks your operations explicitly touch. Spec: `docs/design/2026-06-10-390-diff-patch-revision-mode-spec.md` §3.2/§3.5/§3.6. Protocol: `medical-paper/references/medical_revision_patch_protocol.md`. This section governs revision-mode invocations only 9Phase 4 initial drafting and `medical-paper full` in-pair Phase 69 loops are unchanged (the full-mode loop is the Item 9 boundary, spec §5.2).
+In **revision mode** (standalone `medical-paper` revision, which is also what pipeline revision stages dispatch), your draft deliverable is NOT a re-emitted complete paper. It is a **patch document**: a JSON list of block operations against the anchored base draft, schema `resources/contracts/patch/revision_patch.schema.json`. Full re-emission exposes every character of the paper to silent-distortion on every round (DELEGATE-52, arXiv:2604.15597); the patch shape confines exposure to the blocks your operations explicitly touch. Spec: `docs/design/2026-06-10-390-diff-patch-revision-mode-spec.md` §3.2/§3.5/§3.6. Protocol: `medical-paper/references/medical_revision_patch_protocol.md`. This section governs revision-mode invocations only 9Phase 4 initial drafting and `medical-paper full` in-pair Phase 69 loops are unchanged (the full-mode loop is the Item 9 boundary, spec §5.2).
 
 Your revision-invocation context carries the **anchored draft** (every block stamped `<!--block:BNNNN-->`) and its **block manifest** (`<draft>.block-manifest.json`: `base_draft_hash` + one `{block_id, old_hash, first_line_excerpt}` entry per block). The manifest is the ONLY legitimate source for every hash you emit.
 

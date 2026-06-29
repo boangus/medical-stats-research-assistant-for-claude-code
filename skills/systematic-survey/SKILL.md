@@ -434,42 +434,42 @@ PRISMA-S（Systematic Review Search Methods Extension）要求完整报告检索
 
 | 资源 | 路径 | 用途 |
 |------|------|------|
-| PRISMA 2020 Checklist | `shared/reporting-guidelines/PRISMA_2020_checklist.md` | 系统综述报告 27 项检查清单 |
-| PRISMA-NMA Checklist | `shared/reporting-guidelines/PRISMA_NMA_checklist.md` | 网络 meta 分析报告清单 |
-| CONSORT Checklist | `shared/reporting-guidelines/CONSORT_checklist.md` | RCT 报告清单（评估纳入研究质量时参考） |
-| STROBE Checklist | `shared/reporting-guidelines/STROBE_checklist.md` | 观察性研究报告清单 |
-| SPIRIT Checklist | `shared/reporting-guidelines/SPIRIT_checklist.md` | 临床试验方案报告清单 |
+| PRISMA 2020 Checklist | `src/shared/reporting-guidelines/PRISMA_2020_checklist.md` | 系统综述报告 27 项检查清单 |
+| PRISMA-NMA Checklist | `src/shared/reporting-guidelines/PRISMA_NMA_checklist.md` | 网络 meta 分析报告清单 |
+| CONSORT Checklist | `src/shared/reporting-guidelines/CONSORT_checklist.md` | RCT 报告清单（评估纳入研究质量时参考） |
+| STROBE Checklist | `src/shared/reporting-guidelines/STROBE_checklist.md` | 观察性研究报告清单 |
+| SPIRIT Checklist | `src/shared/reporting-guidelines/SPIRIT_checklist.md` | 临床试验方案报告清单 |
 
 ### 偏倚风险与证据评级
 
 | 资源 | 路径 | 用途 |
 |------|------|------|
-| RoB 2 Checklist | `shared/risk-of-bias/RoB_2_checklist.md` | RCT 偏倚风险评估工具 |
-| ROBINS-I Checklist | `shared/risk-of-bias/ROBINS_I_V2_checklist.md` | 非随机研究偏倚风险评估工具 |
-| QUADAS-2 Checklist | `shared/risk-of-bias/QUADAS_2_checklist.md` | 诊断准确性研究质量评估 |
-| PROBAST Checklist | `shared/risk-of-bias/PROBAST_checklist.md` | 预测模型研究偏倚风险评估 |
-| GRADE Framework | `shared/risk-of-bias/GRADE_framework.md` | GRADE 证据质量评级框架 |
+| RoB 2 Checklist | `resources/risk-of-bias/RoB_2_checklist.md` | RCT 偏倚风险评估工具 |
+| ROBINS-I Checklist | `resources/risk-of-bias/ROBINS_I_V2_checklist.md` | 非随机研究偏倚风险评估工具 |
+| QUADAS-2 Checklist | `resources/risk-of-bias/QUADAS_2_checklist.md` | 诊断准确性研究质量评估 |
+| PROBAST Checklist | `resources/risk-of-bias/PROBAST_checklist.md` | 预测模型研究偏倚风险评估 |
+| GRADE Framework | `resources/risk-of-bias/GRADE_framework.md` | GRADE 证据质量评级框架 |
 
 ### 统计方法
 
 | 资源 | 路径 | 用途 |
 |------|------|------|
-| 统计方法目录 | `shared/statistics-methods/INDEX.md` | 48 章统计方法索引 |
-| Meta 分析章节 | `shared/statistics-methods/chapters/` | 合并效应量、异质性、发表偏倚等 |
-| 统计检验决策树 | `shared/statistics-methods/stat_test_decision_tree.md` | 选择正确统计方法 |
-| 统计约束规则 | `shared/statistics-methods/statistical_constraints.md` | 统计分析硬性约束 |
+| 统计方法目录 | `resources/statistics-methods/INDEX.md` | 48 章统计方法索引 |
+| Meta 分析章节 | `resources/statistics-methods/chapters/` | 合并效应量、异质性、发表偏倚等 |
+| 统计检验决策树 | `resources/statistics-methods/stat_test_decision_tree.md` | 选择正确统计方法 |
+| 统计约束规则 | `resources/statistics-methods/statistical_constraints.md` | 统计分析硬性约束 |
 
 ### PRISMA-trAIce 协议
 
 | 资源 | 路径 | 用途 |
 |------|------|------|
-| PRISMA-trAIce Protocol | `shared/prisma_trAIce_protocol.md` | AI 辅助系统综述的 PRISMA 扩展 |
-| RAISE Framework | `shared/raise_framework.md` | AI 辅助系统综述的 RAISE 框架 |
+| PRISMA-trAIce Protocol | `resources/shared/prisma_trAIce_protocol.md` | AI 辅助系统综述的 PRISMA 扩展 |
+| RAISE Framework | `resources/shared/raise_framework.md` | AI 辅助系统综述的 RAISE 框架 |
 
 ### 反模式参考
 | 资源 | 路径 | 用途 |
 |------|------|------|
-| 医学统计反模式 | `shared/anti-patterns/medical_stats_anti_patterns.md` | 医学统计分析常见错误 |
+| 医学统计反模式 | `resources/anti-patterns/medical_stats_anti_patterns.md` | 医学统计分析常见错误 |
 
 ---
 

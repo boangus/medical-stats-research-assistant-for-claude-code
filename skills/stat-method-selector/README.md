@@ -25,8 +25,11 @@
 
 ### 方式二：独立 Web 界面
 
+Web 界面已迁移至仓库根目录的 `tools/stat-method-selector-server/`：
+
 ```bash
 # 启动本地服务器
+cd tools/stat-method-selector-server
 start-server.bat
 # 浏览器访问 http://localhost:8090
 ```
@@ -38,9 +41,8 @@ start-server.bat
 | `SKILL.md` | Skill 定义文件，包含完整的使用逻辑和输出格式 |
 | `decision-tree.json` | 决策树数据（6-8层维度，112个叶子节点） |
 | `references.md` | 53篇方法学论文的结构化摘要 |
-| `index.html` | Web 版交互界面（独立使用） |
-| `server.js` | 本地 HTTP 服务器 |
-| `audit.py` | 决策树质量审计脚本 |
+
+> Web 界面文件（`server.js`、`index.html` 等）位于 `tools/stat-method-selector-server/`；决策树审计脚本位于 `scripts/audit/`。
 
 ## 适用范围
 

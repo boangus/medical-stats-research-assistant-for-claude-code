@@ -66,8 +66,8 @@ license: CC-BY-NC-SA-4.0
 ## 4. 检查清单集成
 
 ### 4.1 自动化检查
-- `shared/reporting-guidelines/` 目录下的检查清单
-- `shared/reporting-guidelines/statcheck_patterns.py` 统计结果检查
+- `src/shared/reporting-guidelines/` 目录下的检查清单
+- `src/shared/reporting-guidelines/statcheck_patterns.py` 统计结果检查
 - 合规性报告自动生成
 
 ### 4.2 人工审核

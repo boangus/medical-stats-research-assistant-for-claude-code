@@ -1,7 +1,7 @@
 ### Phase 1b: 跨中心一致性检查 🆕（仅 multi-dataset 模式）
 
 > 目的：在多中心研究中，检查各中心数据的一致性，确保汇总分析的可行性。
-> 使用：`shared/templates/multicenter_template.py` 的 `MultiCenterAnalyzer`
+> 使用：`src/shared/templates/multicenter_template.py` 的 `MultiCenterAnalyzer`
 
 **检查内容**（使用 `cross_site_consistency_check()`）：
 

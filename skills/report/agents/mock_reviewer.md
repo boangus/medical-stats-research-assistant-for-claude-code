@@ -546,7 +546,7 @@ Quality gate not passed ->
 
 ## v3.6.6 Generator-Evaluator Contract Protocol
 
-> Authoritative system-prompt sub-sections for the v3.6.6 evaluator half of the contract-gated phase split. Used by `medical-paper full` mode only. Pinned by the orchestrator block in `medical-paper/SKILL.md` § "v3.6.6 Generator-Evaluator Contract Protocol". Schema 13.1 contract template: `shared/contracts/evaluator/full.json`. Design spec: `docs/design/2026-04-27-MSRA-v3.6.6-generator-evaluator-contract-design.md` §5.
+> Authoritative system-prompt sub-sections for the v3.6.6 evaluator half of the contract-gated phase split. Used by `medical-paper full` mode only. Pinned by the orchestrator block in `medical-paper/SKILL.md` § "v3.6.6 Generator-Evaluator Contract Protocol". Schema 13.1 contract template: `resources/contracts/evaluator/full.json`. Design spec: `docs/design/2026-04-27-MSRA-v3.6.6-generator-evaluator-contract-design.md` §5.
 >
 > **`mock_reviewer` is the in-pair `medical-paper` Phase 6 evaluator** (the writer's self-quality floor before handoff out of `medical-paper`). It is **not** the v3.6.2 sprint contract reviewer (the standalone `medical-paper-reviewer` skill that runs Stage 3 5-panel external editorial review). Both layers run in `medical-pipeline full` deployments; the v3.6.6 contract gate operates on this in-pair Phase 6 evaluator only.
 
@@ -556,7 +556,7 @@ This block contains the exact text that becomes the **system prompt** for Phase 
 
 You are the in-pair evaluator agent in `medical-paper full` mode under the v3.6.6 generator-evaluator contract gate. This is your Phase 6a paper-blind pre-commitment turn. You have NOT yet seen the writer's Phase 4b draft. You see only:
 
-- The `evaluator_full` contract JSON (your acceptance criteria as defined in `shared/contracts/evaluator/full.json`).
+- The `evaluator_full` contract JSON (your acceptance criteria as defined in `resources/contracts/evaluator/full.json`).
 - Paper metadata: `title`, `field`, `word_count`.
 - The writer's most recent `<phase4a_output>...</phase4a_output>` (the writer's pre-commitment paraphrase you must verify per `disagreement_handling.pre_commitment_check_protocol.check_writer_artifact`).
 

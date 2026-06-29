@@ -43,7 +43,7 @@ Append-only list. Each entry is an observer report produced at a FULL/SLIM check
 
 ### Material Version Control
 
-Every material artifact produced by the pipeline carries a version label. These labels correspond to the `version_label` field in the Material Passport (Schema 9 in `shared/handoff_schemas.md`).
+Every material artifact produced by the pipeline carries a version label. These labels correspond to the `version_label` field in the Material Passport (Schema 9 in `resources/shared/handoff_schemas.md`).
 
 | Material | Version Format | Example | Schema Reference |
 |----------|---------------|---------|-----------------|

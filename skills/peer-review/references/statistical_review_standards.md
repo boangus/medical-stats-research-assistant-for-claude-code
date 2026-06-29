@@ -110,7 +110,7 @@
 
 ## 5. 引用
 
-- `shared/statistics-methods/` — 统计方法目录 (47 章)
-- `shared/templates/` — R/Python 统计代码模板
+- `resources/statistics-methods/` — 统计方法目录 (47 章)
+- `src/shared/templates/` — R/Python 统计代码模板
 - ICMJE Statistical Guidelines: https://www.icmje.org/recommendations/browse/publishing-and-editorial-issues/scientific-misconduct-fraud-and-collusion.html
 - Altman DG, Bland JM. Statistics notes. BMJ.

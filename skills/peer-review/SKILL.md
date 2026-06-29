@@ -17,8 +17,8 @@ tags: [peer-review, medical-journal, ICMJE, CONSORT, STROBE, manuscript-review, 
 
 模拟完整的国际医学期刊同行评审流程：自动识别论文研究类型与临床领域，动态配备 5 位专业审稿人（主编 + 方法学审稿人 + 临床专家 + 统计审稿人 + 伦理审查员），从临床意义、方法学严谨性、统计学正确性、伦理合规性、报告规范合规性五个非重叠视角独立评审，最终产出结构化的编辑决定（Editorial Decision）与修订路线图（Revision Roadmap）。
 **核心定位**：本 skill 专注于医学期刊同行评审，严格遵循 ICMJE 推荐标准，强制检查 CONSORT/STROBE/PRISMA 等报告规范合规性，独立审查统计方法与临床意义。
-> **路由规范 (v3.9.2):** 参见 `.claude/CLAUDE.md` "Routing Discipline (v3.9.2)" + `shared/references/intent_clarification_protocol.md`。本 skill 假设路由已完成，跨阶段的模糊材料应在上游澄清。
-> - 参考：`shared/references/irb_terminology_glossary.md` — 医学研究伦理术语表（伦理审查员必读）
+> **路由规范 (v3.9.2):** 参见 `.claude/CLAUDE.md` "Routing Discipline (v3.9.2)" + `resources/references/intent_clarification_protocol.md`。本 skill 假设路由已完成，跨阶段的模糊材料应在上游澄清。
+> - 参考：`resources/references/irb_terminology_glossary.md` — 医学研究伦理术语表（伦理审查员必读）
 
 ---
 
@@ -495,10 +495,10 @@ systematic-survey --> report(论文模式) --> [完整性检查] --> peer-review
 
 | 资源路径 | 内容 | 用途 |
 |---------|------|------|
-| `shared/reporting-guidelines/` | CONSORT / STROBE / PRISMA / STARD / TRIPOD+AI / CARE 完整清单 | 报告规范合规性检查 |
-| `shared/risk-of-bias/` | RoB 2 (RCT) / ROBINS-I (非随机) / NOS (观察性) / ROBIS (系统综述) | 偏倚风险评估 |
-| `shared/statistics-methods/` | 统计方法目录 (48 章)，含方法选择、假设检验、模型诊断 | 统计方法审查参考 |
-| `shared/templates/` | R/Python 统计代码模板 | 统计审查时验证代码 |
+| `src/shared/reporting-guidelines/` | CONSORT / STROBE / PRISMA / STARD / TRIPOD+AI / CARE 完整清单 | 报告规范合规性检查 |
+| `resources/risk-of-bias/` | RoB 2 (RCT) / ROBINS-I (非随机) / NOS (观察性) / ROBIS (系统综述) | 偏倚风险评估 |
+| `resources/statistics-methods/` | 统计方法目录 (48 章)，含方法选择、假设检验、模型诊断 | 统计方法审查参考 |
+| `src/shared/templates/` | R/Python 统计代码模板 | 统计审查时验证代码 |
 
 ---
 

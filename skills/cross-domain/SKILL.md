@@ -81,7 +81,7 @@ tags: [cross-domain, multi-modal, fusion, radiomics, deg, correlation, predictio
 1. 数据对齐门闸 (Phase 1) 必须先于融合分析 (Phase 2)
 2. Phase 2 的子 Agent 任务可独立重跑，不依赖 Phase 1 的中间状态
 3. 融合结果门闸 (Phase 3) 在分析之后、用户确认之前执行
-4. 质量门闸复用 shared/quality_gates/ 框架
+4. 质量门闸复用 src/shared/quality_gates/ 框架
 5. 依赖方向严格单向（上游模块 → cross_domain → Pipeline）
 
 ## 快速开始
@@ -351,7 +351,7 @@ result = export_v1_schema(
 
 ## 质量门闸参考
 
-本模块使用以下质量门闸，复用 `shared/quality_gates/` 框架:
+本模块使用以下质量门闸，复用 `src/shared/quality_gates/` 框架:
 
 | 门闸 | 阶段 | 检查项数 | 关键项 | 实现文件 |
 |------|------|---------|--------|---------|
@@ -368,7 +368,7 @@ result = export_v1_schema(
 ## 输出 Schema 说明
 
 输出 Schema 为 `msra/cross_domain_result/v1`，详见:
-`shared/contracts/cross_domain_result_schema.md`
+`resources/contracts/cross_domain_result_schema.md`
 
 | 文件 | 说明 |
 |------|------|
@@ -386,7 +386,7 @@ result = export_v1_schema(
 | 前置模块 | medical_imaging | 提供影像组学特征矩阵 |
 | 前置模块 | bioinformatics | 提供差异基因表达矩阵 |
 | 前置模块 | realtime_analytics | 提供时序监控数据 |
-| 共享框架 | shared/quality_gates | GateRunner + CheckItemResult |
+| 共享框架 | src/shared/quality_gates | GateRunner + CheckItemResult |
 | 共享框架 | agents/implementations/hybrid_mode_bridge | HybridModeBridge + SubAgentType |
 | 主 Pipeline | Stage 3 | 接收 cross_domain 输出进行联合建模 |
 
@@ -394,7 +394,7 @@ result = export_v1_schema(
 
 ## 扩展模块门闸（shared 框架）
 
-> 模块质量门闸定义参见：[shared/quality_gates/gate-cross.md](../../shared/quality_gates/gate-cross.md)
+> 模块质量门闸定义参见：[src/shared/quality_gates/gate-cross.md](../../src/shared/quality_gates/gate-cross.md)
 > 4 项检查，关键项为 1（多模态对齐）、2（融合模型验证）
 
 ---

@@ -210,7 +210,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 ### Stage 1.5: DATA QUALITY GATE 🔴（阻断式检查）
 
-> **完整门闸定义参见**：[shared/quality_gates/gate-data.md](../../shared/quality_gates/gate-data.md)（9 项检查清单 + 判定规则）
+> **完整门闸定义参见**：[src/shared/quality_gates/gate-data.md](../../src/shared/quality_gates/gate-data.md)（9 项检查清单 + 判定规则）
 > **阻断规则**：9 项中关键项 5/6/7/9 任一未通过 或 <7/9 通过 → ❌ 强制退回 Stage 1 修订；回退 ≥2 次触发收敛检测（§7.3）。
 
 ### Stage 2: ANALYSIS PLAN
@@ -226,7 +226,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 ### Stage 2.5: SAP QUALITY GATE 🔴（阻断式检查）
 
-> **完整门闸定义参见**：[shared/quality_gates/gate-sap.md](../../shared/quality_gates/gate-sap.md)（8 项检查清单 + 判定规则）
+> **完整门闸定义参见**：[src/shared/quality_gates/gate-sap.md](../../src/shared/quality_gates/gate-sap.md)（8 项检查清单 + 判定规则）
 > **阻断规则**：8 项中关键项 3/5/7 任一未通过 或 3+ 项未通过 → ❌ 强制退回 Stage 2 修订；回退 ≥2 次触发收敛检测（§7.3）。
 
 ### Stage 3: ANALYSIS EXEC
@@ -240,7 +240,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 ### Stage 3.5: RESULTS QUALITY GATE 🔴（阻断式检查）
 
-> **完整门闸定义参见**：[shared/quality_gates/gate-results.md](../../shared/quality_gates/gate-results.md)（14 项检查清单 + 判定规则）
+> **完整门闸定义参见**：[src/shared/quality_gates/gate-results.md](../../src/shared/quality_gates/gate-results.md)（14 项检查清单 + 判定规则）
 > **阻断规则**：14 项中关键项 1/3/4/10/11/12/13 任一未通过 或 3+ 项未通过 → ❌ 强制退回 Stage 3 修正；回退 ≥2 次触发收敛检测（§7.3）。
 
 ### Stage 4: REPORT
@@ -256,7 +256,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 ## 4. Checkpoint Protocol（三级分层）
 
-> **完整协议定义参见**：[shared/checkpoint_protocol.md](../../shared/checkpoint_protocol.md)（三级 MANDATORY/SLIM/ADAPTIVE 完整规范 + 分层验证框架）
+> **完整协议定义参见**：[resources/shared/checkpoint_protocol.md](../../resources/shared/checkpoint_protocol.md)（三级 MANDATORY/SLIM/ADAPTIVE 完整规范 + 分层验证框架）
 
 | 级别 | 触发 | 跳过规则 | 数量 |
 |------|------|---------|------|
@@ -270,7 +270,7 @@ works_with: [agents/AGENTS.md, agents/protocol.md]
 
 ## 5. Progress Tracking (Passport)
 
-> 使用 Material Passport (`shared/passport/passport.py`) 持久化追踪全部产物。护照路径: `.msra/passport.json`（自动创建）
+> 使用 Material Passport (`src/shared/passport/passport.py`) 持久化追踪全部产物。护照路径: `.msra/passport.json`（自动创建）
 
 **Passport 能力**：产物追踪(planned→in_progress→completed→verified→consumed) · 前置检查(`verify_prerequisites`) · 恢复(`get_resume_point`) · 回滚(`rollback_to`) · 门闸记录(`set_gate_result`)
 
@@ -439,4 +439,4 @@ Pipeline Orchestrator
 
 ## 反例与黑名单
 
-> **完整反模式目录参见**：[shared/anti-patterns/medical_stats_anti_patterns.md](../../shared/anti-patterns/medical_stats_anti_patterns.md)（A1/A2/B2/B3 + 编排器角色禁忌 + 阶段跳转禁忌 + 进度追踪禁忌）
+> **完整反模式目录参见**：[resources/anti-patterns/medical_stats_anti_patterns.md](../../resources/anti-patterns/medical_stats_anti_patterns.md)（A1/A2/B2/B3 + 编排器角色禁忌 + 阶段跳转禁忌 + 进度追踪禁忌）

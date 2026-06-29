@@ -192,7 +192,7 @@ MSRA 会自动执行以下步骤，您只需要观察：
 | **ITT (意向治疗分析)** | 所有被随机分组的人都算在内，不管他们有没有完成治疗 | "即使有人中途退出，也要按最初分的组来算" |
 | **混杂因素** | 除了研究的治疗外，其他可能影响结果的因素 | "吸烟的人可能同时喝酒多，所以喝酒就是混杂因素" |
 
-> **完整术语表**: 如需查看更多术语，请参考 [通俗术语表](../../shared/references/plain_language_glossary.md)
+> **完整术语表**: 如需查看更多术语，请参考 [通俗术语表](../../resources/references/plain_language_glossary.md)
 
 ---
 
@@ -310,8 +310,11 @@ MSRA 会在分析过程中显示进度，您可以随时了解当前的处理状
 ### 6.2 学习资源
 
 - **完整工作流程示例**: [examples/example_workflow.md](../../examples/example_workflow.md)
-- **通俗术语表**: [shared/references/plain_language_glossary.md](../../shared/references/plain_language_glossary.md)
-- **故障排除指南**: [docs/troubleshooting.md](../troubleshooting.md)
+- **通俗术语表**: [resources/references/plain_language_glossary.md](../../resources/references/plain_language_glossary.md)
+- **故障排除指南**: [docs/user_guide/troubleshooting.md](./troubleshooting.md)
+- **大规模处理指南**: [docs/user_guide/large-scale-processing-guide.md](./large-scale-processing-guide.md)
+- **系统设计文档**: [docs/dev/system_design.md](../dev/system_design.md)
+- **发布流程**: [docs/dev/release-workflow.md](../dev/release-workflow.md)
 
 ### 6.3 社区支持
 

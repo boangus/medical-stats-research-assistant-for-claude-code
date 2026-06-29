@@ -9,7 +9,7 @@ import pytest
 # 跳过如果映射文件不存在
 MAPPING_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
-    "shared", "value-normalization", "tcm_terms", "gb_t16751_syndrome.json"
+    "src", "shared", "value-normalization", "tcm_terms", "gb_t16751_syndrome.json"
 )
 
 

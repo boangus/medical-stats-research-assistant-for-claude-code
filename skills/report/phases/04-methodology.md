@@ -1,8 +1,8 @@
 # Phase 4: 方法学描述
 
 > 来源：从 SKILL.md L681-736 抽取。
-> 参考：shared/statistics-methods/methods_catalog.md — 统计方法描述模板
-> 参考：shared/statistics-methods/REFERENCE.md — 统计方法描述的JAMA规范格式参考
+> 参考：resources/statistics-methods/methods_catalog.md — 统计方法描述模板
+> 参考：resources/statistics-methods/REFERENCE.md — 统计方法描述的JAMA规范格式参考
 
 **统计方法学段落模板**：
 

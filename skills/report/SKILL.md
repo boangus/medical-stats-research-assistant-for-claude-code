@@ -35,19 +35,19 @@ tags: [medical-statistics, clinical-trial, report, CONSORT, STROBE, publication,
 > - 图表必须达到发表级标准（publication_figure_standards.md）
 > - 变量名遵循 variable_naming_conventions.md 三列命名体系
 > - 图表注释中的P值与表格、正文必须完全一致（P-R07）
-> - 反模式：shared/anti-patterns/medical_stats_anti_patterns.md（D1/D2/D3/M1-M6）
-> - 统计约束：shared/statistics-methods/statistical_constraints.md
-> - 图表标准：shared/chart-styles/publication_figure_standards.md
-> - 变量命名+自动化标准化：shared/variable_naming_standards.md（677行，50+映射表）+ shared/variable_standardization/（VariableStandardizer + StatFormatter）
-> - 图表模板：shared/templates/publication_figure_template.py
-> - 审慎表达：shared/references/protected_hedging_phrases.md
-> - 期刊模板：shared/journal-templates/（AIM/BMJ/JAMA/Lancet/NEJM 等 7 个）
-> - 图表 FDV：shared/chart_understanding/
+> - 反模式：resources/anti-patterns/medical_stats_anti_patterns.md（D1/D2/D3/M1-M6）
+> - 统计约束：resources/statistics-methods/statistical_constraints.md
+> - 图表标准：resources/chart-styles/publication_figure_standards.md
+> - 变量命名+自动化标准化：resources/shared/variable_naming_standards.md（677行，50+映射表）+ src/shared/variable_standardization/（VariableStandardizer + StatFormatter）
+> - 图表模板：src/shared/templates/publication_figure_template.py
+> - 审慎表达：resources/references/protected_hedging_phrases.md
+> - 期刊模板：resources/journal-templates/（AIM/BMJ/JAMA/Lancet/NEJM 等 7 个）
+> - 图表 FDV：src/shared/chart_understanding/
 
 ## 架构集成图
 
 ```
-输入: analysis-exec结果(JSON) + shared/chart-styles + reporting-guidelines(CONSORT/STROBE)
+输入: analysis-exec结果(JSON) + resources/chart-styles + reporting-guidelines(CONSORT/STROBE)
   ↓
 Phase 0-1: 解读会话+结果解读 (确认优先级 → 提取效应量/P值/CI)
   ↓
@@ -200,7 +200,7 @@ Phase 6: 报告组装 → 输入:JSON骨架+图表 → 输出:HTML+MD
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：[shared/anti-patterns/medical_stats_anti_patterns.md](../../shared/anti-patterns/medical_stats_anti_patterns.md)（D1/D2/D3/A5/M1-M6）
+> 完整医学统计反模式目录参见：[resources/anti-patterns/medical_stats_anti_patterns.md](../../resources/anti-patterns/medical_stats_anti_patterns.md)（D1/D2/D3/A5/M1-M6）
 > 论文写作特定反模式参见：[phases/07-paper-writing.md](phases/07-paper-writing.md) §论文写作反例与黑名单
 
 ---

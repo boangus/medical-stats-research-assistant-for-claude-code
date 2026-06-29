@@ -65,8 +65,8 @@ table1 <- cleaned_data %>%
 
 **Step 2.2: 三线表导出 (→ docx)**
 
-> 参考：shared/report_assembler/export_tables_docx.py — Word 三线表导出器
-> R 版本参考：shared/templates/export_tables_flextable.R
+> 参考：src/shared/report_assembler/export_tables_docx.py — Word 三线表导出器
+> R 版本参考：src/shared/templates/export_tables_flextable.R
 
 将 Step 2.1 生成的表格（基线特征表、回归结果表等）导出为符合医学期刊格式的 `.docx` 三线表。
 
@@ -89,17 +89,17 @@ table1 <- cleaned_data %>%
 
 ```bash
 # Python 版 (首推)
-python shared/report_assembler/export_tables_docx.py \
+python src/shared/report_assembler/export_tables_docx.py \
   --input-md "| 变量 | OR | 95% CI | p |\n|---|...|" \
   --output reports/tables/table2_regression.docx \
   --title "表2 Logistic回归结果" \
   --note "OR: 比值比; CI: 置信区间"
 
 # R flextable 版 (备选, 需 R + flextable)
-Rscript shared/templates/export_tables_flextable.R
+Rscript src/shared/templates/export_tables_flextable.R
 ```
 
-> 完整代码示例（含自定义样式、中文字体处理）见 `shared/report_assembler/export_tables_docx.py` 和 `shared/templates/export_tables_flextable.R`。
+> 完整代码示例（含自定义样式、中文字体处理）见 `src/shared/report_assembler/export_tables_docx.py` 和 `src/shared/templates/export_tables_flextable.R`。
 
 **Step 2.2.3: 异常处理**
 

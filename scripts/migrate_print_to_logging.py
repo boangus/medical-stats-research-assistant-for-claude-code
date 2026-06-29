@@ -298,7 +298,7 @@ def main():
     if args.file:
         files = [Path(args.file)]
     else:
-        files = sorted((project_root / "shared").rglob("*.py"))
+        files = sorted((project_root / "src" / "shared").rglob("*.py"))
 
     results = {"migrated": [], "skipped": [], "errors": []}
 

@@ -9,16 +9,16 @@
 
 | 研究类型 | 报告规范 | 清单位置 | 核心检查项 |
 |----------|---------|---------|-----------|
-| 随机对照试验 (RCT) | **CONSORT 2025** | `shared/reporting-guidelines/consort/` | 流程图、随机化、盲法、ITT |
-| 队列研究 | **STROBE** | `shared/reporting-guidelines/strobe/` | 设计、参与者、变量、偏倚、混杂 |
-| 病例对照研究 | **STROBE** | `shared/reporting-guidelines/strobe/` | 同上 + 匹配策略 |
-| 横断面研究 | **STROBE** | `shared/reporting-guidelines/strobe/` | 同上 + 抽样方法 |
-| 诊断准确性研究 | **STARD 2015** | `shared/reporting-guidelines/stard/` | 金标准、流程图、诊断性能 |
-| 系统综述 (含/不含 Meta) | **PRISMA 2020** | `shared/reporting-guidelines/prisma/` | 检索策略、筛选、偏倚评估、GRADE |
-| Meta 分析 | **PRISMA 2020** | `shared/reporting-guidelines/prisma/` | 异质性、模型选择、发表偏倚 |
-| 预测模型 | **TRIPOD+AI** | `shared/reporting-guidelines/tripod/` | 开发/验证、性能指标、可及性 |
-| 病例报告 | **CARE** | `shared/reporting-guidelines/care/` | 患者信息、时间线、教育意义 |
-| 动物实验 | **ARRIVE 2.0** | `shared/reporting-guidelines/arrive/` | 3R 原则、随机化、盲法 |
+| 随机对照试验 (RCT) | **CONSORT 2025** | `src/shared/reporting-guidelines/consort/` | 流程图、随机化、盲法、ITT |
+| 队列研究 | **STROBE** | `src/shared/reporting-guidelines/strobe/` | 设计、参与者、变量、偏倚、混杂 |
+| 病例对照研究 | **STROBE** | `src/shared/reporting-guidelines/strobe/` | 同上 + 匹配策略 |
+| 横断面研究 | **STROBE** | `src/shared/reporting-guidelines/strobe/` | 同上 + 抽样方法 |
+| 诊断准确性研究 | **STARD 2015** | `src/shared/reporting-guidelines/stard/` | 金标准、流程图、诊断性能 |
+| 系统综述 (含/不含 Meta) | **PRISMA 2020** | `src/shared/reporting-guidelines/prisma/` | 检索策略、筛选、偏倚评估、GRADE |
+| Meta 分析 | **PRISMA 2020** | `src/shared/reporting-guidelines/prisma/` | 异质性、模型选择、发表偏倚 |
+| 预测模型 | **TRIPOD+AI** | `src/shared/reporting-guidelines/tripod/` | 开发/验证、性能指标、可及性 |
+| 病例报告 | **CARE** | `src/shared/reporting-guidelines/care/` | 患者信息、时间线、教育意义 |
+| 动物实验 | **ARRIVE 2.0** | `src/shared/reporting-guidelines/arrive/` | 3R 原则、随机化、盲法 |
 
 ---
 
@@ -57,7 +57,7 @@ Step 2: 匹配报告规范
   └── 查阅上方映射表选择对应规范
 
 Step 3: 加载清单
-  └── 从 shared/reporting-guidelines/ 加载对应清单
+  └── 从 src/shared/reporting-guidelines/ 加载对应清单
 
 Step 4: 逐项检查
   └── 按清单逐项评估论文完成度
@@ -81,16 +81,16 @@ Step 4: 逐项检查
 
 | 研究类型 | 推荐工具 | 位置 |
 |----------|---------|------|
-| RCT | **RoB 2** | `shared/risk-of-bias/` |
-| 非随机干预研究 | **ROBINS-I** | `shared/risk-of-bias/` |
-| 队列/病例对照 | **NOS (Newcastle-Ottawa)** | `shared/risk-of-bias/` |
-| 系统综述 | **ROBIS** | `shared/risk-of-bias/` |
-| 诊断准确性 | **QUADAS-2** | `shared/risk-of-bias/` |
+| RCT | **RoB 2** | `resources/risk-of-bias/` |
+| 非随机干预研究 | **ROBINS-I** | `resources/risk-of-bias/` |
+| 队列/病例对照 | **NOS (Newcastle-Ottawa)** | `resources/risk-of-bias/` |
+| 系统综述 | **ROBIS** | `resources/risk-of-bias/` |
+| 诊断准确性 | **QUADAS-2** | `resources/risk-of-bias/` |
 
 ---
 
 ## 引用
 
-- `shared/reporting-guidelines/` — 全部报告规范清单
-- `shared/risk-of-bias/` — 偏倚风险评估工具
+- `src/shared/reporting-guidelines/` — 全部报告规范清单
+- `resources/risk-of-bias/` — 偏倚风险评估工具
 - EQUATOR Network: https://www.equator-network.org/

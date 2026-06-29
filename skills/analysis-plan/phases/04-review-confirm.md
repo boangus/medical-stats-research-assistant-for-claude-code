@@ -7,9 +7,9 @@
 
 ## Phase 4: 计划审查
 
-> 参考：shared/reporting-guidelines/quality_checklist.md — SAP 审查清单
-> 参考：shared/statistics-methods/chapters/ch25-case-control-studies.md 数据库研究检查清单(统计指南)
-> 参考：shared/risk-of-bias/ — **偏倚评估计划审查**（是否在 SAP 中预设了适当的偏倚评估工具和 GRADE 确定性等级评估）🆕
+> 参考：src/shared/reporting-guidelines/quality_checklist.md — SAP 审查清单
+> 参考：resources/statistics-methods/chapters/ch25-case-control-studies.md 数据库研究检查清单(统计指南)
+> 参考：resources/risk-of-bias/ — **偏倚评估计划审查**（是否在 SAP 中预设了适当的偏倚评估工具和 GRADE 确定性等级评估）🆕
 
 SAP 制定完成后，自动进行独立审查
 
@@ -65,7 +65,7 @@ SAP 制定完成后，自动进行独立审查
 | 2 | 多重比较控制方法未指定 | P2 | 主要+关键次要多个终点 | SAP §5 补充 Hochberg 序贯门控 | 待修 |
 
 严重等级: P0(阻断) / P1(必须修改) / P2(推荐修改) / P3(信息性)
-审查标准: 参考 shared/reporting-guidelines/quality_checklist.md
+审查标准: 参考 src/shared/reporting-guidelines/quality_checklist.md
 ```
 
 ### Phase 4 审查收敛检查汇总表

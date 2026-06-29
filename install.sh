@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 # MSRA (Medical Statistics Research Assistant) - Install Script for Mac/Linux
 # Usage: ./install.sh [--skip-r] [--skip-python] [--dev]
 
@@ -183,9 +183,9 @@ SKILL_DIRS=(
     "skills/systematic-survey"
 )
 KEY_FILES=(
-    "shared/handoff_schemas.md"
-    "shared/passport/passport_schema.md"
-    "shared/sap/sap_standard.md"
+    "resources/shared/handoff_schemas.md"
+    "src/shared/passport/passport_schema.md"
+    "src/shared/sap/sap_standard.md"
     ".claude/CLAUDE.md"
     "commands/msra.md"
     "commands/msra-full.md"

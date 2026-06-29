@@ -24,7 +24,7 @@ tags: [medical-statistics, clinical-trial, SAP, statistical-analysis-plan, estim
 > - 不能将RCT 的分析方法套用在观察性研究上，反之亦然。研究类型决定方法论体系
 > - SAP 中必须预定义主要效应量、切点、假设检验方法
 > - EDA 为方法选择服务，不能用于修改SAP 中已定的分析框架
-> - 参考：shared/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
+> - 参考：resources/anti-patterns/medical_stats_anti_patterns.md（A3/A4/A6）
 
 ## 快速开始
 
@@ -244,7 +244,7 @@ Pipeline 已识别研究类型。本 Skill 根据类型执行不同分支
 
 ## 反例与黑名单
 
-> 完整医学统计反模式目录参见：[shared/anti-patterns/medical_stats_anti_patterns.md](../../shared/anti-patterns/medical_stats_anti_patterns.md)（A1/A3/B1/E1/E2/F1-F4）
+> 完整医学统计反模式目录参见：[resources/anti-patterns/medical_stats_anti_patterns.md](../../resources/anti-patterns/medical_stats_anti_patterns.md)（A1/A3/B1/E1/E2/F1-F4）
 > 涵盖：研究类型禁忌 / Estimands 禁忌 / 方法选择禁忌 / EDA 禁忌 / SAP 制定禁忌 / 流程禁忌 / 变量构造禁忌 / Targeted-Context 禁忌
 
 ---

@@ -90,7 +90,7 @@ class TestAcademicOutputFormat:
     def test_export_figure_default_formats(self):
         """测试export_figure函数的默认格式"""
         # 检查publication_figure_template.py中的默认格式
-        template_path = Path(__file__).parent.parent / "shared" / "templates" / "publication_figure_template.py"
+        template_path = Path(__file__).parent.parent / "src" / "shared" / "templates" / "publication_figure_template.py"
 
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
@@ -104,7 +104,7 @@ class TestAcademicOutputFormat:
     def test_three_line_table_export_script(self):
         """测试三线表导出脚本"""
         # 检查export_tables_docx.py是否存在
-        export_script_path = Path(__file__).parent.parent / "shared" / "report_assembler" / "export_tables_docx.py"
+        export_script_path = Path(__file__).parent.parent / "src" / "shared" / "report_assembler" / "export_tables_docx.py"
 
         assert export_script_path.exists(), "三线表导出脚本不存在"
 

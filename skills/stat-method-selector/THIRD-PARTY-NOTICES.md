@@ -22,12 +22,8 @@ This skill incorporates code and data from the **stat-method-selector** project.
 | `SKILL.md` | Claude Code skill 定义文件 |
 | `decision-tree.json` | 15-goal, 112-method 决策树数据 |
 | `references.md` | 53篇方法学论文的结构化摘要 |
-| `index.html` | Web 版交互界面 |
-| `server.js` | 本地 HTTP 服务器 |
-| `audit.py` | 决策树质量审计脚本 |
-| `article.html` | 文章页面 |
-| `audit_result.txt` | 审计结果 |
-| `start-server.bat` | Windows 启动脚本 |
+
+> Web 界面文件（`server.js`、`start-server.bat`、`index.html`、`article.html`）已迁移至 `tools/stat-method-selector-server/`；决策树审计脚本（`audit.py` → `audit_stat_method_selector.py`、`audit_result.txt`）已迁移至 `scripts/audit/`。
 
 ### MIT License
 

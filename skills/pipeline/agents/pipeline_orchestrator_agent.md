@@ -190,7 +190,7 @@ SLIM checkpoints never reset. MANDATORY checkpoints co-occur with reset when app
 
 **Reset-boundary emission sequence (flag ON, FULL checkpoint):**
 
-1. `state_tracker` stages a new `kind: boundary` entry for `reset_boundary[]` (Schema 9). Entry matches `shared/contracts/passport/reset_ledger_entry.schema.json` `#/$defs/boundary`.
+1. `state_tracker` stages a new `kind: boundary` entry for `reset_boundary[]` (Schema 9). Entry matches `resources/contracts/passport/reset_ledger_entry.schema.json` `#/$defs/boundary`.
 2. Orchestrator computes `hash` using the normative byte serialization defined in protocol doc 搂"The reset boundary protocol" step 2: JSON Canonical Form (RFC 8785) per entry, LF-separated, new entry appended with `hash` set to placeholder `"000000000000"`, SHA-256 first 12 lowercase hex. Write the computed hash back into the new entry, then append to the ledger. Follow the protocol doc exactly 鈥?any deviation breaks cross-session resume.
 3. If the checkpoint co-occurs with a MANDATORY user decision (e.g., Stage 3 review outcome, Stage 5 finalization format), set `pending_decision` on the new entry. Each option is an object with `value` (branch identifier), `next_stage` (stage to route to, or `null` to terminate), and optional `next_mode`. `next` on the boundary entry is still populated as a best-guess default but must NOT be used to auto-advance 鈥?on resume the orchestrator looks up the chosen `value` in `options[]` and routes via that option's `next_stage`/`next_mode` (see 搂Resume Mode obligations).
 4. In the checkpoint notification, orchestrator emits 鈥?as a distinct block below the Decision Dashboard but above the continue/pause prompt:
@@ -245,7 +245,7 @@ Collaboration Depth (advisory, Wang & Zhang 2026 鈥?never blocks):
   Depth-deepening moves you could try next stage:
   - [specific, actionable, rubric-grounded]
   - [specific, actionable, rubric-grounded]
-  Full rubric: shared/collaboration_depth_rubric.md
+  Full rubric: resources/shared/collaboration_depth_rubric.md
 
 Next step: Stage [Y] [Name]
 Purpose: [One-sentence description]
@@ -287,7 +287,7 @@ See [`../references/passport_as_reset_boundary.md`](../references/passport_as_re
 #### SLIM Checkpoint Template
 
 ```
-鈹佲攣鈹?[OK] Stage [X] [Name] -> Stage [Y] [Name] ready 鈹佲攣鈹?Collaboration Depth (advisory): Zone [1|2|3] 路 DI [N] / CV [N] / CR [N] 路 rubric: shared/collaboration_depth_rubric.md
+鈹佲攣鈹?[OK] Stage [X] [Name] -> Stage [Y] [Name] ready 鈹佲攣鈹?Collaboration Depth (advisory): Zone [1|2|3] 路 DI [N] / CV [N] / CR [N] 路 rubric: resources/shared/collaboration_depth_rubric.md
 Reply `continue` to proceed or `pause` to stop here.
 ```
 
@@ -368,7 +368,7 @@ When a sub-skill stage fails or produces unacceptable output:
 
 ### Collaboration Depth Observer (advisory, never blocks)
 
-**When.** At every FULL checkpoint, every SLIM checkpoint, and after Stage 6 (pipeline completion). This is an **observer** agent 鈥?it reads the just-completed dialogue range (per-stage) or the whole pipeline log (at completion), scores the user-AI collaboration pattern against `shared/collaboration_depth_rubric.md`, and emits a short advisory report. It is **not** in the blocking path; the orchestrator's progression decision ignores its output.
+**When.** At every FULL checkpoint, every SLIM checkpoint, and after Stage 6 (pipeline completion). This is an **observer** agent 鈥?it reads the just-completed dialogue range (per-stage) or the whole pipeline log (at completion), scores the user-AI collaboration pattern against `resources/shared/collaboration_depth_rubric.md`, and emits a short advisory report. It is **not** in the blocking path; the orchestrator's progression decision ignores its output.
 
 **How the orchestrator invokes it.**
 1. At checkpoint step 3 (above), after updating `state_tracker` with the new checkpoint, derive the stage's `dialogue_log_ref` (turn range covering only the just-completed stage; see `state_tracker_agent.md`).
@@ -377,7 +377,7 @@ When a sub-skill stage fails or produces unacceptable output:
 4. Receive its Markdown block and inject it as a named section into the checkpoint template (FULL: full block; SLIM: one-line compact; MANDATORY: omit 鈥?MANDATORY checkpoints are integrity gates and must not be diluted).
 5. At Stage 6 completion, dispatch the observer a second time in **whole-pipeline mode** (range = all stages). Its output becomes a new chapter, "Collaboration Depth Trajectory", in the Process Record, **separate from** the existing 6-dimension Collaboration Quality Evaluation (which is AI self-reflection; the observer is about the user's collaboration pattern).
 
-**Cross-model cost and behaviour.** When `ARS_CROSS_MODEL` is set, do not re-dispatch automatically. The secondary-model invocation reads raw dialogue turns that may contain the user's private reasoning and unpublished material, so apply the consent gate first: ask for explicit user consent (if not already granted in this session) and identify the external provider, model, and content class (raw dialogue turns) that would be sent. The environment variable alone is not consent to upload that material. If consent is not granted, log `[CROSS-MODEL-SKIPPED]`, run only the primary-model observer, and append no `cross_model_divergence` block. If consent is granted, re-dispatch `collaboration_depth_agent` on the secondary model; if any dimension score diverges by > 2 points between primary and secondary, append a `cross_model_divergence` block to the checkpoint section. **Never silently average cross-model scores.** The gate gates only the upload 鈥?the observer's advisory-only, non-blocking role is unchanged. See `shared/cross_model_verification.md` for the consent boundary.
+**Cross-model cost and behaviour.** When `ARS_CROSS_MODEL` is set, do not re-dispatch automatically. The secondary-model invocation reads raw dialogue turns that may contain the user's private reasoning and unpublished material, so apply the consent gate first: ask for explicit user consent (if not already granted in this session) and identify the external provider, model, and content class (raw dialogue turns) that would be sent. The environment variable alone is not consent to upload that material. If consent is not granted, log `[CROSS-MODEL-SKIPPED]`, run only the primary-model observer, and append no `cross_model_divergence` block. If consent is granted, re-dispatch `collaboration_depth_agent` on the secondary model; if any dimension score diverges by > 2 points between primary and secondary, append a `cross_model_divergence` block to the checkpoint section. **Never silently average cross-model scores.** The gate gates only the upload 鈥?the observer's advisory-only, non-blocking role is unchanged. See `resources/shared/cross_model_verification.md` for the consent boundary.
 
 The cost is multiplicative: a 10-stage pipeline with cross-model enabled produces up to ~20 observer invocations (10 primary + 10 secondary) on top of primary pipeline work. Users willing to trade coverage for cost may set `ARS_CROSS_MODEL_SAMPLE_INTERVAL=N` (default `1` = every checkpoint; `3` = every third, plus always at pipeline completion). The short-stage guard above also applies per-model, so empty stages incur no cross-model cost.
 
@@ -418,8 +418,8 @@ The cost is multiplicative: a 10-stage pipeline with cross-model enabled produce
 **Cross-references.**
 
 - Spec: `docs/design/2026-04-30-MSRA-v3.6.7-step-6-orchestrator-hooks-spec.md` 搂5.6 (full procedure), 搂5.2 (eleven gating checks), 搂5.3 (verdict semantics), 搂5.4 (round upper bound + escalation).
-- Audit template: `shared/templates/codex_audit_multifile_template.md`
-- Schema: `shared/contracts/passport/audit_artifact_entry.schema.json`
+- Audit template: `src/shared/templates/codex_audit_multifile_template.md`
+- Schema: `resources/contracts/passport/audit_artifact_entry.schema.json`
 - Wrapper: `scripts/run_codex_audit.sh`
 
 ### 3.6 Claim-Faithfulness Audit Gate (v3.8)
@@ -474,14 +474,14 @@ The cost is multiplicative: a 10-stage pipeline with cross-model enabled produce
 
 - Spec: `docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md` 搂5 (matrix), 搂3 (schemas), 搂4 (agent prompt structure), 搂6 (lint)
 - Agent prompt: `medical-pipeline/agents/claim_ref_alignment_audit_agent.md`
-- Schemas: `shared/contracts/passport/claim_audit_result.schema.json`, `claim_intent_manifest.schema.json`, `uncited_assertion.schema.json`, `claim_drift.schema.json`, `constraint_violation.schema.json`
+- Schemas: `resources/contracts/passport/claim_audit_result.schema.json`, `claim_intent_manifest.schema.json`, `uncited_assertion.schema.json`, `claim_drift.schema.json`, `constraint_violation.schema.json`
 - Finalizer module: `scripts/claim_audit_finalizer.py` (8-row matrix + Stage 6 histogram)
 - Pipeline module: `scripts/claim_audit_pipeline.py` (搂4 step 1-6)
 - Lint: `scripts/check_claim_audit_consistency.py`
 
 ### 4. Transition Management
 
-**Before each transition, verify the output artifact conforms to its schema in `shared/handoff_schemas.md`.** If schema validation fails, request the producing agent to re-generate the artifact before proceeding.
+**Before each transition, verify the output artifact conforms to its schema in `resources/shared/handoff_schemas.md`.** If schema validation fails, request the producing agent to re-generate the artifact before proceeding.
 
 **Schema validation step:**
 ```
@@ -505,7 +505,7 @@ The OR preserves any lineage signal already persisted on a resumed or mid-entry 
 
 **Reset-boundary interaction (v3.6.3+):** the 搂"Passport Reset Boundary" emission sequence above invokes this same OR before writing the passport that the boundary entry references. Otherwise `ARS_PASSPORT_RESET=1` on a `systematic-review` run would freeze the passport without `slr_lineage`, and the consuming `resume_from_passport=<hash>` session would see an empty `state_tracker.stages` + a flag-less incoming passport 鈫?OR resolves `false` 鈫?PRISMA-trAIce dispatch blocks. Note: `slr_lineage` lives at passport top-level and is **not** part of the `reset_boundary[]` ledger entry schema (the ledger schema is closed; the boundary hash covers only ledger entries per `passport_as_reset_boundary.md` 搂"The reset boundary protocol" step 2). The field is therefore persisted but **not hash-integrity-checked** by the boundary hash 鈥?same trust model as `origin_skill` / `version_label` / `verification_status` / other Schema 9 top-level passport fields. The protection v3.7.4 needs is correctness-at-write (the OR), not integrity-after-write.
 
-Reference helper: `scripts/slr_lineage.py` `emit(stages, incoming_slr_lineage)`. Pre-v3.7.4 passports lack the field and the renderer treats absence as `false` (cold-start fallback identical to pre-v3.7.4 behavior). See `shared/handoff_schemas.md` 搂"Run-level lineage signal (v3.7.4)" for the field contract, and `docs/design/2026-05-15-issue-111-slr-lineage-emission-design.md` for the design.
+Reference helper: `scripts/slr_lineage.py` `emit(stages, incoming_slr_lineage)`. Pre-v3.7.4 passports lack the field and the renderer treats absence as `false` (cold-start fallback identical to pre-v3.7.4 behavior). See `resources/shared/handoff_schemas.md` 搂"Run-level lineage signal (v3.7.4)" for the field contract, and `docs/design/2026-05-15-issue-111-slr-lineage-emission-design.md` for the design.
 
 **Handoff material transfer rules:**
 
@@ -819,9 +819,9 @@ Example markers:
 
 ## Cite-Time Provenance Finalizer 鈥?v3.10 extension (terminal policy layer)
 
-Spec: `docs/design/2026-05-31-MSRA-v3.10-policy-layer-rescope-spec.md` 搂3 PR-B items 6-9. Firm rule: `shared/references/firm_rules.md` R-L3-2-A (broad form) + R-L3-2-E.
+Spec: `docs/design/2026-05-31-MSRA-v3.10-policy-layer-rescope-spec.md` 搂3 PR-B items 6-9. Firm rule: `resources/references/firm_rules.md` R-L3-2-A (broad form) + R-L3-2-E.
 
-v3.10 adds an **opt-in terminal policy layer** on top of the v3.9.0 advisory channel. The finalizer is the **sole policy evaluator**: it reads the passport-level `terminal_policies` block (per `shared/contracts/passport/terminal_policies.schema.json`) and, under a non-advisory policy, stamps a `policy_hash` on every ref marker and co-emits a terminal `HIGH-BLOCK` token where the policy fires. **The default (absent `terminal_policies`, or every key `advisory`) is byte-equivalent to v3.9.0 (Invariant 7): the finalizer emits the EXACT v3.9.0 marker 鈥?no `policy_hash` stamp, no terminal token, no behavior change.** The `policy_hash` stamp is added ONLY when the passport carries a non-advisory policy (see below); this is what lets a v3.9.0 (stampless) draft and a v3.10 default-advisory draft be identical, and lets the formatter pass a stampless marker under an advisory passport.
+v3.10 adds an **opt-in terminal policy layer** on top of the v3.9.0 advisory channel. The finalizer is the **sole policy evaluator**: it reads the passport-level `terminal_policies` block (per `resources/contracts/passport/terminal_policies.schema.json`) and, under a non-advisory policy, stamps a `policy_hash` on every ref marker and co-emits a terminal `HIGH-BLOCK` token where the policy fires. **The default (absent `terminal_policies`, or every key `advisory`) is byte-equivalent to v3.9.0 (Invariant 7): the finalizer emits the EXACT v3.9.0 marker 鈥?no `policy_hash` stamp, no terminal token, no behavior change.** The `policy_hash` stamp is added ONLY when the passport carries a non-advisory policy (see below); this is what lets a v3.9.0 (stampless) draft and a v3.10 default-advisory draft be identical, and lets the formatter pass a stampless marker under an advisory passport.
 
 ### policy_hash stamp (added ONLY under a non-advisory policy)
 

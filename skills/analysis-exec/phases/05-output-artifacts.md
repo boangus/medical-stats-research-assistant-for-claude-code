@@ -1,6 +1,6 @@
 # Phase 5: 输出产物
 
-> 参考：shared/templates/ — 代码模板目录（含 rstatix_template.R 管道友好检验、gtsummary_template.R 出版级表格、correlation_template.R 相关性分析、table1_template.R 基线表、cox_template.py 生存分析等）；shared/reproducibility/reproducibility_check.py — 输出复现验证
+> 参考：src/shared/templates/ — 代码模板目录（含 rstatix_template.R 管道友好检验、gtsummary_template.R 出版级表格、correlation_template.R 相关性分析、table1_template.R 基线表、cox_template.py 生存分析等）；src/shared/reproducibility/reproducibility_check.py — 输出复现验证
 
 ---
 
@@ -14,13 +14,13 @@
 6. **依从性分析报告**: 用药依从率、合并用药汇总
 7. **安全性分析报告**: AE/SAE汇总、实验室检查、生命体征
 8. **结果表格**: 按SAP格式（主要/次要/探索性）
-9. **图表**: 发表级质量，遵循 shared/chart-styles/publication_figure_standards.md
+9. **图表**: 发表级质量，遵循 resources/chart-styles/publication_figure_standards.md
    - 强制 rcParams: font.family=sans-serif, font.sans-serif=['Arial',...], svg.fonttype='none'
    - 导出格式: SVG（首要）+ PNG 300dpi（预览）
    - 配色: 语义化调色板或期刊配色（journal_color_schemes.json）
    - 变量名: 遵循 variable_naming_conventions.md 规范显示名+单位
    - P值标注: 遵循 P-R01~R07（P<0.001 展示为 "P < 0.001"）
-   - 模板: shared/templates/publication_figure_template.py
+   - 模板: src/shared/templates/publication_figure_template.py
    - 多面板: 遵循三级信息层级（概览→偏差→关系），无冗余面板
    - 轴线: 仅左+下轴线，无边框图例
 10. **假设检验报告**: 所有诊断结果
