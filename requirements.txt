@@ -48,6 +48,10 @@ cvxpy>=1.4                # 凸优化 (合成控制权重求解)
 #   扩展模块 — bioinformatics, medical_imaging, realtime_analytics, cross_domain
 # ============================================================
 
+# ── 互操作性扩展层 (interop) — pyproject.toml [project.optional-dependencies.interop] ──
+pyreadstat>=1.2.0           # SAS XPT 读取（CDISC）
+rapidfuzz>=3.0.0            # 编码模糊匹配
+
 # ============================================================
 # R 依赖 (通过 install.packages 安装，不在此文件管理)
 # ============================================================

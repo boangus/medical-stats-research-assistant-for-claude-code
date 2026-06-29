@@ -1,0 +1,1 @@
+"""ADaM Validator implementation."""
