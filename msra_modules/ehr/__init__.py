@@ -6,6 +6,7 @@
 
 from .base import EHRConnectorBase, EHRConnectionError, PatientQuery
 from .mock_connector import MockEHRConnector
+from .openehr_connector import OpenEHRConnector
 from .openmrs_connector import OpenMRSConnector
 
 __version__ = "0.1.0"
@@ -15,4 +16,5 @@ __all__ = [
     "PatientQuery",
     "MockEHRConnector",
     "OpenMRSConnector",
+    "OpenEHRConnector",
 ]
