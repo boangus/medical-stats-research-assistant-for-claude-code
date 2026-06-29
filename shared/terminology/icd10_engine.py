@@ -94,6 +94,9 @@ class ICD10Engine(TerminologyEngine):
             + self._df["long_description"].fillna("")
         ).tolist()
 
+        # 使用 partial_ratio 做子串匹配:
+        # - 真实医学描述查询（如 "diabetes"）通常会得到 100 分
+        # - 阈值设为 60 以过滤无关查询（如随机字符串通常 ≤ 50）
         results = process.extract(
             description.lower(),
             [t.lower() for t in search_texts],
@@ -103,7 +106,7 @@ class ICD10Engine(TerminologyEngine):
 
         concepts = []
         for match, score, idx in results:
-            if score < 50:
+            if score < 60:
                 continue
             row = self._df.iloc[idx]
             concepts.append(ICD10Concept(
