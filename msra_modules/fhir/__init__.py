@@ -4,6 +4,7 @@
 官方规范: https://hl7.org/fhir/R4/
 """
 
+from .bundle import FHIRBundle, FHIRResourceType
 from .exceptions import (
     FHIRBundleError,
     FHIRError,
@@ -12,6 +13,8 @@ from .exceptions import (
     FHIRResourceNotFoundError,
     FHIRValidationError,
 )
+from .observation import FHIRObservation, ObservationComponent
+from .patient import FHIRPatient
 
 __version__ = "0.1.0"
 __all__ = [
@@ -21,4 +24,9 @@ __all__ = [
     "FHIRResourceNotFoundError",
     "FHIRBundleError",
     "FHIRMappingError",
+    "FHIRPatient",
+    "FHIRObservation",
+    "ObservationComponent",
+    "FHIRBundle",
+    "FHIRResourceType",
 ]
