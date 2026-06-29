@@ -95,6 +95,12 @@ parsing = [
     "tabula-py>=2.7",
 ]
 
+# === 互操作性扩展层 (interop) — CDISC/FHIR/OMOP ===
+interop = [
+    "pyreadstat>=1.2.0",         # SAS XPT 读取（CDISC）
+    "rapidfuzz>=3.0.0",          # 编码模糊匹配
+]
+
 # === 扩展模块层 (已有，保持不变) ===
 dev = [
     "pytest>=7.0",
