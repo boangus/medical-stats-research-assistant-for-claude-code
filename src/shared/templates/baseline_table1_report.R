@@ -1,4 +1,4 @@
-﻿# baseline_table1_report.R
+# baseline_table1_report.R
 # 增强版基线特征表生成器
 # 整合课程 table1sci 核心算法 + gtsummary 灵活性
 #

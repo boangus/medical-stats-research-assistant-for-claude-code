@@ -1,4 +1,4 @@
-﻿# publication_figure_template.R — 出版级图表 R 模板
+# publication_figure_template.R — 出版级图表 R 模板
 # ================================================
 # 提供 ggplot2 出版级图表样式、配色、导出功能
 #
